@@ -147,3 +147,8 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+echo "CLAUDE.md" >> .gitignore
+git add .gitignore
+git commit -m "chore: ignore CLAUDE.md"
+git pushCLAUDE.md
