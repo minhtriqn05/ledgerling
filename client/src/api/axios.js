@@ -13,4 +13,17 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// On 401 (missing/invalid/expired token), drop the token and go to the login page.
+// Skip when already on /login so a wrong password just shows its error message.
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401 && window.location.pathname !== '/login') {
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api;
