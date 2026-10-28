@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import AppLayout from './components/AppLayout/AppLayout.jsx';
 import AuthLayout from './components/AuthLayout/AuthLayout.jsx';
+import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
 import TransactionsPage from './pages/TransactionsPage.jsx';
 import CategoriesPage from './pages/CategoriesPage.jsx';
@@ -17,11 +18,13 @@ export default function App() {
         <Route path="/register" element={<RegisterPage />} />
       </Route>
 
-      {/* Pages with the sidebar / bottom tab bar */}
-      <Route element={<AppLayout />}>
-        <Route path="/" element={<DashboardPage />} />
-        <Route path="/transactions" element={<TransactionsPage />} />
-        <Route path="/categories" element={<CategoriesPage />} />
+      {/* Pages with the sidebar / bottom tab bar. They need a signed-in user. */}
+      <Route element={<ProtectedRoute />}>
+        <Route element={<AppLayout />}>
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/transactions" element={<TransactionsPage />} />
+          <Route path="/categories" element={<CategoriesPage />} />
+        </Route>
       </Route>
 
       {/* Temporary page to review the design tokens. Only available in dev mode. */}

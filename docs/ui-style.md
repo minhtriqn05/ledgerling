@@ -175,7 +175,11 @@ category color is always shown with its name (chip label, avatar letter, legend 
 - **Login (and Register):** gradient panel with headline and two floating mini cards (saved this
   month, this week's bars) · form with icon inputs (email, password + show button), full-width
   button, link to the other page. On phones the panel becomes a short banner. Register adds a
-  "Name" field.
+  "Name" field with a `user` icon. The password show button is the `eye` icon and looks selected
+  (primary-soft) while the password is visible. Errors, both our own checks and the server's message,
+  appear in one error alert between the fields and the button; the browser's built-in messages are
+  turned off (`noValidate`) because they follow the browser language. While the stored session is
+  checked on start-up, protected pages show a centered, muted "Loading…".
 
 ## 8. Components
 

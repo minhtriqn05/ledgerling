@@ -4,3 +4,202 @@
   min-height: 100vh;
   padding: var(--space-6) var(--space-4);
 }
+
+/* Gradient panel on the left, form on the right. */
+.frame {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  width: 100%;
+  max-width: var(--content-max-width);
+  min-height: 600px;
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+}
+
+/* ---------- Visual panel ---------- */
+.visual {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  overflow: hidden;
+  padding: var(--space-6);
+  background: var(--gradient-hero);
+  color: var(--color-hero-text);
+}
+
+.visual::before,
+.visual::after {
+  content: '';
+  position: absolute;
+  border-radius: var(--radius-full);
+  background: var(--color-hero-decor);
+}
+
+.visual::before {
+  top: -140px;
+  right: -120px;
+  width: 360px;
+  height: 360px;
+}
+
+.visual::after {
+  bottom: -120px;
+  left: -80px;
+  width: 280px;
+  height: 280px;
+}
+
+.visual > * {
+  position: relative;
+  z-index: 1;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.logo {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-primary-text);
+}
+
+.pitch {
+  max-width: 380px;
+}
+
+.headline {
+  margin: 0;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.lead {
+  margin: var(--space-3) 0 0;
+  font-size: var(--font-size-md);
+}
+
+/* Two small white cards that hint at what the app shows. */
+.floating {
+  position: relative;
+  flex: 1;
+  min-height: 220px;
+}
+
+.floatCard {
+  position: absolute;
+  display: flex;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+.floatSaved {
+  top: 0;
+  left: 0;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.floatWeek {
+  right: 0;
+  bottom: 0;
+  flex-direction: column;
+  width: 220px;
+}
+
+.floatLabel {
+  display: block;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.floatCard strong {
+  font-size: var(--font-size-lg);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.tile {
+  --tone: var(--color-income);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--tone) 15%, var(--color-surface));
+  color: color-mix(in srgb, var(--tone) 62%, var(--color-text));
+}
+
+.income {
+  color: var(--color-income-text);
+}
+
+.miniBars {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2);
+  height: 64px;
+  margin-top: var(--space-2);
+}
+
+.miniBars span {
+  flex: 1;
+  border-radius: var(--radius-full);
+  background: var(--chart-bar);
+}
+
+.miniBars .miniPeak {
+  background: var(--gradient-hero);
+}
+
+/* ---------- Form side ---------- */
+.formSide {
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 860px) {
+  .frame {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+  }
+
+  .visual {
+    gap: var(--space-4);
+  }
+
+  .floating {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .frame {
+    border-radius: var(--radius-lg);
+  }
+
+  .visual,
+  .formSide {
+    padding: var(--space-5) var(--space-4);
+  }
+}
