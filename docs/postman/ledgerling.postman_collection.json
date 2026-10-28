@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Ledgerling API",
-    "description": "Auth and Categories requests for the Ledgerling API. Run Register (or Login) first: its test script saves the token into {{token}}, and every other request sends it as a Bearer token.",
+    "description": "Auth, Categories and Transactions requests for the Ledgerling API. Run Register (or Login) first: its test script saves the token into {{token}}, and every other request sends it as a Bearer token.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -18,7 +18,15 @@
     { "key": "token2", "value": "" },
     { "key": "categoryName", "value": "" },
     { "key": "categoryNameUpper", "value": "" },
-    { "key": "categoryId", "value": "" }
+    { "key": "categoryId", "value": "" },
+    { "key": "txCategoryName", "value": "" },
+    { "key": "txCategoryId", "value": "" },
+    { "key": "incomeCategoryId", "value": "" },
+    { "key": "otherCategoryId", "value": "" },
+    { "key": "transactionId", "value": "" },
+    { "key": "monthEndId", "value": "" },
+    { "key": "octFirstId", "value": "" },
+    { "key": "novFirstId", "value": "" }
   ],
   "item": [
     {
@@ -1200,6 +1208,2058 @@
               "path": ["categories", "{{categoryId}}"]
             },
             "description": "The category is gone: expect 404."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Transactions",
+      "description": "Run top to bottom. The Setup requests create a throwaway category; the Cleanup requests at the end remove everything again. 'Setup - Other user' needs {{token2}} (Categories folder: 'Other user - Register' and 'Other user - Login').",
+      "item": [
+        {
+          "name": "Setup - List my categories",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const income = pm.response.json().data.find((c) => c.type === 'income');",
+                  "pm.test('Has an income category', function () { pm.expect(income).to.exist; });",
+                  "pm.collectionVariables.set('incomeCategoryId', income._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories"
+              ]
+            },
+            "description": "Saves the id of one income category into {{incomeCategoryId}} (used to test type copying)."
+          }
+        },
+        {
+          "name": "Setup - Create expense category",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// A throwaway category: the transaction tests use it, so the default categories stay untouched",
+                  "pm.collectionVariables.set('txCategoryName', 'TxTest ' + Math.floor(Math.random() * 100000));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set('txCategoryId', pm.response.json().data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{txCategoryName}}\",\n  \"type\": \"expense\",\n  \"color\": \"#FF7043\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories"
+              ]
+            },
+            "description": "Creates an expense category and saves its id into {{txCategoryId}}. Removed again at the end of this folder."
+          }
+        },
+        {
+          "name": "Setup - Other user: List categories",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set('otherCategoryId', pm.response.json().data[0]._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories"
+              ]
+            },
+            "description": "Needs {{token2}}: run 'Other user - Register' and 'Other user - Login' in the Categories folder first. Saves one of the other user's category ids into {{otherCategoryId}}."
+          }
+        },
+        {
+          "name": "Create transaction (month-end 23:30 Vietnam time)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set('monthEndId', pm.response.json().data._id);",
+                  "",
+                  "pm.test('type is copied from the category, currency defaults to VND', function () {",
+                  "  const t = pm.response.json().data;",
+                  "  pm.expect(t.type).to.eql('expense');",
+                  "  pm.expect(t.currency).to.eql('VND');",
+                  "  pm.expect(t.category.name).to.eql(pm.collectionVariables.get('txCategoryName'));",
+                  "});",
+                  "",
+                  "pm.test('date is stored in UTC', function () {",
+                  "  pm.expect(pm.response.json().data.date).to.eql('2026-10-31T16:30:00.000Z');",
+                  "});",
+                  "",
+                  "pm.test('Response has no userId / categoryId', function () {",
+                  "  pm.expect(pm.response.json().data).to.not.have.any.keys('userId', 'categoryId');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{txCategoryId}}\",\n  \"amount\": 45000,\n  \"note\": \"Last day of October, 23:30\",\n  \"date\": \"2026-10-31T23:30:00+07:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "description": "23:30 on the last day of October in Vietnam. Stored in UTC as 2026-10-31T16:30:00.000Z. Saves the id into {{monthEndId}}."
+          }
+        },
+        {
+          "name": "Create transaction (1st of October 00:00, start of month)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set('octFirstId', pm.response.json().data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{txCategoryId}}\",\n  \"amount\": 10000,\n  \"note\": \"Oct 1st, 00:00\",\n  \"date\": \"2026-10-01T00:00:00+07:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "description": "Exactly the start of October in Vietnam (2026-09-30T17:00:00.000Z in UTC). The month filter includes it. Saves the id into {{octFirstId}}."
+          }
+        },
+        {
+          "name": "Create transaction (1st of November 00:30, next month)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set('novFirstId', pm.response.json().data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{txCategoryId}}\",\n  \"amount\": 20000,\n  \"note\": \"Nov 1st, 00:30\",\n  \"date\": \"2026-11-01T00:30:00+07:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "description": "In UTC this is still 2026-10-31T17:30Z, but in Vietnam it is already November. Saves the id into {{novFirstId}}."
+          }
+        },
+        {
+          "name": "Create transaction (type and userId in body are ignored)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set('transactionId', pm.response.json().data._id);",
+                  "",
+                  "pm.test('type comes from the category, not the body', function () {",
+                  "  pm.expect(pm.response.json().data.type).to.eql('expense');",
+                  "});",
+                  "",
+                  "pm.test('currency upper-cased, note trimmed', function () {",
+                  "  const t = pm.response.json().data;",
+                  "  pm.expect(t.currency).to.eql('USD');",
+                  "  pm.expect(t.note).to.eql('trimmed');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{txCategoryId}}\",\n  \"type\": \"income\",\n  \"userId\": \"000000000000000000000000\",\n  \"amount\": 5000.5,\n  \"currency\": \"usd\",\n  \"note\": \"  trimmed  \",\n  \"date\": \"2026-10-15T08:00:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "description": "type and userId are not accepted from the body: type comes from the category (expense), the owner from the token. currency is upper-cased, note is trimmed. Saves the id into {{transactionId}}."
+          }
+        },
+        {
+          "name": "List transactions (month=2026-10)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Contains the 23:30 transaction on Oct 31', function () {",
+                  "  pm.expect(pm.response.json().data.map((t) => t._id)).to.include(pm.collectionVariables.get('monthEndId'));",
+                  "});",
+                  "",
+                  "pm.test('Contains the Oct 1st 00:00 transaction (start is inclusive)', function () {",
+                  "  pm.expect(pm.response.json().data.map((t) => t._id)).to.include(pm.collectionVariables.get('octFirstId'));",
+                  "});",
+                  "",
+                  "pm.test('Does not contain the Nov 1st 00:30 transaction', function () {",
+                  "  pm.expect(pm.response.json().data.map((t) => t._id)).to.not.include(pm.collectionVariables.get('novFirstId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                }
+              ]
+            },
+            "description": "October 2026 in Vietnam time. Must contain the 23:30 month-end one and the Oct 1st 00:00 one, but not the Nov 1st 00:30 one."
+          }
+        },
+        {
+          "name": "List transactions (month=2026-11)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Contains the Nov 1st 00:30 transaction', function () {",
+                  "  pm.expect(pm.response.json().data.map((t) => t._id)).to.include(pm.collectionVariables.get('novFirstId'));",
+                  "});",
+                  "",
+                  "pm.test('Does not contain the October ones', function () {",
+                  "  pm.expect(pm.response.json().data.map((t) => t._id)).to.not.include(pm.collectionVariables.get('monthEndId'));",
+                  "  pm.expect(pm.response.json().data.map((t) => t._id)).to.not.include(pm.collectionVariables.get('octFirstId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-11",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-11"
+                }
+              ]
+            },
+            "description": "November 2026: the Nov 1st 00:30 one is here, the October ones are not."
+          }
+        },
+        {
+          "name": "List transactions (sorted by date, newest first)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Sorted by date descending', function () {",
+                  "  const dates = pm.response.json().data.map((t) => new Date(t.date).getTime());",
+                  "  pm.expect(dates.length).to.be.above(1);",
+                  "  for (let i = 1; i < dates.length; i++) pm.expect(dates[i - 1]).to.be.at.least(dates[i]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                }
+              ]
+            },
+            "description": "The dates must go from newest to oldest."
+          }
+        },
+        {
+          "name": "List transactions (month + type=expense)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Only expense transactions', function () {",
+                  "  pm.response.json().data.forEach((t) => pm.expect(t.type).to.eql('expense'));",
+                  "  pm.expect(pm.response.json().data.map((t) => t._id)).to.include(pm.collectionVariables.get('monthEndId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10&type=expense",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "type",
+                  "value": "expense"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "List transactions (month + type=income)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Only income transactions, none of ours', function () {",
+                  "  pm.response.json().data.forEach((t) => pm.expect(t.type).to.eql('income'));",
+                  "  pm.expect(pm.response.json().data.map((t) => t._id)).to.not.include(pm.collectionVariables.get('monthEndId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10&type=income",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "type",
+                  "value": "income"
+                }
+              ]
+            },
+            "description": "The test transactions are all expenses, so none of them may appear."
+          }
+        },
+        {
+          "name": "List transactions (month + categoryId)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Only transactions of that category', function () {",
+                  "  const data = pm.response.json().data;",
+                  "  pm.expect(data.length).to.be.above(0);",
+                  "  data.forEach((t) => pm.expect(t.category._id).to.eql(pm.collectionVariables.get('txCategoryId')));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10&categoryId={{txCategoryId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{txCategoryId}}"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "List transactions (no filter = current month)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Data is an array without userId', function () {",
+                  "  const data = pm.response.json().data;",
+                  "  pm.expect(data).to.be.an('array');",
+                  "  data.forEach((t) => pm.expect(t).to.not.have.property('userId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "description": "Without month the current month in Vietnam time is used."
+          }
+        },
+        {
+          "name": "List transactions (month invalid)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Month must be in YYYY-MM format\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Month must be in YYYY-MM format\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-13",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-13"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "List transactions (type invalid)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Type must be income or expense\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Type must be income or expense\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?type=other",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "other"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "List transactions (categoryId invalid)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Category id is invalid\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Category id is invalid\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?categoryId=abc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "categoryId",
+                  "value": "abc"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "List transactions (other user)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('None of the first user\\'s transactions', function () {",
+                  "  pm.expect(pm.response.json().data.map((t) => t._id)).to.not.include(pm.collectionVariables.get('monthEndId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                }
+              ]
+            },
+            "description": "The second user must not see the first user's transactions."
+          }
+        },
+        {
+          "name": "List transactions (no token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Not authorized, token missing\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Not authorized, token missing\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Create transaction (amount 0)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Amount must be greater than 0\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Amount must be greater than 0\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{txCategoryId}}\",\n  \"amount\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Create transaction (amount is a string)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Amount must be greater than 0\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Amount must be greater than 0\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{txCategoryId}}\",\n  \"amount\": \"5000\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Create transaction (no categoryId)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Category id is invalid\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Category id is invalid\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 5000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Create transaction (categoryId malformed)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Category id is invalid\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Category id is invalid\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"abc\",\n  \"amount\": 5000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Create transaction (currency invalid)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Currency must be a 3-letter ISO code\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Currency must be a 3-letter ISO code\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{txCategoryId}}\",\n  \"amount\": 5000,\n  \"currency\": \"VN\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Create transaction (note too long)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Note must be at most 200 characters\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Note must be at most 200 characters\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{txCategoryId}}\",\n  \"amount\": 5000,\n  \"note\": \"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "description": "201 characters: expect 400 (200 is allowed)."
+          }
+        },
+        {
+          "name": "Create transaction (date invalid)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Date is invalid, use ISO 8601 like 2026-10-27T12:30:00+07:00\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Date is invalid, use ISO 8601 like 2026-10-27T12:30:00+07:00\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{txCategoryId}}\",\n  \"amount\": 5000,\n  \"date\": \"yesterday\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Create transaction (category does not exist)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Category not found\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Category not found\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"000000000000000000000000\",\n  \"amount\": 5000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Create transaction (other user's category)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Category not found\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Category not found\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{otherCategoryId}}\",\n  \"amount\": 5000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "description": "A real category, but it belongs to the second user: expect 404, as if it did not exist."
+          }
+        },
+        {
+          "name": "Create transaction (no token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Not authorized, token missing\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Not authorized, token missing\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{txCategoryId}}\",\n  \"amount\": 5000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Get transaction",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Returns the transaction from Create', function () {",
+                  "  pm.expect(pm.response.json().data._id).to.eql(pm.collectionVariables.get('transactionId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/{{transactionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "{{transactionId}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Get transaction (other user's id)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Transaction not found\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Transaction not found\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/{{transactionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "{{transactionId}}"
+              ]
+            },
+            "description": "Expect 404, as if it did not exist."
+          }
+        },
+        {
+          "name": "Get transaction (invalid id)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Transaction not found\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Transaction not found\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/abc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "abc"
+              ]
+            },
+            "description": "A malformed id: expect 404 (not 500)."
+          }
+        },
+        {
+          "name": "Update transaction (amount and note)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Fields changed, type unchanged', function () {",
+                  "  const t = pm.response.json().data;",
+                  "  pm.expect(t.amount).to.eql(50000);",
+                  "  pm.expect(t.note).to.eql('Updated');",
+                  "  pm.expect(t.type).to.eql('expense');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 50000,\n  \"note\": \"Updated\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions/{{transactionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "{{transactionId}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Update transaction (move to an income category)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('type is copied again from the new category', function () {",
+                  "  pm.expect(pm.response.json().data.type).to.eql('income');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{incomeCategoryId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions/{{transactionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "{{transactionId}}"
+              ]
+            },
+            "description": "Changing categoryId copies type again, so the transaction becomes income."
+          }
+        },
+        {
+          "name": "Update transaction (empty body)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Nothing to update\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Nothing to update\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions/{{transactionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "{{transactionId}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Update transaction (amount invalid)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Amount must be greater than 0\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Amount must be greater than 0\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": -5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions/{{transactionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "{{transactionId}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Update transaction (other user's category)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Category not found\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Category not found\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{otherCategoryId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions/{{transactionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "{{transactionId}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Update transaction (other user's transaction)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Transaction not found\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Transaction not found\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions/{{transactionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "{{transactionId}}"
+              ]
+            },
+            "description": "The second user tries to edit the first user's transaction: expect 404."
+          }
+        },
+        {
+          "name": "Delete category (still has transactions)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 409', function () {",
+                  "  pm.response.to.have.status(409);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Category still has transactions\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Category still has transactions\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories/{{txCategoryId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories",
+                "{{txCategoryId}}"
+              ]
+            },
+            "description": "The test category still has transactions: expect 409 and the category must survive."
+          }
+        },
+        {
+          "name": "Delete transaction (other user's id)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Transaction not found\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Transaction not found\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/{{transactionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "{{transactionId}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Delete transaction",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Returns the deleted id', function () {",
+                  "  pm.expect(pm.response.json().data._id).to.eql(pm.collectionVariables.get('transactionId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/{{transactionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "{{transactionId}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Delete transaction (again)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Transaction not found\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Transaction not found\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/{{transactionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "{{transactionId}}"
+              ]
+            },
+            "description": "Already deleted: expect 404."
+          }
+        },
+        {
+          "name": "Cleanup - Delete month-end transaction",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Returns the deleted id', function () {",
+                  "  pm.expect(pm.response.json().data._id).to.eql(pm.collectionVariables.get('monthEndId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/{{monthEndId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "{{monthEndId}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Cleanup - Delete Oct 1st transaction",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Returns the deleted id', function () {",
+                  "  pm.expect(pm.response.json().data._id).to.eql(pm.collectionVariables.get('octFirstId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/{{octFirstId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "{{octFirstId}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Cleanup - Delete Nov 1st transaction",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Returns the deleted id', function () {",
+                  "  pm.expect(pm.response.json().data._id).to.eql(pm.collectionVariables.get('novFirstId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/{{novFirstId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "{{novFirstId}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Cleanup - Delete test category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories/{{txCategoryId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories",
+                "{{txCategoryId}}"
+              ]
+            },
+            "description": "No transactions use it any more: expect 200."
           }
         }
       ]
