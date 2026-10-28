@@ -25,24 +25,34 @@ router.use(requireAuth);
  *       - in: query
  *         name: month
  *         required: false
- *         description: Month in Vietnam time (UTC+7). Defaults to the current month.
+ *         description: |
+ *           Month as YYYY-MM in Vietnam time (UTC+7). Defaults to the current month.
+ *           "2026-10" covers 2026-10-01T00:00+07:00 (inclusive) to 2026-11-01T00:00+07:00 (exclusive).
  *         schema:
  *           type: string
+ *           pattern: '^\d{4}-(0[1-9]|1[0-2])$'
  *           example: "2026-10"
  *       - in: query
  *         name: type
  *         required: false
+ *         description: Only income or only expense transactions
  *         schema:
  *           type: string
  *           enum: [income, expense]
+ *           example: expense
  *       - in: query
  *         name: categoryId
  *         required: false
+ *         description: Only transactions of this category
  *         schema:
  *           type: string
+ *           example: 6720b1b2c3d4e5f601234568
  *     responses:
  *       200:
- *         description: The transactions of the signed-in user
+ *         description: |
+ *           The transactions of the signed-in user, sorted by date descending (then createdAt descending).
+ *           Example request - all expenses of one category in October 2026:
+ *           GET /api/transactions?month=2026-10&type=expense&categoryId=6720b1b2c3d4e5f601234568
  *         content:
  *           application/json:
  *             schema:
@@ -55,6 +65,27 @@ router.use(requireAuth);
  *                   type: array
  *                   items:
  *                     $ref: '#/components/schemas/Transaction'
+ *             example:
+ *               success: true
+ *               data:
+ *                 - _id: 6720c1b2c3d4e5f601234570
+ *                   category: { _id: 6720b1b2c3d4e5f601234568, name: Food, color: "#FF7043" }
+ *                   type: expense
+ *                   amount: 85000
+ *                   currency: VND
+ *                   note: Dinner
+ *                   date: "2026-10-27T11:30:00.000Z"
+ *                   createdAt: "2026-10-27T11:31:00.000Z"
+ *                   updatedAt: "2026-10-27T11:31:00.000Z"
+ *                 - _id: 6720c1b2c3d4e5f601234569
+ *                   category: { _id: 6720b1b2c3d4e5f601234568, name: Food, color: "#FF7043" }
+ *                   type: expense
+ *                   amount: 45000
+ *                   currency: VND
+ *                   note: Lunch
+ *                   date: "2026-10-27T05:30:00.000Z"
+ *                   createdAt: "2026-10-27T05:31:00.000Z"
+ *                   updatedAt: "2026-10-27T05:31:00.000Z"
  *       400:
  *         description: Invalid filter ("Month must be in YYYY-MM format", "Type must be income or expense", "Category id is invalid")
  *         content:
