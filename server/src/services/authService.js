@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import { createDefaultCategories } from "./categoryService.js";
 import { httpError } from "../utils/httpError.js";
 
 const SALT_ROUNDS = 10;
@@ -19,6 +20,8 @@ export async function register({ name, email, password }) {
 
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
   const user = await User.create({ name, email, passwordHash });
+  // Every new account starts with a ready-made set of categories
+  await createDefaultCategories(user._id);
 
   return { token: signToken(user._id), user };
 }

@@ -4,6 +4,21 @@ import { httpError } from "../utils/httpError.js";
 // Same case-insensitive comparison as the unique index on the model
 const NAME_COLLATION = { locale: "en", strength: 2 };
 
+// Created for every new account. Colors are the presets from docs/ui-style.md (one per category).
+const DEFAULT_CATEGORIES = [
+  { name: "Food", type: "expense", color: "#F07D62" },
+  { name: "Transport", type: "expense", color: "#4A9FE3" },
+  { name: "Shopping", type: "expense", color: "#7D8CE8" },
+  { name: "Bills", type: "expense", color: "#F19A52" },
+  { name: "Entertainment", type: "expense", color: "#22ADA3" },
+  { name: "Salary", type: "income", color: "#3DB383" },
+  { name: "Other Income", type: "income", color: "#5D7FD8" },
+];
+
+export async function createDefaultCategories(userId) {
+  return Category.insertMany(DEFAULT_CATEGORIES.map((category) => ({ ...category, userId })));
+}
+
 export async function listCategories(userId, { type }) {
   const filter = { userId };
   if (type) filter.type = type;

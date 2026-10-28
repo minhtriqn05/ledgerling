@@ -61,10 +61,17 @@ the contract and the later edit form need it.
 - `docs/api-plan.md` – only if the code differs from it (keep in sync).
 - Commit: `docs: add categories to Postman collection`
 
+**B4 – Default categories on register**
+- `categoryService.js` + `createDefaultCategories(userId)` (`insertMany`); `authService.register()` calls it right
+  after `User.create`. Expense: Food, Transport, Shopping, Bills, Entertainment. Income: Salary, Other Income. Colors
+  are the presets from `docs/ui-style.md`.
+- Test: register a new account → `GET /api/categories` returns 7 items (sorted by type then name, so the 5
+  expense ones first, then the 2 income ones); in Compass each has the new user's `userId`; a second new account gets its own 7.
+- Commit: `feat: create default categories on register`
+
 **F – Frontend page** (separate plan after B3 is tested; the style guide may need an answer first).
 
 ## Not in this feature
 
 - The "has transactions" check on delete (comes with Transactions).
-- Default categories seeded at registration.
 - Frontend (next step).
