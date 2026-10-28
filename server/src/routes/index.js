@@ -1,11 +1,13 @@
 import { Router } from "express";
 import authRoutes from "./authRoutes.js";
 import categoryRoutes from "./categoryRoutes.js";
+import transactionRoutes from "./transactionRoutes.js";
 
 const router = Router();
 
 router.use("/auth", authRoutes);
 router.use("/categories", categoryRoutes);
+router.use("/transactions", transactionRoutes);
 
 /**
  * @openapi
