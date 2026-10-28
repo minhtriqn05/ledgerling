@@ -117,7 +117,7 @@ router.get("/", validateListTransactions, list);
  *                 data:
  *                   $ref: '#/components/schemas/Transaction'
  *       400:
- *         description: Invalid input ("Category id is invalid", "Amount must be greater than 0", "Currency must be a 3-letter ISO code", "Note must be at most 200 characters", "Date is invalid")
+ *         description: Invalid input ("Category id is invalid", "Amount must be greater than 0", "Currency must be a 3-letter ISO code", "Note must be a string", "Note must be at most 200 characters", "Date is invalid, use ISO 8601 like 2026-10-27T12:30:00+07:00")
  *         content:
  *           application/json:
  *             schema:

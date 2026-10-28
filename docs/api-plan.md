@@ -305,7 +305,7 @@ Required: `categoryId`, `amount`. `type` is not sent: the server copies it from 
 
 | Code | message |
 |------|---------|
-| 400 | `"Category id is invalid"`, `"Amount must be greater than 0"`, `"Currency must be a 3-letter ISO code"`, `"Note must be at most 200 characters"`, `"Date is invalid"` |
+| 400 | `"Category id is invalid"`, `"Amount must be greater than 0"`, `"Currency must be a 3-letter ISO code"`, `"Note must be a string"`, `"Note must be at most 200 characters"`, `"Date is invalid, use ISO 8601 like 2026-10-27T12:30:00+07:00"` |
 | 404 | `"Category not found"` |
 
 ### 12. GET /api/transactions/:id

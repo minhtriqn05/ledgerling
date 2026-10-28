@@ -4,6 +4,7 @@ import { MONTH_REGEX } from "../utils/month.js";
 const TYPES = ["income", "expense"];
 const OBJECT_ID_REGEX = /^[0-9a-fA-F]{24}$/;
 const CURRENCY_REGEX = /^[A-Z]{3}$/;
+const ISO_DATE_REGEX = /^\d{4}-\d{2}-\d{2}/;
 
 // Anything that is not a string counts as empty
 function text(value) {
@@ -31,14 +32,18 @@ function checkCurrency(value) {
 }
 
 function checkNote(value) {
-  const note = text(value).trim();
+  if (typeof value !== "string") throw httpError(400, "Note must be a string");
+  const note = value.trim();
   if (note.length > 200) throw httpError(400, "Note must be at most 200 characters");
   return note;
 }
 
+// Must start like an ISO 8601 date (YYYY-MM-DD...), because new Date() alone accepts things like "1"
 function checkDate(value) {
-  const date = typeof value === "string" ? new Date(value) : null;
-  if (!date || Number.isNaN(date.getTime())) throw httpError(400, "Date is invalid");
+  const date = typeof value === "string" && ISO_DATE_REGEX.test(value) ? new Date(value) : null;
+  if (!date || Number.isNaN(date.getTime())) {
+    throw httpError(400, "Date is invalid, use ISO 8601 like 2026-10-27T12:30:00+07:00");
+  }
   return date;
 }
 
