@@ -1,0 +1,27 @@
+.button {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.button:hover {
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+}
+
+.danger:hover {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}

@@ -69,9 +69,48 @@ the contract and the later edit form need it.
   expense ones first, then the 2 income ones); in Compass each has the new user's `userId`; a second new account gets its own 7.
 - Commit: `feat: create default categories on register`
 
-**F – Frontend page** (separate plan after B3 is tested; the style guide may need an answer first).
+## Frontend
+
+The page is built from the approved mock `client/src/pages/styleGuide/CategoriesPreview.jsx`. Decisions taken with the
+owner for what the style guide did not cover (recorded in `docs/ui-style.md` §7):
+
+- **Cards like the mock:** 4px stripe and tinted letter avatar in the category color, name, edit / delete. The
+  transaction count, amount, share bar and month label need Transactions data and come with that feature.
+- **Delete is confirmed inside the card:** `Delete "Food"?` / `This can't be undone.` + Cancel / Delete. No browser
+  `confirm()` and no dialog.
+- **Edit reuses the side form:** "Edit category", the type is locked (the API answers 400 "Type cannot be changed"),
+  Cancel / Save changes.
+- **States:** "Loading categories…" (muted, centered); an empty state per type with a "New category" action; load
+  error = error alert + "Try again"; delete error = error alert above the cards (**Can't delete "Food".** + the
+  server's message); save error = error alert inside the form (e.g. "Category already exists").
+
+Design notes:
+- `client/src/api/categories.js` wraps the four calls; each returns `response.data.data`. Errors are shown with
+  `getErrorMessage()` from `api/axios.js`.
+- The form gets a new `key` each time it is opened (new, edit, after saving), so React builds it again with fields
+  taken from the props; `autoFocus` moves the cursor to Name (on phones the browser scrolls down to the form).
+- The 8 swatch colors are read from the tokens with `cssVar('--chart-N')` and sent in upper case like the default
+  categories, so no color is typed in JavaScript. Create sends `{ name, type, color }`, edit (PATCH) `{ name, color }`.
+- After a change the list is updated in place (sorted by name like the API), without loading it again.
+
+**F1 – Shared components** (reused later by Transactions and the Dashboard)
+- `components/Icon.jsx` + `plus`, `edit`, `trash`, `check`; `Button` + `variant` (primary | secondary | danger) and
+  `icon`; `Alert.module.css` + semibold `strong`.
+- new `PageHeader`, `Card` (+ `CardHeader`), `IconButton`, `SegmentedControl`, `EmptyState`; styles copied from the
+  style-guide kit.
+- Test: Login and Register look unchanged; `npm run build` passes.
+- Commit: `feat: add shared UI components for app pages`
+
+**F2 – Categories page**
+- new `client/src/api/categories.js`; `pages/CategoriesPage.jsx` (+ new `.module.css`); new
+  `pages/categories/CategoryCard.jsx` and `CategoryForm.jsx` (+ `.module.css`); `docs/ui-style.md` §7.
+- Test (browser, new account): 5 expense / 2 income cards; create "Coffee" → it appears; "coffee" again → "Category
+  already exists"; "Coffee" as income → the list switches to Income; edit Food → "Eating out" + Lime; rename to
+  "Bills" → "Category already exists"; delete → Cancel, then Delete; empty state; server stopped → "Cannot reach the
+  server. Please try again." + Try again; no horizontal scroll at 390px.
+- Commit: `feat: build categories page with create, edit and delete`
 
 ## Not in this feature
 
 - The "has transactions" check on delete (comes with Transactions).
-- Frontend (next step).
+- Transaction count, amount and share bar on the category cards (come with Transactions / Reports).

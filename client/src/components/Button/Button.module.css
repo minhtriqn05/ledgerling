@@ -1,3 +1,4 @@
+/* Shared by every variant: shape, size and font. The colors come from the variant classes below. */
 .button {
   display: inline-flex;
   align-items: center;
@@ -7,17 +8,10 @@
   padding: 0 var(--space-5);
   border: 1px solid transparent;
   border-radius: var(--radius-full);
-  background: var(--color-primary);
-  color: var(--color-on-primary);
   font-weight: var(--font-weight-semibold);
   white-space: nowrap;
-  box-shadow: var(--shadow-sm);
   cursor: pointer;
   transition: background 0.15s, box-shadow 0.15s;
-}
-
-.button:hover:not(:disabled) {
-  background: var(--color-primary-hover);
 }
 
 .button:focus-visible {
@@ -28,6 +22,41 @@
 .button:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+}
+
+/* ---------- Variants ---------- */
+.primary {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-color: var(--color-border-strong);
+}
+
+.secondary:hover:not(:disabled) {
+  background: var(--color-surface-muted);
+}
+
+.danger {
+  background: var(--color-danger);
+  color: var(--color-on-primary);
+}
+
+.danger:hover:not(:disabled) {
+  background: var(--color-danger-hover);
+}
+
+/* Icon on the left: slightly less padding on that side. */
+.withIcon {
+  padding-left: var(--space-4);
 }
 
 .block {

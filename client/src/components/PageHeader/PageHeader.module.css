@@ -1,0 +1,21 @@
+/* Title on the left, actions on the right; on narrow screens the actions wrap below the title. */
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+/* Secondary (not muted) text: it sits on the sky band, where muted would be too light. */
+.subtitle {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-secondary);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}

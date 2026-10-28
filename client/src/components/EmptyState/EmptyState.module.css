@@ -1,0 +1,66 @@
+/* Added to the Card: content centered, a bit more room above and below. */
+.empty {
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-6) var(--space-5);
+  text-align: center;
+}
+
+/* Three overlapping soft circles behind an icon. */
+.art {
+  position: relative;
+  width: 120px;
+  height: 96px;
+  margin-bottom: var(--space-2);
+}
+
+.blob {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-full);
+}
+
+.blobSky {
+  top: 0;
+  left: 8px;
+  background: color-mix(in srgb, var(--accent-sky) 30%, var(--color-surface));
+}
+
+.blobMint {
+  top: 6px;
+  right: 6px;
+  background: color-mix(in srgb, var(--accent-mint) 30%, var(--color-surface));
+}
+
+.blobSun {
+  bottom: 0;
+  left: 30px;
+  background: color-mix(in srgb, var(--accent-sun) 30%, var(--color-surface));
+}
+
+.icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-primary-text);
+  box-shadow: var(--shadow-md);
+  transform: translate(-50%, -50%);
+}
+
+.title {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+}
+
+.text {
+  max-width: 300px;
+  margin: 0 0 var(--space-3);
+  color: var(--color-text-secondary);
+}
