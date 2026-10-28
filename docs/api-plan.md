@@ -64,7 +64,7 @@ Swagger UI: `/api-docs` (outside `/api`).
 | 12 | GET | `/api/transactions/:id` | Yes | Get one transaction |
 | 13 | PATCH | `/api/transactions/:id` | Yes | Update a transaction |
 | 14 | DELETE | `/api/transactions/:id` | Yes | Delete a transaction |
-| 15 | GET | `/api/reports/monthly` | Yes | Totals + per-category totals for a month |
+| 15 | GET | `/api/stats/summary` | Yes | Month totals, expense per category, last 6 months (`?month=&currency=`) |
 
 Every protected route (Auth = Yes) can also return **401** (`"Not authorized, token missing"` /
 `"Not authorized, invalid token"`) and every route can return **500** (`"Internal server error"`).
@@ -345,17 +345,17 @@ Auth: yes.
 
 ---
 
-## Reports
+## Stats
 
-### 15. GET /api/reports/monthly
-Auth: yes. Data for the dashboard charts (Recharts).
+### 15. GET /api/stats/summary
+Auth: yes. Data for the dashboard cards and charts (Recharts), computed with MongoDB aggregation.
 
-**Query**
+**Query** (all optional)
 
 | Param | Default | Note |
 |-------|---------|------|
 | `month` | current month (Vietnam time) | `YYYY-MM` |
-| `currency` | `VND` | only transactions in this currency are summed |
+| `currency` | `VND` | 3 uppercase letters; only transactions in this currency are summed |
 
 **200**
 ```json
@@ -364,16 +364,34 @@ Auth: yes. Data for the dashboard charts (Recharts).
   "data": {
     "month": "2026-10",
     "currency": "VND",
-    "totalIncome": 15000000,
-    "totalExpense": 4250000,
-    "balance": 10750000,
-    "byCategory": [
-      { "categoryId": "6720b1b2c3d4e5f60123456a", "name": "Salary", "type": "income", "color": "#43A047", "total": 15000000 },
-      { "categoryId": "6720b1b2c3d4e5f601234568", "name": "Food", "type": "expense", "color": "#FF7043", "total": 2100000 }
+    "totalIncome": 21500000,
+    "totalExpense": 13600000,
+    "balance": 7900000,
+    "expenseByCategory": [
+      { "categoryId": "6720b1b2c3d4e5f601234568", "name": "Food", "color": "#F07D62", "total": 4800000 },
+      { "categoryId": "6720b1b2c3d4e5f601234571", "name": "Bills", "color": "#F19A52", "total": 3200000 },
+      { "categoryId": "6720b1b2c3d4e5f601234572", "name": "Shopping", "color": "#7D8CE8", "total": 2600000 },
+      { "categoryId": "6720b1b2c3d4e5f601234573", "name": "Transport", "color": "#4A9FE3", "total": 1700000 },
+      { "categoryId": "6720b1b2c3d4e5f601234574", "name": "Entertainment", "color": "#22ADA3", "total": 1300000 }
+    ],
+    "byMonth": [
+      { "month": "2026-05", "income": 18500000, "expense": 12100000 },
+      { "month": "2026-06", "income": 18500000, "expense": 14800000 },
+      { "month": "2026-07", "income": 21000000, "expense": 13200000 },
+      { "month": "2026-08", "income": 18500000, "expense": 16400000 },
+      { "month": "2026-09", "income": 19200000, "expense": 11900000 },
+      { "month": "2026-10", "income": 21500000, "expense": 13600000 }
     ]
   }
 }
 ```
-`byCategory` is sorted by `total` descending; categories with no transactions in the month are left out.
+- `balance` = `totalIncome` − `totalExpense` of the month.
+- `expenseByCategory`: expense categories only, sorted by `total` descending (then name). Categories with no
+  expense in the month are left out.
+- `byMonth`: always 6 entries, oldest first, ending with `month` (for `2026-03`: `2025-10` … `2026-03`). A month
+  without transactions has `0`. The last entry has the same numbers as `totalIncome` / `totalExpense`.
+- Every transaction counts in its month in Vietnam time: `2026-11-01T00:30:00+07:00` is November, although it is
+  still October 31 in UTC.
 
-**Errors**: 400 `"Month must be in YYYY-MM format"`, `"Currency must be a 3-letter ISO code"`.
+**Errors**: 400 `"Month must be in YYYY-MM format"`, `"Currency must be a 3-letter ISO code"` (also for lower case
+like `usd`).

@@ -1,5 +1,7 @@
 // Vietnam is UTC+7 all year (no daylight saving)
 const VIETNAM_OFFSET_MS = 7 * 60 * 60 * 1000;
+// The same offset written the way MongoDB date operators expect it (e.g. $dateToString)
+export const VIETNAM_TIMEZONE = "+07:00";
 
 export const MONTH_REGEX = /^\d{4}-(0[1-9]|1[0-2])$/;
 
@@ -18,4 +20,11 @@ export function monthRange(month) {
     from: new Date(Date.UTC(year, monthNumber - 1, 1) - VIETNAM_OFFSET_MS),
     to: new Date(Date.UTC(year, monthNumber, 1) - VIETNAM_OFFSET_MS),
   };
+}
+
+// shiftMonth("2026-03", -5) -> "2025-10". Date.UTC moves to the right year by itself.
+export function shiftMonth(month, delta) {
+  const [year, monthNumber] = month.split("-").map(Number);
+  const shifted = new Date(Date.UTC(year, monthNumber - 1 + delta, 1));
+  return shifted.toISOString().slice(0, 7);
 }
