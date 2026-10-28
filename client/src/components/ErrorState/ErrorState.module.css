@@ -1,0 +1,10 @@
+/* The alert takes the full width, the "Try again" button keeps its own. */
+.error {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.error > button {
+  align-self: flex-start;
+}

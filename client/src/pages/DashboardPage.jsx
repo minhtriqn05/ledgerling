@@ -8,8 +8,9 @@ import PageHeader from '../components/PageHeader/PageHeader.jsx';
 import MonthPicker from '../components/MonthPicker/MonthPicker.jsx';
 import Card, { CardHeader } from '../components/Card/Card.jsx';
 import Button from '../components/Button/Button.jsx';
-import Alert from '../components/Alert/Alert.jsx';
 import EmptyState from '../components/EmptyState/EmptyState.jsx';
+import LoadingState from '../components/LoadingState/LoadingState.jsx';
+import ErrorState from '../components/ErrorState/ErrorState.jsx';
 import Icon from '../components/Icon.jsx';
 import { CategoryDonut, MonthlyExpenseChart } from './dashboard/DashboardCharts.jsx';
 import styles from './DashboardPage.module.css';
@@ -78,24 +79,8 @@ export default function DashboardPage() {
 
   // The page shows one of four states: loading, error, empty or the dashboard.
   function renderContent() {
-    if (loading) {
-      return (
-        <p className={styles.status} role="status">
-          Loading dashboard…
-        </p>
-      );
-    }
-
-    if (loadError) {
-      return (
-        <div className={styles.loadError}>
-          <Alert>{loadError}</Alert>
-          <Button variant="secondary" onClick={retry}>
-            Try again
-          </Button>
-        </div>
-      );
-    }
+    if (loading) return <LoadingState spacious>Loading dashboard…</LoadingState>;
+    if (loadError) return <ErrorState message={loadError} onRetry={retry} />;
 
     // Nothing in the 6-month window at all: the cards and charts would only show zeros.
     const hasData = summary.byMonth.some((m) => m.income > 0 || m.expense > 0);
@@ -143,7 +128,7 @@ export default function DashboardPage() {
                     <li key={c.categoryId} style={{ '--tone': c.color }}>
                       <span className={styles.categoryName}>
                         <i className={styles.categoryDot} />
-                        {c.name}
+                        <span>{c.name}</span>
                       </span>
                       <span className={styles.categoryBar} aria-hidden="true">
                         <span style={{ width: `${(c.total / biggest) * 100}%` }} />
