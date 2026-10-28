@@ -53,9 +53,12 @@
   text-align: right;
 }
 
-/* The note is the only free text, so it is the cell that gets cut short on narrow tables. */
+/* The note is the only free text, so it is the cell that gets cut short on narrow tables.
+   A table ignores a normal max-width on a cell: width 100% gives the note the space the other columns
+   leave, and max-width 0 lets it shrink below its text, so the table never gets wider than the card. */
 .note {
-  max-width: 280px;
+  width: 100%;
+  max-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
 }

@@ -128,7 +128,7 @@ export default function DashboardPage() {
                     <li key={c.categoryId} style={{ '--tone': c.color }}>
                       <span className={styles.categoryName}>
                         <i className={styles.categoryDot} />
-                        {c.name}
+                        <span>{c.name}</span>
                       </span>
                       <span className={styles.categoryBar} aria-hidden="true">
                         <span style={{ width: `${(c.total / biggest) * 100}%` }} />

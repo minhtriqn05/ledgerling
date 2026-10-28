@@ -151,10 +151,11 @@ category color is always shown with its name (chip label, avatar letter, legend 
   The active tab uses the same primary-soft pill as the sidebar. Page content gets extra bottom
   padding so the bar never covers it. Implemented in `client/src/components/AppLayout/`.
 - **Page header:** title + subtitle on the left; month picker pill and primary action on the right.
-- **Breakpoints:** ≤1100px dashboard stats in 2 columns (hero full width), categories form below the
-  list; ≤960px sidebar hidden, a slim app bar (logo + avatar) appears, all rows one column;
-  ≤760px summary cards stacked; ≤640px the transactions table becomes a list; ≤560px 16px padding.
-  No horizontal page scroll at any width (checked at 390px).
+- **Breakpoints:** ≤1100px dashboard stats and the transactions summary cards in 2 columns (balance / net
+  full width), categories form below the list; ≤960px sidebar hidden, a slim app bar (logo + avatar) appears,
+  all rows one column; ≤760px summary cards stacked; ≤640px the transactions table becomes a list (a wider
+  table cuts the note short with "…", so the edit and delete buttons always fit); ≤560px 16px padding.
+  No horizontal page scroll at any width (checked from 320px to 1440px).
 
 ## 7. Screens
 

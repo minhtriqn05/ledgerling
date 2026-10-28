@@ -118,7 +118,8 @@
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 0;
     height: var(--tabbar-height);
-    padding: 0 var(--space-2);
+    /* Padding on all sides, so the active tab is a pill inside the bar instead of a block touching both edges. */
+    padding: var(--space-2);
     border-right: none;
     border-top: 1px solid var(--color-border);
   }
