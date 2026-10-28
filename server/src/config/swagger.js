@@ -25,6 +25,17 @@ const options = {
             updatedAt: { type: "string", format: "date-time", example: "2026-10-27T03:00:00.000Z" },
           },
         },
+        Category: {
+          type: "object",
+          properties: {
+            _id: { type: "string", example: "6720b1b2c3d4e5f601234568" },
+            name: { type: "string", example: "Food" },
+            type: { type: "string", enum: ["income", "expense"], example: "expense" },
+            color: { type: "string", example: "#FF7043" },
+            createdAt: { type: "string", format: "date-time", example: "2026-10-27T03:05:00.000Z" },
+            updatedAt: { type: "string", format: "date-time", example: "2026-10-27T03:05:00.000Z" },
+          },
+        },
         AuthResponse: {
           type: "object",
           properties: {

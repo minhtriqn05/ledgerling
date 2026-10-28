@@ -1,0 +1,120 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Remove the browser's default fieldset border and spacing; min-width: 0 lets it shrink on phones. */
+.fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.legend {
+  margin-bottom: var(--space-1);
+  padding: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+.hint {
+  margin: var(--space-2) 0 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+/* 8 preset colors as two even rows of four. */
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(4, 32px);
+  gap: var(--space-3);
+  padding-top: var(--space-1);
+}
+
+.swatch {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--tone);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.swatch:hover {
+  transform: scale(1.08);
+}
+
+.swatch:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+/* White gap + colored ring around the chosen color. */
+.swatchSelected {
+  box-shadow: 0 0 0 3px var(--color-surface), 0 0 0 5px var(--tone);
+}
+
+/* Keyboard focus on the chosen color: the focus ring goes around its colored ring. */
+.swatchSelected:focus-visible {
+  box-shadow: 0 0 0 3px var(--color-surface), 0 0 0 5px var(--tone), 0 0 0 8px var(--color-focus-ring);
+}
+
+/* ---------- Preview ---------- */
+.preview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.previewLabel {
+  flex-shrink: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+/* Category chip: a dot in the category color + the name, on a light tint of the color. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--tone) 14%, var(--color-surface));
+  color: var(--color-text);
+  font-weight: var(--font-weight-medium);
+}
+
+.dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--tone);
+}
+
+/* A long name ends with "…" instead of pushing the chip out of the card. */
+.chipText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Cancel / Save changes side by side. */
+.actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.actions > button {
+  flex: 1;
+}
