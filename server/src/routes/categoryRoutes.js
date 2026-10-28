@@ -234,7 +234,7 @@ router.patch("/:id", validateCategoryId, validateUpdateCategory, update);
  * @openapi
  * /categories/{id}:
  *   delete:
- *     summary: Delete a category
+ *     summary: Delete a category (409 if transactions still use it)
  *     tags: [Categories]
  *     security:
  *       - bearerAuth: []
@@ -273,6 +273,15 @@ router.patch("/:id", validateCategoryId, validateUpdateCategory, update);
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
+ *       409:
+ *         description: The category is still used by at least one transaction. Move or delete those transactions first.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Category still has transactions
  */
 router.delete("/:id", validateCategoryId, remove);
 

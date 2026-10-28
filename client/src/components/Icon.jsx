@@ -82,6 +82,17 @@ const paths = {
     </>
   ),
   check: <path d="m5 12 5 5L20 7" />,
+  x: <path d="M18 6 6 18M6 6l12 12" />,
+  chevronLeft: <path d="m15 18-6-6 6-6" />,
+  chevronRight: <path d="m9 18 6-6-6-6" />,
+  arrowDownLeft: <path d="M17 7 7 17M17 17H7V7" />,
+  arrowUpRight: <path d="M7 17 17 7M7 7h10v10" />,
+  wallet: (
+    <>
+      <path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3" />
+      <path d="M21 9h-5a3 3 0 0 0 0 6h5z" />
+    </>
+  ),
 };
 
 export default function Icon({ name, size = 20 }) {

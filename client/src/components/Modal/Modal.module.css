@@ -1,0 +1,45 @@
+/* The <dialog> fills the screen and is the dimmed area; the panel is centered in it. */
+.overlay {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: var(--space-4);
+  border: none;
+  background: var(--color-overlay);
+  color: var(--color-text);
+  overflow-y: auto;
+}
+
+/* [open]: a closed dialog stays hidden (display: grid would otherwise override the browser's display: none). */
+.overlay[open] {
+  display: grid;
+  place-items: center;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 500px;
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.title {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+}
