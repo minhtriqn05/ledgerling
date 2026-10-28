@@ -86,11 +86,22 @@
 }
 
 /* ---------- Main area ---------- */
+/* The right column: page content on top, footer pushed to the bottom of the screen. */
 /* A light sky band fades in behind the page header. */
-.main {
+.body {
+  display: flex;
+  flex-direction: column;
   min-width: 0;
-  padding: var(--space-6);
   background: var(--gradient-page-top) top / 100% 320px no-repeat, var(--color-bg);
+}
+
+.main {
+  flex: 1;
+  padding: var(--space-6) var(--space-6) 0;
+}
+
+.footer {
+  padding: var(--space-4) var(--space-6);
 }
 
 /* ---------- Phones: the sidebar becomes a bottom tab bar ---------- */
@@ -136,6 +147,11 @@
   }
 
   .main {
-    padding: var(--space-4) var(--space-4) calc(var(--tabbar-height) + var(--space-5));
+    padding: var(--space-4) var(--space-4) 0;
+  }
+
+  /* Extra bottom padding keeps the footer above the fixed tab bar. */
+  .footer {
+    padding: var(--space-4) var(--space-4) calc(var(--tabbar-height) + var(--space-3));
   }
 }

@@ -1,4 +1,5 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import ApiStatus from '../ApiStatus/ApiStatus.jsx';
 import Icon from '../Icon.jsx';
 import styles from './AppLayout.module.css';
 
@@ -48,9 +49,14 @@ export default function AppLayout() {
         </button>
       </aside>
 
-      <main className={styles.main}>
-        <Outlet />
-      </main>
+      <div className={styles.body}>
+        <main className={styles.main}>
+          <Outlet />
+        </main>
+        <footer className={styles.footer}>
+          <ApiStatus />
+        </footer>
+      </div>
     </div>
   );
 }
