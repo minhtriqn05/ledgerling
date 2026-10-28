@@ -11,6 +11,7 @@ const dayParts = new Intl.DateTimeFormat('en-CA', {
   timeZone: TIME_ZONE,
 });
 const monthLabel = new Intl.DateTimeFormat('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+const monthShortLabel = new Intl.DateTimeFormat('en-GB', { month: 'short', timeZone: 'UTC' });
 
 // Today in Vietnam: "2026-10-28"
 export function todayInput() {
@@ -33,6 +34,12 @@ export function shiftMonth(month, delta) {
 export function formatMonth(month) {
   const [year, number] = month.split('-').map(Number);
   return monthLabel.format(new Date(Date.UTC(year, number - 1, 1)));
+}
+
+// "2026-10" -> "Oct" (chart axis labels)
+export function formatMonthShort(month) {
+  const [year, number] = month.split('-').map(Number);
+  return monthShortLabel.format(new Date(Date.UTC(year, number - 1, 1)));
 }
 
 // An ISO date from the API -> the Vietnam day for an <input type="date">: "2026-10-27T20:00:00.000Z" -> "2026-10-28"

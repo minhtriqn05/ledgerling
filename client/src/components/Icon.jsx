@@ -87,6 +87,18 @@ const paths = {
   chevronRight: <path d="m9 18 6-6-6-6" />,
   arrowDownLeft: <path d="M17 7 7 17M17 17H7V7" />,
   arrowUpRight: <path d="M7 17 17 7M7 7h10v10" />,
+  chart: (
+    <>
+      <path d="M3 3v18h18" />
+      <path d="m7 15 4-4 3 3 5-6" />
+    </>
+  ),
+  pie: (
+    <>
+      <path d="M12 3a9 9 0 1 0 9 9h-9z" />
+      <path d="M15 3v6h6a6 6 0 0 0-6-6z" />
+    </>
+  ),
   wallet: (
     <>
       <path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3" />
