@@ -119,7 +119,7 @@ export default function ComponentsPreview() {
           <p className={styles.typeMd}>Card title – Spending by category</p>
           <p>Body text (14px). The quick brown fox jumps over the lazy dog.</p>
           <p className={styles.typeXs}>Caption / table header (12px)</p>
-          <p>Vietnamese check: Ăn trưa, Tiền điện, Lương tháng 10</p>
+          <p>Sample categories: Lunch, Electricity bill, October salary</p>
         </div>
       </section>
 
