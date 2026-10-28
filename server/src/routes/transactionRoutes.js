@@ -92,12 +92,11 @@ router.use(requireAuth);
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Month must be in YYYY-MM format
  *       401:
- *         description: Token missing or invalid
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *         $ref: '#/components/responses/Unauthorized'
  */
 router.get("/", validateListTransactions, list);
 
@@ -119,20 +118,27 @@ router.get("/", validateListTransactions, list);
  *             properties:
  *               categoryId:
  *                 type: string
+ *                 description: Id of one of your categories (GET /categories)
  *                 example: 6720b1b2c3d4e5f601234568
  *               amount:
  *                 type: number
+ *                 exclusiveMinimum: true
+ *                 minimum: 0
  *                 example: 45000
  *               currency:
  *                 type: string
+ *                 description: ISO 4217 code, 3 letters (lower case is converted to upper case)
+ *                 default: VND
  *                 example: VND
  *               note:
  *                 type: string
  *                 maxLength: 200
+ *                 default: ""
  *                 example: Lunch
  *               date:
  *                 type: string
  *                 format: date-time
+ *                 description: ISO 8601, defaults to now
  *                 example: "2026-10-27T12:30:00+07:00"
  *     responses:
  *       201:
@@ -153,18 +159,20 @@ router.get("/", validateListTransactions, list);
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Amount must be greater than 0
  *       401:
- *         description: Token missing or invalid
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *         $ref: '#/components/responses/Unauthorized'
  *       404:
- *         description: Category not found (or it belongs to another user)
+ *         description: Category not found (it does not exist or belongs to another user)
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Category not found
  */
 router.post("/", validateCreateTransaction, create);
 
@@ -196,17 +204,16 @@ router.post("/", validateCreateTransaction, create);
  *                 data:
  *                   $ref: '#/components/schemas/Transaction'
  *       401:
- *         description: Token missing or invalid
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *         $ref: '#/components/responses/Unauthorized'
  *       404:
- *         description: Transaction not found (or it belongs to another user)
+ *         description: Transaction not found (the id does not exist, is malformed, or belongs to another user)
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Transaction not found
  */
 router.get("/:id", validateTransactionId, getOne);
 
@@ -237,9 +244,12 @@ router.get("/:id", validateTransactionId, getOne);
  *                 example: 6720b1b2c3d4e5f601234568
  *               amount:
  *                 type: number
+ *                 exclusiveMinimum: true
+ *                 minimum: 0
  *                 example: 50000
  *               currency:
  *                 type: string
+ *                 description: ISO 4217 code, 3 letters (lower case is converted to upper case)
  *                 example: VND
  *               note:
  *                 type: string
@@ -268,12 +278,11 @@ router.get("/:id", validateTransactionId, getOne);
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Nothing to update
  *       401:
- *         description: Token missing or invalid
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *         $ref: '#/components/responses/Unauthorized'
  *       404:
  *         description: Transaction or category not found (or it belongs to another user)
  *         content:
@@ -315,17 +324,16 @@ router.patch("/:id", validateTransactionId, validateUpdateTransaction, update);
  *                       type: string
  *                       example: 6720c1b2c3d4e5f601234569
  *       401:
- *         description: Token missing or invalid
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *         $ref: '#/components/responses/Unauthorized'
  *       404:
- *         description: Transaction not found (or it belongs to another user)
+ *         description: Transaction not found (the id does not exist, is malformed, or belongs to another user)
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Transaction not found
  */
 router.delete("/:id", validateTransactionId, remove);
 

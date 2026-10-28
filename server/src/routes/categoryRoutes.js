@@ -49,12 +49,11 @@ router.use(requireAuth);
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Type must be income or expense
  *       401:
- *         description: Token missing or invalid
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *         $ref: '#/components/responses/Unauthorized'
  */
 router.get("/", validateListCategories, list);
 
@@ -84,6 +83,7 @@ router.get("/", validateListCategories, list);
  *                 example: expense
  *               color:
  *                 type: string
+ *                 pattern: '^#[0-9A-Fa-f]{6}$'
  *                 example: "#FF7043"
  *     responses:
  *       201:
@@ -99,23 +99,25 @@ router.get("/", validateListCategories, list);
  *                 data:
  *                   $ref: '#/components/schemas/Category'
  *       400:
- *         description: Invalid input ("Name is required", "Type must be income or expense", "Color must be a hex code like #FF7043")
+ *         description: Invalid input ("Name is required", "Name must be at most 30 characters", "Type must be income or expense", "Color must be a hex code like #FF7043")
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Color must be a hex code like #FF7043
  *       401:
- *         description: Token missing or invalid
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *         $ref: '#/components/responses/Unauthorized'
  *       409:
- *         description: Category already exists (same name and type for this user)
+ *         description: Category already exists (same name and type for this user, case-insensitive)
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Category already exists
  */
 router.post("/", validateCreateCategory, create);
 
@@ -147,17 +149,16 @@ router.post("/", validateCreateCategory, create);
  *                 data:
  *                   $ref: '#/components/schemas/Category'
  *       401:
- *         description: Token missing or invalid
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *         $ref: '#/components/responses/Unauthorized'
  *       404:
- *         description: Category not found (or it belongs to another user)
+ *         description: Category not found (the id does not exist, is malformed, or belongs to another user)
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Category not found
  */
 router.get("/:id", validateCategoryId, getOne);
 
@@ -189,6 +190,7 @@ router.get("/:id", validateCategoryId, getOne);
  *                 example: Eating out
  *               color:
  *                 type: string
+ *                 pattern: '^#[0-9A-Fa-f]{6}$'
  *                 example: "#E53935"
  *     responses:
  *       200:
@@ -204,29 +206,34 @@ router.get("/:id", validateCategoryId, getOne);
  *                 data:
  *                   $ref: '#/components/schemas/Category'
  *       400:
- *         description: Invalid input ("Nothing to update", "Type cannot be changed", "Color must be a hex code like #FF7043")
+ *         description: Invalid input ("Nothing to update", "Type cannot be changed", "Name is required", "Name must be at most 30 characters", "Color must be a hex code like #FF7043")
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Type cannot be changed
  *       401:
- *         description: Token missing or invalid
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *         $ref: '#/components/responses/Unauthorized'
  *       404:
- *         description: Category not found (or it belongs to another user)
+ *         description: Category not found (the id does not exist, is malformed, or belongs to another user)
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Category not found
  *       409:
- *         description: Category already exists (same name and type for this user)
+ *         description: Category already exists (same name and type for this user, case-insensitive)
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Category already exists
  */
 router.patch("/:id", validateCategoryId, validateUpdateCategory, update);
 
@@ -262,17 +269,16 @@ router.patch("/:id", validateCategoryId, validateUpdateCategory, update);
  *                       type: string
  *                       example: 6720b1b2c3d4e5f601234568
  *       401:
- *         description: Token missing or invalid
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *         $ref: '#/components/responses/Unauthorized'
  *       404:
- *         description: Category not found (or it belongs to another user)
+ *         description: Category not found (the id does not exist, is malformed, or belongs to another user)
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Category not found
  *       409:
  *         description: The category is still used by at least one transaction. Move or delete those transactions first.
  *         content:

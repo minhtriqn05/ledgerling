@@ -25,6 +25,7 @@ const router = Router();
  *                 example: Minh Tri
  *               email:
  *                 type: string
+ *                 format: email
  *                 example: tri@example.com
  *               password:
  *                 type: string
@@ -39,17 +40,23 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/AuthResponse'
  *       400:
- *         description: Invalid input (e.g. "Name is required", "Email is invalid", "Password must be at least 6 characters")
+ *         description: Invalid input ("Name is required", "Name must be at most 50 characters", "Email is invalid", "Password must be at least 6 characters", "Password must be at most 72 characters")
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Password must be at least 6 characters
  *       409:
  *         description: Email is already registered
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Email is already registered
  */
 router.post("/register", validateRegister, register);
 
@@ -87,11 +94,14 @@ router.post("/register", validateRegister, register);
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  *       401:
- *         description: Wrong email or password
+ *         description: Wrong email or password (the same message for an unknown email and a wrong password)
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Invalid email or password
  */
 router.post("/login", validateLogin, login);
 
@@ -122,6 +132,9 @@ router.post("/login", validateLogin, login);
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Not authorized, invalid token
  */
 router.get("/me", requireAuth, me);
 
