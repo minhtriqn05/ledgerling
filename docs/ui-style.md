@@ -170,8 +170,18 @@ category color is always shown with its name (chip label, avatar letter, legend 
   date and note, Cancel / Save.
 - **Categories:** Expense/Income switch with counts · cards with a 4px stripe in the category color,
   avatar, edit/delete, transaction count, amount, share bar · "New category" form (name,
-  type, 8 color swatches in two rows, live chip preview) · error alert for 409 ("still has
-  transactions").
+  type, 8 color swatches in two rows, live chip preview). The count, amount and share bar come with
+  Transactions; until then a card shows the avatar, the name and the two icon buttons.
+  - **Edit:** the same form card becomes "Edit category" (edit icon tile); the Type switch is locked
+    (the other side fades out) with the hint "Type can't be changed after a category is created.";
+    Cancel / Save changes side by side.
+  - **Delete:** confirmed inside the card: `Delete "Food"?` / `This can't be undone.` + Cancel
+    (secondary, gets the focus) / Delete (danger). No browser confirm and no dialog.
+  - **States:** a centered, muted "Loading categories…" in the list area; an empty state per type
+    ("No expense categories yet" + "New category"); a load error is an error alert + "Try again"; a
+    delete error is an error alert above the cards (**Can't delete "Food".** + the server's message,
+    e.g. "Category still has transactions"); a save error is an error alert in the form above the
+    button (e.g. "Category already exists").
 - **Login (and Register):** gradient panel with headline and two floating mini cards (saved this
   month, this week's bars) · form with icon inputs (email, password + show button), full-width
   button, link to the other page. On phones the panel becomes a short banner. Register adds a
@@ -188,6 +198,10 @@ action, error state) · segmented control and money type switch · badges · chi
 icon tiles · progress bars · alerts (info, success, error) · table · pagination · dialog on the
 overlay · empty state (three soft circles behind an icon + call to action). All of them are shown
 in the **Components** tab; their styles live in `client/src/pages/styleGuide/ui.module.css`.
+
+The real pages use React components in `client/src/components/` that copy their styles from that kit:
+`Button` (primary / secondary / danger, optional left icon), `IconButton`, `TextField`, `Alert`, `Card` +
+`CardHeader`, `PageHeader`, `SegmentedControl` (optional income / expense tone) and `EmptyState`.
 
 ## 9. Charts (Recharts) – approved (v5)
 
@@ -212,6 +226,7 @@ because SVG needs real color values.
 |---|---|
 | `client/src/styles/tokens.css` | Every design value (colors, gradients, fonts, spacing, radius, shadows) |
 | `client/src/styles/global.css` | Base page styles (font, background, heading reset) |
+| `client/src/components/` | Shared React components used by the real pages (§8) |
 | `client/src/utils/format.js` | Money and date formatting |
 | `client/src/utils/cssVar.js` | Reads a token in JavaScript (for charts) |
 | `client/src/pages/StyleGuidePage.jsx` | The dev-only page with tabs |
