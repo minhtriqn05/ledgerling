@@ -1,0 +1,229 @@
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7);
+}
+
+.heading {
+  margin-bottom: var(--space-4);
+  font-size: var(--font-size-lg);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* ---------- Colors ---------- */
+.colorGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+  gap: var(--space-4);
+}
+
+.groupTitle {
+  margin-bottom: var(--space-3);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.swatchList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.swatch {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.swatchColor {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.swatch code {
+  overflow: hidden;
+  font-size: var(--font-size-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.swatchValue {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+/* ---------- Gradients & tiles ---------- */
+.gradientGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.gradientGrid > div {
+  gap: var(--space-1);
+}
+
+.gradientSample {
+  display: block;
+  height: 72px;
+  margin-bottom: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.gradientGrid code {
+  font-size: var(--font-size-xs);
+}
+
+.gradientUse {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.tileRow {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+}
+
+.tileSample {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+/* ---------- Typography ---------- */
+.typeSample {
+  gap: var(--space-3);
+}
+
+.typeSample p {
+  margin: 0;
+}
+
+.type3xl {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.typeXl {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.typeLg {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
+.typeMd {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+}
+
+.typeXs {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ---------- Form ---------- */
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
+  gap: var(--space-4);
+}
+
+/* ---------- Feedback ---------- */
+.feedbackGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+  align-items: start;
+  gap: var(--space-4);
+}
+
+/* Empty state: three overlapping soft circles behind an icon. */
+.empty {
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-6) var(--space-5);
+  text-align: center;
+}
+
+.emptyArt {
+  position: relative;
+  width: 120px;
+  height: 96px;
+  margin-bottom: var(--space-2);
+}
+
+.blob {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-full);
+}
+
+.blobSky {
+  top: 0;
+  left: 8px;
+  background: color-mix(in srgb, var(--accent-sky) 30%, var(--color-surface));
+}
+
+.blobMint {
+  top: 6px;
+  right: 6px;
+  background: color-mix(in srgb, var(--accent-mint) 30%, var(--color-surface));
+}
+
+.blobSun {
+  bottom: 0;
+  left: 30px;
+  background: color-mix(in srgb, var(--accent-sun) 30%, var(--color-surface));
+}
+
+.emptyIcon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-primary-text);
+  box-shadow: var(--shadow-md);
+  transform: translate(-50%, -50%);
+}
+
+.emptyText {
+  max-width: 300px;
+  margin: 0 0 var(--space-3);
+  color: var(--color-text-secondary);
+}

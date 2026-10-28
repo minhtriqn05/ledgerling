@@ -1,0 +1,301 @@
+/* ---------- Stat cards ---------- */
+.stats {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+/* The hero: vivid sky-to-teal card, white text, two soft circles and a white sparkline. */
+.hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+  overflow: hidden;
+  padding: var(--space-5) var(--space-5) 0;
+  border-radius: var(--radius-lg);
+  background: var(--gradient-hero);
+  color: var(--color-hero-text);
+  box-shadow: var(--shadow-md);
+}
+
+.hero::before,
+.hero::after {
+  content: '';
+  position: absolute;
+  border-radius: var(--radius-full);
+  background: var(--color-hero-decor);
+}
+
+.hero::before {
+  top: -110px;
+  right: -50px;
+  width: 240px;
+  height: 240px;
+}
+
+.hero::after {
+  top: 70px;
+  right: -90px;
+  width: 170px;
+  height: 170px;
+}
+
+/* Content stays above the decorative circles. */
+.hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.heroTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.heroLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: var(--font-weight-medium);
+}
+
+.heroPill {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-income-text);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+}
+
+.heroValue {
+  margin: 0;
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.heroUnit {
+  margin-left: var(--space-1);
+  font-size: 0.55em;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-hero-text-soft);
+}
+
+/* The sparkline sits at the bottom and runs edge to edge. */
+.sparkline {
+  height: 84px;
+  margin: auto calc(var(--space-5) * -1) 0;
+}
+
+.statHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.statLabel {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+.statValue {
+  margin: var(--space-4) 0 var(--space-1);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.statDelta {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+/* Progress bar + caption, pushed to the bottom so both stat cards line up. */
+.statBottom {
+  margin-top: auto;
+  padding-top: var(--space-4);
+}
+
+.statBottom > span {
+  display: block;
+  margin-top: var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+/* ---------- Chart rows ---------- */
+.chartsRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
+  gap: var(--space-4);
+}
+
+.bottomRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.65fr);
+  gap: var(--space-4);
+}
+
+/* Charts grow to the height of the tallest card in their row. */
+.chartFill {
+  flex: 1;
+  min-height: 220px;
+}
+
+.legend {
+  display: flex;
+  gap: var(--space-3);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Category rows: name, a bar in the category color, amount, share. */
+.categoryList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: var(--space-5) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.categoryList li {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr) auto 34px;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.categoryName {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  overflow: hidden;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.categoryBar {
+  height: 6px;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-muted);
+}
+
+.categoryBar > span {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--tone);
+}
+
+.categoryAmount {
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.categoryShare {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Big number above the weekly chart, like a caption for it. */
+.weekTotal {
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.weekNote {
+  margin-left: var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: normal;
+  color: var(--color-text-muted);
+}
+
+.viewAll {
+  height: 32px;
+  padding: 0 var(--space-3);
+}
+
+/* ---------- Recent transactions ---------- */
+.txList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.txRow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.txRow:first-child {
+  padding-top: 0;
+  border-top: none;
+}
+
+.txText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.txText strong {
+  overflow: hidden;
+  font-weight: var(--font-weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.txText span {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1100px) {
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hero {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 960px) {
+  .chartsRow,
+  .bottomRow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -1,0 +1,147 @@
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  align-items: start;
+  gap: var(--space-5);
+}
+
+.listColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.listHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
+  gap: var(--space-4);
+}
+
+/* Each card carries its category color: a stripe on top, the avatar and the bar. */
+.categoryCard {
+  position: relative;
+  gap: var(--space-1);
+  overflow: hidden;
+}
+
+.categoryCard::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: var(--tone);
+}
+
+.cardTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.cardActions {
+  display: flex;
+  margin: calc(var(--space-1) * -1) calc(var(--space-2) * -1) 0 0;
+}
+
+.categoryName {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+}
+
+.categoryMeta {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.categoryAmount {
+  margin: var(--space-3) 0 var(--space-2);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-tight);
+  font-variant-numeric: tabular-nums;
+}
+
+.categoryShare {
+  margin-top: var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+/* ---------- New category form ---------- */
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.typeToggle {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-1);
+  padding: var(--space-1);
+  background: var(--color-surface-muted);
+  border-radius: var(--radius-full);
+}
+
+.typeToggle > button {
+  height: 32px;
+}
+
+/* 8 preset colors as two even rows of four. */
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(4, 32px);
+  gap: var(--space-3);
+}
+
+.swatch {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--tone);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.swatch:hover {
+  transform: scale(1.08);
+}
+
+/* White gap + colored ring around the chosen color. */
+.swatchSelected {
+  box-shadow: 0 0 0 3px var(--color-surface), 0 0 0 5px var(--tone);
+}
+
+.previewRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1100px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -1,0 +1,129 @@
+/*
+ * Design tokens for Ledgerling ("Sky & Mint").
+ * Every color, font, radius, shadow and spacing value lives here.
+ * Components use var(--token-name) and never hardcode these values.
+ * The decisions behind each value are documented in docs/ui-style.md.
+ */
+:root {
+  /* ---------- Brand (clear sky blue) ---------- */
+  --color-primary: #2874b5;       /* primary buttons, links, sparkline */
+  --color-primary-hover: #1f639f;
+  --color-primary-text: #1f639f;  /* blue text: links, active nav item */
+  --color-primary-soft: #e4f0fb;  /* pastel sky: active nav, selected items */
+  --color-on-primary: #ffffff;
+
+  /* ---------- Hero: vivid sky-to-teal, one per screen ---------- */
+  --color-hero-from: var(--color-primary);
+  --color-hero-to: #1b7f86;
+  --gradient-hero: linear-gradient(135deg, var(--color-hero-from) 0%, var(--color-hero-to) 100%);
+  --color-hero-text: #ffffff;                       /* 4.7:1 or more on the whole gradient */
+  --color-hero-text-soft: rgba(255, 255, 255, 0.8); /* large text only, e.g. the ₫ unit */
+  --color-hero-decor: rgba(255, 255, 255, 0.12);    /* decorative circles */
+
+  /* ---------- Soft washes ---------- */
+  --gradient-soft: linear-gradient(135deg, #dceefc 0%, #e3f6ed 100%); /* pastel sky to mint */
+  --gradient-page-top: linear-gradient(180deg, #e4f0fb 0%, rgba(228, 240, 251, 0) 100%); /* light sky band */
+
+  /* ---------- Surfaces ---------- */
+  --color-bg: #f4f7fa;            /* page background */
+  --color-surface: #ffffff;       /* cards, tables, inputs, sidebar */
+  --color-surface-muted: #eff4f8; /* table header, hover rows, progress tracks */
+  --color-overlay: rgba(23, 37, 52, 0.45); /* behind dialogs */
+
+  /* ---------- Text ---------- */
+  --color-text: #172534;          /* deep navy ink */
+  --color-text-secondary: #4a5868;
+  --color-text-muted: #617082;    /* hints, dates, axis labels (on white or page bg only) */
+
+  /* ---------- Borders ---------- */
+  --color-border: #e3eaf1;
+  --color-border-strong: #c9d5e0; /* input borders */
+  --color-focus-ring: rgba(40, 116, 181, 0.25);
+
+  /* ---------- Money: income / expense ---------- */
+  /* Fill = chart lines, icons, bars. Text = amounts written in text. */
+  --color-income: #25a37a;        /* fresh green */
+  --color-income-text: #1e7a52;
+  --color-income-soft: #e2f5eb;
+  --color-expense: #ec6559;       /* soft coral */
+  --color-expense-text: #bd3f36;
+  --color-expense-soft: #fdecea;
+
+  /* ---------- Feedback ---------- */
+  --color-danger: #bd3f36;        /* delete buttons, error messages */
+  --color-danger-hover: #a3362e;
+  --color-danger-soft: #fdecea;
+
+  /* ---------- Accents: icon tiles, tinted cards, illustrations ---------- */
+  /* Same hues as the category colors; soft tints are mixed in CSS with color-mix(). */
+  --accent-sky: var(--chart-1);
+  --accent-coral: var(--chart-2);
+  --accent-teal: var(--chart-3);
+  --accent-sun: var(--chart-4);
+  --accent-periwinkle: var(--chart-5);
+  --accent-mint: var(--chart-6);
+
+  /* ---------- Chart ---------- */
+  /* Default category colors, in this fixed order (checked for color blindness). */
+  --chart-1: #4a9fe3; /* sky */
+  --chart-2: #f07d62; /* coral */
+  --chart-3: #22ada3; /* teal */
+  --chart-4: #f19a52; /* apricot */
+  --chart-5: #7d8ce8; /* periwinkle */
+  --chart-6: #3db383; /* mint */
+  --chart-7: #5d7fd8; /* cornflower */
+  --chart-8: #94c24f; /* lime */
+  /* Single-series bar charts: pastel capsules on a light track, one bar highlighted. */
+  --chart-bar: #8fc2ec;
+  --chart-bar-track: #eef4fa;
+  --chart-highlight: #2874b5;
+  --chart-grid: #e3eaf1;
+  --chart-axis: #617082;
+
+  /* ---------- Typography ---------- */
+  --font-sans: 'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --font-size-xs: 0.75rem;   /* 12px: captions, table header, axis labels */
+  --font-size-sm: 0.875rem;  /* 14px: body text, inputs, table rows */
+  --font-size-md: 1rem;      /* 16px: card titles */
+  --font-size-lg: 1.25rem;   /* 20px: section titles, card amounts */
+  --font-size-xl: 1.5rem;    /* 24px: page titles, stat card numbers */
+  --font-size-2xl: 2rem;     /* 32px: large headings */
+  --font-size-3xl: 2.25rem;  /* 36px: the hero number */
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --letter-spacing-tight: -0.02em; /* big numbers and titles */
+
+  /* ---------- Spacing (4px scale) ---------- */
+  --space-1: 0.25rem; /* 4px */
+  --space-2: 0.5rem;  /* 8px */
+  --space-3: 0.75rem; /* 12px */
+  --space-4: 1rem;    /* 16px */
+  --space-5: 1.5rem;  /* 24px */
+  --space-6: 2rem;    /* 32px */
+  --space-7: 3rem;    /* 48px */
+
+  /* ---------- Radius ---------- */
+  --radius-sm: 8px;     /* swatches, small badges */
+  --radius-md: 12px;    /* inputs, nav items, tiles, avatars, tooltips */
+  --radius-lg: 20px;    /* cards, tables, chart panels, dialogs */
+  --radius-xl: 28px;    /* the app frame */
+  --radius-full: 999px; /* buttons, pills, chips, chart capsules */
+
+  /* ---------- Shadows (navy tint, very soft) ---------- */
+  --shadow-sm: 0 1px 2px rgba(23, 37, 52, 0.04), 0 2px 6px rgba(23, 37, 52, 0.04);
+  --shadow-md: 0 12px 32px rgba(23, 37, 52, 0.08);
+  --shadow-lg: 0 24px 64px rgba(23, 37, 52, 0.18); /* dialogs, floating cards */
+
+  /* ---------- Layout ---------- */
+  --sidebar-width: 240px;
+  --tabbar-height: 64px;  /* bottom tab bar on phones */
+  --content-max-width: 1200px;
+  --control-height: 40px; /* buttons and inputs share one height */
+}

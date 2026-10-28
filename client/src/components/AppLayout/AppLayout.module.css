@@ -1,0 +1,141 @@
+.layout {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  height: 100vh;
+  padding: var(--space-5) var(--space-4);
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--space-2);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.logo {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  background: var(--gradient-hero);
+  color: var(--color-hero-text);
+  box-shadow: var(--shadow-sm);
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+/* Used by the three links and by the Log out button, so they look the same. */
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 42px;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.navItem:hover {
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+}
+
+.navItem:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+.navActive,
+.navActive:hover {
+  background: var(--color-primary-soft);
+  color: var(--color-primary-text);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Pushes Log out to the bottom of the sidebar. */
+.logout {
+  margin-top: auto;
+}
+
+/* ---------- Main area ---------- */
+/* A light sky band fades in behind the page header. */
+.main {
+  min-width: 0;
+  padding: var(--space-6);
+  background: var(--gradient-page-top) top / 100% 320px no-repeat, var(--color-bg);
+}
+
+/* ---------- Phones: the sidebar becomes a bottom tab bar ---------- */
+@media (max-width: 960px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sidebar {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 10;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+    height: var(--tabbar-height);
+    padding: 0 var(--space-2);
+    border-right: none;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .brand {
+    display: none;
+  }
+
+  /* The links join the same 4-column grid as the Log out button. */
+  .nav {
+    display: contents;
+  }
+
+  .navItem {
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    min-height: 0;
+    padding: var(--space-1);
+    font-size: var(--font-size-xs);
+    text-align: center;
+  }
+
+  .logout {
+    margin-top: 0;
+  }
+
+  .main {
+    padding: var(--space-4) var(--space-4) calc(var(--tabbar-height) + var(--space-5));
+  }
+}
