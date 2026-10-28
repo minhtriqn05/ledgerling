@@ -28,6 +28,8 @@ router.use("/stats", statsRoutes);
  *                 success:
  *                   type: boolean
  *                   example: true
+ *             example:
+ *               success: true
  */
 router.get("/health", (req, res) => {
   res.status(200).json({ success: true });

@@ -15,7 +15,11 @@ const allowedOrigins = (process.env.CLIENT_URL || "")
 app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+    // Keep the pasted token after a page reload
+    swaggerOptions: { persistAuthorization: true },
+  })
+);
 app.use("/api", routes);
 
 app.use(notFound);

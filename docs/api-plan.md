@@ -23,9 +23,9 @@ Swagger UI: `/api-docs` (outside `/api`).
 |------|------|
 | 200 | OK (read, update, delete) |
 | 201 | Created |
-| 400 | Invalid input (validation failed, unknown field value, bad format) |
+| 400 | Invalid input (validation failed, unknown field value, bad format, body that is not valid JSON → `"Invalid JSON body"`) |
 | 401 | Missing/invalid/expired token, wrong email or password |
-| 404 | Not found, or belongs to another user |
+| 404 | Not found, belongs to another user, malformed `:id` in the URL, or unknown route (`"Route not found"`) |
 | 409 | Duplicate (email, category name) or conflict (category still has transactions) |
 | 500 | Server error |
 
@@ -40,9 +40,10 @@ Swagger UI: `/api-docs` (outside `/api`).
 | `type` | `"income"` or `"expense"` |
 | `color` | hex `#RRGGBB` |
 | `categoryId` | valid ObjectId of one of the user's categories |
-| `amount` | number > 0 |
-| `currency` | 3 uppercase letters (ISO 4217), default `"VND"` |
-| `note` | string, max 200 chars, optional, default `""` |
+| `amount` | JSON number > 0 (a string like `"45000"` is refused) |
+| `currency` (transaction body) | 3 letters (ISO 4217); lower case is converted to upper case; default `"VND"` |
+| `currency` (stats query) | 3 **uppercase** letters; lower case like `usd` is refused with 400; default `"VND"` |
+| `note` | string, trimmed, max 200 chars, optional, default `""` |
 | `date` | ISO 8601 date, default: now |
 | `month` (query) | `YYYY-MM` |
 
@@ -79,8 +80,9 @@ Auth: no.
 
 **200**
 ```json
-{ "success": true, "data": { "status": "ok" } }
+{ "success": true }
 ```
+(No `data` field.)
 
 ---
 
@@ -116,8 +118,10 @@ Auth: no.
 
 | Code | message |
 |------|---------|
-| 400 | `"Name is required"`, `"Email is invalid"`, `"Password must be at least 6 characters"` |
+| 400 | `"Name is required"`, `"Name must be at most 50 characters"`, `"Email is invalid"`, `"Password must be at least 6 characters"`, `"Password must be at most 72 characters"` |
 | 409 | `"Email is already registered"` |
+
+A new account also gets 7 default categories (Food, Transport, Shopping, Bills, Entertainment, Salary, Other Income).
 
 ### 3. POST /api/auth/login
 Auth: no.
@@ -200,8 +204,8 @@ Auth: yes.
 
 | Code | message |
 |------|---------|
-| 400 | `"Name is required"`, `"Type must be income or expense"`, `"Color must be a hex code like #FF7043"` |
-| 409 | `"Category already exists"` (same name + type for this user) |
+| 400 | `"Name is required"`, `"Name must be at most 30 characters"`, `"Type must be income or expense"`, `"Color must be a hex code like #FF7043"` |
+| 409 | `"Category already exists"` (same name + type for this user, case-insensitive) |
 
 ### 7. GET /api/categories/:id
 Auth: yes.
@@ -225,7 +229,7 @@ Auth: yes.
 
 | Code | message |
 |------|---------|
-| 400 | `"Nothing to update"`, `"Type cannot be changed"`, `"Color must be a hex code like #FF7043"` |
+| 400 | `"Nothing to update"`, `"Type cannot be changed"` (any `type` in the body, even the same value), `"Name is required"`, `"Name must be at most 30 characters"`, `"Color must be a hex code like #FF7043"` |
 | 404 | `"Category not found"` |
 | 409 | `"Category already exists"` |
 

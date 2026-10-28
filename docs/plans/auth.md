@@ -203,7 +203,8 @@ Each step is tested (Postman or browser) and committed on its own. No new librar
 
 ## Not in this feature
 
-- `/api/health` returns `{ success: true }` while `api-plan.md` documents `data: { status: "ok" }`: a separate small fix.
+- `/api/health` returns `{ success: true }` while `api-plan.md` documented `data: { status: "ok" }`: fixed later in
+  `api-plan.md` (feature/api-docs).
 - The phone app bar with the avatar (ui-style §6) comes with the Dashboard work.
 - No refresh tokens, password reset, rate limiting or email verification.
 - Before deploying: set `JWT_SECRET` and `JWT_EXPIRES_IN` on Render (the start-up check stops the server if the secret

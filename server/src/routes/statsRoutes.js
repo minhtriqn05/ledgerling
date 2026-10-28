@@ -124,17 +124,16 @@ router.use(requireAuth);
  *                   - { month: "2026-09", income: 19200000, expense: 11900000 }
  *                   - { month: "2026-10", income: 21500000, expense: 13600000 }
  *       400:
- *         description: Invalid query ("Month must be in YYYY-MM format", "Currency must be a 3-letter ISO code")
+ *         description: Invalid query ("Month must be in YYYY-MM format", "Currency must be a 3-letter ISO code" - also for lower case like usd)
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Currency must be a 3-letter ISO code
  *       401:
- *         description: Token missing or invalid
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *         $ref: '#/components/responses/Unauthorized'
  */
 router.get("/summary", validateStatsSummary, summary);
 

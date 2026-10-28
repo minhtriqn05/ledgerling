@@ -6,12 +6,58 @@ const options = {
     info: {
       title: "Ledgerling API",
       version: "1.0.0",
-      description: "REST API for the Ledgerling personal expense tracker",
+      description: [
+        "REST API for the Ledgerling personal expense tracker.",
+        "",
+        "**How to try the routes that need a login (the lock icon):**",
+        "1. Call `POST /auth/register` or `POST /auth/login` and copy the `token` from the response.",
+        "2. Click **Authorize** (top right), paste the token (without the word `Bearer`) and confirm.",
+        "3. Every protected request now sends `Authorization: Bearer <token>`.",
+        "",
+        "Success: `{ \"success\": true, \"data\": ... }`. Error: `{ \"success\": false, \"message\": \"...\" }`.",
+        "Every route can also answer 500 (server error). A body that is not valid JSON gets 400 `Invalid JSON body`.",
+      ].join("\n"),
     },
     servers: [{ url: "/api" }],
+    tags: [
+      { name: "Health", description: "Is the server running?" },
+      { name: "Auth", description: "Register, log in and read the current user" },
+      { name: "Categories", description: "Income and expense categories of the signed-in user" },
+      { name: "Transactions", description: "Income and expense records of the signed-in user" },
+      { name: "Stats", description: "Numbers for the dashboard charts" },
+    ],
     components: {
       securitySchemes: {
-        bearerAuth: { type: "http", scheme: "bearer", bearerFormat: "JWT" },
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+          description: "The token returned by /auth/register or /auth/login",
+        },
+      },
+      // Answers repeated on many routes; route comments point to them with $ref
+      responses: {
+        Unauthorized: {
+          description: "Token missing, invalid or expired",
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/ErrorResponse" },
+              examples: {
+                missing: { summary: "No Authorization header", value: { success: false, message: "Not authorized, token missing" } },
+                invalid: { summary: "Wrong, malformed or expired token", value: { success: false, message: "Not authorized, invalid token" } },
+              },
+            },
+          },
+        },
+        ServerError: {
+          description: "Unexpected server error",
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/ErrorResponse" },
+              example: { success: false, message: "Internal server error" },
+            },
+          },
+        },
       },
       // Shapes shared by several endpoints; route comments point to them with $ref
       schemas: {
@@ -84,4 +130,13 @@ const options = {
   apis: ["./src/routes/*.js"],
 };
 
-export default swaggerJsdoc(options);
+const spec = swaggerJsdoc(options);
+
+// Every route can fail with a 500, so add it here instead of repeating it in every comment
+for (const pathItem of Object.values(spec.paths)) {
+  for (const operation of Object.values(pathItem)) {
+    operation.responses["500"] = { $ref: "#/components/responses/ServerError" };
+  }
+}
+
+export default spec;
