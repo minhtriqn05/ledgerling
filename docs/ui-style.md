@@ -146,6 +146,10 @@ category color is always shown with its name (chip label, avatar letter, legend 
 - **Sidebar:** gradient logo tile, nav items (Dashboard, Transactions, Categories) with line icons,
   active item = primary-soft background + primary-text; a "Saved in October" card (pastel wash +
   mint progress ring); user block (sun-tinted initials) and "Log out" at the bottom.
+- **Phones (≤960px):** the sidebar becomes a fixed **bottom tab bar** (`--tabbar-height` 64px) with
+  four equal tabs – Dashboard, Transactions, Categories, Log out – each an icon above a 12px label.
+  The active tab uses the same primary-soft pill as the sidebar. Page content gets extra bottom
+  padding so the bar never covers it. Implemented in `client/src/components/AppLayout/`.
 - **Page header:** title + subtitle on the left; month picker pill and primary action on the right.
 - **Breakpoints:** ≤1100px dashboard stats in 2 columns (hero full width), categories form below the
   list; ≤960px sidebar hidden, a slim app bar (logo + avatar) appears, all rows one column;
