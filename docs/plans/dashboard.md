@@ -44,8 +44,14 @@ follow Vietnam time, and another user's data never shows up.
   requests remove everything again.
 - Commit: `docs: add stats summary to API plan and Postman`
 
-## Frontend (next)
+## Frontend
 
-Planned once the backend is committed, from the approved mock. The cards, Cash flow and Spending by category read
-`GET /api/stats/summary`; the "vs last month" change can be computed from the last two entries of `byMonth`.
-Not covered by this endpoint yet: "This week" (spending per day) and "Recent transactions".
+Built from the approved mock, reading only `GET /api/stats/summary`:
+- `api/stats.js` (`getSummary(month)`), `pages/DashboardPage.jsx` (+ `.module.css`) and
+  `pages/dashboard/DashboardCharts.jsx` (+ `.module.css`); `Icon.jsx` gets `chart` and `pie`, `vnDate.js` gets
+  `formatMonthShort`.
+- Header with the month picker, three cards (Total Income, Total Expense, Balance as the hero), a donut of
+  `expenseByCategory` in the category colors and a capsule bar chart of the `expense` in `byMonth` (selected month
+  highlighted).
+- States: loading, error (+ "Try again"), empty (no transaction in the 6 months), and "No expenses" inside the donut card.
+- Left out for now: hero sparkline, "vs last month" changes, Cash flow area chart, "This week", "Recent transactions".
