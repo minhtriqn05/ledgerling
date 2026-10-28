@@ -201,7 +201,10 @@ in the **Components** tab; their styles live in `client/src/pages/styleGuide/ui.
 
 The real pages use React components in `client/src/components/` that copy their styles from that kit:
 `Button` (primary / secondary / danger, optional left icon), `IconButton`, `TextField`, `Alert`, `Card` +
-`CardHeader`, `PageHeader`, `SegmentedControl` (optional income / expense tone) and `EmptyState`.
+`CardHeader`, `PageHeader`, `SegmentedControl` (optional income / expense tone), `EmptyState`, `MonthPicker`
+(previous / next arrows around the month name) and `Modal` (a native `<dialog>` over the dimmed page; Escape, the X
+button and a click outside close it; an element with `data-autofocus` gets the focus). The Transactions page uses
+`Modal` for the add / edit form and for the delete confirmation.
 
 ## 9. Charts (Recharts) – approved (v5)
 
