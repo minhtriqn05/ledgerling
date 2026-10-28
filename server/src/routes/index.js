@@ -1,9 +1,11 @@
 import { Router } from "express";
 import authRoutes from "./authRoutes.js";
+import categoryRoutes from "./categoryRoutes.js";
 
 const router = Router();
 
 router.use("/auth", authRoutes);
+router.use("/categories", categoryRoutes);
 
 /**
  * @openapi
