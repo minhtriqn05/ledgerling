@@ -1,0 +1,30 @@
+/* Shared by the Login and Register pages. */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 360px;
+}
+
+.subtitle {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-secondary);
+}
+
+/* "New to Ledgerling? Create an account" */
+.switch {
+  margin: 0;
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.link {
+  color: var(--color-primary-text);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
