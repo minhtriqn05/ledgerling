@@ -1,0 +1,196 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* ---------- Number cards ---------- */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+/* Income and expense are tinted with --tone; balance is the one vivid hero card. */
+.statCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-5);
+  border: 1px solid color-mix(in srgb, var(--tone) 22%, var(--color-surface));
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--tone) 10%, var(--color-surface));
+}
+
+.income {
+  --tone: var(--color-income);
+  --money: var(--color-income-text);
+}
+
+.expense {
+  --tone: var(--color-expense);
+  --money: var(--color-expense-text);
+}
+
+.balance {
+  border: none;
+  background: var(--gradient-hero);
+  box-shadow: var(--shadow-md);
+  color: var(--color-hero-text);
+  --money: var(--color-hero-text);
+}
+
+/* White tile on the tinted cards, a soft white wash on the hero. */
+.statTile {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: color-mix(in srgb, var(--tone) 62%, var(--color-text));
+  box-shadow: var(--shadow-sm);
+}
+
+.balance .statTile {
+  background: var(--color-hero-decor);
+  color: var(--color-hero-text);
+  box-shadow: none;
+}
+
+.statText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.statText span {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.balance .statText span {
+  color: var(--color-hero-text);
+}
+
+.statText strong {
+  color: var(--money);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ---------- Charts ---------- */
+.chartsRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: var(--space-4);
+}
+
+/* Category rows: name, a bar in the category color, amount, share. */
+.categoryList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: var(--space-5) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.categoryList li {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr) auto 34px;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.categoryName {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  overflow: hidden;
+  color: var(--color-text-secondary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.categoryDot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--tone);
+}
+
+.categoryBar {
+  height: 6px;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-muted);
+}
+
+.categoryBar > span {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--tone);
+}
+
+.categoryAmount {
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.categoryShare {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* ---------- States ---------- */
+/* "Loading dashboard…" */
+.status {
+  margin: 0;
+  padding: var(--space-7) 0;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+/* Inside a card, e.g. "No expenses in October 2026." */
+.cardStatus {
+  margin: 0;
+  padding: var(--space-6) 0;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+/* The alert takes the full width, the "Try again" button keeps its own. */
+.loadError {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.loadError > button {
+  align-self: flex-start;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 960px) {
+  .chartsRow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 760px) {
+  .stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

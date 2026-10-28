@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Ledgerling API",
-    "description": "Auth, Categories and Transactions requests for the Ledgerling API. Run Register (or Login) first: its test script saves the token into {{token}}, and every other request sends it as a Bearer token.",
+    "description": "Auth, Categories, Transactions and Stats requests for the Ledgerling API. Run Register (or Login) first: its test script saves the token into {{token}}, and every other request sends it as a Bearer token.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -26,7 +26,15 @@
     { "key": "transactionId", "value": "" },
     { "key": "monthEndId", "value": "" },
     { "key": "octFirstId", "value": "" },
-    { "key": "novFirstId", "value": "" }
+    { "key": "novFirstId", "value": "" },
+    { "key": "statsCategoryName", "value": "" },
+    { "key": "statsCategoryId", "value": "" },
+    { "key": "statsIncomeCategoryId", "value": "" },
+    { "key": "statsIncomeId", "value": "" },
+    { "key": "statsMarFirstId", "value": "" },
+    { "key": "statsJanId", "value": "" },
+    { "key": "statsAprFirstId", "value": "" },
+    { "key": "statsUsdId", "value": "" }
   ],
   "item": [
     {
@@ -3257,6 +3265,890 @@
               "path": [
                 "categories",
                 "{{txCategoryId}}"
+              ]
+            },
+            "description": "No transactions use it any more: expect 200."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Stats",
+      "description": "Run top to bottom, after the Auth and Categories folders ({{token}}, and {{token2}} from 'Other user - Login'). Uses March 2020, where the test user has no other data: the Setup requests create a throwaway expense category and 5 transactions, the Cleanup requests remove them again.",
+      "item": [
+        {
+          "name": "Setup - List my categories",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const income = pm.response.json().data.find((c) => c.type === 'income');",
+                  "pm.test('Has an income category', function () { pm.expect(income).to.exist; });",
+                  "pm.collectionVariables.set('statsIncomeCategoryId', income._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories"
+              ]
+            },
+            "description": "Saves the id of one income category into {{statsIncomeCategoryId}}."
+          }
+        },
+        {
+          "name": "Setup - Create expense category",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// A throwaway category, so the test expenses are easy to recognise and to remove",
+                  "pm.collectionVariables.set('statsCategoryName', 'StatsTest ' + Math.floor(Math.random() * 100000));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set('statsCategoryId', pm.response.json().data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{statsCategoryName}}\",\n  \"type\": \"expense\",\n  \"color\": \"#FF7043\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories"
+              ]
+            },
+            "description": "Creates an expense category and saves its id into {{statsCategoryId}}. Removed again at the end of this folder."
+          }
+        },
+        {
+          "name": "Setup - Create income (Mar 10th)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set('statsIncomeId', pm.response.json().data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{statsIncomeCategoryId}}\",\n  \"amount\": 1000000,\n  \"note\": \"Stats: March income\",\n  \"date\": \"2020-03-10T09:00:00+07:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "description": "Income in the middle of March 2020. Saves the id into {{statsIncomeId}}."
+          }
+        },
+        {
+          "name": "Setup - Create expense (Mar 1st 00:30 Vietnam time)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set('statsMarFirstId', pm.response.json().data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{statsCategoryId}}\",\n  \"amount\": 200000,\n  \"note\": \"Stats: Mar 1st, 00:30\",\n  \"date\": \"2020-03-01T00:30:00+07:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "description": "In UTC this is still 2020-02-29T17:30Z (2020 is a leap year), but in Vietnam it is already March. Saves the id into {{statsMarFirstId}}."
+          }
+        },
+        {
+          "name": "Setup - Create expense (January)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set('statsJanId', pm.response.json().data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{statsCategoryId}}\",\n  \"amount\": 30000,\n  \"note\": \"Stats: January\",\n  \"date\": \"2020-01-15T12:00:00+07:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "description": "Not in the March totals, but inside the 6 months of the chart. Saves the id into {{statsJanId}}."
+          }
+        },
+        {
+          "name": "Setup - Create expense (Apr 1st 00:30 Vietnam time)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set('statsAprFirstId', pm.response.json().data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{statsCategoryId}}\",\n  \"amount\": 70000,\n  \"note\": \"Stats: Apr 1st, 00:30\",\n  \"date\": \"2020-04-01T00:30:00+07:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "description": "In UTC this is still 2020-03-31T17:30Z, but in Vietnam it is already April. Saves the id into {{statsAprFirstId}}."
+          }
+        },
+        {
+          "name": "Setup - Create expense in USD",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set('statsUsdId', pm.response.json().data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{statsCategoryId}}\",\n  \"amount\": 10,\n  \"currency\": \"USD\",\n  \"note\": \"Stats: in USD\",\n  \"date\": \"2020-03-05T12:00:00+07:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "description": "Only summed when ?currency=USD is asked for. Saves the id into {{statsUsdId}}."
+          }
+        },
+        {
+          "name": "Summary (month=2020-03)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const data = pm.response.json().data;",
+                  "",
+                  "pm.test('Totals of March 2020 in VND', function () {",
+                  "  pm.expect(data.month).to.eql('2020-03');",
+                  "  pm.expect(data.currency).to.eql('VND');",
+                  "  pm.expect(data.totalIncome).to.eql(1000000);",
+                  "  pm.expect(data.totalExpense).to.eql(200000);",
+                  "  pm.expect(data.balance).to.eql(800000);",
+                  "});",
+                  "",
+                  "pm.test('Expense per category: the test category with its name and color', function () {",
+                  "  pm.expect(data.expenseByCategory).to.eql([{",
+                  "    categoryId: pm.collectionVariables.get('statsCategoryId'),",
+                  "    name: pm.collectionVariables.get('statsCategoryName'),",
+                  "    color: '#FF7043',",
+                  "    total: 200000,",
+                  "  }]);",
+                  "});",
+                  "",
+                  "pm.test('byMonth: 6 months ending with March, across the new year', function () {",
+                  "  pm.expect(data.byMonth.map((m) => m.month)).to.eql(['2019-10', '2019-11', '2019-12', '2020-01', '2020-02', '2020-03']);",
+                  "  pm.expect(data.byMonth.map((m) => m.expense)).to.eql([0, 0, 0, 30000, 0, 200000]);",
+                  "  pm.expect(data.byMonth.map((m) => m.income)).to.eql([0, 0, 0, 0, 0, 1000000]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/stats/summary?month=2020-03",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "stats",
+                "summary"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2020-03"
+                }
+              ]
+            },
+            "description": "March 2020 in Vietnam time, VND only. The Mar 1st 00:30 expense (Feb 29 in UTC) counts in March, the Apr 1st 00:30 one (Mar 31 in UTC) does not, and the USD one is not summed. byMonth goes back to October 2019."
+          }
+        },
+        {
+          "name": "Summary (month=2020-04)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const data = pm.response.json().data;",
+                  "",
+                  "pm.test('Apr 1st 00:30 Vietnam time counts in April, not March', function () {",
+                  "  pm.expect(data.totalExpense).to.eql(70000);",
+                  "  pm.expect(data.byMonth.slice(-2)).to.eql([",
+                  "    { month: '2020-03', income: 1000000, expense: 200000 },",
+                  "    { month: '2020-04', income: 0, expense: 70000 },",
+                  "  ]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/stats/summary?month=2020-04",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "stats",
+                "summary"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2020-04"
+                }
+              ]
+            },
+            "description": "The expense saved as 2020-03-31T17:30Z in UTC belongs to April in Vietnam time."
+          }
+        },
+        {
+          "name": "Summary (currency=USD)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Only the USD transaction is summed', function () {",
+                  "  const data = pm.response.json().data;",
+                  "  pm.expect(data.currency).to.eql('USD');",
+                  "  pm.expect(data.totalIncome).to.eql(0);",
+                  "  pm.expect(data.totalExpense).to.eql(10);",
+                  "  pm.expect(data.expenseByCategory.map((c) => c.total)).to.eql([10]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/stats/summary?month=2020-03&currency=USD",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "stats",
+                "summary"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2020-03"
+                },
+                {
+                  "key": "currency",
+                  "value": "USD"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Summary (no params = current month)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Defaults: current month in Vietnam time, VND, 6 months ending with it', function () {",
+                  "  const data = pm.response.json().data;",
+                  "  const month = new Date(Date.now() + 7 * 60 * 60 * 1000).toISOString().slice(0, 7);",
+                  "  pm.expect(data.month).to.eql(month);",
+                  "  pm.expect(data.currency).to.eql('VND');",
+                  "  pm.expect(data.byMonth).to.have.lengthOf(6);",
+                  "  pm.expect(data.byMonth[5].month).to.eql(month);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/stats/summary",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "stats",
+                "summary"
+              ]
+            },
+            "description": "Without month the current month in Vietnam time is used, without currency VND."
+          }
+        },
+        {
+          "name": "Summary (month invalid)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Month must be in YYYY-MM format\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Month must be in YYYY-MM format\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/stats/summary?month=2020-13",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "stats",
+                "summary"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2020-13"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Summary (currency in lower case)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Currency must be a 3-letter ISO code\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Currency must be a 3-letter ISO code\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/stats/summary?currency=usd",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "stats",
+                "summary"
+              ],
+              "query": [
+                {
+                  "key": "currency",
+                  "value": "usd"
+                }
+              ]
+            },
+            "description": "Currency codes must be sent in upper case (USD)."
+          }
+        },
+        {
+          "name": "Summary (other user)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('None of the first user\\'s numbers', function () {",
+                  "  const data = pm.response.json().data;",
+                  "  pm.expect(data.totalIncome).to.eql(0);",
+                  "  pm.expect(data.totalExpense).to.eql(0);",
+                  "  pm.expect(data.expenseByCategory).to.eql([]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/stats/summary?month=2020-03",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "stats",
+                "summary"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2020-03"
+                }
+              ]
+            },
+            "description": "The second user must not see the first user's numbers."
+          }
+        },
+        {
+          "name": "Summary (no token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Not authorized, token missing\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Not authorized, token missing\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/stats/summary",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "stats",
+                "summary"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Cleanup - Delete Mar 10th income",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/{{statsIncomeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "{{statsIncomeId}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Cleanup - Delete Mar 1st expense",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/{{statsMarFirstId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "{{statsMarFirstId}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Cleanup - Delete January expense",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/{{statsJanId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "{{statsJanId}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Cleanup - Delete Apr 1st expense",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/{{statsAprFirstId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "{{statsAprFirstId}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Cleanup - Delete USD expense",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/{{statsUsdId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "{{statsUsdId}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Cleanup - Delete test category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories/{{statsCategoryId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories",
+                "{{statsCategoryId}}"
               ]
             },
             "description": "No transactions use it any more: expect 200."
