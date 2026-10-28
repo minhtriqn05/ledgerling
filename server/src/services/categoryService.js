@@ -1,4 +1,5 @@
 import Category from "../models/Category.js";
+import Transaction from "../models/Transaction.js";
 import { httpError } from "../utils/httpError.js";
 
 // Same case-insensitive comparison as the unique index on the model
@@ -56,7 +57,9 @@ export async function updateCategory(userId, id, changes) {
 
 export async function deleteCategory(userId, id) {
   const category = await findOwned(userId, id);
-  // TODO (transactions feature): answer 409 "Category still has transactions" before deleting
+  const inUse = await Transaction.exists({ userId, categoryId: category._id });
+  if (inUse) throw httpError(409, "Category still has transactions");
+
   await category.deleteOne();
   return { _id: category._id };
 }
