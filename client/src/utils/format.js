@@ -10,6 +10,12 @@ const fullDate = new Intl.DateTimeFormat('en-GB', {
   year: 'numeric',
   timeZone: 'Asia/Ho_Chi_Minh',
 });
+const dayMonthYear = new Intl.DateTimeFormat('en-GB', {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+  timeZone: 'Asia/Ho_Chi_Minh',
+});
 
 // 12450000 -> "12.450.000"
 export function formatNumber(amount) {
@@ -39,4 +45,9 @@ export function formatDayMonth(date) {
 // "2026-10-25" -> "25 Oct 2026"
 export function formatDate(date) {
   return fullDate.format(new Date(date));
+}
+
+// "2026-10-25" -> "25/10/2026"
+export function formatDateDMY(date) {
+  return dayMonthYear.format(new Date(date));
 }
