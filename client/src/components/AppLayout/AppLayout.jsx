@@ -1,6 +1,7 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import ApiStatus from '../ApiStatus/ApiStatus.jsx';
 import Icon from '../Icon.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
 import styles from './AppLayout.module.css';
 
 // Shared layout for signed-in pages: a sidebar on desktop, a bottom tab bar on phones.
@@ -14,11 +15,12 @@ const navItems = [
 
 export default function AppLayout() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
-  // The token lives in localStorage (see CLAUDE.md), so logging out means removing it.
+  // logout() removes the token from localStorage and clears the user in AuthContext.
   function handleLogout() {
-    localStorage.removeItem('token');
-    navigate('/login');
+    logout();
+    navigate('/login', { replace: true });
   }
 
   return (
