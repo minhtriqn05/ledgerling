@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { register, login } from "../controllers/authController.js";
+import { register, login, me } from "../controllers/authController.js";
 import { validateRegister, validateLogin } from "../middlewares/validateAuth.js";
+import { requireAuth } from "../middlewares/requireAuth.js";
 
 const router = Router();
 
@@ -93,5 +94,35 @@ router.post("/register", validateRegister, register);
  *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post("/login", validateLogin, login);
+
+/**
+ * @openapi
+ * /auth/me:
+ *   get:
+ *     summary: Get the current user
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: The user that owns the token (no password hash)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Token missing, invalid or expired, or the account no longer exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+router.get("/me", requireAuth, me);
 
 export default router;

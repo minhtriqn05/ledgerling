@@ -23,6 +23,13 @@ export async function register({ name, email, password }) {
   return { token: signToken(user._id), user };
 }
 
+export async function getCurrentUser(userId) {
+  // A valid token can outlive its account (e.g. the user was deleted), so check the database
+  const user = await User.findById(userId);
+  if (!user) throw httpError(401, "Not authorized, invalid token");
+  return user;
+}
+
 export async function login({ email, password }) {
   const user = await User.findOne({ email });
   // Same message for an unknown email and a wrong password, so nobody can learn which emails exist
