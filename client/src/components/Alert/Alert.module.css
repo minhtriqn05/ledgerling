@@ -1,0 +1,17 @@
+/* Tinted with the expense (coral) tone; the text itself stays in the normal text color. */
+.alert {
+  --tone: var(--color-expense);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--tone) 12%, var(--color-surface));
+  color: var(--color-text);
+}
+
+.alert > svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: color-mix(in srgb, var(--tone) 62%, var(--color-text));
+}
