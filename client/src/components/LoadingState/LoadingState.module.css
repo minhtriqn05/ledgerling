@@ -1,0 +1,17 @@
+.loading {
+  margin: 0;
+  padding: var(--space-6) 0;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.spacious {
+  padding: var(--space-7) 0;
+}
+
+.fullScreen {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 0;
+}

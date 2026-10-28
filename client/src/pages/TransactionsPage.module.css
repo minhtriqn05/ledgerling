@@ -103,24 +103,6 @@
 
 /* ---------- States ---------- */
 /* "Loading transactions…" */
-.status {
-  margin: 0;
-  padding: var(--space-6) 0;
-  color: var(--color-text-muted);
-  text-align: center;
-}
-
-/* The alert takes the full width, the "Try again" button keeps its own. */
-.loadError {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.loadError > button {
-  align-self: flex-start;
-}
-
 /* ---------- Responsive ---------- */
 @media (max-width: 760px) {
   .summary {
