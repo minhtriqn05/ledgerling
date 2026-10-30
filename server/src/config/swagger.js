@@ -27,6 +27,11 @@ const options = {
       { name: "Stats", description: "Numbers for the dashboard charts" },
       { name: "Budgets", description: "Monthly spending limits per expense category of the signed-in user" },
       { name: "Tags", description: "Tags the signed-in user put on transactions" },
+      {
+        name: "Recurring",
+        description:
+          "Weekly or monthly rules that create real transactions when they are due. There is no cron job: GET /transactions, /stats/summary, /budgets and /recurring first create what is due up to today (Vietnam time, at most 60 transactions per rule per request).",
+      },
     ],
     components: {
       securitySchemes: {
@@ -107,6 +112,11 @@ const options = {
               items: { type: "string" },
               example: ["work", "team-lunch"],
             },
+            recurringRuleId: {
+              type: "string",
+              description: "Only on transactions created by a recurring rule. Stays after the rule is deleted. Cannot be set by the client.",
+              example: "6720e1b2c3d4e5f601234590",
+            },
             date: { type: "string", format: "date-time", example: "2026-10-27T05:30:00.000Z" },
             createdAt: { type: "string", format: "date-time", example: "2026-10-27T05:31:00.000Z" },
             updatedAt: { type: "string", format: "date-time", example: "2026-10-27T05:31:00.000Z" },
@@ -137,6 +147,54 @@ const options = {
             },
             createdAt: { type: "string", format: "date-time", example: "2026-10-01T02:01:00.000Z" },
             updatedAt: { type: "string", format: "date-time", example: "2026-10-01T02:01:00.000Z" },
+          },
+        },
+        RecurringRule: {
+          type: "object",
+          properties: {
+            _id: { type: "string", example: "6720e1b2c3d4e5f601234590" },
+            category: {
+              type: "object",
+              properties: {
+                _id: { type: "string", example: "6720b1b2c3d4e5f601234571" },
+                name: { type: "string", example: "Bills" },
+                color: { type: "string", example: "#F19A52" },
+                type: { type: "string", enum: ["income", "expense"], example: "expense" },
+              },
+            },
+            amount: { type: "number", description: "In VND", example: 3500000 },
+            note: { type: "string", example: "Rent" },
+            frequency: { type: "string", enum: ["weekly", "monthly"], example: "monthly" },
+            startDate: { type: "string", format: "date-time", description: "Noon Vietnam time of the start day", example: "2026-08-31T05:00:00.000Z" },
+            nextRunDate: { type: "string", format: "date-time", description: "The next date to create a transaction for", example: "2026-11-30T05:00:00.000Z" },
+            endDate: { type: "string", format: "date-time", nullable: true, description: "The last day that can run; null means no end", example: null },
+            active: { type: "boolean", example: true },
+            ended: { type: "boolean", description: "true when nextRunDate is after endDate: the rule will not run again", example: false },
+            createdAt: { type: "string", format: "date-time", example: "2026-10-01T02:01:00.000Z" },
+            updatedAt: { type: "string", format: "date-time", example: "2026-10-01T02:01:00.000Z" },
+          },
+        },
+        RecurringRuleInput: {
+          type: "object",
+          required: ["categoryId", "amount", "frequency", "startDate"],
+          properties: {
+            categoryId: { type: "string", description: "Id of one of your categories", example: "6720b1b2c3d4e5f601234571" },
+            amount: { type: "number", description: "In VND, greater than 0", example: 3500000 },
+            note: { type: "string", maxLength: 200, example: "Rent" },
+            frequency: { type: "string", enum: ["weekly", "monthly"], example: "monthly" },
+            startDate: {
+              type: "string",
+              format: "date",
+              description: "First run, a day in Vietnam time. A monthly rule on day 29-31 runs on the last day of a shorter month.",
+              example: "2026-08-31",
+            },
+            endDate: {
+              type: "string",
+              format: "date",
+              nullable: true,
+              description: "Optional last day that can run, must be after startDate",
+              example: "2027-08-31",
+            },
           },
         },
         // Sent next to `data` by paginated list endpoints (data stays an array: one page)

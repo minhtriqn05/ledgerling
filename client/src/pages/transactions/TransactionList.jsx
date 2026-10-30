@@ -1,6 +1,17 @@
 import { formatDateDMY, formatDayMonth, formatSignedVnd } from '../../utils/format.js';
 import IconButton from '../../components/IconButton/IconButton.jsx';
+import Icon from '../../components/Icon.jsx';
 import styles from './TransactionList.module.css';
+
+// Marks a transaction that a recurring rule created
+function RecurringLabel() {
+  return (
+    <span className={styles.recurring}>
+      <Icon name="repeat" size={12} />
+      Recurring
+    </span>
+  );
+}
 
 // The tags of one transaction as small buttons: a click filters the list by that tag.
 function TagChips({ tags = [], onTagClick }) {
@@ -47,6 +58,7 @@ export default function TransactionList({ transactions, onEdit, onDelete, onTagC
                     <i className={styles.dot} />
                     {t.category.name}
                   </span>
+                  {t.recurringRuleId && <RecurringLabel />}
                 </td>
                 <td className={styles.note}>{t.note || <span className={styles.muted}>—</span>}</td>
                 <td>
@@ -85,6 +97,7 @@ export default function TransactionList({ transactions, onEdit, onDelete, onTagC
                 <strong>{t.note || t.category.name}</strong>
                 <span>
                   {t.category.name} · {formatDayMonth(t.date)}
+                  {t.recurringRuleId && <RecurringLabel />}
                 </span>
               </span>
               <span className={`${styles.amount} ${styles[t.type]}`}>{formatSignedVnd(t.amount, t.type)}</span>

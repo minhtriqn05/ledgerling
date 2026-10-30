@@ -15,7 +15,8 @@ Swagger UI: `/api-docs` (outside `/api`).
   to the 1st of the next month at 00:00 +07:00.
   Example `2026-10` → `2026-09-30T17:00:00.000Z` ≤ date < `2026-10-31T17:00:00.000Z`.
 - **Dates** are ISO 8601 strings; the server stores them in UTC.
-- **Updates** use PATCH: send only the fields you want to change (at least one).
+- **Updates** use PATCH: send only the fields you want to change (at least one). The exception is
+  `PUT /recurring/:id`, which replaces the whole rule.
 
 ### Status codes
 
@@ -26,7 +27,7 @@ Swagger UI: `/api-docs` (outside `/api`).
 | 400 | Invalid input (validation failed, unknown field value, bad format, body that is not valid JSON → `"Invalid JSON body"`) |
 | 401 | Missing/invalid/expired token, wrong email or password |
 | 404 | Not found, belongs to another user, malformed `:id` in the URL, or unknown route (`"Route not found"`) |
-| 409 | Duplicate (email, category name, budget of the same category and month) or conflict (category still has transactions) |
+| 409 | Duplicate (email, category name, budget of the same category and month, two transactions of one recurring rule on the same date) or conflict (category still has transactions or recurring rules) |
 | 500 | Server error |
 
 ### Validation rules
@@ -50,6 +51,9 @@ Swagger UI: `/api-docs` (outside `/api`).
 | `month` (budget body) | `YYYY-MM`, required; cannot be changed after the budget is created |
 | `categoryId` (budget body) | valid ObjectId of one of the user's **expense** categories |
 | `amount` (budget body) | JSON number > 0, the limit in VND |
+| `frequency` (recurring body) | `"weekly"` or `"monthly"`, required |
+| `startDate` (recurring body) | a day that exists, `YYYY-MM-DD` in Vietnam time, required |
+| `endDate` (recurring body) | a day that exists, `YYYY-MM-DD`, after `startDate`; optional, `null` or left out means no end |
 
 ## Endpoint summary
 
@@ -63,7 +67,7 @@ Swagger UI: `/api-docs` (outside `/api`).
 | 6 | POST | `/api/categories` | Yes | Create a category |
 | 7 | GET | `/api/categories/:id` | Yes | Get one category |
 | 8 | PATCH | `/api/categories/:id` | Yes | Update name / color |
-| 9 | DELETE | `/api/categories/:id` | Yes | Delete (409 if it has transactions) |
+| 9 | DELETE | `/api/categories/:id` | Yes | Delete (409 if it has transactions or recurring rules) |
 | 10 | GET | `/api/transactions` | Yes | List my transactions, paginated (`?month=&from=&to=&type=&categoryId=&tag=&q=&sort=&page=&limit=`) |
 | 11 | POST | `/api/transactions` | Yes | Create a transaction |
 | 12 | GET | `/api/transactions/:id` | Yes | Get one transaction |
@@ -78,6 +82,11 @@ Swagger UI: `/api-docs` (outside `/api`).
 | 21 | GET | `/api/transactions/export` | Yes | Download my transactions as a CSV file, same filters as endpoint 10 without `page` / `limit` (max 5000 rows) |
 | 22 | POST | `/api/transactions/import` | Yes | Import up to 500 rows read from a CSV file; valid rows are saved, bad rows are listed |
 | 23 | GET | `/api/tags` | Yes | The tags I have used, with how many transactions carry each |
+| 24 | GET | `/api/recurring` | Yes | List my recurring rules |
+| 25 | POST | `/api/recurring` | Yes | Create a recurring rule |
+| 26 | PUT | `/api/recurring/:id` | Yes | Replace a recurring rule |
+| 27 | PATCH | `/api/recurring/:id/toggle` | Yes | Turn a rule on or off |
+| 28 | DELETE | `/api/recurring/:id` | Yes | Delete a rule (its transactions are kept) |
 
 Every protected route (Auth = Yes) can also return **401** (`"Not authorized, token missing"` /
 `"Not authorized, invalid token"`) and every route can return **500** (`"Internal server error"`).
@@ -259,6 +268,7 @@ Auth: yes.
 |------|---------|
 | 404 | `"Category not found"` |
 | 409 | `"Category still has transactions"` |
+| 409 | `"Category still has recurring rules"` (also when the rule is turned off) |
 
 When the delete succeeds, the budgets of the category (every month) are deleted with it.
 
@@ -376,6 +386,7 @@ If `categoryId` changes, `type` is copied again from the new category.
 |------|---------|
 | 400 | `"Nothing to update"` + same validation messages as create |
 | 404 | `"Transaction not found"`, `"Category not found"` |
+| 409 | `"Duplicate value"` (the new date is already used by another transaction of the same recurring rule) |
 
 ### 14. DELETE /api/transactions/:id
 Auth: yes.
@@ -629,3 +640,94 @@ every category already has one in `toMonth`.
 | Code | message |
 |------|---------|
 | 400 | `"From month must be in YYYY-MM format"`, `"To month must be in YYYY-MM format"`, `"From month and to month must be different"` |
+
+---
+
+## Recurring
+
+A rule creates real transactions by itself, weekly or monthly. The rule has no currency: its transactions are in VND.
+
+Rule object (category populated):
+```json
+{
+  "_id": "6720e1b2c3d4e5f601234590",
+  "category": { "_id": "6720b1b2c3d4e5f601234571", "name": "Bills", "color": "#F19A52", "type": "expense" },
+  "amount": 3500000,
+  "note": "Rent",
+  "frequency": "monthly",
+  "startDate": "2026-08-31T05:00:00.000Z",
+  "nextRunDate": "2026-11-30T05:00:00.000Z",
+  "endDate": null,
+  "active": true,
+  "ended": false,
+  "createdAt": "2026-08-31T02:01:00.000Z",
+  "updatedAt": "2026-10-31T02:01:00.000Z"
+}
+```
+- All dates of a rule are stored at noon Vietnam time, so one day is always exactly one `Date`.
+- `ended` is computed: `true` when `nextRunDate` is after `endDate`, so the rule will not run again.
+- `userId` is not returned. Stored as `categoryId`, returned as `category`.
+
+### How the transactions are created
+There is no cron job, because the free Render server sleeps when nobody is using it. Instead,
+`GET /api/transactions`, `GET /api/stats/summary`, `GET /api/budgets` and `GET /api/recurring` first call
+`processDueRules(userId)`, which goes through the user's active rules:
+- It creates a transaction for every date from `nextRunDate` up to today (Vietnam time), at most **60 per rule per request**.
+  A rule with more due dates continues on the next request.
+- A created transaction gets `type` from the category, `note` and `amount` from the rule, `date` = the run date and
+  `recurringRuleId` = the rule. `recurringRuleId` can never be set by a client. It stays after the rule is deleted.
+- A **monthly** rule always counts from the day of `startDate`: 31 Jan → 28 Feb → 31 Mar. A month that is too short uses its last day.
+- A **weekly** rule runs every 7 days.
+- `endDate` is the last day that can run. A rule past its end stops, and moving `endDate` later makes it run again.
+
+**Safe when many requests run at once** (the Dashboard alone sends several):
+1. A partial unique index on Transaction (`recurringRuleId + date`, only for transactions that have a `recurringRuleId`)
+   refuses a second transaction for the same date. The duplicate error (E11000) is ignored.
+2. `nextRunDate` moves with `findOneAndUpdate({ _id, active: true, nextRunDate: <the date just used> })`, so only one
+   request can move it, and no date is ever skipped.
+
+### 24. GET /api/recurring
+Auth: yes. Active rules first, then the rule that runs soonest. No rules returns `[]`.
+
+### 25. POST /api/recurring
+Auth: yes.
+
+**Body**
+```json
+{ "categoryId": "6720b1b2c3d4e5f601234571", "amount": 3500000, "note": "Rent", "frequency": "monthly", "startDate": "2026-08-31", "endDate": null }
+```
+`note` and `endDate` are optional. A `startDate` in the past is allowed: the missed transactions are created on the next
+call of one of the routes above.
+
+**201** – the rule, with `nextRunDate` = `startDate`.
+
+**Errors**
+
+| Code | message |
+|------|---------|
+| 400 | `"Category id is invalid"`, `"Amount must be greater than 0"`, `"Frequency must be weekly or monthly"`, `"Start date must be a date in YYYY-MM-DD format"`, `"End date must be a date in YYYY-MM-DD format"`, `"End date must be after the start date"`, `"Note must be a string"`, `"Note must be at most 200 characters"` |
+| 404 | `"Category not found"` (does not exist or belongs to another user) |
+
+### 26. PUT /api/recurring/:id
+Auth: yes. Same body as POST. It replaces the whole rule: a missing `note` becomes empty, a missing `endDate` removes the end date.
+
+Changing `frequency` or `startDate` recalculates `nextRunDate`: the first date of the new schedule **after the last
+transaction the rule created** (`startDate` if it has created none), so changing monthly to weekly does not create
+every past week. Transactions already created are never changed.
+
+**200** – the updated rule. **Errors**: same 400 as POST; 404 `"Recurring rule not found"` or `"Category not found"`.
+
+### 27. PATCH /api/recurring/:id/toggle
+Auth: yes. No body. A rule that is off creates nothing. Turning it back on skips the dates that passed while it was off:
+`nextRunDate` becomes the first date of the schedule from today on.
+
+**200** – the rule with its new `active`. **Errors**: 404 `"Recurring rule not found"`.
+
+### 28. DELETE /api/recurring/:id
+Auth: yes. The transactions the rule created are kept.
+
+**200**
+```json
+{ "success": true, "data": { "_id": "6720e1b2c3d4e5f601234590" } }
+```
+**Errors**: 404 `"Recurring rule not found"`.

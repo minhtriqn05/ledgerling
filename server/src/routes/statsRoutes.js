@@ -13,6 +13,7 @@ router.use(requireAuth);
  * /stats/summary:
  *   get:
  *     summary: Dashboard numbers of a month (totals, expense per category, last 6 months)
+ *     description: First creates the transactions of my recurring rules that are due up to today (see the Recurring tag).
  *     tags: [Stats]
  *     security:
  *       - bearerAuth: []
