@@ -94,6 +94,9 @@ Swagger UI: `/api-docs` (outside `/api`).
 | 33 | DELETE | `/api/goals/:id` | Yes | Delete a goal and its history |
 | 34 | POST | `/api/goals/:id/contributions` | Yes | Add money (amount > 0) or withdraw money (amount < 0) |
 | 35 | DELETE | `/api/goals/:id/contributions/:contributionId` | Yes | Delete a contribution entered by mistake |
+| 36 | GET | `/api/reports/monthly` | Yes | One month with last month's comparison, top categories, daily expense, top tags (`?month=&currency=`) |
+| 37 | GET | `/api/reports/yearly` | Yes | Income and expense of the 12 months of a year (`?year=&currency=`) |
+| 38 | GET | `/api/insights` | Yes | Up to 6 rule-based tips about a month (`?month=&currency=`) |
 
 Every protected route (Auth = Yes) can also return **401** (`"Not authorized, token missing"` /
 `"Not authorized, invalid token"`) and every route can return **500** (`"Internal server error"`).
@@ -857,3 +860,126 @@ Auth: yes. Takes a contribution back: deleting a deposit lowers `savedAmount`, d
 |------|---------|
 | 400 | `"Deleting this deposit would make the saved amount negative"` (the money of that deposit was already withdrawn) |
 | 404 | `"Goal not found"`, `"Contribution not found"` (also when the id belongs to another goal) |
+
+
+---
+
+## Reports and insights
+
+Read-only routes for the Reports page and the Dashboard card. Like `GET /transactions`, each one first creates the
+transactions of my recurring rules that are due, so their numbers include them. Everything is computed by MongoDB
+aggregation. Months and days are read in **Vietnam time (UTC+7)**: an expense at 23:30 on the last day of a month stays
+in that month and on that day. Only transactions in one currency are summed (`currency`, default `VND`, 3 **uppercase**
+letters), so 10 USD is never added as 10 VND.
+
+### 36. GET /api/reports/monthly
+Auth: yes. Query: `month=YYYY-MM` (default: the current month in Vietnam time), `currency` (default `VND`).
+
+**200**
+```json
+{
+  "success": true,
+  "data": {
+    "month": "2025-10",
+    "currency": "VND",
+    "totals": { "income": 21500000, "expense": 1250000, "balance": 20250000 },
+    "previousMonth": "2025-09",
+    "previousTotals": { "income": 18000000, "expense": 1100000, "balance": 16900000 },
+    "changes": { "income": 19.4, "expense": 13.6, "balance": 19.8 },
+    "topCategories": [
+      { "categoryId": "6720b1b2c3d4e5f601234568", "name": "Bills", "color": "#F19A52", "icon": null,
+        "total": 1000000, "percent": 80, "previousTotal": 800000, "changePercent": 25 }
+    ],
+    "dailyExpense": [ { "date": "2025-10-01", "total": 0 }, { "date": "2025-10-02", "total": 0 } ],
+    "averagePerDay": 40323,
+    "noSpendDays": 27,
+    "largestExpense": {
+      "_id": "6720c1b2c3d4e5f601234569", "amount": 1000000, "note": "Electricity", "date": "2025-10-10T02:00:00.000Z",
+      "category": { "_id": "6720b1b2c3d4e5f601234568", "name": "Bills", "color": "#F19A52", "icon": null }
+    },
+    "topTags": [ { "tag": "work", "total": 200000, "count": 2 } ]
+  }
+}
+```
+(`dailyExpense` is shortened here: it has one entry for every day of the month.)
+
+| Field | How it is calculated |
+|-------|----------------------|
+| `totals`, `previousTotals` | Income, expense and `balance = income - expense` of the month and of the month before |
+| `changes` | `(current - previous) / abs(previous) * 100`, 1 decimal. **`null` when last month is 0.** A positive `expense` change means more spending |
+| `topCategories` | Up to 5 expense categories with an expense this month, biggest first (same total: by name). `percent` = share of the month's expense, 1 decimal. `changePercent` compares with the same category last month (`null` when it was 0). `icon` is `null` for now: categories have no icon yet |
+| `dailyExpense` | **Every** day of the month in order (28-31 entries); a day without expenses has `total` 0 |
+| `averagePerDay` | Expense / days that have started, rounded to a whole number. A past month: all its days. The current month: up to and including today. A future month: 0 |
+| `noSpendDays` | Finished days without any expense. Today is not counted (it may still get one). A future month: 0 |
+| `largestExpense` | The biggest single expense (the latest when two are equal), or `null` |
+| `topTags` | Up to 5 tags with the most expense, `total` = sum of the transactions that carry the tag. A transaction with 2 tags counts in both |
+
+A month without transactions is **not** an error: totals are 0, `changes` are `null`, `topCategories` and `topTags` are
+`[]`, `largestExpense` is `null`, `dailyExpense` is all zeros.
+
+**Errors**: 400 `"Month must be in YYYY-MM format"`, `"Currency must be a 3-letter ISO code"`.
+
+### 37. GET /api/reports/yearly
+Auth: yes. Query: `year=YYYY` (1970-2100, default: the current year in Vietnam time), `currency` (default `VND`).
+
+**200**
+```json
+{
+  "success": true,
+  "data": {
+    "year": 2025,
+    "currency": "VND",
+    "months": [
+      { "month": "2025-01", "income": 0, "expense": 0, "balance": 0 },
+      { "month": "2025-10", "income": 21500000, "expense": 1250000, "balance": 20250000 }
+    ],
+    "totals": { "income": 39500000, "expense": 2430000, "balance": 37070000 },
+    "topExpenseMonth": { "month": "2025-10", "expense": 1250000 }
+  }
+}
+```
+(`months` is shortened here: it always has 12 entries, January first, and a month without transactions has 0.)
+`topExpenseMonth` is the month with the most expense (the earlier month when two are equal), or `null` when the whole
+year has no expenses.
+
+**Errors**: 400 `"Year must be a 4-digit year from 1970 to 2100"`, `"Currency must be a 3-letter ISO code"`.
+
+### 38. GET /api/insights
+Auth: yes. Query: `month=YYYY-MM` (default: the current month), `currency` (default `VND`).
+
+**200**
+```json
+{
+  "success": true,
+  "data": {
+    "month": "2025-10",
+    "currency": "VND",
+    "insights": [
+      { "type": "category-up", "severity": "warning",
+        "message": "You spent 200.000 ₫ (25%) more on Bills than last month.",
+        "link": "/transactions?month=2025-10&category=6720b1b2c3d4e5f601234568" },
+      { "type": "savings-rate", "severity": "success",
+        "message": "Great! You saved 94% of your income in October 2025.",
+        "link": "/reports?tab=monthly&month=2025-10" }
+    ]
+  }
+}
+```
+Built from simple rules (no AI). `severity` is `info`, `warning` or `success`. The list is sorted warning, success, info and has
+**at most 6** items; a month without any income or expense returns `[]`.
+
+| `type` | Condition | `severity` |
+|--------|-----------|------------|
+| `budget-forecast` | **Current month, VND only.** `spent / days passed * days in month` is above the budget (a budget already used up says so). At most 2 budgets, the biggest overshoot first | warning |
+| `category-up` | The category with the biggest increase in money, when it is **+20% or more** from last month (last month must be above 0) | warning |
+| `category-down` | The category with the biggest decrease in money, when it is **-20% or less** (a category that dropped to 0 counts) | success |
+| `savings-rate` | `(income - expense) / income`: 20% or more | success |
+| | 0% to 19% | info |
+| | below 0%, or an expense with no income | warning |
+| `no-spend-days` | Finished days without an expense: 5 or more | success |
+| | 1 to 4 days, or 0 days ("you spent every day") | info |
+| `largest-expense` | The biggest single expense of the month, `link` opens its day | info |
+
+`link` is a path inside the app. Amounts in `message` are written like the client does (`1.000.000 ₫`).
+
+**Errors**: 400 `"Month must be in YYYY-MM format"`, `"Currency must be a 3-letter ISO code"`.

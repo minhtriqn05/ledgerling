@@ -212,3 +212,16 @@
     padding: var(--space-4);
   }
 }
+
+/* ---------- Print: only the page, without the sidebar and the footer ---------- */
+@media print {
+  .layout {
+    display: block;
+    min-height: 0;
+  }
+
+  .sidebar,
+  .footer {
+    display: none;
+  }
+}

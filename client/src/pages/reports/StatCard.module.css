@@ -1,0 +1,116 @@
+/* Same look as the number cards of the Dashboard: income and expense are tinted with --tone, balance is the one hero card. */
+.card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-5);
+  border: 1px solid color-mix(in srgb, var(--tone) 22%, var(--color-surface));
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--tone) 10%, var(--color-surface));
+}
+
+.income {
+  --tone: var(--color-income);
+  --money: var(--color-income-text);
+}
+
+.expense {
+  --tone: var(--color-expense);
+  --money: var(--color-expense-text);
+}
+
+.neutral {
+  --tone: var(--accent-sky);
+  --money: var(--color-text);
+}
+
+.balance {
+  border: none;
+  background: var(--gradient-hero);
+  box-shadow: var(--shadow-md);
+  color: var(--color-hero-text);
+  --money: var(--color-hero-text);
+}
+
+.tile {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: color-mix(in srgb, var(--tone) 62%, var(--color-text));
+  box-shadow: var(--shadow-sm);
+}
+
+.balance .tile {
+  background: var(--color-hero-decor);
+  color: var(--color-hero-text);
+  box-shadow: none;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.balance .label {
+  color: var(--color-hero-text);
+}
+
+.value {
+  color: var(--money);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.extra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.balance .extra {
+  color: var(--color-hero-text);
+}
+
+@media print {
+  .card {
+    box-shadow: none;
+  }
+
+  /* A gradient background is not printed by default: use a plain light card and dark text */
+  .balance {
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text);
+    --money: var(--color-text);
+  }
+
+  .balance .label,
+  .balance .extra {
+    color: var(--color-text-secondary);
+  }
+
+  .balance .tile {
+    background: var(--color-surface-muted);
+    color: var(--color-text);
+  }
+}

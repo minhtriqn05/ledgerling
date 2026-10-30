@@ -1,0 +1,44 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.content {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* Green: better than last month. Red: worse. Gray: no change or nothing to compare with. */
+.good {
+  background: var(--color-income-soft);
+  color: var(--color-income-text);
+}
+
+.bad {
+  background: var(--color-expense-soft);
+  color: var(--color-expense-text);
+}
+
+.neutral {
+  background: var(--color-surface-muted);
+  color: var(--color-text-secondary);
+}
+
+/* Read by screen readers only (the visible text is the short version) */
+.visually {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Ledgerling API",
-    "description": "Auth, Categories, Transactions, Stats, Budgets, Tags, CSV import, Recurring and Goals requests for the Ledgerling API. Run Register (or Login) first: its test script saves the token into {{token}}, and every other request sends it as a Bearer token.",
+    "description": "Auth, Categories, Transactions, Stats, Budgets, Tags, CSV import, Recurring, Goals and Reports requests for the Ledgerling API. Run Register (or Login) first: its test script saves the token into {{token}}, and every other request sends it as a Bearer token.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -11454,6 +11454,375 @@
                 "{{goalId}}"
               ]
             }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "description": "Reports and insights. Run after the Auth folder ({{token}}). The requests look at months where the test user usually has no data, so every one of them works on an empty account too: an empty month returns zeros, never an error.",
+      "item": [
+        {
+          "name": "Monthly report - current month",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const data = pm.response.json().data;",
+                  "pm.test('Has the totals and 31 or fewer days', function () {",
+                  "  pm.expect(data.totals).to.have.keys([\"income\", \"expense\", \"balance\"]);",
+                  "  pm.expect(data.dailyExpense.length).to.be.within(28, 31);",
+                  "  pm.expect(data.topCategories.length).to.be.at.most(5);",
+                  "  pm.expect(data.topTags.length).to.be.at.most(5);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reports/monthly",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reports",
+                "monthly"
+              ]
+            },
+            "description": "Without ?month= the report is for the current month (Vietnam time)."
+          }
+        },
+        {
+          "name": "Monthly report - empty month",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const data = pm.response.json().data;",
+                  "pm.test('Everything is 0 or empty', function () {",
+                  "  pm.expect(data.totals).to.eql({ income: 0, expense: 0, balance: 0 });",
+                  "  pm.expect(data.changes).to.eql({ income: null, expense: null, balance: null });",
+                  "  pm.expect(data.dailyExpense.length).to.eql(28);",
+                  "  pm.expect(data.topCategories).to.eql([]);",
+                  "  pm.expect(data.largestExpense).to.eql(null);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reports/monthly?month=1990-02",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reports",
+                "monthly"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "1990-02"
+                }
+              ]
+            },
+            "description": "A month without transactions: zeros, empty lists, null changes, one entry for each of the 28 days of February 1990."
+          }
+        },
+        {
+          "name": "Monthly report - bad month",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Message', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql('Month must be in YYYY-MM format');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reports/monthly?month=2026-13",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reports",
+                "monthly"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-13"
+                }
+              ]
+            },
+            "description": "Month 13 does not exist: 400."
+          }
+        },
+        {
+          "name": "Monthly report - no token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/reports/monthly?month=2026-10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reports",
+                "monthly"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                }
+              ]
+            },
+            "description": "Without the Authorization header: 401."
+          }
+        },
+        {
+          "name": "Yearly report",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const data = pm.response.json().data;",
+                  "pm.test('12 months, January first', function () {",
+                  "  pm.expect(data.months.length).to.eql(12);",
+                  "  pm.expect(data.months[0].month).to.eql('2026-01');",
+                  "  pm.expect(data.months[11].month).to.eql('2026-12');",
+                  "});",
+                  "pm.test('The totals are the sum of the months', function () {",
+                  "  const expense = data.months.reduce((sum, m) => sum + m.expense, 0);",
+                  "  pm.expect(data.totals.expense).to.eql(expense);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reports/yearly?year=2026",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reports",
+                "yearly"
+              ],
+              "query": [
+                {
+                  "key": "year",
+                  "value": "2026"
+                }
+              ]
+            },
+            "description": "Income and expense of the 12 months of 2026, the year totals and the month with the most expense."
+          }
+        },
+        {
+          "name": "Yearly report - empty year",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const data = pm.response.json().data;",
+                  "pm.test('Zeros and no top month', function () {",
+                  "  pm.expect(data.totals).to.eql({ income: 0, expense: 0, balance: 0 });",
+                  "  pm.expect(data.topExpenseMonth).to.eql(null);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reports/yearly?year=1990",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reports",
+                "yearly"
+              ],
+              "query": [
+                {
+                  "key": "year",
+                  "value": "1990"
+                }
+              ]
+            },
+            "description": "A year without transactions."
+          }
+        },
+        {
+          "name": "Yearly report - bad year",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reports/yearly?year=26",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reports",
+                "yearly"
+              ],
+              "query": [
+                {
+                  "key": "year",
+                  "value": "26"
+                }
+              ]
+            },
+            "description": "Not a 4-digit year: 400."
+          }
+        },
+        {
+          "name": "Insights - current month",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const insights = pm.response.json().data.insights;",
+                  "pm.test('At most 6, each with type, severity, message and link', function () {",
+                  "  pm.expect(insights.length).to.be.at.most(6);",
+                  "  insights.forEach((i) => {",
+                  "    pm.expect(i).to.have.keys(['type', 'severity', 'message', 'link']);",
+                  "    pm.expect(['info', 'warning', 'success']).to.include(i.severity);",
+                  "  });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/insights",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "insights"
+              ]
+            },
+            "description": "Rule-based tips for the current month. An account without transactions gets an empty list."
+          }
+        },
+        {
+          "name": "Insights - bad month",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/insights?month=abc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "insights"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "abc"
+                }
+              ]
+            },
+            "description": "Not a month: 400."
           }
         }
       ]

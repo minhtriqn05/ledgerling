@@ -1,0 +1,80 @@
+.tab {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+/* ---------- Month by month ---------- */
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.table th,
+.table td {
+  padding: var(--space-2) var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.table thead th {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.table tbody tr:last-child th,
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table .number {
+  text-align: right;
+}
+
+.income {
+  color: var(--color-income-text);
+}
+
+.expense {
+  color: var(--color-expense-text);
+}
+
+.headerExtra {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+
+/* Highest-spending month: a pill in the header of the chart card */
+.topMonth {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  margin: 0;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--color-expense-soft);
+  color: var(--color-expense-text);
+  font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 760px) {
+  .stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

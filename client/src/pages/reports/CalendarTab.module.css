@@ -1,0 +1,139 @@
+.total {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.total strong {
+  color: var(--color-expense-text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 7 columns, Monday first. Week day names, then the day cells. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.weekday {
+  padding-bottom: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  text-align: center;
+}
+
+.empty {
+  min-height: 64px;
+}
+
+/* One day: the day number on top, the amount (if any) under it. */
+.day {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-1);
+  min-width: 0;
+  min-height: 64px;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+  text-align: left;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.day:hover {
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-sm);
+}
+
+.day:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+.dayNumber {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.dayAmount {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  text-overflow: ellipsis;
+}
+
+/* Darker = more spent. Coral (the expense color) mixed into white in 4 steps. */
+.level0 {
+  background: var(--color-surface-muted);
+}
+
+.level1 {
+  background: color-mix(in srgb, var(--color-expense) 16%, var(--color-surface));
+}
+
+.level2 {
+  background: color-mix(in srgb, var(--color-expense) 32%, var(--color-surface));
+}
+
+.level3 {
+  background: color-mix(in srgb, var(--color-expense) 50%, var(--color-surface));
+}
+
+.level4 {
+  background: color-mix(in srgb, var(--color-expense) 70%, var(--color-surface));
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-1);
+  margin-top: var(--space-4);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.swatch {
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.hint {
+  margin: var(--space-2) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  text-align: right;
+}
+
+@media (max-width: 560px) {
+  .grid {
+    gap: var(--space-1);
+  }
+
+  .day,
+  .empty {
+    min-height: 52px;
+  }
+
+  .day {
+    padding: var(--space-1);
+  }
+}
+
+@media print {
+  .hint {
+    display: none;
+  }
+}
