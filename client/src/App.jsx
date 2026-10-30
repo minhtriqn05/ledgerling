@@ -19,7 +19,7 @@ export default function App() {
         <Route path="/register" element={<RegisterPage />} />
       </Route>
 
-      {/* Pages with the sidebar / bottom tab bar. They need a signed-in user. */}
+      {/* Pages with the sidebar / top bar. They need a signed-in user. */}
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route path="/" element={<DashboardPage />} />

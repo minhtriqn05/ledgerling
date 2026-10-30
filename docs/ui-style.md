@@ -146,13 +146,18 @@ category color is always shown with its name (chip label, avatar letter, legend 
 - **Sidebar:** gradient logo tile, nav items (Dashboard, Transactions, Categories) with line icons,
   active item = primary-soft background + primary-text; a "Saved in October" card (pastel wash +
   mint progress ring); user block (sun-tinted initials) and "Log out" at the bottom.
-- **Phones (≤960px):** the sidebar becomes a fixed **bottom tab bar** (`--tabbar-height` 64px) with
-  four equal tabs – Dashboard, Transactions, Categories, Log out – each an icon above a 12px label.
-  The active tab uses the same primary-soft pill as the sidebar. Page content gets extra bottom
-  padding so the bar never covers it. Implemented in `client/src/components/AppLayout/`.
+- **Navigation items:** one array, `navItems` in `client/src/config/navItems.js` (`label`, `path`, optional
+  `icon`). Adding a page to the menu is one new line there plus its route in `App.jsx`.
+- **Active page:** primary-soft background, primary-text, semibold, plus a 4px primary bar on the left
+  edge (so it is not shown by color alone). The link also gets `aria-current="page"` from React Router.
+- **Narrow screens (<768px):** the sidebar becomes a sticky **top bar** (`--topbar-height` 56px): logo + name on
+  the left, a round menu button on the right (hamburger, turns into an X when open). The button opens a
+  **panel** under the bar (white, 20px radius, `--shadow-lg`) with the same items and "Log out" after a divider.
+  The panel closes on Escape, on a click outside, or after choosing a link. Implemented in
+  `client/src/components/AppLayout/`.
 - **Page header:** title + subtitle on the left; month picker pill and primary action on the right.
 - **Breakpoints:** ≤1100px dashboard stats in 2 columns (hero full width), categories form below the
-  list; ≤960px sidebar hidden, a slim app bar (logo + avatar) appears, all rows one column;
+  list; ≤960px all rows one column; <768px the sidebar turns into the top bar + menu panel;
   ≤760px summary cards stacked; ≤640px the transactions table becomes a list; ≤560px 16px padding.
   No horizontal page scroll at any width (checked at 390px).
 

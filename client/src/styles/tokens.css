@@ -123,7 +123,7 @@
 
   /* ---------- Layout ---------- */
   --sidebar-width: 240px;
-  --tabbar-height: 64px;  /* bottom tab bar on phones */
+  --topbar-height: 56px;  /* top bar with the menu button on narrow screens */
   --content-max-width: 1200px;
   --control-height: 40px; /* buttons and inputs share one height */
 }
