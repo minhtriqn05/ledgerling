@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import AppLayout from './components/AppLayout/AppLayout.jsx';
 import AuthLayout from './components/AuthLayout/AuthLayout.jsx';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute.jsx';
@@ -8,6 +8,7 @@ import CategoriesPage from './pages/CategoriesPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import StyleGuidePage from './pages/StyleGuidePage.jsx';
+import NotFoundPage from './pages/NotFoundPage.jsx';
 
 export default function App() {
   return (
@@ -30,8 +31,8 @@ export default function App() {
       {/* Temporary page to review the design tokens. Only available in dev mode. */}
       {import.meta.env.DEV && <Route path="/style-guide" element={<StyleGuidePage />} />}
 
-      {/* Any other address goes back to the Dashboard */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      {/* Any other address */}
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }
