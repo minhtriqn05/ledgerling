@@ -43,6 +43,11 @@ const options = {
           "Monthly and yearly numbers for the Reports page. Months and days are read in Vietnam time (UTC+7). Like the other read routes, they first create the recurring transactions that are due.",
       },
       { name: "Insights", description: "Tips built from simple rules on the numbers of a month (no AI)" },
+      {
+        name: "Templates",
+        description:
+          "Saved category + amount + note combos of the signed-in user. The quick add dialog shows them as chips; a click creates a normal transaction dated today.",
+      },
     ],
     components: {
       securitySchemes: {
@@ -96,6 +101,7 @@ const options = {
             name: { type: "string", example: "Food" },
             type: { type: "string", enum: ["income", "expense"], example: "expense" },
             color: { type: "string", example: "#FF7043" },
+            icon: { type: "string", nullable: true, description: "One emoji, or null when the category has none", example: "🍜" },
             createdAt: { type: "string", format: "date-time", example: "2026-10-27T03:05:00.000Z" },
             updatedAt: { type: "string", format: "date-time", example: "2026-10-27T03:05:00.000Z" },
           },
@@ -110,6 +116,7 @@ const options = {
                 _id: { type: "string", example: "6720b1b2c3d4e5f601234568" },
                 name: { type: "string", example: "Food" },
                 color: { type: "string", example: "#FF7043" },
+                icon: { type: "string", nullable: true, example: "🍜" },
               },
             },
             type: { type: "string", enum: ["income", "expense"], example: "expense" },
@@ -143,6 +150,7 @@ const options = {
                 _id: { type: "string", example: "6720b1b2c3d4e5f601234568" },
                 name: { type: "string", example: "Food" },
                 color: { type: "string", example: "#F07D62" },
+                icon: { type: "string", nullable: true, example: "🍜" },
               },
             },
             month: { type: "string", example: "2026-10" },
@@ -170,6 +178,7 @@ const options = {
                 _id: { type: "string", example: "6720b1b2c3d4e5f601234571" },
                 name: { type: "string", example: "Bills" },
                 color: { type: "string", example: "#F19A52" },
+                icon: { type: "string", nullable: true, example: "🧾" },
                 type: { type: "string", enum: ["income", "expense"], example: "expense" },
               },
             },
@@ -206,6 +215,37 @@ const options = {
               description: "Optional last day that can run, must be after startDate",
               example: "2027-08-31",
             },
+          },
+        },
+        Template: {
+          type: "object",
+          properties: {
+            _id: { type: "string", example: "6720b1b2c3d4e5f601234700" },
+            name: { type: "string", example: "Morning coffee" },
+            category: {
+              type: "object",
+              properties: {
+                _id: { type: "string", example: "6720b1b2c3d4e5f601234568" },
+                name: { type: "string", example: "Food" },
+                color: { type: "string", example: "#F07D62" },
+                icon: { type: "string", nullable: true, example: "🍜" },
+                type: { type: "string", enum: ["income", "expense"], example: "expense" },
+              },
+            },
+            amount: { type: "number", description: "In VND", example: 35000 },
+            note: { type: "string", example: "Coffee" },
+            createdAt: { type: "string", format: "date-time", example: "2026-10-31T02:00:00.000Z" },
+            updatedAt: { type: "string", format: "date-time", example: "2026-10-31T02:00:00.000Z" },
+          },
+        },
+        TemplateInput: {
+          type: "object",
+          required: ["name", "categoryId", "amount"],
+          properties: {
+            name: { type: "string", minLength: 1, maxLength: 40, example: "Morning coffee" },
+            categoryId: { type: "string", description: "Id of one of your categories", example: "6720b1b2c3d4e5f601234568" },
+            amount: { type: "number", description: "In VND, greater than 0", example: 35000 },
+            note: { type: "string", maxLength: 200, example: "Coffee" },
           },
         },
         Contribution: {

@@ -15,15 +15,16 @@ export function ToastProvider({ children }) {
     setToasts((list) => list.filter((toast) => toast.id !== id));
   }, []);
 
-  const show = useCallback((type, message) => {
-    setToasts((list) => [...list, { id: ++nextId, type, message }].slice(-MAX_TOASTS));
+  // options (optional): { duration: ms, action: { label, onClick } }, see components/Toast/Toast.jsx
+  const show = useCallback((type, message, options = {}) => {
+    setToasts((list) => [...list, { id: ++nextId, type, message, ...options }].slice(-MAX_TOASTS));
   }, []);
 
   // Same object on every render, so components can put it in an effect's dependency list.
   const value = useMemo(
     () => ({
-      success: (message) => show('success', message),
-      error: (message) => show('error', message),
+      success: (message, options) => show('success', message, options),
+      error: (message, options) => show('error', message, options),
     }),
     [show]
   );
@@ -37,6 +38,7 @@ export function ToastProvider({ children }) {
 }
 
 // Usage: const toast = useToast(); toast.success('Category added'); toast.error(getErrorMessage(err));
+// With a button: toast.success('Transaction deleted', { duration: 5000, action: { label: 'Undo', onClick: undo } });
 export function useToast() {
   const context = useContext(ToastContext);
   if (!context) throw new Error('useToast must be used inside <ToastProvider>');

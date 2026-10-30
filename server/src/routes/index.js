@@ -9,6 +9,7 @@ import recurringRoutes from "./recurringRoutes.js";
 import goalRoutes from "./goalRoutes.js";
 import reportRoutes from "./reportRoutes.js";
 import insightRoutes from "./insightRoutes.js";
+import templateRoutes from "./templateRoutes.js";
 
 const router = Router();
 
@@ -22,6 +23,7 @@ router.use("/recurring", recurringRoutes);
 router.use("/goals", goalRoutes);
 router.use("/reports", reportRoutes);
 router.use("/insights", insightRoutes);
+router.use("/templates", templateRoutes);
 
 /**
  * @openapi

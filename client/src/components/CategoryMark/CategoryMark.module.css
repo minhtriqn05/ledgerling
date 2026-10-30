@@ -1,0 +1,6 @@
+/* An emoji takes the place of the 8px dot, so it is a little bigger than the text and never shrinks. */
+.mark {
+  flex-shrink: 0;
+  font-size: 1.1em;
+  line-height: 1;
+}

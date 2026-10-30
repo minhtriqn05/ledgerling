@@ -40,7 +40,7 @@ export function ChartTooltip({ active, payload, label, hideLabel = false }) {
         return (
           <p key={item.name} className={styles.tooltipRow}>
             {color && <span className={styles.dot} style={{ background: color }} />}
-            <span>{item.name}</span>
+            <span>{item.payload?.icon ? `${item.payload.icon} ${item.name}` : item.name}</span>
             <strong>{formatVnd(item.value)}</strong>
           </p>
         );

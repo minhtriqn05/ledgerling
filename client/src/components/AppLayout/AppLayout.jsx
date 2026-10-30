@@ -2,18 +2,40 @@ import { useEffect, useRef, useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import ApiStatus from '../ApiStatus/ApiStatus.jsx';
 import Icon from '../Icon.jsx';
+import QuickAddButton from '../QuickAdd/QuickAddButton.jsx';
+import QuickAddDialog from '../QuickAdd/QuickAddDialog.jsx';
+import ShortcutsDialog from '../QuickAdd/ShortcutsDialog.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
+import { useHotkeys } from '../../hooks/useHotkeys.js';
 import { navItems } from '../../config/navItems.js';
 import styles from './AppLayout.module.css';
 
 // Shared layout for signed-in pages: a sidebar on wide screens, a top bar with a menu button below 768px.
 // The page itself is rendered by <Outlet />. The menu items come from config/navItems.js.
+// It also holds what every signed-in page shares: the "+" button / N key (Quick add), and the shortcuts / and ?.
 
 export default function AppLayout() {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false); // only matters on narrow screens
+  const [quickAddOpen, setQuickAddOpen] = useState(false);
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
+  // Changing this key makes React build the open page again, so it loads its data again after a Quick add.
+  const [pageKey, setPageKey] = useState(0);
   const sidebarRef = useRef(null);
+
+  // "/" jumps to the search box of the Transactions page (and opens that page first if it is not the one shown)
+  function focusSearch() {
+    const input = document.querySelector('[data-hotkey-search]');
+    if (input) input.focus();
+    else navigate('/transactions', { state: { focusSearch: true } });
+  }
+
+  useHotkeys({
+    n: () => setQuickAddOpen(true),
+    '/': focusSearch,
+    '?': () => setShortcutsOpen(true),
+  });
 
   // While the panel is open: Escape or a click outside closes it.
   useEffect(() => {
@@ -88,12 +110,21 @@ export default function AppLayout() {
 
       <div className={styles.body}>
         <main className={styles.main}>
-          <Outlet />
+          <Outlet key={pageKey} />
         </main>
         <footer className={styles.footer}>
           <ApiStatus />
+          <button type="button" className={styles.shortcutsLink} onClick={() => setShortcutsOpen(true)}>
+            <kbd>?</kbd> Keyboard shortcuts
+          </button>
         </footer>
       </div>
+
+      <QuickAddButton onClick={() => setQuickAddOpen(true)} />
+      {quickAddOpen && (
+        <QuickAddDialog onSaved={() => setPageKey((key) => key + 1)} onClose={() => setQuickAddOpen(false)} />
+      )}
+      {shortcutsOpen && <ShortcutsDialog onClose={() => setShortcutsOpen(false)} />}
     </div>
   );
 }

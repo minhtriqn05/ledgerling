@@ -10,6 +10,7 @@ import SegmentedControl from '../../components/SegmentedControl/SegmentedControl
 import Button from '../../components/Button/Button.jsx';
 import Alert from '../../components/Alert/Alert.jsx';
 import Icon from '../../components/Icon.jsx';
+import CategoryMark from '../../components/CategoryMark/CategoryMark.jsx';
 // Same fields as the "Add transaction" dialog, so it uses the same styles
 import styles from '../transactions/TransactionFormDialog.module.css';
 
@@ -122,7 +123,13 @@ export default function RuleFormDialog({ rule, categories, onSaved, onClose }) {
                     aria-pressed={selected}
                     onClick={() => setCategoryId(c._id)}
                   >
-                    {selected ? <Icon name="check" size={14} /> : <i className={styles.dot} />}
+                    {selected ? (
+                      <Icon name="check" size={14} />
+                    ) : (
+                      <CategoryMark icon={c.icon}>
+                        <i className={styles.dot} />
+                      </CategoryMark>
+                    )}
                     {c.name}
                   </button>
                 );

@@ -3,6 +3,7 @@ import { formatVnd } from '../../utils/format.js';
 import Card from '../../components/Card/Card.jsx';
 import Button from '../../components/Button/Button.jsx';
 import IconButton from '../../components/IconButton/IconButton.jsx';
+import CategoryMark from '../../components/CategoryMark/CategoryMark.jsx';
 import styles from './BudgetCard.module.css';
 
 // One budget in the grid: category dot + name, "spent / amount", a progress bar and a "left / over" line.
@@ -49,7 +50,9 @@ export default function BudgetCard({ budget, onEdit, onDelete }) {
     <Card className={`${styles.card} ${styles[budget.status]}`}>
       <div className={styles.top}>
         <h2 id={titleId} className={styles.name}>
-          <i className={styles.dot} style={{ background: category.color }} aria-hidden="true" />
+          <CategoryMark icon={category.icon}>
+            <i className={styles.dot} style={{ background: category.color }} aria-hidden="true" />
+          </CategoryMark>
           <span>{category.name}</span>
         </h2>
         <span className={styles.actions}>

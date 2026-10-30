@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { createTransaction, updateTransaction } from '../../api/transactions.js';
+import { createTemplate } from '../../api/templates.js';
 import { getTags } from '../../api/tags.js';
 import { getErrorMessage } from '../../api/axios.js';
 import { useToast } from '../../context/ToastContext.jsx';
@@ -12,6 +13,7 @@ import Button from '../../components/Button/Button.jsx';
 import Alert from '../../components/Alert/Alert.jsx';
 import TagInput from '../../components/TagInput/TagInput.jsx';
 import Icon from '../../components/Icon.jsx';
+import CategoryMark from '../../components/CategoryMark/CategoryMark.jsx';
 import styles from './TransactionFormDialog.module.css';
 
 const TYPE_OPTIONS = [
@@ -35,6 +37,9 @@ export default function TransactionFormDialog({ transaction, categories, onSaved
   const [tags, setTags] = useState(transaction?.tags ?? []);
   // The tags used before, offered as suggestions. If they cannot be loaded the box simply has none.
   const [knownTags, setKnownTags] = useState([]);
+  // "Save as template": also keeps category + amount + note as a template for the Quick add chips
+  const [saveTemplate, setSaveTemplate] = useState(false);
+  const [templateName, setTemplateName] = useState('');
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const toast = useToast();
@@ -84,6 +89,16 @@ export default function TransactionFormDialog({ transaction, categories, onSaved
         saved = await updateTransaction(transaction._id, data);
       } else {
         saved = await createTransaction({ ...data, date: fromDateInput(date) });
+      }
+      // The transaction is saved by now. A template that fails must not look like the transaction failed.
+      if (saveTemplate) {
+        try {
+          const name = templateName.trim() || data.note || saved.category.name;
+          await createTemplate({ name: name.slice(0, 40), categoryId, amount: data.amount, note: data.note });
+          toast.success('Template saved');
+        } catch (err) {
+          toast.error(`The transaction was saved, but the template was not: ${getErrorMessage(err)}`);
+        }
       }
       // The page closes the dialog and reloads the list.
       onSaved(saved);
@@ -136,7 +151,13 @@ export default function TransactionFormDialog({ transaction, categories, onSaved
                     aria-pressed={selected}
                     onClick={() => setCategoryId(c._id)}
                   >
-                    {selected ? <Icon name="check" size={14} /> : <i className={styles.dot} />}
+                    {selected ? (
+                      <Icon name="check" size={14} />
+                    ) : (
+                      <CategoryMark icon={c.icon}>
+                        <i className={styles.dot} />
+                      </CategoryMark>
+                    )}
                     {c.name}
                   </button>
                 );
@@ -179,6 +200,36 @@ export default function TransactionFormDialog({ transaction, categories, onSaved
             Tags
           </label>
           <TagInput id="transaction-tags" value={tags} onChange={setTags} suggestions={knownTags} disabled={saving} />
+        </div>
+
+        <div className={styles.field}>
+          <label className={styles.checkLabel}>
+            <input
+              type="checkbox"
+              checked={saveTemplate}
+              disabled={saving}
+              onChange={(event) => setSaveTemplate(event.target.checked)}
+            />
+            Save as template
+          </label>
+          {saveTemplate && (
+            <>
+              <label className={styles.srOnly} htmlFor="template-name">
+                Template name
+              </label>
+              <input
+                id="template-name"
+                className={styles.input}
+                autoComplete="off"
+                placeholder="Template name (default: the note or the category)"
+                maxLength={40}
+                value={templateName}
+                disabled={saving}
+                onChange={(event) => setTemplateName(event.target.value)}
+              />
+              <p className={styles.hint}>Keeps the category, amount and note. Find it as a chip in Quick add.</p>
+            </>
+          )}
         </div>
 
         {error && <Alert>{error}</Alert>}

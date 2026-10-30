@@ -2,6 +2,7 @@ import Category from "../models/Category.js";
 import Transaction from "../models/Transaction.js";
 import Budget from "../models/Budget.js";
 import RecurringRule from "../models/RecurringRule.js";
+import TransactionTemplate from "../models/TransactionTemplate.js";
 import { httpError } from "../utils/httpError.js";
 
 // Same case-insensitive comparison as the unique index on the model
@@ -9,13 +10,13 @@ const NAME_COLLATION = { locale: "en", strength: 2 };
 
 // Created for every new account. Colors are the presets from docs/ui-style.md (one per category).
 const DEFAULT_CATEGORIES = [
-  { name: "Food", type: "expense", color: "#F07D62" },
-  { name: "Transport", type: "expense", color: "#4A9FE3" },
-  { name: "Shopping", type: "expense", color: "#7D8CE8" },
-  { name: "Bills", type: "expense", color: "#F19A52" },
-  { name: "Entertainment", type: "expense", color: "#22ADA3" },
-  { name: "Salary", type: "income", color: "#3DB383" },
-  { name: "Other Income", type: "income", color: "#5D7FD8" },
+  { name: "Food", type: "expense", color: "#F07D62", icon: "🍜" },
+  { name: "Transport", type: "expense", color: "#4A9FE3", icon: "🚌" },
+  { name: "Shopping", type: "expense", color: "#7D8CE8", icon: "🛍️" },
+  { name: "Bills", type: "expense", color: "#F19A52", icon: "🧾" },
+  { name: "Entertainment", type: "expense", color: "#22ADA3", icon: "🎬" },
+  { name: "Salary", type: "income", color: "#3DB383", icon: "💰" },
+  { name: "Other Income", type: "income", color: "#5D7FD8", icon: "🎁" },
 ];
 
 export async function createDefaultCategories(userId) {
@@ -64,16 +65,17 @@ export async function deleteCategory(userId, id) {
   const hasRule = await RecurringRule.exists({ userId, categoryId: category._id });
   if (hasRule) throw httpError(409, "Category still has recurring rules");
 
-  // A budget means nothing without its category, so its budgets (every month) go too
+  // A budget or a template means nothing without its category, so they go too
   await Budget.deleteMany({ userId, categoryId: category._id });
+  await TransactionTemplate.deleteMany({ userId, categoryId: category._id });
   await category.deleteOne();
   return { _id: category._id };
 }
 
-export async function createCategory(userId, { name, type, color }) {
+export async function createCategory(userId, { name, type, color, icon }) {
   // Friendly message first; the unique index is the safety net if two requests race
   const existing = await Category.findOne({ userId, type, name }).collation(NAME_COLLATION);
   if (existing) throw httpError(409, "Category already exists");
 
-  return Category.create({ userId, name, type, color });
+  return Category.create({ userId, name, type, color, icon: icon ?? null });
 }

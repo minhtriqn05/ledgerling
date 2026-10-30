@@ -5,7 +5,9 @@ import { formatVnd } from '../../utils/format.js';
 import { formatMonth } from '../../utils/vnDate.js';
 import Card, { CardHeader } from '../../components/Card/Card.jsx';
 import Button from '../../components/Button/Button.jsx';
+import LoadingState from '../../components/LoadingState/LoadingState.jsx';
 import Icon from '../../components/Icon.jsx';
+import CategoryMark from '../../components/CategoryMark/CategoryMark.jsx';
 import styles from './BudgetAlerts.module.css';
 
 // "Budget alerts" card: the budgets of the month that reached 80% (warning) or 100% (over), the fullest first.
@@ -37,7 +39,7 @@ export default function BudgetAlerts({ month }) {
 
   function renderBody() {
     if (failed) return <p className={styles.note}>Budgets could not be loaded.</p>;
-    if (budgets === null) return <p className={styles.note}>Loading budgets…</p>;
+    if (budgets === null) return <LoadingState skeleton="rows" count={2}>Loading budgets…</LoadingState>;
 
     if (budgets.length === 0) {
       return (
@@ -66,7 +68,9 @@ export default function BudgetAlerts({ month }) {
         {alerts.map((budget) => (
           <li key={budget._id} className={`${styles.item} ${styles[budget.status]}`}>
             <span className={styles.name}>
-              <i className={styles.dot} style={{ background: budget.category.color }} aria-hidden="true" />
+              <CategoryMark icon={budget.category.icon}>
+                <i className={styles.dot} style={{ background: budget.category.color }} aria-hidden="true" />
+              </CategoryMark>
               <span>{budget.category.name}</span>
             </span>
             <span className={styles.message}>

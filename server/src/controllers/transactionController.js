@@ -48,3 +48,13 @@ export async function remove(req, res) {
   const data = await transactionService.deleteTransaction(req.user.id, req.params.id);
   res.status(200).json({ success: true, data });
 }
+
+export async function bulkDelete(req, res) {
+  const data = await transactionService.bulkDeleteTransactions(req.user.id, req.body.ids);
+  res.status(200).json({ success: true, data });
+}
+
+export async function bulkCategory(req, res) {
+  const data = await transactionService.bulkChangeCategory(req.user.id, req.body.ids, req.body.categoryId);
+  res.status(200).json({ success: true, data });
+}

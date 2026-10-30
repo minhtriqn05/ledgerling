@@ -6,7 +6,7 @@ import { httpError } from "../utils/httpError.js";
 import { currentMonth, monthRange } from "../utils/month.js";
 
 // Shows the category's name and color instead of just its id
-const CATEGORY_FIELDS = "name color";
+const CATEGORY_FIELDS = "name color icon";
 // A budget has no currency: it is in VND, so only VND expenses count as spent
 const BUDGET_CURRENCY = "VND";
 // Warnings at 80% and 100% of the budget

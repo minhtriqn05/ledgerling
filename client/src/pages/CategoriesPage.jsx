@@ -106,7 +106,7 @@ export default function CategoriesPage() {
 
   // The left column shows one of four states: loading, error, empty or the cards.
   function renderList() {
-    if (loading) return <LoadingState>Loading categories…</LoadingState>;
+    if (loading) return <LoadingState skeleton="cards">Loading categories…</LoadingState>;
     if (loadError) return <ErrorState message={loadError} onRetry={retry} />;
 
     if (visible.length === 0) {

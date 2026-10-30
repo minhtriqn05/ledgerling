@@ -85,6 +85,11 @@ router.get("/", validateListCategories, list);
  *                 type: string
  *                 pattern: '^#[0-9A-Fa-f]{6}$'
  *                 example: "#FF7043"
+ *               icon:
+ *                 type: string
+ *                 nullable: true
+ *                 description: Optional. Exactly one emoji; null or "" means no icon.
+ *                 example: "🍜"
  *     responses:
  *       201:
  *         description: Category created
@@ -99,7 +104,7 @@ router.get("/", validateListCategories, list);
  *                 data:
  *                   $ref: '#/components/schemas/Category'
  *       400:
- *         description: Invalid input ("Name is required", "Name must be at most 30 characters", "Type must be income or expense", "Color must be a hex code like #FF7043")
+ *         description: Invalid input ("Name is required", "Name must be at most 30 characters", "Type must be income or expense", "Color must be a hex code like #FF7043", "Icon must be a single emoji")
  *         content:
  *           application/json:
  *             schema:
@@ -166,7 +171,7 @@ router.get("/:id", validateCategoryId, getOne);
  * @openapi
  * /categories/{id}:
  *   patch:
- *     summary: Update the name and/or color of a category (type cannot be changed)
+ *     summary: Update the name, color and/or icon of a category (type cannot be changed)
  *     tags: [Categories]
  *     security:
  *       - bearerAuth: []
@@ -192,6 +197,11 @@ router.get("/:id", validateCategoryId, getOne);
  *                 type: string
  *                 pattern: '^#[0-9A-Fa-f]{6}$'
  *                 example: "#E53935"
+ *               icon:
+ *                 type: string
+ *                 nullable: true
+ *                 description: Exactly one emoji; null or "" removes the icon.
+ *                 example: "🍔"
  *     responses:
  *       200:
  *         description: The updated category
@@ -206,7 +216,7 @@ router.get("/:id", validateCategoryId, getOne);
  *                 data:
  *                   $ref: '#/components/schemas/Category'
  *       400:
- *         description: Invalid input ("Nothing to update", "Type cannot be changed", "Name is required", "Name must be at most 30 characters", "Color must be a hex code like #FF7043")
+ *         description: Invalid input ("Nothing to update", "Type cannot be changed", "Name is required", "Name must be at most 30 characters", "Color must be a hex code like #FF7043", "Icon must be a single emoji")
  *         content:
  *           application/json:
  *             schema:
@@ -242,7 +252,7 @@ router.patch("/:id", validateCategoryId, validateUpdateCategory, update);
  * /categories/{id}:
  *   delete:
  *     summary: Delete a category (409 if transactions still use it)
- *     description: The budgets of the category (every month) are deleted together with it.
+ *     description: The budgets of the category (every month) and its transaction templates are deleted together with it.
  *     tags: [Categories]
  *     security:
  *       - bearerAuth: []

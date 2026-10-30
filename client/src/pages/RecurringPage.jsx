@@ -83,7 +83,7 @@ export default function RecurringPage() {
 
   // The page shows one of four states: loading, error, empty or the list.
   function renderContent() {
-    if (loading) return <LoadingState>Loading rules…</LoadingState>;
+    if (loading) return <LoadingState skeleton="rows">Loading rules…</LoadingState>;
     if (loadError) return <ErrorState message={loadError} onRetry={reload} />;
 
     if (rules.length === 0) {

@@ -9,6 +9,7 @@ import Modal from '../../components/Modal/Modal.jsx';
 import Button from '../../components/Button/Button.jsx';
 import Alert from '../../components/Alert/Alert.jsx';
 import Icon from '../../components/Icon.jsx';
+import CategoryMark from '../../components/CategoryMark/CategoryMark.jsx';
 import styles from './BudgetFormDialog.module.css';
 
 // "Add budget" dialog, or "Edit budget" when `budget` is given.
@@ -61,7 +62,9 @@ export default function BudgetFormDialog({ budget, month, availableCategories, o
             // The category cannot change after the budget is created.
             <div className={styles.categoryPicker}>
               <span className={`${styles.chip} ${styles.chipSelected}`} style={{ '--tone': budget.category.color }}>
-                <i className={styles.dot} />
+                <CategoryMark icon={budget.category.icon}>
+                  <i className={styles.dot} />
+                </CategoryMark>
                 {budget.category.name}
               </span>
             </div>
@@ -84,7 +87,13 @@ export default function BudgetFormDialog({ budget, month, availableCategories, o
                     disabled={saving}
                     onClick={() => setCategoryId(c._id)}
                   >
-                    {selected ? <Icon name="check" size={14} /> : <i className={styles.dot} />}
+                    {selected ? (
+                      <Icon name="check" size={14} />
+                    ) : (
+                      <CategoryMark icon={c.icon}>
+                        <i className={styles.dot} />
+                      </CategoryMark>
+                    )}
                     {c.name}
                   </button>
                 );

@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { getMonthlyReport } from '../../api/reports.js';
 import { useLoad } from '../../hooks/useLoad.js';
 import { formatDate, formatVnd } from '../../utils/format.js';
+import { categoryLabel } from '../../utils/emoji.js';
 import { formatMonth } from '../../utils/vnDate.js';
 import Card, { CardHeader } from '../../components/Card/Card.jsx';
 import Button from '../../components/Button/Button.jsx';
@@ -31,7 +32,7 @@ export default function MonthlyTab({ month }) {
   const navigate = useNavigate();
   const { data: report, loading, error, reload } = useLoad(() => getMonthlyReport(month), [month]);
 
-  if (loading) return <LoadingState spacious>Loading report…</LoadingState>;
+  if (loading) return <LoadingState skeleton="cards">Loading report…</LoadingState>;
   if (error) return <ErrorState message={error} onRetry={reload} />;
 
   const { totals, changes, topCategories, topTags, largestExpense } = report;
@@ -84,7 +85,7 @@ export default function MonthlyTab({ month }) {
           value={largestExpense ? formatVnd(largestExpense.amount) : '—'}
           detail={
             largestExpense
-              ? `${largestExpense.category.name} · ${formatDate(largestExpense.date)}${largestExpense.note ? ` · ${largestExpense.note}` : ''}`
+              ? `${categoryLabel(largestExpense.category)} · ${formatDate(largestExpense.date)}${largestExpense.note ? ` · ${largestExpense.note}` : ''}`
               : 'No expenses this month'
           }
         />

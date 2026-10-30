@@ -270,3 +270,29 @@ export function validateImportTransactions(req, res, next) {
   });
   next();
 }
+
+// ----- POST /transactions/bulk-delete and PATCH /transactions/bulk-category -----
+
+export const MAX_BULK_IDS = 200;
+
+// The body has `ids`: an array of 1 to 200 transaction ids. Duplicates are removed.
+// A malformed id is a 400 here (unlike /transactions/:id, where it is a 404): it is part of the body, not the address.
+function checkIds(value) {
+  if (!Array.isArray(value) || value.length === 0) throw httpError(400, "Ids must be a non-empty array");
+  if (value.length > MAX_BULK_IDS) throw httpError(400, `You can change at most ${MAX_BULK_IDS} transactions at a time`);
+  const ids = value.map((id) => text(id).trim());
+  if (!ids.every((id) => OBJECT_ID_REGEX.test(id))) throw httpError(400, "Every id must be a valid transaction id");
+  return [...new Set(ids)];
+}
+
+export function validateBulkDelete(req, res, next) {
+  req.body = { ids: checkIds(req.body?.ids) };
+  next();
+}
+
+export function validateBulkCategory(req, res, next) {
+  const body = req.body ?? {};
+  // ids first, so "too many ids" is reported before anything about the category
+  req.body = { ids: checkIds(body.ids), categoryId: checkCategoryId(body.categoryId) };
+  next();
+}

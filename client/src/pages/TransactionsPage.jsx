@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { getCategories } from '../api/categories.js';
-import { exportTransactions, getTransactions } from '../api/transactions.js';
+import { deleteTransaction, exportTransactions, getTransactions } from '../api/transactions.js';
 import { getSummary } from '../api/stats.js';
 import { getErrorMessage } from '../api/axios.js';
 import { useToast } from '../context/ToastContext.jsx';
+import { UNDO_MS, useUndoDelete } from '../hooks/useUndoDelete.js';
+import { categoryLabel } from '../utils/emoji.js';
 import { formatDate, formatSignedVnd, formatVnd } from '../utils/format.js';
 import { downloadFile } from '../utils/downloadFile.js';
 import { currentMonth, formatMonth, fromDateInput, toDateInput } from '../utils/vnDate.js';
@@ -18,7 +20,9 @@ import ErrorState from '../components/ErrorState/ErrorState.jsx';
 import Icon from '../components/Icon.jsx';
 import TransactionList from './transactions/TransactionList.jsx';
 import TransactionFormDialog from './transactions/TransactionFormDialog.jsx';
-import DeleteTransactionDialog from './transactions/DeleteTransactionDialog.jsx';
+import BulkBar from './transactions/BulkBar.jsx';
+import BulkDeleteDialog from './transactions/BulkDeleteDialog.jsx';
+import BulkCategoryDialog from './transactions/BulkCategoryDialog.jsx';
 import Pager from './transactions/Pager.jsx';
 import ImportDialog from './transactions/ImportDialog.jsx';
 import styles from './TransactionsPage.module.css';
@@ -149,11 +153,43 @@ export default function TransactionsPage() {
   // "Try again" and a save change these, which runs the matching effect again
   const [categoriesKey, setCategoriesKey] = useState(0);
   const [reloadKey, setReloadKey] = useState(0);
-  // The open dialog: null, { kind: 'form', transaction } (transaction = null for a new one), { kind: 'delete', transaction }
-  // or { kind: 'import' }
+  // The open dialog: null, { kind: 'form', transaction } (transaction = null for a new one), { kind: 'import' },
+  // { kind: 'bulk-delete' } or { kind: 'bulk-category' }
   const [dialog, setDialog] = useState(null);
   const [exporting, setExporting] = useState(false);
+  // The ids of the ticked rows (bulk actions)
+  const [selectedIds, setSelectedIds] = useState(() => new Set());
+  const searchRef = useRef(null);
+  const location = useLocation();
+  const navigate = useNavigate();
   const toast = useToast();
+
+  // Delete with Undo: the row disappears at once, the API is called 5 seconds later unless Undo was clicked
+  // (and at once when the page is left). See hooks/useUndoDelete.js.
+  const undoDelete = useUndoDelete(deleteTransaction, {
+    onDone: (id) => {
+      // Take it out of the list now; the reload brings the page count, the totals and the rows that move up
+      setTransactions((list) => list.filter((t) => t._id !== id));
+      setReloadKey((key) => key + 1);
+    },
+    onError: (err) => toast.error(getErrorMessage(err)),
+  });
+
+  // The "/" key on another page lands here with a request to focus the search box
+  useEffect(() => {
+    if (!location.state?.focusSearch) return;
+    searchRef.current?.focus();
+    navigate(`${location.pathname}${location.search}`, { replace: true, state: null });
+  }, [location, navigate]);
+
+  // A ticked row that is no longer on the page (another page, filter or search, or it was deleted) is unticked
+  useEffect(() => {
+    setSelectedIds((current) => {
+      const onPage = new Set(transactions.map((t) => t._id));
+      const kept = [...current].filter((id) => onPage.has(id));
+      return kept.length === current.size ? current : new Set(kept);
+    });
+  }, [transactions]);
 
   // The categories fill the filter and the form. They load once.
   useEffect(() => {
@@ -339,25 +375,71 @@ export default function TransactionsPage() {
     setReloadKey((key) => key + 1);
   }
 
-  function handleDeleted(deleted) {
-    toast.success('Transaction deleted');
+  // The trash button (and the Delete button of the edit dialog): no question, but a few seconds to Undo
+  function handleDelete(transaction) {
     setDialog(null);
-    // Hide the row now, then reload: the page count, the totals and the rows that move up come from the server.
-    setTransactions((list) => list.filter((t) => t._id !== deleted._id));
+    undoDelete.remove(transaction._id);
+    setSelectedIds((current) => {
+      const next = new Set(current);
+      next.delete(transaction._id);
+      return next;
+    });
+    toast.success('Transaction deleted', {
+      duration: UNDO_MS,
+      action: { label: 'Undo', onClick: () => undoDelete.undo(transaction._id) },
+    });
+  }
+
+  function toggleRow(id) {
+    setSelectedIds((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  // The "select all" box ticks every row shown on this page, or clears them
+  function toggleAll(checked) {
+    setSelectedIds(checked ? new Set(visibleTransactions.map((t) => t._id)) : new Set());
+  }
+
+  // A bulk action finished: unselect, close the dialog and load the list (and the totals) again
+  function afterBulk(message) {
+    toast.success(message);
+    setDialog(null);
+    setSelectedIds(new Set());
+    startLoading();
     setReloadKey((key) => key + 1);
   }
+
+  function handleBulkDeleted(count) {
+    afterBulk(`Deleted ${count} ${count === 1 ? 'transaction' : 'transactions'}`);
+  }
+
+  function handleBulkCategory({ updated, category }) {
+    afterBulk(
+      updated === 0
+        ? `Already in ${category.name}`
+        : `Moved ${updated} ${updated === 1 ? 'transaction' : 'transactions'} to ${category.name}`
+    );
+  }
+
+  // Rows waiting for their Undo time are already gone from the screen (and from the counts)
+  const visibleTransactions = transactions.filter((t) => !undoDelete.hiddenIds.has(t._id));
+  const hiddenCount = transactions.length - visibleTransactions.length;
 
   const ready = !loading && !loadError;
   // The summary of another month (still loading) must not be shown under this month's name
   const showTotals = ready && !hasRange && summary?.month === month;
-  const total = meta?.total ?? 0;
+  const total = Math.max((meta?.total ?? 0) - hiddenCount, 0);
 
   // The card shows one of four states: loading, error, empty or the list.
   function renderContent() {
-    if (loading) return <LoadingState>Loading transactions…</LoadingState>;
+    if (loading) return <LoadingState skeleton="rows">Loading transactions…</LoadingState>;
     if (loadError) return <ErrorState message={loadError} onRetry={retry} />;
 
-    if (transactions.length === 0) {
+    if (visibleTransactions.length === 0) {
       if (q) {
         return (
           <EmptyState
@@ -397,12 +479,15 @@ export default function TransactionsPage() {
     return (
       <>
         <TransactionList
-          transactions={transactions}
+          transactions={visibleTransactions}
           onEdit={(transaction) => setDialog({ kind: 'form', transaction })}
-          onDelete={(transaction) => setDialog({ kind: 'delete', transaction })}
+          onDelete={handleDelete}
           onTagClick={filterByTag}
+          selectedIds={selectedIds}
+          onToggle={toggleRow}
+          onToggleAll={toggleAll}
         />
-        <Pager meta={meta} onPage={changePage} />
+        <Pager meta={{ ...meta, total }} onPage={changePage} />
       </>
     );
   }
@@ -443,6 +528,8 @@ export default function TransactionsPage() {
           <span className={styles.search}>
             <Icon name="search" size={18} />
             <input
+              ref={searchRef}
+              data-hotkey-search
               className={styles.searchInput}
               type="search"
               value={searchInput}
@@ -465,7 +552,7 @@ export default function TransactionsPage() {
                   .filter((c) => c.type === 'expense')
                   .map((c) => (
                     <option key={c._id} value={c._id}>
-                      {c.name}
+                      {categoryLabel(c)}
                     </option>
                   ))}
               </optgroup>
@@ -474,7 +561,7 @@ export default function TransactionsPage() {
                   .filter((c) => c.type === 'income')
                   .map((c) => (
                     <option key={c._id} value={c._id}>
-                      {c.name}
+                      {categoryLabel(c)}
                     </option>
                   ))}
               </optgroup>
@@ -525,6 +612,15 @@ export default function TransactionsPage() {
           <p className={styles.rangeNote}>The date range replaces the month picker while it is set.</p>
         )}
 
+        {ready && selectedIds.size > 0 && (
+          <BulkBar
+            count={selectedIds.size}
+            onChangeCategory={() => setDialog({ kind: 'bulk-category' })}
+            onDelete={() => setDialog({ kind: 'bulk-delete' })}
+            onClear={() => setSelectedIds(new Set())}
+          />
+        )}
+
         {renderContent()}
       </Card>
 
@@ -534,16 +630,20 @@ export default function TransactionsPage() {
           categories={categories}
           onSaved={handleSaved}
           onClose={() => setDialog(null)}
-          onDelete={(transaction) => setDialog({ kind: 'delete', transaction })}
+          onDelete={handleDelete}
         />
       )}
       {dialog?.kind === 'import' && (
         <ImportDialog categories={categories} onImported={handleImported} onClose={() => setDialog(null)} />
       )}
-      {dialog?.kind === 'delete' && (
-        <DeleteTransactionDialog
-          transaction={dialog.transaction}
-          onDeleted={handleDeleted}
+      {dialog?.kind === 'bulk-delete' && (
+        <BulkDeleteDialog ids={[...selectedIds]} onDeleted={handleBulkDeleted} onClose={() => setDialog(null)} />
+      )}
+      {dialog?.kind === 'bulk-category' && (
+        <BulkCategoryDialog
+          ids={[...selectedIds]}
+          categories={categories}
+          onChanged={handleBulkCategory}
           onClose={() => setDialog(null)}
         />
       )}
