@@ -68,6 +68,12 @@ const paths = {
     </>
   ),
   plus: <path d="M12 5v14M5 12h14" />,
+  search: (
+    <>
+      <circle cx="11" cy="11" r="7" />
+      <path d="m20 20-3.5-3.5" />
+    </>
+  ),
   edit: (
     <>
       <path d="M4 20h4L19 9l-4-4L4 16z" />
@@ -79,6 +85,13 @@ const paths = {
       <path d="M4 7h16" />
       <path d="M9 7V4h6v3" />
       <path d="m6 7 1 13h10l1-13" />
+    </>
+  ),
+  download: (
+    <>
+      <path d="M12 4v11" />
+      <path d="m7 11 5 5 5-5" />
+      <path d="M5 20h14" />
     </>
   ),
   menu: <path d="M4 7h16M4 12h16M4 17h16" />,

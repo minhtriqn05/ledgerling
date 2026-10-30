@@ -131,6 +131,16 @@ const options = {
             updatedAt: { type: "string", format: "date-time", example: "2026-10-01T02:01:00.000Z" },
           },
         },
+        // Sent next to `data` by paginated list endpoints (data stays an array: one page)
+        PaginationMeta: {
+          type: "object",
+          properties: {
+            page: { type: "integer", example: 1 },
+            limit: { type: "integer", example: 20 },
+            total: { type: "integer", description: "Items matching the filters, on all pages", example: 47 },
+            totalPages: { type: "integer", description: "Math.ceil(total / limit), 0 when nothing matches", example: 3 },
+          },
+        },
         AuthResponse: {
           type: "object",
           properties: {

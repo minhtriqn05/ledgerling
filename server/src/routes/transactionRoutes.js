@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { list, create, getOne, update, remove } from "../controllers/transactionController.js";
+import { list, exportCsv, create, getOne, update, remove } from "../controllers/transactionController.js";
 import {
   validateCreateTransaction,
   validateListTransactions,
+  validateExportTransactions,
   validateUpdateTransaction,
   validateTransactionId,
 } from "../middlewares/validateTransaction.js";
@@ -17,7 +18,7 @@ router.use(requireAuth);
  * @openapi
  * /transactions:
  *   get:
- *     summary: List my transactions of a month (newest first)
+ *     summary: List my transactions (search, sort, date range, one page at a time)
  *     tags: [Transactions]
  *     security:
  *       - bearerAuth: []
@@ -26,12 +27,33 @@ router.use(requireAuth);
  *         name: month
  *         required: false
  *         description: |
- *           Month as YYYY-MM in Vietnam time (UTC+7). Defaults to the current month.
+ *           Month as YYYY-MM in Vietnam time (UTC+7). Used when neither from nor to is sent; defaults to the current month.
  *           "2026-10" covers 2026-10-01T00:00+07:00 (inclusive) to 2026-11-01T00:00+07:00 (exclusive).
+ *           Cannot be sent together with from or to.
  *         schema:
  *           type: string
  *           pattern: '^\d{4}-(0[1-9]|1[0-2])$'
  *           example: "2026-10"
+ *       - in: query
+ *         name: from
+ *         required: false
+ *         description: |
+ *           First day (inclusive) as YYYY-MM-DD, from 00:00 Vietnam time. "2026-10-15" starts at 2026-10-15T00:00+07:00.
+ *           Without to, the range has no end.
+ *         schema:
+ *           type: string
+ *           format: date
+ *           example: "2026-10-01"
+ *       - in: query
+ *         name: to
+ *         required: false
+ *         description: |
+ *           Last day (inclusive, the whole day) as YYYY-MM-DD, Vietnam time. "2026-10-31" ends before 2026-11-01T00:00+07:00.
+ *           Without from, the range has no start. Must not be before from.
+ *         schema:
+ *           type: string
+ *           format: date
+ *           example: "2026-10-31"
  *       - in: query
  *         name: type
  *         required: false
@@ -47,12 +69,52 @@ router.use(requireAuth);
  *         schema:
  *           type: string
  *           example: 6720b1b2c3d4e5f601234568
+ *       - in: query
+ *         name: q
+ *         required: false
+ *         description: |
+ *           Search in the note, ignoring upper / lower case ("lunch" finds "Lunch with team"). Trimmed; empty is ignored.
+ *           Special characters like "(" or "." are matched as plain text. Accents are not ignored ("an" does not find "ăn").
+ *         schema:
+ *           type: string
+ *           maxLength: 100
+ *           example: lunch
+ *       - in: query
+ *         name: sort
+ *         required: false
+ *         description: |
+ *           "date" = oldest first, "-date" = newest first, "amount" = smallest first, "-amount" = biggest first.
+ *           Ties keep a fixed order (date, then createdAt / _id), so pages never overlap.
+ *         schema:
+ *           type: string
+ *           enum: [date, -date, amount, -amount]
+ *           default: -date
+ *           example: -amount
+ *       - in: query
+ *         name: page
+ *         required: false
+ *         description: Page number. A page after the last one returns an empty array.
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *           example: 2
+ *       - in: query
+ *         name: limit
+ *         required: false
+ *         description: Transactions per page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 20
+ *           example: 20
  *     responses:
  *       200:
  *         description: |
- *           The transactions of the signed-in user, sorted by date descending (then createdAt descending).
- *           Example request - all expenses of one category in October 2026:
- *           GET /api/transactions?month=2026-10&type=expense&categoryId=6720b1b2c3d4e5f601234568
+ *           One page of the signed-in user's transactions that match all the filters, and meta about the pages.
+ *           Example request - second page of October 2026 expenses with "lunch" in the note, biggest first:
+ *           GET /api/transactions?month=2026-10&type=expense&q=lunch&sort=-amount&page=2&limit=20
  *         content:
  *           application/json:
  *             schema:
@@ -65,6 +127,8 @@ router.use(requireAuth);
  *                   type: array
  *                   items:
  *                     $ref: '#/components/schemas/Transaction'
+ *                 meta:
+ *                   $ref: '#/components/schemas/PaginationMeta'
  *             example:
  *               success: true
  *               data:
@@ -86,19 +150,126 @@ router.use(requireAuth);
  *                   date: "2026-10-27T05:30:00.000Z"
  *                   createdAt: "2026-10-27T05:31:00.000Z"
  *                   updatedAt: "2026-10-27T05:31:00.000Z"
+ *               meta: { page: 1, limit: 20, total: 2, totalPages: 1 }
  *       400:
- *         description: Invalid filter ("Month must be in YYYY-MM format", "Type must be income or expense", "Category id is invalid")
+ *         description: |
+ *           Invalid filter: "Use either month or from/to, not both", "Month must be in YYYY-MM format",
+ *           "From must be a date in YYYY-MM-DD format", "To must be a date in YYYY-MM-DD format",
+ *           "From must be before or equal to to", "Type must be income or expense", "Category id is invalid",
+ *           "Search must be a string", "Search must be at most 100 characters",
+ *           "Sort must be one of date, -date, amount, -amount", "Page must be a whole number from 1",
+ *           "Limit must be a whole number from 1 to 100"
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  *             example:
  *               success: false
- *               message: Month must be in YYYY-MM format
+ *               message: Use either month or from/to, not both
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
 router.get("/", validateListTransactions, list);
+
+/**
+ * @openapi
+ * /transactions/export:
+ *   get:
+ *     summary: Download my transactions as a CSV file (same filters as the list, no paging)
+ *     description: |
+ *       Columns: Date (Vietnam time, YYYY-MM-DD HH:mm), Type, Category, Amount, Currency, Note.
+ *       At most 5000 rows; if more match, only the first 5000 of the chosen sort are in the file.
+ *       The file starts with a UTF-8 BOM (so Excel shows accents correctly), cells with a comma, a double quote or
+ *       a line break are quoted, and a cell that starts with = + - @ gets a ' in front (CSV injection).
+ *       Declared before /transactions/{id}, so "export" is never read as an id.
+ *     tags: [Transactions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: month
+ *         required: false
+ *         description: Month as YYYY-MM in Vietnam time. Used when neither from nor to is sent; defaults to the current month. Cannot be sent together with from or to.
+ *         schema:
+ *           type: string
+ *           pattern: '^\d{4}-(0[1-9]|1[0-2])$'
+ *           example: "2026-10"
+ *       - in: query
+ *         name: from
+ *         required: false
+ *         description: First day (inclusive) as YYYY-MM-DD, from 00:00 Vietnam time.
+ *         schema:
+ *           type: string
+ *           format: date
+ *           example: "2026-10-01"
+ *       - in: query
+ *         name: to
+ *         required: false
+ *         description: Last day (inclusive, the whole day) as YYYY-MM-DD, Vietnam time. Must not be before from.
+ *         schema:
+ *           type: string
+ *           format: date
+ *           example: "2026-10-31"
+ *       - in: query
+ *         name: type
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [income, expense]
+ *           example: expense
+ *       - in: query
+ *         name: categoryId
+ *         required: false
+ *         schema:
+ *           type: string
+ *           example: 6720b1b2c3d4e5f601234568
+ *       - in: query
+ *         name: q
+ *         required: false
+ *         description: Search in the note, ignoring upper / lower case (max 100 characters)
+ *         schema:
+ *           type: string
+ *           maxLength: 100
+ *           example: lunch
+ *       - in: query
+ *         name: sort
+ *         required: false
+ *         description: Order of the rows
+ *         schema:
+ *           type: string
+ *           enum: [date, -date, amount, -amount]
+ *           default: -date
+ *     responses:
+ *       200:
+ *         description: |
+ *           The CSV file. The name is ledgerling-YYYY-MM.csv for a month (default: current month)
+ *           and ledgerling-FROM_TO.csv for a date range.
+ *         headers:
+ *           Content-Disposition:
+ *             description: Makes the browser download the file
+ *             schema:
+ *               type: string
+ *               example: attachment; filename="ledgerling-2026-10.csv"
+ *         content:
+ *           text/csv:
+ *             schema:
+ *               type: string
+ *             example: "Date,Type,Category,Amount,Currency,Note\r\n2026-10-27 12:30,expense,Food,45000,VND,Lunch\r\n2026-10-27 18:30,expense,Food,85000,VND,\"Dinner, with team\"\r\n"
+ *       400:
+ *         description: |
+ *           Invalid filter (same messages as GET /transactions, except for page and limit, which are ignored here),
+ *           e.g. "Use either month or from/to, not both"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Use either month or from/to, not both
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
+router.get("/export", validateExportTransactions, exportCsv);
 
 /**
  * @openapi

@@ -12,7 +12,8 @@ const allowedOrigins = (process.env.CLIENT_URL || "")
   .map((origin) => origin.trim())
   .filter(Boolean);
 
-app.use(cors({ origin: allowedOrigins }));
+// Content-Disposition is exposed so the browser app can read the file name of a CSV export
+app.use(cors({ origin: allowedOrigins, exposedHeaders: ["Content-Disposition"] }));
 app.use(express.json());
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {

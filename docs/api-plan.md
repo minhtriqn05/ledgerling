@@ -63,7 +63,7 @@ Swagger UI: `/api-docs` (outside `/api`).
 | 7 | GET | `/api/categories/:id` | Yes | Get one category |
 | 8 | PATCH | `/api/categories/:id` | Yes | Update name / color |
 | 9 | DELETE | `/api/categories/:id` | Yes | Delete (409 if it has transactions) |
-| 10 | GET | `/api/transactions` | Yes | List my transactions (`?month=&type=&categoryId=`) |
+| 10 | GET | `/api/transactions` | Yes | List my transactions, paginated (`?month=&from=&to=&type=&categoryId=&q=&sort=&page=&limit=`) |
 | 11 | POST | `/api/transactions` | Yes | Create a transaction |
 | 12 | GET | `/api/transactions/:id` | Yes | Get one transaction |
 | 13 | PATCH | `/api/transactions/:id` | Yes | Update a transaction |
@@ -74,6 +74,7 @@ Swagger UI: `/api-docs` (outside `/api`).
 | 18 | PATCH | `/api/budgets/:id` | Yes | Change the amount of a budget |
 | 19 | DELETE | `/api/budgets/:id` | Yes | Delete a budget |
 | 20 | POST | `/api/budgets/copy` | Yes | Copy my budgets from one month to another |
+| 21 | GET | `/api/transactions/export` | Yes | Download my transactions as a CSV file, same filters as endpoint 10 without `page` / `limit` (max 5000 rows) |
 
 Every protected route (Auth = Yes) can also return **401** (`"Not authorized, token missing"` /
 `"Not authorized, invalid token"`) and every route can return **500** (`"Internal server error"`).
@@ -285,18 +286,39 @@ Auth: yes.
 
 | Param | Example | Note |
 |-------|---------|------|
-| `month` | `2026-10` | default: current month in Vietnam time |
+| `month` | `2026-10` | `YYYY-MM`, Vietnam time. Used when neither `from` nor `to` is sent; default: current month |
+| `from` | `2026-10-01` | `YYYY-MM-DD`, first day included, from 00:00 +07:00 |
+| `to` | `2026-10-31` | `YYYY-MM-DD`, last day included (until 00:00 +07:00 of the next day) |
 | `type` | `expense` | `income` \| `expense` |
 | `categoryId` | `6720b1b2...` | |
+| `q` | `lunch` | search in `note`, ignores upper / lower case; trimmed, empty is ignored, max 100 characters |
+| `sort` | `-amount` | `date`, `-date` (default), `amount`, `-amount` (`-` = descending) |
+| `page` | `2` | whole number ≥ 1, default `1` |
+| `limit` | `20` | whole number 1–100, default `20` |
 
-Sorted by `date` descending, then `createdAt` descending.
+- `month` cannot be sent together with `from` / `to` (400). `from` alone has no end, `to` alone has no start.
+- All the filters are combined (AND).
+- `q` is matched as plain text: `(` or `.` are not regex syntax. Accents are not ignored (`an` does not find `ăn`).
+- Ties keep a fixed order so pages never overlap: `-date` = date, createdAt, `_id` descending (the old order);
+  `date` = the same ascending; `amount` / `-amount` = amount, then date and `_id` descending.
+- `meta.totalPages` = `Math.ceil(total / limit)`, `0` when nothing matches. A page after the last one returns `data: []`.
 
-**200**
+**200** – `data` is one page (still an array), `meta` describes the pages
 ```json
-{ "success": true, "data": [ { "_id": "...", "category": { "_id": "...", "name": "Food", "color": "#FF7043" }, "type": "expense", "amount": 45000, "currency": "VND", "note": "Lunch", "date": "...", "createdAt": "...", "updatedAt": "..." } ] }
+{
+  "success": true,
+  "data": [ { "_id": "...", "category": { "_id": "...", "name": "Food", "color": "#FF7043" }, "type": "expense", "amount": 45000, "currency": "VND", "note": "Lunch", "date": "...", "createdAt": "...", "updatedAt": "..." } ],
+  "meta": { "page": 1, "limit": 20, "total": 47, "totalPages": 3 }
+}
 ```
 
-**Errors**: 400 `"Month must be in YYYY-MM format"`, `"Type must be income or expense"`, `"Category id is invalid"`.
+**Errors** (400)
+- `"Use either month or from/to, not both"`, `"Month must be in YYYY-MM format"`
+- `"From must be a date in YYYY-MM-DD format"`, `"To must be a date in YYYY-MM-DD format"` (also for days that do not exist like `2026-02-30`), `"From must be before or equal to to"`
+- `"Type must be income or expense"`, `"Category id is invalid"`
+- `"Search must be a string"` (e.g. `?q=a&q=b`), `"Search must be at most 100 characters"`
+- `"Sort must be one of date, -date, amount, -amount"`
+- `"Page must be a whole number from 1"`, `"Limit must be a whole number from 1 to 100"`
 
 ### 11. POST /api/transactions
 Auth: yes.
@@ -356,6 +378,29 @@ Auth: yes.
 ```
 
 **Errors**: 404 `"Transaction not found"`.
+
+### 21. GET /api/transactions/export
+Auth: yes. Declared **before** `/api/transactions/:id`, so `export` is never read as an id.
+
+**Query**: the same filters as endpoint 10 (`month`, `from`, `to`, `type`, `categoryId`, `q`, `sort`), with the same rules.
+`page` and `limit` are ignored (even if invalid). At most **5000 rows**; if more match, only the first 5000 of the chosen sort are in the file.
+
+**200** – a file, not JSON
+- `Content-Type: text/csv; charset=utf-8`
+- `Content-Disposition: attachment; filename="ledgerling-2026-10.csv"` – `ledgerling-YYYY-MM.csv` for a month (default: current month),
+  `ledgerling-FROM_TO.csv` for a date range (`start` / `end` when one side is missing)
+- Columns: `Date` (Vietnam time, `YYYY-MM-DD HH:mm`), `Type`, `Category`, `Amount`, `Currency`, `Note`
+- Starts with a UTF-8 BOM; lines end with CRLF
+- A cell with a comma, a double quote or a line break is wrapped in `"` (each `"` inside is doubled)
+- A cell that starts with `=`, `+`, `-`, `@` (or a tab / carriage return) gets a `'` in front, so a spreadsheet does not run it as a formula (CSV injection)
+
+```
+Date,Type,Category,Amount,Currency,Note
+2026-10-27 12:30,expense,Food,45000,VND,Lunch
+2026-10-27 18:30,expense,Food,85000,VND,"Dinner, with team"
+```
+
+**Errors** (400): the same as endpoint 10 for the filters (nothing for `page` / `limit`). The error body is JSON as usual.
 
 ---
 
