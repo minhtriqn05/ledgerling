@@ -7,7 +7,7 @@ import api from './axios.js';
 // filters (all optional, see docs/api-plan.md endpoint 10):
 //   month: 'YYYY-MM' (the server uses the current month by default; cannot be combined with from / to)
 //   from, to: 'YYYY-MM-DD' (both days included)
-//   type: 'income' | 'expense', categoryId, q (search in the note)
+//   type: 'income' | 'expense', categoryId, q (search in the note), tag (one tag)
 //   sort: 'date' | '-date' (default) | 'amount' | '-amount'
 //   page (default 1), limit (default 20, at most 100)
 // Returns one page: { items, meta }.
@@ -40,13 +40,13 @@ export async function exportTransactions(filters = {}) {
   }
 }
 
-// transaction: { categoryId, amount, note, date }. The type comes from the category; the currency defaults to VND.
+// transaction: { categoryId, amount, note, tags, date }. The type comes from the category; the currency defaults to VND.
 export async function createTransaction(transaction) {
   const response = await api.post('/transactions', transaction);
   return response.data.data;
 }
 
-// changes: any of { categoryId, amount, note, date }
+// changes: any of { categoryId, amount, note, tags, date }
 export async function updateTransaction(id, changes) {
   const response = await api.patch(`/transactions/${id}`, changes);
   return response.data.data;
@@ -55,5 +55,13 @@ export async function updateTransaction(id, changes) {
 // Returns { _id } of the deleted transaction.
 export async function deleteTransaction(id) {
   const response = await api.delete(`/transactions/${id}`);
+  return response.data.data;
+}
+
+// Sends the rows read from a CSV file (docs/api-plan.md, endpoint 22): 1 to 500 rows, see utils/csvImport.js.
+// Returns { imported, failed, errors } where errors is [{ row, message }] (row 1 = the first row sent).
+// Good rows are saved even when other rows fail, so a result with errors is not a thrown error.
+export async function importTransactions(rows) {
+  const response = await api.post('/transactions/import', { rows });
   return response.data.data;
 }

@@ -47,10 +47,11 @@ function dateFilter({ month, from, to }) {
 }
 
 // The MongoDB filter shared by the list and the export. userId always comes from the token.
-function buildFilter(userId, { type, categoryId, q, ...range }) {
+function buildFilter(userId, { type, categoryId, q, tag, ...range }) {
   const filter = { userId, date: dateFilter(range) };
   if (type) filter.type = type;
   if (categoryId) filter.categoryId = categoryId;
+  if (tag) filter.tags = tag; // matches when the tag is one of the transaction's tags
   if (q) filter.note = { $regex: escapeRegex(q), $options: "i" };
   return filter;
 }
@@ -76,7 +77,7 @@ export async function listTransactions(userId, query) {
 // A file bigger than this is cut off (the newest / first rows of the chosen sort are kept)
 export const EXPORT_MAX_ROWS = 5000;
 
-const CSV_HEADER = ["Date", "Type", "Category", "Amount", "Currency", "Note"];
+const CSV_HEADER = ["Date", "Type", "Category", "Amount", "Currency", "Note", "Tags"];
 
 // Same filters and sort as the list, but no paging. Returns { filename, csv }.
 export async function exportTransactions(userId, query) {
@@ -93,6 +94,7 @@ export async function exportTransactions(userId, query) {
     t.amount,
     t.currency,
     t.note,
+    (t.tags ?? []).join(";"), // a transaction saved before tags existed has none
   ]);
 
   // "ledgerling-2026-10.csv" for a month, "ledgerling-2026-10-01_2026-10-31.csv" for a date range
@@ -144,4 +146,27 @@ export async function deleteTransaction(userId, id) {
   const transaction = await findOwned(userId, id);
   await transaction.deleteOne();
   return { _id: transaction._id };
+}
+
+// Saves the good rows of a CSV import. `rows` are the cleaned rows from validateImportTransactions and `errors`
+// the rows it already refused. A row whose category (name + type) is not one of the user's categories is
+// refused here: categories are never created by an import. Only the good rows are saved.
+export async function importTransactions(userId, rows, errors) {
+  const categories = await Category.find({ userId });
+  const byNameAndType = new Map(categories.map((c) => [`${c.type}:${c.name.toLowerCase()}`, c]));
+
+  const docs = [];
+  const allErrors = [...errors];
+  for (const { row, categoryName, ...data } of rows) {
+    const category = byNameAndType.get(`${data.type}:${categoryName.toLowerCase()}`);
+    if (!category) {
+      allErrors.push({ row, message: `Category "${categoryName}" (${data.type}) not found` });
+      continue;
+    }
+    docs.push({ ...data, userId, categoryId: category._id });
+  }
+
+  if (docs.length > 0) await Transaction.insertMany(docs);
+  allErrors.sort((a, b) => a.row - b.row);
+  return { imported: docs.length, failed: allErrors.length, errors: allErrors };
 }

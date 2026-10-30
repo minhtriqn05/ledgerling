@@ -21,6 +21,12 @@ export async function exportCsv(req, res) {
     .send(csv);
 }
 
+// 200 even when some rows were refused: the answer lists them, the good rows are saved
+export async function importCsv(req, res) {
+  const data = await transactionService.importTransactions(req.user.id, req.importRows, req.importErrors);
+  res.status(200).json({ success: true, data });
+}
+
 export async function getOne(req, res) {
   const data = await transactionService.getTransaction(req.user.id, req.params.id);
   res.status(200).json({ success: true, data });

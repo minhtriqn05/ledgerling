@@ -1,0 +1,141 @@
+/* The Modal draws the white panel; this is what goes inside it. */
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+.file {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+}
+
+.file:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+.hint {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.summary {
+  margin: 0;
+  font-weight: var(--font-weight-medium);
+}
+
+/* ---------- Preview table (scrolls inside the dialog) ---------- */
+.previewWrap {
+  max-height: 320px;
+  overflow: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.previewWrap:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-xs);
+}
+
+.table th {
+  position: sticky;
+  top: 0;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-semibold);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.table td {
+  padding: var(--space-2) var(--space-3);
+  border-top: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.table .alignRight {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.noteCell {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.muted {
+  color: var(--color-text-muted);
+}
+
+/* A row with a problem: tinted, and the message says what is wrong (color is never the only signal). */
+.badRow td {
+  background: var(--color-danger-soft);
+}
+
+.problem {
+  color: var(--color-danger);
+  font-weight: var(--font-weight-medium);
+}
+
+.ok {
+  color: var(--color-income-text);
+}
+
+/* ---------- Result ---------- */
+.errorList {
+  max-height: 240px;
+  margin: 0;
+  padding: var(--space-3) var(--space-4) var(--space-3) var(--space-5);
+  overflow: auto;
+  border-radius: var(--radius-md);
+  background: var(--color-danger-soft);
+  font-size: var(--font-size-sm);
+}
+
+.errorList li + li {
+  margin-top: var(--space-1);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+@media (max-width: 480px) {
+  .actions {
+    flex-wrap: wrap;
+  }
+
+  .actions > button {
+    flex: 1 1 auto;
+  }
+}

@@ -4,6 +4,7 @@ import categoryRoutes from "./categoryRoutes.js";
 import transactionRoutes from "./transactionRoutes.js";
 import statsRoutes from "./statsRoutes.js";
 import budgetRoutes from "./budgetRoutes.js";
+import tagRoutes from "./tagRoutes.js";
 
 const router = Router();
 
@@ -12,6 +13,7 @@ router.use("/categories", categoryRoutes);
 router.use("/transactions", transactionRoutes);
 router.use("/stats", statsRoutes);
 router.use("/budgets", budgetRoutes);
+router.use("/tags", tagRoutes);
 
 /**
  * @openapi

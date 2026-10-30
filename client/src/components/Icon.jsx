@@ -94,6 +94,13 @@ const paths = {
       <path d="M5 20h14" />
     </>
   ),
+  upload: (
+    <>
+      <path d="M12 16V5" />
+      <path d="m7 9 5-5 5 5" />
+      <path d="M5 20h14" />
+    </>
+  ),
   menu: <path d="M4 7h16M4 12h16M4 17h16" />,
   check: <path d="m5 12 5 5L20 7" />,
   x: <path d="M18 6 6 18M6 6l12 12" />,

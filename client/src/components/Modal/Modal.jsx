@@ -6,7 +6,8 @@ import styles from './Modal.module.css';
 // inside, closes on Escape and makes the page behind unclickable.
 // onClose is called for Escape, the X button and a click on the dimmed area.
 // `busy` (e.g. while saving) stops all three, so a request in progress is not abandoned by accident.
-export default function Modal({ title, onClose, busy = false, children }) {
+// `wide` gives the panel more room (for a table).
+export default function Modal({ title, onClose, busy = false, wide = false, children }) {
   const dialogRef = useRef(null);
   const titleId = useId();
 
@@ -39,7 +40,7 @@ export default function Modal({ title, onClose, busy = false, children }) {
 
   return (
     <dialog ref={dialogRef} className={styles.overlay} aria-labelledby={titleId} onCancel={handleCancel} onClick={handleClick}>
-      <div className={styles.panel}>
+      <div className={wide ? `${styles.panel} ${styles.wide}` : styles.panel}>
         <div className={styles.header}>
           <h2 id={titleId} className={styles.title}>
             {title}

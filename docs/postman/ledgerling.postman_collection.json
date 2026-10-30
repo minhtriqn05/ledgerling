@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Ledgerling API",
-    "description": "Auth, Categories, Transactions, Stats and Budgets requests for the Ledgerling API. Run Register (or Login) first: its test script saves the token into {{token}}, and every other request sends it as a Bearer token.",
+    "description": "Auth, Categories, Transactions, Stats, Budgets, Tags and CSV import requests for the Ledgerling API. Run Register (or Login) first: its test script saves the token into {{token}}, and every other request sends it as a Bearer token.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -47,7 +47,14 @@
     { "key": "budgetTx1Id", "value": "" },
     { "key": "budgetTx2Id", "value": "" },
     { "key": "budgetTx3Id", "value": "" },
-    { "key": "budgetTx4Id", "value": "" }
+    { "key": "budgetTx4Id", "value": "" },
+    { "key": "tagCategoryId", "value": "" },
+    { "key": "tagCategoryName", "value": "" },
+    { "key": "tagTransactionId", "value": "" },
+    { "key": "tagPlainId", "value": "" },
+    { "key": "tagImportedId", "value": "" },
+    { "key": "tagOtherId", "value": "" },
+    { "key": "tagBigBody", "value": "" }
   ],
   "item": [
     {
@@ -4206,7 +4213,7 @@
                   "",
                   "pm.test('Starts with the BOM and the header row', function () {",
                   "  pm.expect(pm.response.text().charCodeAt(0)).to.eql(0xFEFF);",
-                  "  pm.expect(pm.response.text().slice(1).split('\\r\\n')[0]).to.eql('Date,Type,Category,Amount,Currency,Note');",
+                  "  pm.expect(pm.response.text().slice(1).split('\\r\\n')[0]).to.eql('Date,Type,Category,Amount,Currency,Note,Tags');",
                   "});"
                 ]
               }
@@ -8404,6 +8411,1269 @@
               ]
             },
             "description": "No transactions use it any more: expect 200."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tags and CSV import",
+      "description": "Tags on transactions, GET /tags, the tag filter, the Tags column of the export and POST /transactions/import. Run the folder top to bottom: it makes its own data and deletes it at the end.",
+      "item": [
+        {
+          "name": "Setup - Pick an expense category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const category = pm.response.json().data[0];",
+                  "pm.test('Has an expense category', function () { pm.expect(category).to.exist; });",
+                  "pm.collectionVariables.set('tagCategoryId', category._id);",
+                  "pm.collectionVariables.set('tagCategoryName', category.name);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories?type=expense",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "expense"
+                }
+              ]
+            },
+            "description": "Saves the id and the name of one expense category into {{tagCategoryId}} and {{tagCategoryName}}."
+          }
+        },
+        {
+          "name": "Create transaction with tags (saved in lower case)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Tags are lower case, trimmed, without duplicates', function () {",
+                  "  pm.expect(pm.response.json().data.tags).to.eql(['postman', 'tag-test']);",
+                  "});",
+                  "pm.collectionVariables.set('tagTransactionId', pm.response.json().data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{tagCategoryId}}\",\n  \"amount\": 12345,\n  \"note\": \"Postman tags\",\n  \"date\": \"2026-10-15T10:00:00+07:00\",\n  \"tags\": [\n    \"Postman\",\n    \" postman \",\n    \"Tag-Test\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Create transaction (no tags = empty array)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('tags is []', function () { pm.expect(pm.response.json().data.tags).to.eql([]); });",
+                  "pm.collectionVariables.set('tagPlainId', pm.response.json().data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{tagCategoryId}}\",\n  \"amount\": 1000,\n  \"note\": \"Postman no tags\",\n  \"date\": \"2026-10-15T11:00:00+07:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Create transaction (6 tags)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message', function () { pm.expect(pm.response.json().message).to.eql('A transaction can have at most 5 tags'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{tagCategoryId}}\",\n  \"amount\": 1000,\n  \"tags\": [\n    \"a\",\n    \"b\",\n    \"c\",\n    \"d\",\n    \"e\",\n    \"f\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Create transaction (tag with a space)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message', function () { pm.expect(pm.response.json().message).to.eql('Each tag must be 1-20 letters, digits or hyphens'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{tagCategoryId}}\",\n  \"amount\": 1000,\n  \"tags\": [\n    \"two words\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Create transaction (tag of 21 characters)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{tagCategoryId}}\",\n  \"amount\": 1000,\n  \"tags\": [\n    \"aaaaaaaaaaaaaaaaaaaaa\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Create transaction (tags is not an array)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message', function () { pm.expect(pm.response.json().message).to.eql('Tags must be an array'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{tagCategoryId}}\",\n  \"amount\": 1000,\n  \"tags\": \"work\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "List transactions (tag=postman)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Only transactions with the tag', function () {",
+                  "  const data = pm.response.json().data;",
+                  "  pm.expect(data.length).to.be.above(0);",
+                  "  data.forEach((t) => pm.expect(t.tags).to.include('postman'));",
+                  "  pm.expect(data.map((t) => t._id)).to.include(pm.collectionVariables.get('tagTransactionId'));",
+                  "  pm.expect(data.map((t) => t._id)).to.not.include(pm.collectionVariables.get('tagPlainId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10&tag=postman&limit=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "tag",
+                  "value": "postman"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "List transactions (tag in capitals)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Found', function () { pm.expect(pm.response.json().meta.total).to.be.above(0); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10&tag=POSTMAN",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "tag",
+                  "value": "POSTMAN"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "List transactions (bad tag)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message', function () { pm.expect(pm.response.json().message).to.eql('Each tag must be 1-20 letters, digits or hyphens'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?tag=bad%20tag",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "tag",
+                  "value": "bad%20tag"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "List transactions (empty tag)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?tag=",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "tag",
+                  "value": ""
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Update transaction (replace the tags)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Tags replaced', function () { pm.expect(pm.response.json().data.tags).to.eql(['postman', 'replaced']); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tags\": [\n    \"postman\",\n    \"replaced\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions/{{tagTransactionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "{{tagTransactionId}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Update transaction (bad tag)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tags\": [\n    \"no good\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions/{{tagTransactionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "{{tagTransactionId}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "List my tags",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Has postman with a count, most used first', function () {",
+                  "  const data = pm.response.json().data;",
+                  "  const postman = data.find((t) => t.tag === 'postman');",
+                  "  pm.expect(postman.count).to.be.above(0);",
+                  "  for (let i = 1; i < data.length; i++) pm.expect(data[i - 1].count).to.be.at.least(data[i].count);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tags",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tags"
+              ]
+            },
+            "description": "Used for the tag suggestions in the transaction form."
+          }
+        },
+        {
+          "name": "List my tags (no token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tags",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tags"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Export CSV (tag=postman has a Tags column)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Header and a row with the tags joined by ;', function () {",
+                  "  const lines = pm.response.text().slice(1).split('\\r\\n');",
+                  "  pm.expect(lines[0]).to.eql('Date,Type,Category,Amount,Currency,Note,Tags');",
+                  "  pm.expect(pm.response.text()).to.include('postman;replaced');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/export?month=2026-10&tag=postman",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "export"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "tag",
+                  "value": "postman"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Export CSV (bad tag)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/export?tag=bad%20tag",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "export"
+              ],
+              "query": [
+                {
+                  "key": "tag",
+                  "value": "bad%20tag"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Import (one good row, one unknown category)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('1 imported, 1 failed, the error names row 2', function () {",
+                  "  const data = pm.response.json().data;",
+                  "  pm.expect(data.imported).to.eql(1);",
+                  "  pm.expect(data.failed).to.eql(1);",
+                  "  pm.expect(data.errors).to.have.length(1);",
+                  "  pm.expect(data.errors[0].row).to.eql(2);",
+                  "  pm.expect(data.errors[0].message).to.eql('Category \"No such category 12345\" (expense) not found');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rows\": [\n    {\n      \"date\": \"2026-10-16 08:30\",\n      \"type\": \"expense\",\n      \"category\": \"{{tagCategoryName}}\",\n      \"amount\": 7000,\n      \"currency\": \"vnd\",\n      \"note\": \"Postman import\",\n      \"tags\": [\n        \"postman-import\"\n      ]\n    },\n    {\n      \"date\": \"2026-10-16\",\n      \"type\": \"expense\",\n      \"category\": \"No such category 12345\",\n      \"amount\": 1000\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions/import",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "import"
+              ]
+            },
+            "description": "The date is read as Vietnam time: 2026-10-16 08:30 is 2026-10-16T01:30:00.000Z. Nothing is created for the bad row."
+          }
+        },
+        {
+          "name": "List transactions (tag=postman-import, find the imported row)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Saved with the right date, currency and category', function () {",
+                  "  const data = pm.response.json().data;",
+                  "  pm.expect(data).to.have.length(1);",
+                  "  pm.expect(data[0].date).to.eql('2026-10-16T01:30:00.000Z');",
+                  "  pm.expect(data[0].currency).to.eql('VND');",
+                  "  pm.expect(data[0].category._id).to.eql(pm.collectionVariables.get('tagCategoryId'));",
+                  "});",
+                  "pm.collectionVariables.set('tagImportedId', pm.response.json().data[0]._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10&tag=postman-import",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "tag",
+                  "value": "postman-import"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Import (userId in a row is ignored)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Imported to me', function () { pm.expect(pm.response.json().data.imported).to.eql(1); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rows\": [\n    {\n      \"date\": \"2026-10-16\",\n      \"type\": \"expense\",\n      \"category\": \"{{tagCategoryName}}\",\n      \"amount\": 1,\n      \"note\": \"Postman other\",\n      \"userId\": \"000000000000000000000000\",\n      \"tags\": [\n        \"postman-other\"\n      ]\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions/import",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "import"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Import (no rows)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message', function () { pm.expect(pm.response.json().message).to.eql('Rows must be a non-empty array'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions/import",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "import"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Import (empty array)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rows\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions/import",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "import"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Import (501 rows)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const row = { date: '2026-10-16', type: 'expense', category: pm.collectionVariables.get('tagCategoryName'), amount: 1 };",
+                  "pm.collectionVariables.set('tagBigBody', JSON.stringify({ rows: Array(501).fill(row) }));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message', function () { pm.expect(pm.response.json().message).to.eql('You can import at most 500 rows at a time'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/import",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "import"
+              ]
+            },
+            "description": "The body is built by the pre-request script, so nothing is saved.",
+            "body": {
+              "mode": "raw",
+              "raw": "{{tagBigBody}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Import (no token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rows\": [\n    {\n      \"type\": \"expense\",\n      \"category\": \"Food\",\n      \"amount\": 1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions/import",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "import"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Cleanup - Delete transaction with tags",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/{{tagTransactionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "{{tagTransactionId}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Cleanup - Delete transaction without tags",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/{{tagPlainId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "{{tagPlainId}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Cleanup - Delete imported transaction",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/{{tagImportedId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "{{tagImportedId}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Cleanup - Find the \"other\" import",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set('tagOtherId', pm.response.json().data[0]._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10&tag=postman-other",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "tag",
+                  "value": "postman-other"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Cleanup - Delete the \"other\" import",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/{{tagOtherId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "{{tagOtherId}}"
+              ]
+            },
+            "description": ""
           }
         }
       ]

@@ -68,10 +68,10 @@ describe("GET /api/transactions/export", () => {
     expect(res.headers["content-disposition"]).toBe('attachment; filename="ledgerling-2026-10.csv"');
 
     const lines = res.text.replace(/^﻿/, "").trim().split("\r\n");
-    expect(lines[0]).toBe("Date,Type,Category,Amount,Currency,Note");
-    expect(lines[1]).toBe("2026-10-02 08:00,expense,Food,35000,VND,Coffee (large)");
+    expect(lines[0]).toBe("Date,Type,Category,Amount,Currency,Note,Tags");
+    expect(lines[1]).toBe("2026-10-02 08:00,expense,Food,35000,VND,Coffee (large),");
     expect(lines).toHaveLength(5);
-    expect(lines[4]).toBe("2026-10-25 09:00,income,Salary,20000000,VND,'=SUM(A1)");
+    expect(lines[4]).toBe("2026-10-25 09:00,income,Salary,20000000,VND,'=SUM(A1),");
   });
 
   it("needs a token (401)", async () => {

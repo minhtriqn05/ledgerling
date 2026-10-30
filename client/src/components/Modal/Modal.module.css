@@ -32,6 +32,10 @@
   box-shadow: var(--shadow-lg);
 }
 
+.panel.wide {
+  max-width: 820px;
+}
+
 .header {
   display: flex;
   align-items: center;

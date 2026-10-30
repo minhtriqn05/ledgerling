@@ -37,6 +37,7 @@ erDiagram
         number amount "greater than 0"
         string currency "ISO code, default VND"
         string note
+        string_array tags "up to 5, lowercase, each 1-20 of a-z 0-9 -"
         date date
         date createdAt
         date updatedAt
@@ -64,3 +65,5 @@ erDiagram
 - A Budget is unique per user + category + month: compound unique index on `(userId, categoryId, month)` (API returns 409).
 - `spent`, `remaining`, `percent` and `status` of a budget are not stored: they are computed from the month's VND expense transactions.
 - Deleting a Category also deletes its Budgets (after the 409 check for transactions).
+- Tags are stored inside the Transaction (no separate collection). `GET /api/tags` counts them with an aggregation.
+- Indexes on Transaction: `(userId, date -1)` for the list and `(userId, tags)` for the tag filter and the tag list.

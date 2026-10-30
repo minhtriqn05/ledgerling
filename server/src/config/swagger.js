@@ -26,6 +26,7 @@ const options = {
       { name: "Transactions", description: "Income and expense records of the signed-in user" },
       { name: "Stats", description: "Numbers for the dashboard charts" },
       { name: "Budgets", description: "Monthly spending limits per expense category of the signed-in user" },
+      { name: "Tags", description: "Tags the signed-in user put on transactions" },
     ],
     components: {
       securitySchemes: {
@@ -99,6 +100,13 @@ const options = {
             amount: { type: "number", example: 45000 },
             currency: { type: "string", example: "VND" },
             note: { type: "string", example: "Lunch" },
+            tags: {
+              type: "array",
+              maxItems: 5,
+              description: "Lower case, 1-20 letters, digits or hyphens each",
+              items: { type: "string" },
+              example: ["work", "team-lunch"],
+            },
             date: { type: "string", format: "date-time", example: "2026-10-27T05:30:00.000Z" },
             createdAt: { type: "string", format: "date-time", example: "2026-10-27T05:31:00.000Z" },
             updatedAt: { type: "string", format: "date-time", example: "2026-10-27T05:31:00.000Z" },

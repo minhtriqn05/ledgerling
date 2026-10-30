@@ -194,3 +194,36 @@
     display: block;
   }
 }
+
+/* ---------- Tags: small pills, a click filters the list ---------- */
+.tags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.tag {
+  padding: 2px var(--space-3);
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-soft);
+  color: var(--color-primary-text);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+
+.tag:hover {
+  border-color: var(--color-primary);
+}
+
+.tag:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+/* On the phone list the tags sit under the row, in line with the text (avatar 40px + gap) */
+.mobileTags {
+  display: flex;
+  padding: 0 0 var(--space-3) calc(40px + var(--space-3));
+}
