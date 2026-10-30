@@ -25,6 +25,7 @@ const options = {
       { name: "Categories", description: "Income and expense categories of the signed-in user" },
       { name: "Transactions", description: "Income and expense records of the signed-in user" },
       { name: "Stats", description: "Numbers for the dashboard charts" },
+      { name: "Budgets", description: "Monthly spending limits per expense category of the signed-in user" },
     ],
     components: {
       securitySchemes: {
@@ -101,6 +102,33 @@ const options = {
             date: { type: "string", format: "date-time", example: "2026-10-27T05:30:00.000Z" },
             createdAt: { type: "string", format: "date-time", example: "2026-10-27T05:31:00.000Z" },
             updatedAt: { type: "string", format: "date-time", example: "2026-10-27T05:31:00.000Z" },
+          },
+        },
+        Budget: {
+          type: "object",
+          properties: {
+            _id: { type: "string", example: "6720d1b2c3d4e5f601234581" },
+            category: {
+              type: "object",
+              properties: {
+                _id: { type: "string", example: "6720b1b2c3d4e5f601234568" },
+                name: { type: "string", example: "Food" },
+                color: { type: "string", example: "#F07D62" },
+              },
+            },
+            month: { type: "string", example: "2026-10" },
+            amount: { type: "number", description: "Spending limit in VND", example: 5000000 },
+            spent: { type: "number", description: "VND expense of the category in the month", example: 4250000 },
+            remaining: { type: "number", description: "amount - spent, negative when over budget", example: 750000 },
+            percent: { type: "integer", description: "spent / amount in %, rounded down", example: 85 },
+            status: {
+              type: "string",
+              enum: ["ok", "warning", "exceeded"],
+              description: "ok below 80%, warning from 80%, exceeded from 100%",
+              example: "warning",
+            },
+            createdAt: { type: "string", format: "date-time", example: "2026-10-01T02:01:00.000Z" },
+            updatedAt: { type: "string", format: "date-time", example: "2026-10-01T02:01:00.000Z" },
           },
         },
         AuthResponse: {

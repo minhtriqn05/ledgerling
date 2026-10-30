@@ -242,6 +242,7 @@ router.patch("/:id", validateCategoryId, validateUpdateCategory, update);
  * /categories/{id}:
  *   delete:
  *     summary: Delete a category (409 if transactions still use it)
+ *     description: The budgets of the category (every month) are deleted together with it.
  *     tags: [Categories]
  *     security:
  *       - bearerAuth: []
@@ -253,7 +254,7 @@ router.patch("/:id", validateCategoryId, validateUpdateCategory, update);
  *           type: string
  *     responses:
  *       200:
- *         description: Deleted, returns the id
+ *         description: Deleted together with its budgets, returns the id
  *         content:
  *           application/json:
  *             schema:
