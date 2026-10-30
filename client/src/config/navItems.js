@@ -4,4 +4,5 @@ export const navItems = [
   { label: 'Dashboard', path: '/', icon: 'dashboard' },
   { label: 'Transactions', path: '/transactions', icon: 'transactions' },
   { label: 'Categories', path: '/categories', icon: 'categories' },
+  { label: 'Budgets', path: '/budgets', icon: 'wallet' },
 ];
