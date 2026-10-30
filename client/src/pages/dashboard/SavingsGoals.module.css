@@ -1,0 +1,95 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Loading, error and "no goals" text */
+.note {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.invite {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+/* Every goal is completed */
+.allDone {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-income) 12%, var(--color-surface));
+  color: var(--color-income-text);
+  font-weight: var(--font-weight-medium);
+}
+
+/* --goal-color is set inline from the goal */
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+}
+
+.name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  font-weight: var(--font-weight-medium);
+}
+
+.name > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dot {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  background: var(--goal-color);
+}
+
+.percent {
+  font-weight: var(--font-weight-bold);
+}
+
+.track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-muted);
+}
+
+.bar {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--goal-color);
+}
+
+.meta {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}

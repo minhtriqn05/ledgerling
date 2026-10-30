@@ -1,0 +1,141 @@
+/* --goal-color is set inline from the goal. A completed goal switches to the income green. */
+.card {
+  --tone: var(--goal-color);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  height: 100%;
+}
+
+.completed {
+  --tone: var(--color-income);
+}
+
+.top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+/* Dot in the goal color + name. Long names wrap instead of overflowing the card. */
+.name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  overflow-wrap: anywhere;
+}
+
+.dot {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-full);
+  background: var(--goal-color);
+}
+
+/* Pulled into the corner so the icons line up with the top of the name. */
+.actions {
+  display: flex;
+  flex-shrink: 0;
+  margin: calc(var(--space-2) * -1) calc(var(--space-2) * -1) 0 0;
+}
+
+/* The "Completed" label: a check and a word, so color is never the only signal */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  align-self: flex-start;
+  margin: 0;
+  padding: 2px var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--color-income-soft);
+  color: var(--color-income-text);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.amounts {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.amounts strong {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.amounts span {
+  color: var(--color-text-secondary);
+}
+
+.track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-muted);
+}
+
+.bar {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--tone);
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.percent {
+  color: var(--color-text-secondary);
+}
+
+.deadline {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* The deadline has passed: red text, and the words "overdue" say the same without color */
+.late {
+  color: var(--color-expense-text);
+  font-weight: var(--font-weight-medium);
+}
+
+.perMonth {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-primary-soft);
+  color: var(--color-primary-text);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The two buttons sit at the bottom of the card, so cards of different heights line up. */
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: auto;
+}
+
+.buttons > button {
+  flex: 1 1 auto;
+  padding: 0 var(--space-3);
+}

@@ -7,6 +7,7 @@ import TransactionsPage from './pages/TransactionsPage.jsx';
 import CategoriesPage from './pages/CategoriesPage.jsx';
 import BudgetsPage from './pages/BudgetsPage.jsx';
 import RecurringPage from './pages/RecurringPage.jsx';
+import GoalsPage from './pages/GoalsPage.jsx';
 import LoginPage from'./pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import StyleGuidePage from './pages/StyleGuidePage.jsx';
@@ -29,6 +30,7 @@ export default function App() {
           <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/budgets" element={<BudgetsPage />} />
           <Route path="/recurring" element={<RecurringPage />} />
+          <Route path="/goals" element={<GoalsPage />} />
         </Route>
       </Route>
 

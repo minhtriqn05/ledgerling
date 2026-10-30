@@ -12,6 +12,8 @@ erDiagram
     USER ||--o{ RECURRING_RULE : schedules
     CATEGORY ||--o{ RECURRING_RULE : classifies
     RECURRING_RULE |o--o{ TRANSACTION : creates
+    USER ||--o{ GOAL : saves
+    GOAL ||--o{ CONTRIBUTION : holds
 
     USER {
         ObjectId _id PK
@@ -71,6 +73,25 @@ erDiagram
         date createdAt
         date updatedAt
     }
+
+    GOAL {
+        ObjectId _id PK
+        ObjectId userId FK
+        string name "1-60 characters"
+        number targetAmount "greater than 0, whole VND"
+        number savedAmount "default 0, never below 0"
+        date deadline "optional, noon Vietnam time"
+        string color "hex, e.g. #4A9FE3"
+        date createdAt
+        date updatedAt
+    }
+
+    CONTRIBUTION {
+        ObjectId _id PK
+        number amount "whole VND, not 0: positive = deposit, negative = withdrawal"
+        string note "up to 200 characters"
+        date date "noon Vietnam time"
+    }
 ```
 
 ## Relationships
@@ -90,3 +111,7 @@ erDiagram
 - Deleting a Category also deletes its Budgets (after the 409 check for transactions).
 - Tags are stored inside the Transaction (no separate collection). `GET /api/tags` counts them with an aggregation.
 - Indexes on Transaction: `(userId, date -1)` for the list and `(userId, tags)` for the tag filter and the tag list.
+- One User has many Goals (`Goal.userId`). The contributions are stored inside the Goal as an array of subdocuments (no separate collection), so a goal and its history are always read and changed together.
+- `Goal.savedAmount` is the sum of the contributions. It is changed only by an atomic `$inc` together with `$push` / `$pull` of a contribution, with a condition that keeps it at 0 or more.
+- `progress`, `remaining` and `completed` of a goal are not stored: they are computed from `savedAmount` and `targetAmount`.
+- Index on Goal: `(userId)` for the list.

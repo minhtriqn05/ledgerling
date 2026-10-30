@@ -32,6 +32,11 @@ const options = {
         description:
           "Weekly or monthly rules that create real transactions when they are due. There is no cron job: GET /transactions, /stats/summary, /budgets and /recurring first create what is due up to today (Vietnam time, at most 60 transactions per rule per request).",
       },
+      {
+        name: "Goals",
+        description:
+          "Savings goals of the signed-in user. Money goes in and out through contributions: a positive amount adds money, a negative amount withdraws it, and the saved amount never goes below 0.",
+      },
     ],
     components: {
       securitySchemes: {
@@ -195,6 +200,61 @@ const options = {
               description: "Optional last day that can run, must be after startDate",
               example: "2027-08-31",
             },
+          },
+        },
+        Contribution: {
+          type: "object",
+          properties: {
+            _id: { type: "string", example: "6720f1b2c3d4e5f601234611" },
+            amount: { type: "number", description: "In VND. Positive = money added, negative = money withdrawn", example: 500000 },
+            note: { type: "string", example: "October bonus" },
+            date: { type: "string", format: "date-time", description: "Noon Vietnam time of the day", example: "2026-10-30T05:00:00.000Z" },
+          },
+        },
+        Goal: {
+          type: "object",
+          properties: {
+            _id: { type: "string", example: "6720f1b2c3d4e5f601234601" },
+            name: { type: "string", example: "New laptop" },
+            targetAmount: { type: "number", description: "In VND", example: 20000000 },
+            savedAmount: { type: "number", description: "In VND, never below 0", example: 5000000 },
+            deadline: { type: "string", format: "date-time", nullable: true, description: "Noon Vietnam time of the last day; null means no deadline", example: "2027-03-31T05:00:00.000Z" },
+            color: { type: "string", example: "#4A9FE3" },
+            progress: { type: "number", description: "savedAmount / targetAmount in %, 1 decimal rounded down, at most 100", example: 25 },
+            remaining: { type: "number", description: "targetAmount - savedAmount, never below 0", example: 15000000 },
+            completed: { type: "boolean", description: "true when savedAmount >= targetAmount", example: false },
+            contributions: {
+              type: "array",
+              description: "Newest first. Left out of GET /goals (the list).",
+              items: { $ref: "#/components/schemas/Contribution" },
+            },
+            createdAt: { type: "string", format: "date-time", example: "2026-10-30T02:01:00.000Z" },
+            updatedAt: { type: "string", format: "date-time", example: "2026-10-30T02:01:00.000Z" },
+          },
+        },
+        GoalInput: {
+          type: "object",
+          required: ["name", "targetAmount", "color"],
+          properties: {
+            name: { type: "string", minLength: 1, maxLength: 60, example: "New laptop" },
+            targetAmount: { type: "integer", description: "In VND, a whole number greater than 0", example: 20000000 },
+            deadline: {
+              type: "string",
+              format: "date",
+              nullable: true,
+              description: "Optional last day, in Vietnam time. Must be after today when the goal is created.",
+              example: "2027-03-31",
+            },
+            color: { type: "string", description: "Hex code", example: "#4A9FE3" },
+          },
+        },
+        ContributionInput: {
+          type: "object",
+          required: ["amount"],
+          properties: {
+            amount: { type: "integer", description: "In VND, a whole number other than 0. Positive adds money, negative withdraws it.", example: 500000 },
+            note: { type: "string", maxLength: 200, example: "October bonus" },
+            date: { type: "string", format: "date", description: "A day in Vietnam time. Defaults to today.", example: "2026-10-30" },
           },
         },
         // Sent next to `data` by paginated list endpoints (data stays an array: one page)

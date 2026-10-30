@@ -6,6 +6,7 @@ import statsRoutes from "./statsRoutes.js";
 import budgetRoutes from "./budgetRoutes.js";
 import tagRoutes from "./tagRoutes.js";
 import recurringRoutes from "./recurringRoutes.js";
+import goalRoutes from "./goalRoutes.js";
 
 const router = Router();
 
@@ -16,6 +17,7 @@ router.use("/stats", statsRoutes);
 router.use("/budgets", budgetRoutes);
 router.use("/tags", tagRoutes);
 router.use("/recurring", recurringRoutes);
+router.use("/goals", goalRoutes);
 
 /**
  * @openapi

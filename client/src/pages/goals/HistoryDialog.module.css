@@ -1,0 +1,82 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.summary {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.empty {
+  margin: 0;
+  padding: var(--space-5) 0;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+/* Long histories scroll inside the dialog instead of making it taller than the screen. */
+.list {
+  max-height: 50vh;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+}
+
+.row + .row {
+  border-top: 1px solid var(--color-border);
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.kind {
+  font-weight: var(--font-weight-semibold);
+}
+
+.meta {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  overflow-wrap: anywhere;
+}
+
+/* Money: always carries + / − too, so color is never the only signal */
+.amount {
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.income {
+  color: var(--color-income-text);
+}
+
+.expense {
+  color: var(--color-expense-text);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (max-width: 480px) {
+  .actions > button {
+    flex: 1;
+  }
+}

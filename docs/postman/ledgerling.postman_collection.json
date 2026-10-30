@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Ledgerling API",
-    "description": "Auth, Categories, Transactions, Stats, Budgets, Tags and CSV import requests for the Ledgerling API. Run Register (or Login) first: its test script saves the token into {{token}}, and every other request sends it as a Bearer token.",
+    "description": "Auth, Categories, Transactions, Stats, Budgets, Tags, CSV import, Recurring and Goals requests for the Ledgerling API. Run Register (or Login) first: its test script saves the token into {{token}}, and every other request sends it as a Bearer token.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -60,7 +60,11 @@
     { "key": "recurringStart", "value": "" },
     { "key": "recurringMonth", "value": "" },
     { "key": "recurringRuleId", "value": "" },
-    { "key": "recurringTransactionId", "value": "" }
+    { "key": "recurringTransactionId", "value": "" },
+    { "key": "goalId", "value": "" },
+    { "key": "goalContributionId", "value": "" },
+    { "key": "goalDeadline", "value": "" },
+    { "key": "goalToday", "value": "" }
   ],
   "item": [
     {
@@ -10489,6 +10493,965 @@
               "path": [
                 "categories",
                 "{{recurringCategoryId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Goals",
+      "item": [
+        {
+          "name": "Create goal",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// A deadline 30 days from now, in Vietnam time (must be after today)",
+                  "const day = new Date(Date.now() + 7 * 60 * 60 * 1000 + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);",
+                  "pm.collectionVariables.set('goalDeadline', day);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "const data = pm.response.json().data;",
+                  "pm.collectionVariables.set('goalId', data._id);",
+                  "pm.test('Starts empty', function () {",
+                  "  pm.expect(data.savedAmount).to.eql(0);",
+                  "  pm.expect(data.completed).to.eql(false);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New laptop\",\n  \"targetAmount\": 1000000,\n  \"deadline\": \"{{goalDeadline}}\",\n  \"color\": \"#4A9FE3\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/goals",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "goals"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create goal - deadline today (400)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('goalToday', new Date(Date.now() + 7 * 60 * 60 * 1000).toISOString().slice(0, 10));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New laptop\",\n  \"targetAmount\": 1000000,\n  \"deadline\": \"{{goalToday}}\",\n  \"color\": \"#4A9FE3\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/goals",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "goals"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create goal - target 0 (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New laptop\",\n  \"targetAmount\": 0,\n  \"deadline\": \"{{goalDeadline}}\",\n  \"color\": \"#4A9FE3\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/goals",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "goals"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create goal - bad color (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New laptop\",\n  \"targetAmount\": 1000000,\n  \"deadline\": \"{{goalDeadline}}\",\n  \"color\": \"blue\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/goals",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "goals"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create goal - no token (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New laptop\",\n  \"targetAmount\": 1000000,\n  \"deadline\": \"{{goalDeadline}}\",\n  \"color\": \"#4A9FE3\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/goals",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "goals"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List goals",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('The list has no history', function () {",
+                  "  pm.response.json().data.forEach(function (goal) { pm.expect(goal.contributions).to.eql(undefined); });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/goals",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "goals"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add money",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "const data = pm.response.json().data;",
+                  "pm.collectionVariables.set('goalContributionId', data.contributions[0]._id);",
+                  "pm.test('Progress is 40', function () {",
+                  "  pm.expect(data.savedAmount).to.eql(400000);",
+                  "  pm.expect(data.progress).to.eql(40);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 400000,\n  \"note\": \"First deposit\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/goals/{{goalId}}/contributions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "goals",
+                "{{goalId}}",
+                "contributions"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Withdraw money",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Saved is 300000', function () {",
+                  "  pm.expect(pm.response.json().data.savedAmount).to.eql(300000);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": -100000,\n  \"note\": \"Phone repair\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/goals/{{goalId}}/contributions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "goals",
+                "{{goalId}}",
+                "contributions"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Withdraw more than saved (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": -300001\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/goals/{{goalId}}/contributions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "goals",
+                "{{goalId}}",
+                "contributions"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Contribution amount 0 (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/goals/{{goalId}}/contributions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "goals",
+                "{{goalId}}",
+                "contributions"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add the rest (goal completed)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Completed', function () {",
+                  "  pm.expect(pm.response.json().data.completed).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 700000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/goals/{{goalId}}/contributions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "goals",
+                "{{goalId}}",
+                "contributions"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get goal with history",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Three contributions', function () {",
+                  "  pm.expect(pm.response.json().data.contributions.length).to.eql(3);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/goals/{{goalId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "goals",
+                "{{goalId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update goal",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Saved amount is kept, deadline removed', function () {",
+                  "  const data = pm.response.json().data;",
+                  "  pm.expect(data.savedAmount).to.eql(1000000);",
+                  "  pm.expect(data.deadline).to.eql(null);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Gaming laptop\",\n  \"targetAmount\": 2000000,\n  \"color\": \"#F07D62\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/goals/{{goalId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "goals",
+                "{{goalId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Other user: get goal (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/goals/{{goalId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "goals",
+                "{{goalId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Other user: update goal (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"x\",\n  \"targetAmount\": 1,\n  \"color\": \"#000000\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/goals/{{goalId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "goals",
+                "{{goalId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Other user: add money (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 1000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/goals/{{goalId}}/contributions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "goals",
+                "{{goalId}}",
+                "contributions"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Other user: delete contribution (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/goals/{{goalId}}/contributions/{{goalContributionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "goals",
+                "{{goalId}}",
+                "contributions",
+                "{{goalContributionId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Other user: delete goal (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/goals/{{goalId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "goals",
+                "{{goalId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete first deposit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Saved is 600000', function () {",
+                  "  pm.expect(pm.response.json().data.savedAmount).to.eql(600000);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/goals/{{goalId}}/contributions/{{goalContributionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "goals",
+                "{{goalId}}",
+                "contributions",
+                "{{goalContributionId}}"
+              ]
+            },
+            "description": "Takes the first deposit (400.000) back. The rest of the saved money (600.000) still covers it, so this works."
+          }
+        },
+        {
+          "name": "Delete contribution again (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/goals/{{goalId}}/contributions/{{goalContributionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "goals",
+                "{{goalId}}",
+                "contributions",
+                "{{goalContributionId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete goal",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/goals/{{goalId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "goals",
+                "{{goalId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete goal again (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/goals/{{goalId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "goals",
+                "{{goalId}}"
               ]
             }
           }
