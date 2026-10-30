@@ -44,6 +44,22 @@ export function nextDayStart(day) {
   return new Date(Date.UTC(year, monthNumber - 1, dayNumber + 1) - VIETNAM_OFFSET_MS);
 }
 
+// "2026-10-15" -> 2026-10-15T05:00Z (12:00 of that day in Vietnam time, like the dates from the Transactions form)
+export function dayNoon(day) {
+  const [year, monthNumber, dayNumber] = day.split("-").map(Number);
+  return new Date(Date.UTC(year, monthNumber - 1, dayNumber, 12) - VIETNAM_OFFSET_MS);
+}
+
+// A moment as its day in Vietnam time: 2026-10-14T17:00Z -> "2026-10-15"
+export function vietnamDay(date) {
+  return new Date(date.getTime() + VIETNAM_OFFSET_MS).toISOString().slice(0, 10);
+}
+
+// Today in Vietnam time, as "YYYY-MM-DD"
+export function todayInVietnam() {
+  return vietnamDay(new Date());
+}
+
 // A moment as "YYYY-MM-DD HH:mm" in Vietnam time: 2026-10-27T05:30Z -> "2026-10-27 12:30"
 export function formatVietnamDateTime(date) {
   return new Date(date.getTime() + VIETNAM_OFFSET_MS).toISOString().slice(0, 16).replace("T", " ");

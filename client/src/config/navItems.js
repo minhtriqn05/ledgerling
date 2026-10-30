@@ -5,4 +5,5 @@ export const navItems = [
   { label: 'Transactions', path: '/transactions', icon: 'transactions' },
   { label: 'Categories', path: '/categories', icon: 'categories' },
   { label: 'Budgets', path: '/budgets', icon: 'wallet' },
+  { label: 'Recurring', path: '/recurring', icon: 'repeat' },
 ];

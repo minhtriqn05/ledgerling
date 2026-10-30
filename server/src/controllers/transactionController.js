@@ -1,9 +1,11 @@
 import * as transactionService from "../services/transactionService.js";
+import { processDueRules } from "../services/recurringService.js";
 
 // The user always comes from the token (req.user.id, set by requireAuth).
 
 // data stays an array (one page); meta tells the client how many pages there are
 export async function list(req, res) {
+  await processDueRules(req.user.id);
   const { items, meta } = await transactionService.listTransactions(req.user.id, req.listQuery);
   res.status(200).json({ success: true, data: items, meta });
 }

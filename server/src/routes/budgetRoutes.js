@@ -19,6 +19,7 @@ router.use(requireAuth);
  * /budgets:
  *   get:
  *     summary: List my budgets of a month, each with how much is already spent
+ *     description: First creates the transactions of my recurring rules that are due up to today (see the Recurring tag).
  *     tags: [Budgets]
  *     security:
  *       - bearerAuth: []

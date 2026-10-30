@@ -20,6 +20,7 @@ router.use(requireAuth);
  * /transactions:
  *   get:
  *     summary: List my transactions (search, sort, date range, one page at a time)
+ *     description: First creates the transactions of my recurring rules that are due up to today (see the Recurring tag).
  *     tags: [Transactions]
  *     security:
  *       - bearerAuth: []
@@ -608,6 +609,15 @@ router.get("/:id", validateTransactionId, getOne);
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
+ *       409:
+ *         description: The new date is already used by another transaction of the same recurring rule
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Duplicate value
  */
 router.patch("/:id", validateTransactionId, validateUpdateTransaction, update);
 

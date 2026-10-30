@@ -54,7 +54,13 @@
     { "key": "tagPlainId", "value": "" },
     { "key": "tagImportedId", "value": "" },
     { "key": "tagOtherId", "value": "" },
-    { "key": "tagBigBody", "value": "" }
+    { "key": "tagBigBody", "value": "" },
+    { "key": "recurringCategoryName", "value": "" },
+    { "key": "recurringCategoryId", "value": "" },
+    { "key": "recurringStart", "value": "" },
+    { "key": "recurringMonth", "value": "" },
+    { "key": "recurringRuleId", "value": "" },
+    { "key": "recurringTransactionId", "value": "" }
   ],
   "item": [
     {
@@ -9674,6 +9680,817 @@
               ]
             },
             "description": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "Recurring",
+      "item": [
+        {
+          "name": "Setup - Create category",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('recurringCategoryName', 'RecurringTest ' + Math.floor(Math.random() * 100000));",
+                  "// The 1st of this month in Vietnam time, so exactly one run is due",
+                  "const vietnam = new Date(Date.now() + 7 * 60 * 60 * 1000).toISOString();",
+                  "pm.collectionVariables.set('recurringStart', vietnam.slice(0, 8) + '01');",
+                  "pm.collectionVariables.set('recurringMonth', vietnam.slice(0, 7));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.collectionVariables.set('recurringCategoryId', pm.response.json().data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{recurringCategoryName}}\",\n  \"type\": \"expense\",\n  \"color\": \"#FF7043\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories"
+              ]
+            },
+            "description": "A throwaway category for this folder. Removed again at the end."
+          }
+        },
+        {
+          "name": "Create rule (started this month)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "const data = pm.response.json().data;",
+                  "pm.collectionVariables.set('recurringRuleId', data._id);",
+                  "pm.test('Active, not ended, first run is the start date', function () {",
+                  "  pm.expect(data.active).to.eql(true);",
+                  "  pm.expect(data.ended).to.eql(false);",
+                  "  pm.expect(data.nextRunDate).to.eql(data.startDate);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{recurringCategoryId}}\",\n  \"amount\": 3500000,\n  \"note\": \"Rent\",\n  \"frequency\": \"monthly\",\n  \"startDate\": \"{{recurringStart}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/recurring",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recurring"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create rule - amount 0 (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Message', function () { pm.expect(pm.response.json().message).to.eql('Amount must be greater than 0'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{recurringCategoryId}}\",\n  \"amount\": 0,\n  \"note\": \"Rent\",\n  \"frequency\": \"monthly\",\n  \"startDate\": \"{{recurringStart}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/recurring",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recurring"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create rule - bad frequency (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Message', function () { pm.expect(pm.response.json().message).to.eql('Frequency must be weekly or monthly'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{recurringCategoryId}}\",\n  \"amount\": 3500000,\n  \"note\": \"Rent\",\n  \"frequency\": \"daily\",\n  \"startDate\": \"{{recurringStart}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/recurring",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recurring"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create rule - bad start date (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Message', function () { pm.expect(pm.response.json().message).to.eql('Start date must be a date in YYYY-MM-DD format'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{recurringCategoryId}}\",\n  \"amount\": 3500000,\n  \"note\": \"Rent\",\n  \"frequency\": \"monthly\",\n  \"startDate\": \"2026-02-30\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/recurring",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recurring"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create rule - end date before start (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Message', function () { pm.expect(pm.response.json().message).to.eql('End date must be after the start date'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{recurringCategoryId}}\",\n  \"amount\": 3500000,\n  \"note\": \"Rent\",\n  \"frequency\": \"monthly\",\n  \"startDate\": \"2026-10-10\",\n  \"endDate\": \"2026-10-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/recurring",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recurring"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create rule - no token (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{recurringCategoryId}}\",\n  \"amount\": 3500000,\n  \"note\": \"Rent\",\n  \"frequency\": \"monthly\",\n  \"startDate\": \"{{recurringStart}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/recurring",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recurring"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List transactions - the due run was created",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const data = pm.response.json().data;",
+                  "pm.test('Exactly one transaction, marked with the rule', function () {",
+                  "  pm.expect(data.length).to.eql(1);",
+                  "  pm.expect(data[0].recurringRuleId).to.eql(pm.collectionVariables.get('recurringRuleId'));",
+                  "  pm.expect(data[0].note).to.eql('Rent');",
+                  "  pm.expect(data[0].type).to.eql('expense');",
+                  "});",
+                  "pm.collectionVariables.set('recurringTransactionId', data[0]._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month={{recurringMonth}}&categoryId={{recurringCategoryId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "{{recurringMonth}}"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{recurringCategoryId}}"
+                }
+              ]
+            },
+            "description": "GET /transactions first creates what is due. Send it twice: there is still one transaction."
+          }
+        },
+        {
+          "name": "List rules - next run moved to next month",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const rule = pm.response.json().data.find((r) => r._id === pm.collectionVariables.get('recurringRuleId'));",
+                  "pm.test('nextRunDate is after startDate', function () {",
+                  "  pm.expect(new Date(rule.nextRunDate) > new Date(rule.startDate)).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/recurring",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recurring"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Other user: update rule (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{recurringCategoryId}}\",\n  \"amount\": 3500000,\n  \"note\": \"Rent\",\n  \"frequency\": \"monthly\",\n  \"startDate\": \"{{recurringStart}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/recurring/{{recurringRuleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recurring",
+                "{{recurringRuleId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Other user: toggle rule (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/recurring/{{recurringRuleId}}/toggle",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recurring",
+                "{{recurringRuleId}}",
+                "toggle"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Other user: delete rule (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/recurring/{{recurringRuleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recurring",
+                "{{recurringRuleId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update rule (amount and note, next run stays)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Updated', function () { pm.expect(pm.response.json().data.amount).to.eql(4000000); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{recurringCategoryId}}\",\n  \"amount\": 4000000,\n  \"note\": \"New rent\",\n  \"frequency\": \"monthly\",\n  \"startDate\": \"{{recurringStart}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/recurring/{{recurringRuleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recurring",
+                "{{recurringRuleId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Toggle rule off",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Off', function () { pm.expect(pm.response.json().data.active).to.eql(false); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/recurring/{{recurringRuleId}}/toggle",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recurring",
+                "{{recurringRuleId}}",
+                "toggle"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Toggle rule on",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('On', function () { pm.expect(pm.response.json().data.active).to.eql(true); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/recurring/{{recurringRuleId}}/toggle",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recurring",
+                "{{recurringRuleId}}",
+                "toggle"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete the created transaction",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/{{recurringTransactionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "{{recurringTransactionId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete category that still has a rule (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 409', function () {",
+                  "  pm.response.to.have.status(409);",
+                  "});",
+                  "pm.test('Message', function () { pm.expect(pm.response.json().message).to.eql('Category still has recurring rules'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories/{{recurringCategoryId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories",
+                "{{recurringCategoryId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete rule",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/recurring/{{recurringRuleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recurring",
+                "{{recurringRuleId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete rule again (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/recurring/{{recurringRuleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recurring",
+                "{{recurringRuleId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Cleanup - Delete category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories/{{recurringCategoryId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories",
+                "{{recurringCategoryId}}"
+              ]
+            }
           }
         }
       ]

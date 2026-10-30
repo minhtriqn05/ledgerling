@@ -1,6 +1,7 @@
 import Category from "../models/Category.js";
 import Transaction from "../models/Transaction.js";
 import Budget from "../models/Budget.js";
+import RecurringRule from "../models/RecurringRule.js";
 import { httpError } from "../utils/httpError.js";
 
 // Same case-insensitive comparison as the unique index on the model
@@ -60,6 +61,8 @@ export async function deleteCategory(userId, id) {
   const category = await findOwned(userId, id);
   const inUse = await Transaction.exists({ userId, categoryId: category._id });
   if (inUse) throw httpError(409, "Category still has transactions");
+  const hasRule = await RecurringRule.exists({ userId, categoryId: category._id });
+  if (hasRule) throw httpError(409, "Category still has recurring rules");
 
   // A budget means nothing without its category, so its budgets (every month) go too
   await Budget.deleteMany({ userId, categoryId: category._id });

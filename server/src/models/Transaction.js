@@ -14,6 +14,9 @@ const transactionSchema = new mongoose.Schema(
     date: { type: Date, default: Date.now },
     // Lower case, at most 5, each 1-20 of a-z 0-9 - (checked by the request validation)
     tags: { type: [String], default: [] },
+    // Only on transactions created by a recurring rule. Stays after the rule is deleted.
+    // Never read from a request body: only processDueRules sets it.
+    recurringRuleId: { type: mongoose.Schema.Types.ObjectId, ref: "RecurringRule" },
   },
   // Adds createdAt and updatedAt
   { timestamps: true }
@@ -23,6 +26,12 @@ const transactionSchema = new mongoose.Schema(
 transactionSchema.index({ userId: 1, date: -1 });
 // Speeds up the tag filter and the tag list (one entry per tag of each transaction)
 transactionSchema.index({ userId: 1, tags: 1 });
+// A rule never creates two transactions for the same date, even when requests run at the same time.
+// Partial: transactions without a rule are not in this index, so they can share a date.
+transactionSchema.index(
+  { recurringRuleId: 1, date: 1 },
+  { unique: true, partialFilterExpression: { recurringRuleId: { $exists: true } } }
+);
 
 // userId and __v are internal. categoryId is always populated, so it is returned as "category".
 transactionSchema.set("toJSON", {

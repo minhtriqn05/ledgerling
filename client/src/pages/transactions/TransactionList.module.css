@@ -195,6 +195,22 @@
   }
 }
 
+/* ---------- "Recurring" label: created by a recurring rule ---------- */
+/* The double class wins over ".mobileText span", which would make the text muted on phones. */
+.recurring.recurring {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-left: var(--space-2);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-income-soft);
+  color: var(--color-income-text);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  vertical-align: middle;
+}
+
 /* ---------- Tags: small pills, a click filters the list ---------- */
 .tags {
   display: inline-flex;

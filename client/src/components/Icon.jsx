@@ -101,6 +101,15 @@ const paths = {
       <path d="M5 20h14" />
     </>
   ),
+  // Two arrows going around, for recurring rules
+  repeat: (
+    <>
+      <path d="m17 2 4 4-4 4" />
+      <path d="M3 11V9a3 3 0 0 1 3-3h15" />
+      <path d="m7 22-4-4 4-4" />
+      <path d="M21 13v2a3 3 0 0 1-3 3H3" />
+    </>
+  ),
   menu: <path d="M4 7h16M4 12h16M4 17h16" />,
   check: <path d="m5 12 5 5L20 7" />,
   x: <path d="M18 6 6 18M6 6l12 12" />,
