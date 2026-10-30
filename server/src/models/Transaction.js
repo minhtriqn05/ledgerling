@@ -12,6 +12,8 @@ const transactionSchema = new mongoose.Schema(
     currency: { type: String, default: "VND", match: /^[A-Z]{3}$/ },
     note: { type: String, default: "", trim: true, maxlength: 200 },
     date: { type: Date, default: Date.now },
+    // Lower case, at most 5, each 1-20 of a-z 0-9 - (checked by the request validation)
+    tags: { type: [String], default: [] },
   },
   // Adds createdAt and updatedAt
   { timestamps: true }
@@ -19,6 +21,8 @@ const transactionSchema = new mongoose.Schema(
 
 // Speeds up the monthly list: filter by user and month, newest first
 transactionSchema.index({ userId: 1, date: -1 });
+// Speeds up the tag filter and the tag list (one entry per tag of each transaction)
+transactionSchema.index({ userId: 1, tags: 1 });
 
 // userId and __v are internal. categoryId is always populated, so it is returned as "category".
 transactionSchema.set("toJSON", {

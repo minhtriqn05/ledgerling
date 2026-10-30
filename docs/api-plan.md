@@ -44,6 +44,7 @@ Swagger UI: `/api-docs` (outside `/api`).
 | `currency` (transaction body) | 3 letters (ISO 4217); lower case is converted to upper case; default `"VND"` |
 | `currency` (stats query) | 3 **uppercase** letters; lower case like `usd` is refused with 400; default `"VND"` |
 | `note` | string, trimmed, max 200 chars, optional, default `""` |
+| `tags` | array of up to 5 tags, optional, default `[]`. Each tag is trimmed, converted to lower case, 1–20 characters of `a-z 0-9 -`; duplicates are removed |
 | `date` | ISO 8601 date, default: now |
 | `month` (query) | `YYYY-MM` |
 | `month` (budget body) | `YYYY-MM`, required; cannot be changed after the budget is created |
@@ -63,7 +64,7 @@ Swagger UI: `/api-docs` (outside `/api`).
 | 7 | GET | `/api/categories/:id` | Yes | Get one category |
 | 8 | PATCH | `/api/categories/:id` | Yes | Update name / color |
 | 9 | DELETE | `/api/categories/:id` | Yes | Delete (409 if it has transactions) |
-| 10 | GET | `/api/transactions` | Yes | List my transactions, paginated (`?month=&from=&to=&type=&categoryId=&q=&sort=&page=&limit=`) |
+| 10 | GET | `/api/transactions` | Yes | List my transactions, paginated (`?month=&from=&to=&type=&categoryId=&tag=&q=&sort=&page=&limit=`) |
 | 11 | POST | `/api/transactions` | Yes | Create a transaction |
 | 12 | GET | `/api/transactions/:id` | Yes | Get one transaction |
 | 13 | PATCH | `/api/transactions/:id` | Yes | Update a transaction |
@@ -75,6 +76,8 @@ Swagger UI: `/api-docs` (outside `/api`).
 | 19 | DELETE | `/api/budgets/:id` | Yes | Delete a budget |
 | 20 | POST | `/api/budgets/copy` | Yes | Copy my budgets from one month to another |
 | 21 | GET | `/api/transactions/export` | Yes | Download my transactions as a CSV file, same filters as endpoint 10 without `page` / `limit` (max 5000 rows) |
+| 22 | POST | `/api/transactions/import` | Yes | Import up to 500 rows read from a CSV file; valid rows are saved, bad rows are listed |
+| 23 | GET | `/api/tags` | Yes | The tags I have used, with how many transactions carry each |
 
 Every protected route (Auth = Yes) can also return **401** (`"Not authorized, token missing"` /
 `"Not authorized, invalid token"`) and every route can return **500** (`"Internal server error"`).
@@ -272,6 +275,7 @@ Transaction object (category populated for display):
   "amount": 45000,
   "currency": "VND",
   "note": "Lunch",
+  "tags": ["work"],
   "date": "2026-10-27T05:30:00.000Z",
   "createdAt": "2026-10-27T05:31:00.000Z",
   "updatedAt": "2026-10-27T05:31:00.000Z"
@@ -291,6 +295,7 @@ Auth: yes.
 | `to` | `2026-10-31` | `YYYY-MM-DD`, last day included (until 00:00 +07:00 of the next day) |
 | `type` | `expense` | `income` \| `expense` |
 | `categoryId` | `6720b1b2...` | |
+| `tag` | `work` | only transactions that have this tag; one tag, upper case is converted to lower case |
 | `q` | `lunch` | search in `note`, ignores upper / lower case; trimmed, empty is ignored, max 100 characters |
 | `sort` | `-amount` | `date`, `-date` (default), `amount`, `-amount` (`-` = descending) |
 | `page` | `2` | whole number ≥ 1, default `1` |
@@ -316,6 +321,7 @@ Auth: yes.
 - `"Use either month or from/to, not both"`, `"Month must be in YYYY-MM format"`
 - `"From must be a date in YYYY-MM-DD format"`, `"To must be a date in YYYY-MM-DD format"` (also for days that do not exist like `2026-02-30`), `"From must be before or equal to to"`
 - `"Type must be income or expense"`, `"Category id is invalid"`
+- `"Each tag must be 1-20 letters, digits or hyphens"` (bad `tag`, e.g. `work!` or an empty `?tag=`)
 - `"Search must be a string"` (e.g. `?q=a&q=b`), `"Search must be at most 100 characters"`
 - `"Sort must be one of date, -date, amount, -amount"`
 - `"Page must be a whole number from 1"`, `"Limit must be a whole number from 1 to 100"`
@@ -330,6 +336,7 @@ Auth: yes.
   "amount": 45000,
   "currency": "VND",
   "note": "Lunch",
+  "tags": ["work", "team-lunch"],
   "date": "2026-10-27T12:30:00+07:00"
 }
 ```
@@ -341,7 +348,7 @@ Required: `categoryId`, `amount`. `type` is not sent: the server copies it from 
 
 | Code | message |
 |------|---------|
-| 400 | `"Category id is invalid"`, `"Amount must be greater than 0"`, `"Currency must be a 3-letter ISO code"`, `"Note must be a string"`, `"Note must be at most 200 characters"`, `"Date is invalid, use ISO 8601 like 2026-10-27T12:30:00+07:00"` |
+| 400 | `"Category id is invalid"`, `"Amount must be greater than 0"`, `"Currency must be a 3-letter ISO code"`, `"Note must be a string"`, `"Note must be at most 200 characters"`, `"Date is invalid, use ISO 8601 like 2026-10-27T12:30:00+07:00"`, `"Tags must be an array"`, `"Each tag must be 1-20 letters, digits or hyphens"`, `"A transaction can have at most 5 tags"` |
 | 404 | `"Category not found"` |
 
 ### 12. GET /api/transactions/:id
@@ -354,11 +361,12 @@ Auth: yes.
 ### 13. PATCH /api/transactions/:id
 Auth: yes.
 
-**Body** (at least one of `categoryId`, `amount`, `currency`, `note`, `date`)
+**Body** (at least one of `categoryId`, `amount`, `currency`, `note`, `tags`, `date`)
 ```json
 { "amount": 50000, "note": "Lunch with friends" }
 ```
 If `categoryId` changes, `type` is copied again from the new category.
+`tags` replaces all the tags of the transaction; `[]` removes them.
 
 **200** – `data` is the updated transaction object.
 
@@ -382,25 +390,84 @@ Auth: yes.
 ### 21. GET /api/transactions/export
 Auth: yes. Declared **before** `/api/transactions/:id`, so `export` is never read as an id.
 
-**Query**: the same filters as endpoint 10 (`month`, `from`, `to`, `type`, `categoryId`, `q`, `sort`), with the same rules.
+**Query**: the same filters as endpoint 10 (`month`, `from`, `to`, `type`, `categoryId`, `tag`, `q`, `sort`), with the same rules.
 `page` and `limit` are ignored (even if invalid). At most **5000 rows**; if more match, only the first 5000 of the chosen sort are in the file.
 
 **200** – a file, not JSON
 - `Content-Type: text/csv; charset=utf-8`
 - `Content-Disposition: attachment; filename="ledgerling-2026-10.csv"` – `ledgerling-YYYY-MM.csv` for a month (default: current month),
   `ledgerling-FROM_TO.csv` for a date range (`start` / `end` when one side is missing)
-- Columns: `Date` (Vietnam time, `YYYY-MM-DD HH:mm`), `Type`, `Category`, `Amount`, `Currency`, `Note`
+- Columns: `Date` (Vietnam time, `YYYY-MM-DD HH:mm`), `Type`, `Category`, `Amount`, `Currency`, `Note`, `Tags` (the tags of the transaction joined with `;`, empty when none)
 - Starts with a UTF-8 BOM; lines end with CRLF
 - A cell with a comma, a double quote or a line break is wrapped in `"` (each `"` inside is doubled)
 - A cell that starts with `=`, `+`, `-`, `@` (or a tab / carriage return) gets a `'` in front, so a spreadsheet does not run it as a formula (CSV injection)
 
 ```
-Date,Type,Category,Amount,Currency,Note
-2026-10-27 12:30,expense,Food,45000,VND,Lunch
-2026-10-27 18:30,expense,Food,85000,VND,"Dinner, with team"
+Date,Type,Category,Amount,Currency,Note,Tags
+2026-10-27 12:30,expense,Food,45000,VND,Lunch,work
+2026-10-27 18:30,expense,Food,85000,VND,"Dinner, with team",work;trip
 ```
 
 **Errors** (400): the same as endpoint 10 for the filters (nothing for `page` / `limit`). The error body is JSON as usual.
+
+### 22. POST /api/transactions/import
+Auth: yes. Declared **before** `/api/transactions/:id`.
+
+The browser reads the CSV file (papaparse) and sends its rows as JSON, so the file itself is never uploaded.
+Every row is checked like a new transaction (endpoint 11); the category is found by **name and type** among the
+user's categories, ignoring upper / lower case. A category that does not exist (or has the other type) is an error for
+that row: an import never creates categories. Only the valid rows are saved.
+
+**Body** – `rows`: 1 to 500 items
+```json
+{
+  "rows": [
+    { "date": "2026-10-27 12:30", "type": "expense", "category": "Food", "amount": 45000, "currency": "VND", "note": "Lunch", "tags": ["work"] },
+    { "date": "2026-10-28", "type": "expense", "category": "Unknown", "amount": 10000 }
+  ]
+}
+```
+
+| Field of a row | Rule |
+|----------------|------|
+| `type` | required, `income` or `expense` |
+| `category` | required, the name of one of the user's categories of this `type` |
+| `amount` | required, JSON number > 0 |
+| `date` | `YYYY-MM-DD HH:mm` or `YYYY-MM-DD` (Vietnam time, the export format; a day alone is 00:00), or ISO 8601 with an offset; empty = now |
+| `currency`, `note`, `tags` | as in endpoint 11; empty = the default (`VND`, `""`, `[]`) |
+
+An empty value (`""` or `null`) counts as missing. `userId` and any other field in a row are ignored.
+
+**200** – also when some rows are refused (a partial import is not an error). `errors[].row` is the position of the row in `rows` (1 = the first row).
+```json
+{
+  "success": true,
+  "data": {
+    "imported": 1,
+    "failed": 1,
+    "errors": [ { "row": 2, "message": "Category \"Unknown\" (expense) not found" } ]
+  }
+}
+```
+
+**Errors**
+
+| Code | message |
+|------|---------|
+| 400 | `"Rows must be a non-empty array"`, `"You can import at most 500 rows at a time"` |
+
+Row messages (in `errors`): the validation messages of endpoint 11 (`"Amount must be greater than 0"`, tags messages...),
+`"Type must be income or expense"`, `"Category is required"`, `"Date is invalid, use YYYY-MM-DD HH:mm or ISO 8601"`,
+`"Row must be an object"` and `"Category \"X\" (expense) not found"`.
+Sending the same rows twice saves them twice (no duplicate check). The JSON body limit is 300 kB.
+
+### 23. GET /api/tags
+Auth: yes. Used for the tag suggestions in the transaction form.
+
+**200** – the tags the user has used (on all transactions, any month), most used first, then A to Z. `[]` when none.
+```json
+{ "success": true, "data": [ { "tag": "work", "count": 12 }, { "tag": "trip", "count": 3 } ] }
+```
 
 ---
 

@@ -20,6 +20,7 @@ import TransactionList from './transactions/TransactionList.jsx';
 import TransactionFormDialog from './transactions/TransactionFormDialog.jsx';
 import DeleteTransactionDialog from './transactions/DeleteTransactionDialog.jsx';
 import Pager from './transactions/Pager.jsx';
+import ImportDialog from './transactions/ImportDialog.jsx';
 import styles from './TransactionsPage.module.css';
 
 // Design: TransactionsPreview in pages/styleGuide. Header with the month picker, three summary cards,
@@ -55,6 +56,7 @@ const DEFAULT_SORT = '-date';
 const MONTH_REGEX = /^\d{4}-(0[1-9]|1[0-2])$/;
 const DAY_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 const OBJECT_ID_REGEX = /^[0-9a-f]{24}$/i;
+const TAG_REGEX = /^[a-z0-9-]{1,20}$/;
 
 // "2026-02-30" has the right shape but is not a real day (Date.UTC quietly turns it into March 2nd)
 function isRealDay(text) {
@@ -63,12 +65,13 @@ function isRealDay(text) {
   return new Date(Date.UTC(year, month - 1, day)).toISOString().slice(0, 10) === text;
 }
 
-// Every filter lives in the URL (?month=2026-10&category=...&q=coffee&sort=-amount&from=...&to=...&page=2),
+// Every filter lives in the URL (?month=2026-10&category=...&tag=work&q=coffee&sort=-amount&from=...&to=...&page=2),
 // so F5 or a shared link shows the same list. A value that is missing or hand-edited into nonsense falls back to its
 // default, so the API never gets a value it refuses (that would show an error screen instead of the list).
 function readFilters(searchParams) {
   const month = searchParams.get('month');
   const category = searchParams.get('category');
+  const tag = (searchParams.get('tag') ?? '').toLowerCase();
   const sort = searchParams.get('sort');
   let from = isRealDay(searchParams.get('from')) ? searchParams.get('from') : '';
   let to = isRealDay(searchParams.get('to')) ? searchParams.get('to') : '';
@@ -81,6 +84,7 @@ function readFilters(searchParams) {
   return {
     month: MONTH_REGEX.test(month ?? '') ? month : currentMonth(),
     categoryId: OBJECT_ID_REGEX.test(category ?? '') ? category : 'all',
+    tag: TAG_REGEX.test(tag) ? tag : '',
     q: (searchParams.get('q') ?? '').trim(),
     sort: SORT_OPTIONS.some((option) => option.value === sort) ? sort : DEFAULT_SORT,
     from,
@@ -115,7 +119,7 @@ function formatRange(from, to) {
 
 export default function TransactionsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { month, categoryId, q, sort, from, to, page } = readFilters(searchParams);
+  const { month, categoryId, tag, q, sort, from, to, page } = readFilters(searchParams);
   const hasRange = Boolean(from || to);
   // The filters as the API wants them, shared by the list and the CSV export.
   // A date range replaces the month (the API refuses both). useMemo keeps the same object until a filter changes.
@@ -128,9 +132,10 @@ export default function TransactionsPage() {
       filters.month = month;
     }
     if (categoryId !== 'all') filters.categoryId = categoryId;
+    if (tag) filters.tag = tag;
     if (q) filters.q = q;
     return filters;
-  }, [month, categoryId, q, sort, from, to]);
+  }, [month, categoryId, tag, q, sort, from, to]);
   // What is typed in the search box. It reaches the URL (q) 300 ms after the last key.
   const [searchInput, setSearchInput] = useState(q);
   // The text the search box itself just put in the URL (null when none is on its way), see the two effects below
@@ -144,7 +149,8 @@ export default function TransactionsPage() {
   // "Try again" and a save change these, which runs the matching effect again
   const [categoriesKey, setCategoriesKey] = useState(0);
   const [reloadKey, setReloadKey] = useState(0);
-  // The open dialog: null, { kind: 'form', transaction } (transaction = null for a new one) or { kind: 'delete', transaction }
+  // The open dialog: null, { kind: 'form', transaction } (transaction = null for a new one), { kind: 'delete', transaction }
+  // or { kind: 'import' }
   const [dialog, setDialog] = useState(null);
   const [exporting, setExporting] = useState(false);
   const toast = useToast();
@@ -272,14 +278,27 @@ export default function TransactionsPage() {
   }
 
   // The month stays: it is where you are, not a filter.
-  const hasFilters = Boolean(q || searchInput.trim() || categoryId !== 'all' || sort !== DEFAULT_SORT || hasRange);
+  const hasFilters = Boolean(
+    q || searchInput.trim() || categoryId !== 'all' || tag || sort !== DEFAULT_SORT || hasRange
+  );
 
   function clearFilters() {
     setSearchInput('');
     // Only the search box had text, not sent yet: the URL stays the same, so no reload would come
     // to end "Loading…". The list is already unfiltered, there is nothing more to do.
-    if (!q && categoryId === 'all' && sort === DEFAULT_SORT && !hasRange) return;
-    updateFilters({ q: '', category: '', sort: '', from: '', to: '' });
+    if (!q && categoryId === 'all' && !tag && sort === DEFAULT_SORT && !hasRange) return;
+    updateFilters({ q: '', category: '', tag: '', sort: '', from: '', to: '' });
+  }
+
+  // A click on a tag chip in the list (or the x on the "Tag" chip, with an empty tag)
+  function filterByTag(nextTag) {
+    updateFilters({ tag: nextTag });
+  }
+
+  // The import answered: show the new rows. The dialog stays open with the result until the user closes it.
+  function handleImported() {
+    startLoading();
+    setReloadKey((key) => key + 1);
   }
 
   // Downloads every transaction that matches the current filters (not just this page; the server stops at 5000).
@@ -315,6 +334,7 @@ export default function TransactionsPage() {
       to: '',
       q: '',
       category: categoryId !== 'all' && categoryId !== saved.category._id ? '' : categoryId,
+      tag: tag && saved.tags?.includes(tag) ? tag : '',
     });
     setReloadKey((key) => key + 1);
   }
@@ -352,7 +372,7 @@ export default function TransactionsPage() {
         );
       }
 
-      const filtered = categoryId !== 'all' || hasRange;
+      const filtered = categoryId !== 'all' || hasRange || Boolean(tag);
       return (
         <EmptyState
           icon="transactions"
@@ -363,7 +383,7 @@ export default function TransactionsPage() {
           }
           text={
             filtered
-              ? 'Try another date range or category, or add one now.'
+              ? 'Try another date range, category or tag, or add one now.'
               : 'Add your first income or expense for this month.'
           }
         >
@@ -380,6 +400,7 @@ export default function TransactionsPage() {
           transactions={transactions}
           onEdit={(transaction) => setDialog({ kind: 'form', transaction })}
           onDelete={(transaction) => setDialog({ kind: 'delete', transaction })}
+          onTagClick={filterByTag}
         />
         <Pager meta={meta} onPage={changePage} />
       </>
@@ -395,6 +416,9 @@ export default function TransactionsPage() {
         subtitle={ready ? `${period} · ${total} ${total === 1 ? 'transaction' : 'transactions'}` : period}
       >
         <MonthPicker month={month} onChange={changeMonth} />
+        <Button variant="secondary" icon="upload" onClick={() => setDialog({ kind: 'import' })} disabled={loading}>
+          Import CSV
+        </Button>
         <Button variant="secondary" icon="download" onClick={handleExport} disabled={!ready || total === 0 || exporting}>
           {exporting ? 'Exporting…' : 'Export CSV'}
         </Button>
@@ -478,6 +502,19 @@ export default function TransactionsPage() {
             <span className={styles.filterLabel}>To</span>
             <input className={styles.select} type="date" value={to} min={from || undefined} onChange={changeTo} />
           </label>
+          {tag && (
+            <span className={styles.activeTag}>
+              Tag: #{tag}
+              <button
+                type="button"
+                className={styles.activeTagRemove}
+                aria-label={`Remove tag filter ${tag}`}
+                onClick={() => filterByTag('')}
+              >
+                <Icon name="x" size={14} />
+              </button>
+            </span>
+          )}
           {hasFilters && (
             <Button variant="secondary" onClick={clearFilters}>
               Clear filters
@@ -499,6 +536,9 @@ export default function TransactionsPage() {
           onClose={() => setDialog(null)}
           onDelete={(transaction) => setDialog({ kind: 'delete', transaction })}
         />
+      )}
+      {dialog?.kind === 'import' && (
+        <ImportDialog categories={categories} onImported={handleImported} onClose={() => setDialog(null)} />
       )}
       {dialog?.kind === 'delete' && (
         <DeleteTransactionDialog

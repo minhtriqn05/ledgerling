@@ -2,10 +2,26 @@ import { formatDateDMY, formatDayMonth, formatSignedVnd } from '../../utils/form
 import IconButton from '../../components/IconButton/IconButton.jsx';
 import styles from './TransactionList.module.css';
 
+// The tags of one transaction as small buttons: a click filters the list by that tag.
+function TagChips({ tags = [], onTagClick }) {
+  return tags.map((tag) => (
+    <button
+      key={tag}
+      type="button"
+      className={styles.tag}
+      aria-label={`Filter by tag ${tag}`}
+      onClick={() => onTagClick(tag)}
+    >
+      #{tag}
+    </button>
+  ));
+}
+
 // The month's transactions: a table on wide screens, a simple list on phones (≤640px, see the css).
 // Design: TransactionsPreview in pages/styleGuide.
 // On the phone list a tap opens the edit dialog (which also has the Delete button).
-export default function TransactionList({ transactions, onEdit, onDelete }) {
+// onTagClick(tag) is called when a tag chip is clicked.
+export default function TransactionList({ transactions, onEdit, onDelete, onTagClick }) {
   return (
     <>
       <div className={styles.tableWrap}>
@@ -15,6 +31,7 @@ export default function TransactionList({ transactions, onEdit, onDelete }) {
               <th>Date</th>
               <th>Category</th>
               <th>Note</th>
+              <th>Tags</th>
               <th className={styles.alignRight}>Amount</th>
               <th className={styles.alignRight}>
                 <span className={styles.srOnly}>Actions</span>
@@ -32,6 +49,11 @@ export default function TransactionList({ transactions, onEdit, onDelete }) {
                   </span>
                 </td>
                 <td className={styles.note}>{t.note || <span className={styles.muted}>—</span>}</td>
+                <td>
+                  <span className={styles.tags}>
+                    <TagChips tags={t.tags} onTagClick={onTagClick} />
+                  </span>
+                </td>
                 <td className={`${styles.alignRight} ${styles.amount} ${styles[t.type]}`}>
                   {formatSignedVnd(t.amount, t.type)}
                 </td>
@@ -67,6 +89,12 @@ export default function TransactionList({ transactions, onEdit, onDelete }) {
               </span>
               <span className={`${styles.amount} ${styles[t.type]}`}>{formatSignedVnd(t.amount, t.type)}</span>
             </button>
+            {/* Outside the row button: a button cannot hold other buttons */}
+            {t.tags?.length > 0 && (
+              <span className={`${styles.tags} ${styles.mobileTags}`}>
+                <TagChips tags={t.tags} onTagClick={onTagClick} />
+              </span>
+            )}
           </li>
         ))}
       </ul>

@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { createTransaction, updateTransaction } from '../../api/transactions.js';
+import { getTags } from '../../api/tags.js';
 import { getErrorMessage } from '../../api/axios.js';
 import { useToast } from '../../context/ToastContext.jsx';
 import { formatNumber } from '../../utils/format.js';
@@ -9,6 +10,7 @@ import Modal from '../../components/Modal/Modal.jsx';
 import SegmentedControl from '../../components/SegmentedControl/SegmentedControl.jsx';
 import Button from '../../components/Button/Button.jsx';
 import Alert from '../../components/Alert/Alert.jsx';
+import TagInput from '../../components/TagInput/TagInput.jsx';
 import Icon from '../../components/Icon.jsx';
 import styles from './TransactionFormDialog.module.css';
 
@@ -30,9 +32,24 @@ export default function TransactionFormDialog({ transaction, categories, onSaved
   const [categoryId, setCategoryId] = useState(transaction?.category._id ?? '');
   const [date, setDate] = useState(initialDate);
   const [note, setNote] = useState(transaction?.note ?? '');
+  const [tags, setTags] = useState(transaction?.tags ?? []);
+  // The tags used before, offered as suggestions. If they cannot be loaded the box simply has none.
+  const [knownTags, setKnownTags] = useState([]);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const toast = useToast();
+
+  useEffect(() => {
+    let cancelled = false;
+    getTags()
+      .then((data) => {
+        if (!cancelled) setKnownTags(data);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const typeCategories = categories.filter((c) => c.type === type);
 
@@ -55,7 +72,7 @@ export default function TransactionFormDialog({ transaction, categories, onSaved
     if (!categoryId) return setError('Please choose a category.');
     if (!date) return setError('Please pick a date.');
 
-    const data = { categoryId, amount: Number(amount), note: note.trim() };
+    const data = { categoryId, amount: Number(amount), note: note.trim(), tags };
 
     setError('');
     setSaving(true);
@@ -155,6 +172,13 @@ export default function TransactionFormDialog({ transaction, categories, onSaved
               onChange={(event) => setNote(event.target.value)}
             />
           </div>
+        </div>
+
+        <div className={styles.field}>
+          <label className={styles.label} htmlFor="transaction-tags">
+            Tags
+          </label>
+          <TagInput id="transaction-tags" value={tags} onChange={setTags} suggestions={knownTags} disabled={saving} />
         </div>
 
         {error && <Alert>{error}</Alert>}

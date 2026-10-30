@@ -1,9 +1,10 @@
 import { Router } from "express";
-import { list, exportCsv, create, getOne, update, remove } from "../controllers/transactionController.js";
+import { list, exportCsv, importCsv, create, getOne, update, remove } from "../controllers/transactionController.js";
 import {
   validateCreateTransaction,
   validateListTransactions,
   validateExportTransactions,
+  validateImportTransactions,
   validateUpdateTransaction,
   validateTransactionId,
 } from "../middlewares/validateTransaction.js";
@@ -69,6 +70,14 @@ router.use(requireAuth);
  *         schema:
  *           type: string
  *           example: 6720b1b2c3d4e5f601234568
+ *       - in: query
+ *         name: tag
+ *         required: false
+ *         description: Only transactions that have this tag (one tag; upper case is converted to lower case)
+ *         schema:
+ *           type: string
+ *           pattern: '^[a-z0-9-]{1,20}$'
+ *           example: work
  *       - in: query
  *         name: q
  *         required: false
@@ -156,6 +165,7 @@ router.use(requireAuth);
  *           Invalid filter: "Use either month or from/to, not both", "Month must be in YYYY-MM format",
  *           "From must be a date in YYYY-MM-DD format", "To must be a date in YYYY-MM-DD format",
  *           "From must be before or equal to to", "Type must be income or expense", "Category id is invalid",
+ *           "Each tag must be 1-20 letters, digits or hyphens",
  *           "Search must be a string", "Search must be at most 100 characters",
  *           "Sort must be one of date, -date, amount, -amount", "Page must be a whole number from 1",
  *           "Limit must be a whole number from 1 to 100"
@@ -177,7 +187,8 @@ router.get("/", validateListTransactions, list);
  *   get:
  *     summary: Download my transactions as a CSV file (same filters as the list, no paging)
  *     description: |
- *       Columns: Date (Vietnam time, YYYY-MM-DD HH:mm), Type, Category, Amount, Currency, Note.
+ *       Columns: Date (Vietnam time, YYYY-MM-DD HH:mm), Type, Category, Amount, Currency, Note, Tags (separated by ";").
+ *       The file can be sent back to POST /transactions/import (after it is read into JSON rows).
  *       At most 5000 rows; if more match, only the first 5000 of the chosen sort are in the file.
  *       The file starts with a UTF-8 BOM (so Excel shows accents correctly), cells with a comma, a double quote or
  *       a line break are quoted, and a cell that starts with = + - @ gets a ' in front (CSV injection).
@@ -224,6 +235,14 @@ router.get("/", validateListTransactions, list);
  *           type: string
  *           example: 6720b1b2c3d4e5f601234568
  *       - in: query
+ *         name: tag
+ *         required: false
+ *         description: Only transactions that have this tag
+ *         schema:
+ *           type: string
+ *           pattern: '^[a-z0-9-]{1,20}$'
+ *           example: work
+ *       - in: query
  *         name: q
  *         required: false
  *         description: Search in the note, ignoring upper / lower case (max 100 characters)
@@ -254,7 +273,7 @@ router.get("/", validateListTransactions, list);
  *           text/csv:
  *             schema:
  *               type: string
- *             example: "Date,Type,Category,Amount,Currency,Note\r\n2026-10-27 12:30,expense,Food,45000,VND,Lunch\r\n2026-10-27 18:30,expense,Food,85000,VND,\"Dinner, with team\"\r\n"
+ *             example: "Date,Type,Category,Amount,Currency,Note,Tags\r\n2026-10-27 12:30,expense,Food,45000,VND,Lunch,work\r\n2026-10-27 18:30,expense,Food,85000,VND,\"Dinner, with team\",work;trip\r\n"
  *       400:
  *         description: |
  *           Invalid filter (same messages as GET /transactions, except for page and limit, which are ignored here),
@@ -311,6 +330,14 @@ router.get("/export", validateExportTransactions, exportCsv);
  *                 format: date-time
  *                 description: ISO 8601, defaults to now
  *                 example: "2026-10-27T12:30:00+07:00"
+ *               tags:
+ *                 type: array
+ *                 maxItems: 5
+ *                 description: Up to 5 tags, each 1-20 letters, digits or hyphens. Upper case is converted to lower case and duplicates are removed.
+ *                 default: []
+ *                 items:
+ *                   type: string
+ *                 example: [work, team-lunch]
  *     responses:
  *       201:
  *         description: Transaction created
@@ -325,7 +352,7 @@ router.get("/export", validateExportTransactions, exportCsv);
  *                 data:
  *                   $ref: '#/components/schemas/Transaction'
  *       400:
- *         description: Invalid input ("Category id is invalid", "Amount must be greater than 0", "Currency must be a 3-letter ISO code", "Note must be a string", "Note must be at most 200 characters", "Date is invalid, use ISO 8601 like 2026-10-27T12:30:00+07:00")
+ *         description: Invalid input ("Category id is invalid", "Amount must be greater than 0", "Currency must be a 3-letter ISO code", "Note must be a string", "Note must be at most 200 characters", "Date is invalid, use ISO 8601 like 2026-10-27T12:30:00+07:00", "Tags must be an array", "Each tag must be 1-20 letters, digits or hyphens", "A transaction can have at most 5 tags")
  *         content:
  *           application/json:
  *             schema:
@@ -346,6 +373,120 @@ router.get("/export", validateExportTransactions, exportCsv);
  *               message: Category not found
  */
 router.post("/", validateCreateTransaction, create);
+
+/**
+ * @openapi
+ * /transactions/import:
+ *   post:
+ *     summary: Import transactions from the rows of a CSV file (good rows are saved, bad rows are listed)
+ *     description: |
+ *       The app reads the CSV in the browser and sends the rows here as JSON, 1 to 500 rows at a time.
+ *       Each row is checked like a new transaction. The category is found by its name and type among the
+ *       categories of the signed-in user (upper / lower case ignored); a category that does not exist is an error
+ *       for that row, an import never creates categories. Only the valid rows are saved.
+ *       The answer is 200 even when some rows are refused: look at `failed` and `errors`.
+ *       Sending the same rows twice saves them twice.
+ *       Declared before /transactions/{id}.
+ *     tags: [Transactions]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [rows]
+ *             properties:
+ *               rows:
+ *                 type: array
+ *                 minItems: 1
+ *                 maxItems: 500
+ *                 items:
+ *                   type: object
+ *                   required: [type, category, amount]
+ *                   properties:
+ *                     date:
+ *                       type: string
+ *                       description: |
+ *                         "YYYY-MM-DD HH:mm" or "YYYY-MM-DD" (Vietnam time, the format of the export) or ISO 8601
+ *                         with an offset. Empty = now.
+ *                       example: "2026-10-27 12:30"
+ *                     type:
+ *                       type: string
+ *                       enum: [income, expense]
+ *                     category:
+ *                       type: string
+ *                       description: Name of one of your categories of this type
+ *                       example: Food
+ *                     amount:
+ *                       type: number
+ *                       description: JSON number greater than 0
+ *                       example: 45000
+ *                     currency:
+ *                       type: string
+ *                       description: 3 letters, empty = VND
+ *                       example: VND
+ *                     note:
+ *                       type: string
+ *                       maxLength: 200
+ *                       example: Lunch
+ *                     tags:
+ *                       type: array
+ *                       maxItems: 5
+ *                       items:
+ *                         type: string
+ *                       example: [work]
+ *           example:
+ *             rows:
+ *               - { date: "2026-10-27 12:30", type: expense, category: Food, amount: 45000, currency: VND, note: Lunch, tags: [work] }
+ *               - { date: "2026-10-28", type: expense, category: Unknown, amount: 10000 }
+ *     responses:
+ *       200:
+ *         description: |
+ *           `imported` rows were saved, `failed` were refused. `errors[].row` is the position of the row in the
+ *           request (1 = the first row).
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     imported:
+ *                       type: integer
+ *                       example: 1
+ *                     failed:
+ *                       type: integer
+ *                       example: 1
+ *                     errors:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           row:
+ *                             type: integer
+ *                             example: 2
+ *                           message:
+ *                             type: string
+ *                             example: Category "Unknown" (expense) not found
+ *       400:
+ *         description: 'The body is not usable: "Rows must be a non-empty array", "You can import at most 500 rows at a time"'
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: You can import at most 500 rows at a time
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
+router.post("/import", validateImportTransactions, importCsv);
 
 /**
  * @openapi
@@ -430,6 +571,13 @@ router.get("/:id", validateTransactionId, getOne);
  *                 type: string
  *                 format: date-time
  *                 example: "2026-10-27T12:30:00+07:00"
+ *               tags:
+ *                 type: array
+ *                 maxItems: 5
+ *                 description: Replaces all the tags of the transaction. [] removes them.
+ *                 items:
+ *                   type: string
+ *                 example: [work]
  *     responses:
  *       200:
  *         description: The updated transaction
