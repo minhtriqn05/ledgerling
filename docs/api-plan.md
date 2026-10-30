@@ -87,6 +87,13 @@ Swagger UI: `/api-docs` (outside `/api`).
 | 26 | PUT | `/api/recurring/:id` | Yes | Replace a recurring rule |
 | 27 | PATCH | `/api/recurring/:id/toggle` | Yes | Turn a rule on or off |
 | 28 | DELETE | `/api/recurring/:id` | Yes | Delete a rule (its transactions are kept) |
+| 29 | GET | `/api/goals` | Yes | List my savings goals with progress (no history) |
+| 30 | POST | `/api/goals` | Yes | Create a goal |
+| 31 | GET | `/api/goals/:id` | Yes | Get one goal with its contribution history |
+| 32 | PUT | `/api/goals/:id` | Yes | Replace name, target, deadline and color |
+| 33 | DELETE | `/api/goals/:id` | Yes | Delete a goal and its history |
+| 34 | POST | `/api/goals/:id/contributions` | Yes | Add money (amount > 0) or withdraw money (amount < 0) |
+| 35 | DELETE | `/api/goals/:id/contributions/:contributionId` | Yes | Delete a contribution entered by mistake |
 
 Every protected route (Auth = Yes) can also return **401** (`"Not authorized, token missing"` /
 `"Not authorized, invalid token"`) and every route can return **500** (`"Internal server error"`).
@@ -731,3 +738,122 @@ Auth: yes. The transactions the rule created are kept.
 { "success": true, "data": { "_id": "6720e1b2c3d4e5f601234590" } }
 ```
 **Errors**: 404 `"Recurring rule not found"`.
+
+---
+
+## Goals
+
+A savings goal with a target in VND, an optional deadline and a history of contributions.
+
+```json
+{
+  "_id": "6720f1b2c3d4e5f601234601",
+  "name": "New laptop",
+  "targetAmount": 20000000,
+  "savedAmount": 5000000,
+  "deadline": "2027-03-31T05:00:00.000Z",
+  "color": "#4A9FE3",
+  "progress": 25,
+  "remaining": 15000000,
+  "completed": false,
+  "contributions": [
+    { "_id": "6720f1b2c3d4e5f601234611", "amount": 5000000, "note": "October bonus", "date": "2026-10-30T05:00:00.000Z" }
+  ],
+  "createdAt": "2026-10-30T02:01:00.000Z",
+  "updatedAt": "2026-10-30T02:05:00.000Z"
+}
+```
+- `progress`, `remaining` and `completed` are computed, not stored. `progress` is `savedAmount / targetAmount` in %, with
+  1 decimal **rounded down** and at most 100, so `100` always means the goal is reached (99.96% shows as `99.9`).
+  `remaining` is `targetAmount - savedAmount` and never below 0. `completed` is `savedAmount >= targetAmount`.
+- `deadline` and the `date` of a contribution are days in Vietnam time, stored at noon (like recurring rules).
+  `deadline` is `null` when the goal has none.
+- `GET /api/goals` leaves `contributions` out. Every other route returns the goal with `contributions`, newest first.
+- All amounts are **whole numbers** (no decimals), up to 999.999.999.999. This keeps `$inc` exact.
+- `userId` is not returned. `savedAmount` can only change through the contribution routes.
+
+### How the saved amount stays correct
+A contribution changes `savedAmount` and the history with **one** `findOneAndUpdate`:
+`{ _id, userId, savedAmount: { $gte: -amount } }` → `{ $inc: { savedAmount: amount }, $push: { contributions: ... } }`.
+- For a deposit (`amount > 0`) the condition is always true.
+- For a withdrawal (`amount < 0`) the condition only matches while the goal holds at least `-amount`. A bigger withdrawal
+  matches nothing and the API answers 400, so `savedAmount` never goes below 0.
+- MongoDB applies one update to a document at a time, so requests sent at the same moment cannot lose an addition,
+  and two withdrawals cannot spend the same money.
+
+Deleting a contribution is also one update: `$inc: { savedAmount: -amount }` and `$pull`, with the filter
+`{ savedAmount: { $gte: amount }, contributions: { $elemMatch: { _id, amount } } }`. Deleting the same entry twice at
+the same moment takes it back only once (the second request gets 404).
+
+### 29. GET /api/goals
+Auth: yes. Goals still to reach come first, the nearest `deadline` first (goals without a deadline after them, newest
+first). Completed goals come last. No goals returns `[]`. The goals have no `contributions`.
+
+### 30. POST /api/goals
+Auth: yes.
+
+**Body**
+```json
+{ "name": "New laptop", "targetAmount": 20000000, "deadline": "2027-03-31", "color": "#4A9FE3" }
+```
+`deadline` is optional; when it is sent it must be **after today** (Vietnam time).
+
+**201** – the goal with `savedAmount` 0 and no contributions.
+
+**Errors**
+
+| Code | message |
+|------|---------|
+| 400 | `"Name is required"`, `"Name must be at most 60 characters"`, `"Target amount must be a whole number greater than 0"`, `"Deadline must be a date in YYYY-MM-DD format"`, `"Deadline must be after today"`, `"Color must be a hex code like #FF7043"` |
+
+### 31. GET /api/goals/:id
+Auth: yes. **200** – the goal with its `contributions`, newest first (same day: the last added first).
+**Errors**: 404 `"Goal not found"` (does not exist, malformed id, or belongs to another user).
+
+### 32. PUT /api/goals/:id
+Auth: yes. Same body as POST. It replaces `name`, `targetAmount`, `deadline` and `color`: a missing `deadline` removes it.
+`savedAmount` and the history are not changed (a `savedAmount` in the body is ignored). The deadline is **not** checked
+against today here, so a goal whose deadline has passed can still be edited.
+
+**200** – the updated goal. **Errors**: same 400 as POST (except `"Deadline must be after today"`); 404 `"Goal not found"`.
+
+### 33. DELETE /api/goals/:id
+Auth: yes. Deletes the goal and its history.
+
+**200**
+```json
+{ "success": true, "data": { "_id": "6720f1b2c3d4e5f601234601" } }
+```
+**Errors**: 404 `"Goal not found"`.
+
+### 34. POST /api/goals/:id/contributions
+Auth: yes. A positive `amount` adds money, a negative `amount` withdraws it.
+
+**Body**
+```json
+{ "amount": 500000, "note": "October bonus", "date": "2026-10-30" }
+```
+`note` (up to 200 characters) and `date` (a day, default today in Vietnam time) are optional.
+
+**201** – the goal with its new `savedAmount`, `progress`, `completed` and `contributions`. Saving more than the target is
+allowed: the goal stays completed and `remaining` is 0.
+
+**Errors**
+
+| Code | message |
+|------|---------|
+| 400 | `"Amount must be a whole number other than 0"`, `"Note must be a string"`, `"Note must be at most 200 characters"`, `"Date must be a date in YYYY-MM-DD format"` |
+| 400 | `"You cannot withdraw more than the saved amount"` |
+| 404 | `"Goal not found"` |
+
+### 35. DELETE /api/goals/:id/contributions/:contributionId
+Auth: yes. Takes a contribution back: deleting a deposit lowers `savedAmount`, deleting a withdrawal raises it.
+
+**200** – the goal with its new `savedAmount` and `contributions`.
+
+**Errors**
+
+| Code | message |
+|------|---------|
+| 400 | `"Deleting this deposit would make the saved amount negative"` (the money of that deposit was already withdrawn) |
+| 404 | `"Goal not found"`, `"Contribution not found"` (also when the id belongs to another goal) |

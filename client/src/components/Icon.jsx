@@ -110,6 +110,21 @@ const paths = {
       <path d="M21 13v2a3 3 0 0 1-3 3H3" />
     </>
   ),
+  // Rings and a center dot, for savings goals
+  target: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <circle cx="12" cy="12" r="5" />
+      <circle cx="12" cy="12" r="1" />
+    </>
+  ),
+  // A clock face, for the history of a goal
+  history: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 2" />
+    </>
+  ),
   menu: <path d="M4 7h16M4 12h16M4 17h16" />,
   check: <path d="m5 12 5 5L20 7" />,
   x: <path d="M18 6 6 18M6 6l12 12" />,

@@ -1,0 +1,39 @@
+/* The fields come from TransactionFormDialog.module.css. Only the color swatches are new. */
+/* 8 preset colors as two even rows of four, like the category form. */
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(4, 32px);
+  gap: var(--space-3);
+  padding-top: var(--space-1);
+}
+
+.swatch {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--tone);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.swatch:hover {
+  transform: scale(1.08);
+}
+
+.swatch:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+/* White gap + colored ring around the chosen color. */
+.swatchSelected {
+  box-shadow: 0 0 0 3px var(--color-surface), 0 0 0 5px var(--tone);
+}
+
+.swatchSelected:focus-visible {
+  box-shadow: 0 0 0 3px var(--color-surface), 0 0 0 5px var(--tone), 0 0 0 8px var(--color-focus-ring);
+}
