@@ -26,7 +26,7 @@ Swagger UI: `/api-docs` (outside `/api`).
 | 400 | Invalid input (validation failed, unknown field value, bad format, body that is not valid JSON → `"Invalid JSON body"`) |
 | 401 | Missing/invalid/expired token, wrong email or password |
 | 404 | Not found, belongs to another user, malformed `:id` in the URL, or unknown route (`"Route not found"`) |
-| 409 | Duplicate (email, category name) or conflict (category still has transactions) |
+| 409 | Duplicate (email, category name, budget of the same category and month) or conflict (category still has transactions) |
 | 500 | Server error |
 
 ### Validation rules
@@ -46,6 +46,9 @@ Swagger UI: `/api-docs` (outside `/api`).
 | `note` | string, trimmed, max 200 chars, optional, default `""` |
 | `date` | ISO 8601 date, default: now |
 | `month` (query) | `YYYY-MM` |
+| `month` (budget body) | `YYYY-MM`, required; cannot be changed after the budget is created |
+| `categoryId` (budget body) | valid ObjectId of one of the user's **expense** categories |
+| `amount` (budget body) | JSON number > 0, the limit in VND |
 
 ## Endpoint summary
 
@@ -66,6 +69,11 @@ Swagger UI: `/api-docs` (outside `/api`).
 | 13 | PATCH | `/api/transactions/:id` | Yes | Update a transaction |
 | 14 | DELETE | `/api/transactions/:id` | Yes | Delete a transaction |
 | 15 | GET | `/api/stats/summary` | Yes | Month totals, expense per category, last 6 months (`?month=&currency=`) |
+| 16 | GET | `/api/budgets` | Yes | List my budgets of a month with spent / remaining / percent / status (`?month=`) |
+| 17 | POST | `/api/budgets` | Yes | Create a budget for an expense category and month |
+| 18 | PATCH | `/api/budgets/:id` | Yes | Change the amount of a budget |
+| 19 | DELETE | `/api/budgets/:id` | Yes | Delete a budget |
+| 20 | POST | `/api/budgets/copy` | Yes | Copy my budgets from one month to another |
 
 Every protected route (Auth = Yes) can also return **401** (`"Not authorized, token missing"` /
 `"Not authorized, invalid token"`) and every route can return **500** (`"Internal server error"`).
@@ -248,6 +256,8 @@ Auth: yes.
 | 404 | `"Category not found"` |
 | 409 | `"Category still has transactions"` |
 
+When the delete succeeds, the budgets of the category (every month) are deleted with it.
+
 ---
 
 ## Transactions
@@ -399,3 +409,111 @@ Auth: yes. Data for the dashboard cards and charts (Recharts), computed with Mon
 
 **Errors**: 400 `"Month must be in YYYY-MM format"`, `"Currency must be a 3-letter ISO code"` (also for lower case
 like `usd`).
+
+---
+
+## Budgets
+
+A budget is a monthly spending limit (in VND) for one expense category. Unique per user + category + month.
+
+Budget object (category populated, progress computed by the server):
+```json
+{
+  "_id": "6720d1b2c3d4e5f601234581",
+  "category": { "_id": "6720b1b2c3d4e5f601234568", "name": "Food", "color": "#F07D62" },
+  "month": "2026-10",
+  "amount": 5000000,
+  "spent": 4250000,
+  "remaining": 750000,
+  "percent": 85,
+  "status": "warning",
+  "createdAt": "2026-10-01T02:01:00.000Z",
+  "updatedAt": "2026-10-01T02:01:00.000Z"
+}
+```
+- `spent`: total of the category's **VND expense** transactions in the month (Vietnam time). Other currencies are not counted.
+- `remaining` = `amount` − `spent` (negative when over budget).
+- `percent` = `spent / amount × 100`, rounded to 1 decimal (e.g. `85.3`).
+- `status`: `"ok"` (below 80%), `"warning"` (80% up to 100%), `"over"` (100% or more). It uses the exact ratio, so
+  79.96% shows `percent: 80` but is still `"ok"`.
+- `GET /api/budgets` computes `spent` of all the budgets with one MongoDB aggregation (expense transactions grouped by `categoryId`).
+- `userId` is not returned. Stored as `categoryId`, returned as `category`.
+
+### 16. GET /api/budgets
+Auth: yes.
+
+**Query** (optional): `month` = `YYYY-MM`, default: current month in Vietnam time.
+
+Sorted by category name. A month without budgets returns `[]`.
+
+**200** – `data` is an array of budget objects.
+
+**Errors**: 400 `"Month must be in YYYY-MM format"`.
+
+### 17. POST /api/budgets
+Auth: yes.
+
+**Body**
+```json
+{ "categoryId": "6720b1b2c3d4e5f601234568", "month": "2026-10", "amount": 5000000 }
+```
+
+**201** – `data` is the new budget object (with `spent`, `remaining`, `percent`, `status`).
+
+**Errors**
+
+| Code | message |
+|------|---------|
+| 400 | `"Category id is invalid"`, `"Month must be in YYYY-MM format"`, `"Amount must be greater than 0"`, `"Budgets are only for expense categories"` |
+| 404 | `"Category not found"` (does not exist or belongs to another user) |
+| 409 | `"Budget already exists for this category and month"` |
+
+### 18. PATCH /api/budgets/:id
+Auth: yes.
+
+**Body** (only the amount can change)
+```json
+{ "amount": 6000000 }
+```
+
+**200** – `data` is the updated budget object.
+
+**Errors**
+
+| Code | message |
+|------|---------|
+| 400 | `"Nothing to update"`, `"Only the amount can be changed"` (any `categoryId` or `month` in the body), `"Amount must be greater than 0"` |
+| 404 | `"Budget not found"` (also for another user's budget or a malformed id) |
+
+### 19. DELETE /api/budgets/:id
+Auth: yes. Transactions are not touched.
+
+**200**
+```json
+{ "success": true, "data": { "_id": "6720d1b2c3d4e5f601234581" } }
+```
+
+**Errors**: 404 `"Budget not found"`.
+
+### 20. POST /api/budgets/copy
+Auth: yes.
+
+Creates, in `toMonth`, a budget with the same category and amount for every budget of `fromMonth`.
+A category that already has a budget in `toMonth` is skipped (its amount is not changed).
+
+**Body**
+```json
+{ "fromMonth": "2026-09", "toMonth": "2026-10" }
+```
+
+**200** – `data.copied` is the number of budgets created. It is `0` when `fromMonth` has no budgets or
+every category already has one in `toMonth`.
+```json
+{ "success": true, "data": { "copied": 3 } }
+```
+
+**Errors**
+
+| Code | message |
+|------|---------|
+| 400 | `"From month must be in YYYY-MM format"`, `"To month must be in YYYY-MM format"`, `"From month and to month must be different"` |

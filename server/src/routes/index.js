@@ -3,6 +3,7 @@ import authRoutes from "./authRoutes.js";
 import categoryRoutes from "./categoryRoutes.js";
 import transactionRoutes from "./transactionRoutes.js";
 import statsRoutes from "./statsRoutes.js";
+import budgetRoutes from "./budgetRoutes.js";
 
 const router = Router();
 
@@ -10,6 +11,7 @@ router.use("/auth", authRoutes);
 router.use("/categories", categoryRoutes);
 router.use("/transactions", transactionRoutes);
 router.use("/stats", statsRoutes);
+router.use("/budgets", budgetRoutes);
 
 /**
  * @openapi

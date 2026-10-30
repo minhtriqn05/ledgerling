@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Ledgerling API",
-    "description": "Auth, Categories, Transactions and Stats requests for the Ledgerling API. Run Register (or Login) first: its test script saves the token into {{token}}, and every other request sends it as a Bearer token.",
+    "description": "Auth, Categories, Transactions, Stats and Budgets requests for the Ledgerling API. Run Register (or Login) first: its test script saves the token into {{token}}, and every other request sends it as a Bearer token.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -34,7 +34,19 @@
     { "key": "statsMarFirstId", "value": "" },
     { "key": "statsJanId", "value": "" },
     { "key": "statsAprFirstId", "value": "" },
-    { "key": "statsUsdId", "value": "" }
+    { "key": "statsUsdId", "value": "" },
+    { "key": "budgetCategoryName", "value": "" },
+    { "key": "budgetCategoryId", "value": "" },
+    { "key": "budgetIncomeCategoryId", "value": "" },
+    { "key": "budgetOtherCategoryId", "value": "" },
+    { "key": "budgetSecondCategoryName", "value": "" },
+    { "key": "budgetSecondCategoryId", "value": "" },
+    { "key": "budgetId", "value": "" },
+    { "key": "budgetSecondId", "value": "" },
+    { "key": "budgetTx1Id", "value": "" },
+    { "key": "budgetTx2Id", "value": "" },
+    { "key": "budgetTx3Id", "value": "" },
+    { "key": "budgetTx4Id", "value": "" }
   ],
   "item": [
     {
@@ -4149,6 +4161,1979 @@
               "path": [
                 "categories",
                 "{{statsCategoryId}}"
+              ]
+            },
+            "description": "No transactions use it any more: expect 200."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Budgets",
+      "description": "Run top to bottom, after the Auth and Categories folders ({{token}}, and {{token2}} from 'Other user - Login'). Uses March 2020, where the test user has no other data: the Setup requests create two throwaway expense categories and 4 transactions, the Cleanup requests remove them again. The numbers in the tests are calculated by hand (see each request's description).",
+      "item": [
+        {
+          "name": "Setup - List my categories",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const income = pm.response.json().data.find((c) => c.type === 'income');",
+                  "pm.test('Has an income category', function () { pm.expect(income).to.exist; });",
+                  "pm.collectionVariables.set('budgetIncomeCategoryId', income._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories"
+              ]
+            },
+            "description": "Saves the id of one income category into {{budgetIncomeCategoryId}} (budgets must be refused for it)."
+          }
+        },
+        {
+          "name": "Setup - Other user: List categories",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set('budgetOtherCategoryId', pm.response.json().data[0]._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories"
+              ]
+            },
+            "description": "Saves a category of the other user into {{budgetOtherCategoryId}}."
+          }
+        },
+        {
+          "name": "Setup - Create expense category",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('budgetCategoryName', 'BudgetTest ' + Math.floor(Math.random() * 100000));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set('budgetCategoryId', pm.response.json().data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{budgetCategoryName}}\",\n  \"type\": \"expense\",\n  \"color\": \"#FF7043\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories"
+              ]
+            },
+            "description": "A throwaway expense category for the budget and its transactions. Removed again at the end of this folder."
+          }
+        },
+        {
+          "name": "Setup - Create second expense category (no transactions)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('budgetSecondCategoryName', 'BudgetTest2 ' + Math.floor(Math.random() * 100000));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set('budgetSecondCategoryId', pm.response.json().data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{budgetSecondCategoryName}}\",\n  \"type\": \"expense\",\n  \"color\": \"#4A9FE3\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories"
+              ]
+            },
+            "description": "Used to check that deleting a category deletes its budgets. It has no transactions, so it can be deleted."
+          }
+        },
+        {
+          "name": "Setup - Create expense (Mar 1st 00:30 Vietnam time)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set('budgetTx1Id', pm.response.json().data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{budgetCategoryId}}\",\n  \"amount\": 500000,\n  \"note\": \"Budgets: Create expense (Mar 1st 00:30 Vietnam time)\",\n  \"date\": \"2020-03-01T00:30:00+07:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "description": "500,000 VND. Mar 1st 00:30 in Vietnam is still Feb 29 in UTC, but it counts in March."
+          }
+        },
+        {
+          "name": "Setup - Create expense (Mar 15th)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set('budgetTx2Id', pm.response.json().data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{budgetCategoryId}}\",\n  \"amount\": 353000,\n  \"note\": \"Budgets: Create expense (Mar 15th)\",\n  \"date\": \"2020-03-15T12:00:00+07:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "description": "353,000 VND. With the first expense, spent in March is 853,000."
+          }
+        },
+        {
+          "name": "Setup - Create expense in USD",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set('budgetTx3Id', pm.response.json().data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{budgetCategoryId}}\",\n  \"amount\": 50,\n  \"currency\": \"USD\",\n  \"note\": \"Budgets: Create expense in USD\",\n  \"date\": \"2020-03-10T09:00:00+07:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "description": "50 USD. A budget is in VND, so this is not counted."
+          }
+        },
+        {
+          "name": "Setup - Create expense (Apr 1st 00:30 Vietnam time)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set('budgetTx4Id', pm.response.json().data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{budgetCategoryId}}\",\n  \"amount\": 200000,\n  \"note\": \"Budgets: Create expense (Apr 1st 00:30 Vietnam time)\",\n  \"date\": \"2020-04-01T00:30:00+07:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "description": "200,000 VND. Mar 31 in UTC, but April in Vietnam, so it is not counted in March."
+          }
+        },
+        {
+          "name": "Create budget (March 2020, 1,000,000)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "const b = pm.response.json().data;",
+                  "pm.collectionVariables.set('budgetId', b._id);",
+                  "",
+                  "pm.test('Budget of the test category, with the progress already computed', function () {",
+                  "  pm.expect(b.category._id).to.eql(pm.collectionVariables.get('budgetCategoryId'));",
+                  "  pm.expect(b.category.name).to.eql(pm.collectionVariables.get('budgetCategoryName'));",
+                  "  pm.expect(b.month).to.eql('2020-03');",
+                  "  pm.expect(b.amount).to.eql(1000000);",
+                  "  pm.expect(b.spent).to.eql(853000);",
+                  "  pm.expect(b.remaining).to.eql(147000);",
+                  "  pm.expect(b.percent).to.eql(85.3);",
+                  "  pm.expect(b.status).to.eql('warning');",
+                  "});",
+                  "",
+                  "pm.test('userId is not returned', function () {",
+                  "  pm.expect(b).to.not.have.property('userId');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{budgetCategoryId}}\",\n  \"month\": \"2020-03\",\n  \"amount\": 1000000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/budgets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "budgets"
+              ]
+            },
+            "description": "Hand calculation: spent = 500,000 + 353,000 = 853,000 (the USD and the April expense are left out). remaining = 1,000,000 - 853,000 = 147,000. percent = 853,000 / 1,000,000 = 85.3. 85.3% is from 80%, so status = warning. Saves the id into {{budgetId}}."
+          }
+        },
+        {
+          "name": "List budgets (month=2020-03)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const list = pm.response.json().data;",
+                  "const b = list.find((x) => x._id === pm.collectionVariables.get('budgetId'));",
+                  "",
+                  "pm.test('The March budget is in the list with the same numbers', function () {",
+                  "  pm.expect(b).to.exist;",
+                  "  pm.expect(b.amount).to.eql(1000000);",
+                  "  pm.expect(b.spent).to.eql(853000);",
+                  "  pm.expect(b.remaining).to.eql(147000);",
+                  "  pm.expect(b.percent).to.eql(85.3);",
+                  "  pm.expect(b.status).to.eql('warning');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/budgets?month=2020-03",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "budgets"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2020-03"
+                }
+              ]
+            },
+            "description": "Same numbers as the create answer: spent 853000, remaining 147000, percent 85.3, warning."
+          }
+        },
+        {
+          "name": "List budgets (month=2020-04)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('The March budget is not in April', function () {",
+                  "  pm.expect(pm.response.json().data.map((x) => x._id)).to.not.include(pm.collectionVariables.get('budgetId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/budgets?month=2020-04",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "budgets"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2020-04"
+                }
+              ]
+            },
+            "description": "A budget belongs to one month only."
+          }
+        },
+        {
+          "name": "Update budget amount (800,000 = over budget)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const b = pm.response.json().data;",
+                  "pm.test('Over budget: 853,000 of 800,000 = 106.6%', function () {",
+                  "  pm.expect(b.amount).to.eql(800000);",
+                  "  pm.expect(b.spent).to.eql(853000);",
+                  "  pm.expect(b.remaining).to.eql(-53000);",
+                  "  pm.expect(b.percent).to.eql(106.6);",
+                  "  pm.expect(b.status).to.eql('over');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 800000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/budgets/{{budgetId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "budgets",
+                "{{budgetId}}"
+              ]
+            },
+            "description": "Hand calculation: 853,000 / 800,000 = 1.06625 -> 106.6 (1 decimal). remaining = 800,000 - 853,000 = -53,000. From 100% the status is over."
+          }
+        },
+        {
+          "name": "Update budget amount (853,000 = exactly 100%)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const b = pm.response.json().data;",
+                  "pm.test('Exactly 100% is already over, with nothing remaining', function () {",
+                  "  pm.expect(b.amount).to.eql(853000);",
+                  "  pm.expect(b.spent).to.eql(853000);",
+                  "  pm.expect(b.remaining).to.eql(0);",
+                  "  pm.expect(b.percent).to.eql(100);",
+                  "  pm.expect(b.status).to.eql('over');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 853000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/budgets/{{budgetId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "budgets",
+                "{{budgetId}}"
+              ]
+            },
+            "description": "Boundary: spent equals the amount -> percent 100, remaining 0, status over."
+          }
+        },
+        {
+          "name": "List budgets (no token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Not authorized, token missing\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Not authorized, token missing\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/budgets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "budgets"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "List budgets (month invalid)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Month must be in YYYY-MM format\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Month must be in YYYY-MM format\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/budgets?month=2020-13",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "budgets"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2020-13"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Create budget (no token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Not authorized, token missing\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Not authorized, token missing\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{budgetCategoryId}}\",\n  \"month\": \"2020-03\",\n  \"amount\": 1000000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/budgets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "budgets"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Create budget (month 2020-13)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Month must be in YYYY-MM format\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Month must be in YYYY-MM format\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{budgetCategoryId}}\",\n  \"month\": \"2020-13\",\n  \"amount\": 1000000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/budgets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "budgets"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Create budget (month 2020-3, wrong format)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Month must be in YYYY-MM format\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Month must be in YYYY-MM format\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{budgetCategoryId}}\",\n  \"month\": \"2020-3\",\n  \"amount\": 1000000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/budgets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "budgets"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Create budget (income category)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Budgets are only for expense categories\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Budgets are only for expense categories\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{budgetIncomeCategoryId}}\",\n  \"month\": \"2020-03\",\n  \"amount\": 1000000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/budgets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "budgets"
+              ]
+            },
+            "description": "Budgets exist for expense categories only."
+          }
+        },
+        {
+          "name": "Create budget (same category and month)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 409', function () {",
+                  "  pm.response.to.have.status(409);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Budget already exists for this category and month\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Budget already exists for this category and month\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{budgetCategoryId}}\",\n  \"month\": \"2020-03\",\n  \"amount\": 500000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/budgets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "budgets"
+              ]
+            },
+            "description": "The unique index is user + category + month. Another month for the same category would be fine."
+          }
+        },
+        {
+          "name": "Create budget (amount 0)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Amount must be greater than 0\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Amount must be greater than 0\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{budgetCategoryId}}\",\n  \"month\": \"2020-05\",\n  \"amount\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/budgets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "budgets"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Create budget (amount is a string)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Amount must be greater than 0\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Amount must be greater than 0\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{budgetCategoryId}}\",\n  \"month\": \"2020-05\",\n  \"amount\": \"1000\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/budgets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "budgets"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Create budget (categoryId malformed)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Category id is invalid\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Category id is invalid\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"abc\",\n  \"month\": \"2020-05\",\n  \"amount\": 1000000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/budgets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "budgets"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Create budget (other user's category)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Category not found\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Category not found\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{budgetOtherCategoryId}}\",\n  \"month\": \"2020-05\",\n  \"amount\": 1000000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/budgets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "budgets"
+              ]
+            },
+            "description": "A category of another user looks like it does not exist."
+          }
+        },
+        {
+          "name": "Update budget (month in body)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Only the amount can be changed\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Only the amount can be changed\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 900000,\n  \"month\": \"2020-04\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/budgets/{{budgetId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "budgets",
+                "{{budgetId}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Update budget (empty body)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Nothing to update\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Nothing to update\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/budgets/{{budgetId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "budgets",
+                "{{budgetId}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Update budget (amount 0)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Amount must be greater than 0\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Amount must be greater than 0\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/budgets/{{budgetId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "budgets",
+                "{{budgetId}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Update budget (invalid id)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Budget not found\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Budget not found\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 900000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/budgets/abc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "budgets",
+                "abc"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Other user: List budgets (month=2020-03)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('The other user sees none of these budgets', function () {",
+                  "  pm.expect(pm.response.json().data.map((x) => x._id)).to.not.include(pm.collectionVariables.get('budgetId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/budgets?month=2020-03",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "budgets"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2020-03"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Other user: Update budget (my id)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Budget not found\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Budget not found\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/budgets/{{budgetId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "budgets",
+                "{{budgetId}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Other user: Delete budget (my id)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Budget not found\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Budget not found\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/budgets/{{budgetId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "budgets",
+                "{{budgetId}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Delete category (still has transactions)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 409', function () {",
+                  "  pm.response.to.have.status(409);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Category still has transactions\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Category still has transactions\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories/{{budgetCategoryId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories",
+                "{{budgetCategoryId}}"
+              ]
+            },
+            "description": "The delete is refused, so the budget must still exist (next request)."
+          }
+        },
+        {
+          "name": "List budgets (budget still there after the 409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('The budget is still in the list', function () {",
+                  "  pm.expect(pm.response.json().data.map((x) => x._id)).to.include(pm.collectionVariables.get('budgetId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/budgets?month=2020-03",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "budgets"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2020-03"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Create budget (second category)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "const b = pm.response.json().data;",
+                  "pm.collectionVariables.set('budgetSecondId', b._id);",
+                  "",
+                  "pm.test('Nothing spent yet: 0 of 300,000', function () {",
+                  "  pm.expect(b.amount).to.eql(300000);",
+                  "  pm.expect(b.spent).to.eql(0);",
+                  "  pm.expect(b.remaining).to.eql(300000);",
+                  "  pm.expect(b.percent).to.eql(0);",
+                  "  pm.expect(b.status).to.eql('ok');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{budgetSecondCategoryId}}\",\n  \"month\": \"2020-03\",\n  \"amount\": 300000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/budgets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "budgets"
+              ]
+            },
+            "description": "No transactions in this category: spent 0, remaining 300000, percent 0, status ok. Saves the id into {{budgetSecondId}}."
+          }
+        },
+        {
+          "name": "Delete second category (its budget goes too)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories/{{budgetSecondCategoryId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories",
+                "{{budgetSecondCategoryId}}"
+              ]
+            },
+            "description": "No transactions use it: deleted. Its budget is deleted with it."
+          }
+        },
+        {
+          "name": "Update budget (its category was deleted)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Budget not found\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Budget not found\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 400000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/budgets/{{budgetSecondId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "budgets",
+                "{{budgetSecondId}}"
+              ]
+            },
+            "description": "The budget of the deleted category is gone."
+          }
+        },
+        {
+          "name": "Delete budget",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Returns the id', function () {",
+                  "  pm.expect(pm.response.json().data._id).to.eql(pm.collectionVariables.get('budgetId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/budgets/{{budgetId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "budgets",
+                "{{budgetId}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Delete budget (again)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Budget not found\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Budget not found\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/budgets/{{budgetId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "budgets",
+                "{{budgetId}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "List budgets (after delete)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('The test budgets are gone', function () {",
+                  "  const ids = pm.response.json().data.map((x) => x._id);",
+                  "  pm.expect(ids).to.not.include(pm.collectionVariables.get('budgetId'));",
+                  "  pm.expect(ids).to.not.include(pm.collectionVariables.get('budgetSecondId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/budgets?month=2020-03",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "budgets"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2020-03"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Cleanup - Delete test expense 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/{{budgetTx1Id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "{{budgetTx1Id}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Cleanup - Delete test expense 2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/{{budgetTx2Id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "{{budgetTx2Id}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Cleanup - Delete test expense 3",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/{{budgetTx3Id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "{{budgetTx3Id}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Cleanup - Delete test expense 4",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/{{budgetTx4Id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "{{budgetTx4Id}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Cleanup - Delete test category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories/{{budgetCategoryId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories",
+                "{{budgetCategoryId}}"
               ]
             },
             "description": "No transactions use it any more: expect 200."

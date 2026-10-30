@@ -1,5 +1,6 @@
 import Category from "../models/Category.js";
 import Transaction from "../models/Transaction.js";
+import Budget from "../models/Budget.js";
 import { httpError } from "../utils/httpError.js";
 
 // Same case-insensitive comparison as the unique index on the model
@@ -60,6 +61,8 @@ export async function deleteCategory(userId, id) {
   const inUse = await Transaction.exists({ userId, categoryId: category._id });
   if (inUse) throw httpError(409, "Category still has transactions");
 
+  // A budget means nothing without its category, so its budgets (every month) go too
+  await Budget.deleteMany({ userId, categoryId: category._id });
   await category.deleteOne();
   return { _id: category._id };
 }

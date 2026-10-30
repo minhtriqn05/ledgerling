@@ -12,6 +12,7 @@ import EmptyState from '../components/EmptyState/EmptyState.jsx';
 import LoadingState from '../components/LoadingState/LoadingState.jsx';
 import ErrorState from '../components/ErrorState/ErrorState.jsx';
 import Icon from '../components/Icon.jsx';
+import BudgetAlerts from './dashboard/BudgetAlerts.jsx';
 import { CategoryDonut, MonthlyExpenseChart } from './dashboard/DashboardCharts.jsx';
 import styles from './DashboardPage.module.css';
 
@@ -114,6 +115,8 @@ export default function DashboardPage() {
           <StatCard tone="expense" icon="arrowUpRight" label="Total Expense" value={formatVnd(summary.totalExpense)} />
           <StatCard tone="balance" icon="wallet" label="Balance" value={formatVnd(summary.balance)} />
         </section>
+
+        <BudgetAlerts month={month} />
 
         <section className={styles.chartsRow}>
           <Card>

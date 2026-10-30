@@ -5,7 +5,8 @@ import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
 import TransactionsPage from './pages/TransactionsPage.jsx';
 import CategoriesPage from './pages/CategoriesPage.jsx';
-import LoginPage from './pages/LoginPage.jsx';
+import BudgetsPage from './pages/BudgetsPage.jsx';
+import LoginPage from'./pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import StyleGuidePage from './pages/StyleGuidePage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
@@ -25,6 +26,7 @@ export default function App() {
           <Route path="/" element={<DashboardPage />} />
           <Route path="/transactions" element={<TransactionsPage />} />
           <Route path="/categories" element={<CategoriesPage />} />
+          <Route path="/budgets" element={<BudgetsPage />} />
         </Route>
       </Route>
 
