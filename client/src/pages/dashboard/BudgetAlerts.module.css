@@ -1,16 +1,36 @@
-.link {
-  color: var(--color-primary-text);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-}
-
 .list {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  margin: var(--space-4) 0 0;
+  margin: 0;
   padding: 0;
   list-style: none;
+}
+
+/* Loading, error and "no budgets" text */
+.note {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.invite {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+/* Everything is below 80% */
+.onTrack {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-income) 12%, var(--color-surface));
+  color: var(--color-income-text);
+  font-weight: var(--font-weight-medium);
 }
 
 /* Same colors as the bars on the Budgets page: yellow from 80%, red from 100%. */
