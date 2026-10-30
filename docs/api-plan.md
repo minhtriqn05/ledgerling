@@ -432,8 +432,10 @@ Budget object (category populated, progress computed by the server):
 ```
 - `spent`: total of the category's **VND expense** transactions in the month (Vietnam time). Other currencies are not counted.
 - `remaining` = `amount` − `spent` (negative when over budget).
-- `percent` = `spent / amount × 100`, rounded **down** (so 99.9% shows 99 and stays `warning`).
-- `status`: `"ok"` (below 80%), `"warning"` (80–99%), `"exceeded"` (100% or more).
+- `percent` = `spent / amount × 100`, rounded to 1 decimal (e.g. `85.3`).
+- `status`: `"ok"` (below 80%), `"warning"` (80% up to 100%), `"over"` (100% or more). It uses the exact ratio, so
+  79.96% shows `percent: 80` but is still `"ok"`.
+- `GET /api/budgets` computes `spent` of all the budgets with one MongoDB aggregation (expense transactions grouped by `categoryId`).
 - `userId` is not returned. Stored as `categoryId`, returned as `category`.
 
 ### 16. GET /api/budgets

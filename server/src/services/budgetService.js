@@ -11,7 +11,7 @@ const CATEGORY_FIELDS = "name color";
 const BUDGET_CURRENCY = "VND";
 // Warnings at 80% and 100% of the budget
 const WARNING_PERCENT = 80;
-const EXCEEDED_PERCENT = 100;
+const OVER_PERCENT = 100;
 
 // The category must belong to the same user (otherwise 404, as if it did not exist) and be an expense category
 async function findOwnedExpenseCategory(userId, categoryId) {
@@ -49,12 +49,14 @@ async function spentByCategory(userId, month, categoryIds) {
 }
 
 // The budget as JSON plus how much of it is used.
-// percent is rounded down, so the number shown always matches the status (99.9% is 99, still "warning").
+// percent is shown with 1 decimal (85.3). The status uses the exact ratio, not the rounded number,
+// so 79.96% is shown as 80 but is still "ok" (it is below 80%).
 function withProgress(budget, spent) {
-  const percent = Math.floor((spent / budget.amount) * 100);
+  const exactPercent = (spent / budget.amount) * 100;
+  const percent = Math.round(exactPercent * 10) / 10;
   let status = "ok";
-  if (percent >= EXCEEDED_PERCENT) status = "exceeded";
-  else if (percent >= WARNING_PERCENT) status = "warning";
+  if (exactPercent >= OVER_PERCENT) status = "over";
+  else if (exactPercent >= WARNING_PERCENT) status = "warning";
 
   return { ...budget.toJSON(), spent, remaining: budget.amount - spent, percent, status };
 }

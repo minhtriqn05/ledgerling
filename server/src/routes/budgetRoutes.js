@@ -37,8 +37,9 @@ router.use(requireAuth);
  *         description: |
  *           The budgets of the signed-in user for the month, sorted by category name.
  *           spent = total VND expense of the category in the month (other currencies are not counted).
- *           remaining = amount - spent (negative when over budget). percent = spent / amount, rounded down.
- *           status: ok (below 80%), warning (80-99%), exceeded (100% or more).
+ *           All spent values come from one MongoDB aggregation (expense transactions grouped by category).
+ *           remaining = amount - spent (negative when over budget). percent = spent / amount, rounded to 1 decimal.
+ *           status: ok (below 80%), warning (80% up to 100%), over (100% or more).
  *           Example request - October 2026:
  *           GET /api/budgets?month=2026-10
  *         content:
@@ -62,8 +63,8 @@ router.use(requireAuth);
  *                   amount: 3000000
  *                   spent: 3200000
  *                   remaining: -200000
- *                   percent: 106
- *                   status: exceeded
+ *                   percent: 106.7
+ *                   status: over
  *                   createdAt: "2026-10-01T02:00:00.000Z"
  *                   updatedAt: "2026-10-01T02:00:00.000Z"
  *                 - _id: 6720d1b2c3d4e5f601234581
