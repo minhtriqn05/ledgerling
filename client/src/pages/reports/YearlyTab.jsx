@@ -18,7 +18,7 @@ export default function YearlyTab({ year }) {
   const navigate = useNavigate();
   const { data: report, loading, error, reload } = useLoad(() => getYearlyReport(year), [year]);
 
-  if (loading) return <LoadingState spacious>Loading report…</LoadingState>;
+  if (loading) return <LoadingState skeleton="cards">Loading report…</LoadingState>;
   if (error) return <ErrorState message={error} onRetry={reload} />;
 
   const { totals, months, topExpenseMonth } = report;

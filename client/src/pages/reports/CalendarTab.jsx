@@ -19,7 +19,7 @@ export default function CalendarTab({ month }) {
   const navigate = useNavigate();
   const { data: report, loading, error, reload } = useLoad(() => getMonthlyReport(month), [month]);
 
-  if (loading) return <LoadingState spacious>Loading calendar…</LoadingState>;
+  if (loading) return <LoadingState skeleton="cards">Loading calendar…</LoadingState>;
   if (error) return <ErrorState message={error} onRetry={reload} />;
 
   const { cells } = buildCalendar(month, report.dailyExpense);

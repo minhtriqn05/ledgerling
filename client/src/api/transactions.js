@@ -65,3 +65,16 @@ export async function importTransactions(rows) {
   const response = await api.post('/transactions/import', { rows });
   return response.data.data;
 }
+
+// Deletes many transactions at once (docs/api-plan.md, endpoint 44): 1 to 200 ids.
+// Returns { deleted }, how many were deleted.
+export async function bulkDeleteTransactions(ids) {
+  const response = await api.post('/transactions/bulk-delete', { ids });
+  return response.data.data;
+}
+
+// Moves many transactions to another category (endpoint 45): 1 to 200 ids. Returns { updated }, how many changed.
+export async function bulkChangeCategory(ids, categoryId) {
+  const response = await api.patch('/transactions/bulk-category', { ids, categoryId });
+  return response.data.data;
+}

@@ -44,8 +44,8 @@ export default function CategoryCard({ category, onEdit, onDelete }) {
   return (
     <Card className={styles.card} style={{ '--tone': category.color }}>
       <div className={styles.top}>
-        <span className={styles.avatar} aria-hidden="true">
-          {category.name.charAt(0).toUpperCase()}
+        <span className={`${styles.avatar} ${category.icon ? styles.avatarIcon : ''}`} aria-hidden="true">
+          {category.icon || category.name.charAt(0).toUpperCase()}
         </span>
         <span className={styles.actions}>
           <IconButton icon="edit" size={16} label={`Edit ${category.name}`} onClick={() => onEdit(category)} />

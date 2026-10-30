@@ -11,7 +11,7 @@ import {
 } from "../utils/month.js";
 
 // Shows the category's name and color instead of just its id
-const CATEGORY_FIELDS = "name color";
+const CATEGORY_FIELDS = "name color icon";
 
 // The category must belong to the same user, otherwise it looks like it does not exist (404)
 async function findOwnedCategory(userId, categoryId) {
@@ -169,4 +169,23 @@ export async function importTransactions(userId, rows, errors) {
   if (docs.length > 0) await Transaction.insertMany(docs);
   allErrors.sort((a, b) => a.row - b.row);
   return { imported: docs.length, failed: allErrors.length, errors: allErrors };
+}
+
+// Deletes the listed transactions that belong to the user. Ids of other users (or that do not exist) are skipped
+// without an error, so the answer never tells whether such an id exists. Returns how many were deleted.
+export async function bulkDeleteTransactions(userId, ids) {
+  const result = await Transaction.deleteMany({ _id: { $in: ids }, userId });
+  return { deleted: result.deletedCount };
+}
+
+// Moves the listed transactions of the user to another category of the user and copies the category's type to them.
+// Returns how many transactions really changed: one that already has the category is left alone (and not counted),
+// which also keeps its updatedAt.
+export async function bulkChangeCategory(userId, ids, categoryId) {
+  const category = await findOwnedCategory(userId, categoryId);
+  const result = await Transaction.updateMany(
+    { _id: { $in: ids }, userId, categoryId: { $ne: category._id } },
+    { $set: { categoryId: category._id, type: category.type } }
+  );
+  return { updated: result.modifiedCount };
 }

@@ -6,7 +6,7 @@ import { dayNoon, nextDayStart, todayInVietnam, vietnamDay } from "../utils/mont
 import { firstRunDayFrom, nextRunDay } from "../utils/recurrence.js";
 
 // Shows the category's name and color instead of just its id
-const CATEGORY_FIELDS = "name color type";
+const CATEGORY_FIELDS = "name color icon type";
 // One request creates at most this many transactions per rule. A rule with more due dates continues on the next request.
 const MAX_RUNS_PER_PASS = 60;
 const DUPLICATE_KEY = 11000;

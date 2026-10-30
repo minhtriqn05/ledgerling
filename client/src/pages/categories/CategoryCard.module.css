@@ -34,6 +34,12 @@
   font-weight: var(--font-weight-bold);
 }
 
+/* An emoji instead of the letter: bigger, and it keeps its own colors. */
+.avatarIcon {
+  font-size: var(--font-size-lg);
+  line-height: 1;
+}
+
 /* Pulled into the corner so the icons line up with the top of the avatar. */
 .actions {
   display: flex;

@@ -40,6 +40,7 @@ Swagger UI: `/api-docs` (outside `/api`).
 | `name` (category) | string, trimmed, 1–30 chars, unique per user + type (case-insensitive) |
 | `type` | `"income"` or `"expense"` |
 | `color` | hex `#RRGGBB` |
+| `icon` (category) | optional; exactly one emoji (one visible character, e.g. `🍜`, `🛍️`). `null` or `""` means no icon. Default categories get one; older categories have `null` |
 | `categoryId` | valid ObjectId of one of the user's categories |
 | `amount` | JSON number > 0 (a string like `"45000"` is refused) |
 | `currency` (transaction body) | 3 letters (ISO 4217); lower case is converted to upper case; default `"VND"` |
@@ -53,6 +54,8 @@ Swagger UI: `/api-docs` (outside `/api`).
 | `amount` (budget body) | JSON number > 0, the limit in VND |
 | `frequency` (recurring body) | `"weekly"` or `"monthly"`, required |
 | `startDate` (recurring body) | a day that exists, `YYYY-MM-DD` in Vietnam time, required |
+| `name` (template) | string, trimmed, 1–40 chars |
+| `ids` (bulk body) | array of 1–200 transaction ids (24-hex strings); duplicates are removed; more than 200 → 400 |
 | `endDate` (recurring body) | a day that exists, `YYYY-MM-DD`, after `startDate`; optional, `null` or left out means no end |
 
 ## Endpoint summary
@@ -97,6 +100,13 @@ Swagger UI: `/api-docs` (outside `/api`).
 | 36 | GET | `/api/reports/monthly` | Yes | One month with last month's comparison, top categories, daily expense, top tags (`?month=&currency=`) |
 | 37 | GET | `/api/reports/yearly` | Yes | Income and expense of the 12 months of a year (`?year=&currency=`) |
 | 38 | GET | `/api/insights` | Yes | Up to 6 rule-based tips about a month (`?month=&currency=`) |
+| 39 | GET | `/api/templates` | Yes | List my transaction templates |
+| 40 | POST | `/api/templates` | Yes | Create a template (name, category, amount, note) |
+| 41 | GET | `/api/templates/:id` | Yes | Get one template |
+| 42 | PATCH | `/api/templates/:id` | Yes | Update a template |
+| 43 | DELETE | `/api/templates/:id` | Yes | Delete a template |
+| 44 | POST | `/api/transactions/bulk-delete` | Yes | Delete up to 200 of my transactions at once |
+| 45 | PATCH | `/api/transactions/bulk-category` | Yes | Move up to 200 of my transactions to another category |
 
 Every protected route (Auth = Yes) can also return **401** (`"Not authorized, token missing"` /
 `"Not authorized, invalid token"`) and every route can return **500** (`"Internal server error"`).
@@ -216,7 +226,7 @@ Auth: yes.
 
 **200**
 ```json
-{ "success": true, "data": [ { "_id": "...", "name": "Food", "type": "expense", "color": "#FF7043", "createdAt": "...", "updatedAt": "..." } ] }
+{ "success": true, "data": [ { "_id": "...", "name": "Food", "type": "expense", "color": "#FF7043", "icon": "🍜", "createdAt": "...", "updatedAt": "..." } ] }
 ```
 
 **Errors**: 400 `"Type must be income or expense"`.
@@ -226,8 +236,9 @@ Auth: yes.
 
 **Body**
 ```json
-{ "name": "Food", "type": "expense", "color": "#FF7043" }
+{ "name": "Food", "type": "expense", "color": "#FF7043", "icon": "🍜" }
 ```
+`icon` is optional.
 
 **201** – `data` is the new category object.
 
@@ -235,7 +246,7 @@ Auth: yes.
 
 | Code | message |
 |------|---------|
-| 400 | `"Name is required"`, `"Name must be at most 30 characters"`, `"Type must be income or expense"`, `"Color must be a hex code like #FF7043"` |
+| 400 | `"Name is required"`, `"Name must be at most 30 characters"`, `"Type must be income or expense"`, `"Color must be a hex code like #FF7043"`, `"Icon must be a single emoji"` |
 | 409 | `"Category already exists"` (same name + type for this user, case-insensitive) |
 
 ### 7. GET /api/categories/:id
@@ -250,8 +261,9 @@ Auth: yes.
 
 **Body** (at least one field)
 ```json
-{ "name": "Eating out", "color": "#E53935" }
+{ "name": "Eating out", "color": "#E53935", "icon": "🍔" }
 ```
+`icon: null` (or `""`) removes the icon.
 `type` cannot be changed (it is copied into every transaction of this category).
 
 **200** – `data` is the updated category object.
@@ -260,7 +272,7 @@ Auth: yes.
 
 | Code | message |
 |------|---------|
-| 400 | `"Nothing to update"`, `"Type cannot be changed"` (any `type` in the body, even the same value), `"Name is required"`, `"Name must be at most 30 characters"`, `"Color must be a hex code like #FF7043"` |
+| 400 | `"Nothing to update"`, `"Type cannot be changed"` (any `type` in the body, even the same value), `"Name is required"`, `"Name must be at most 30 characters"`, `"Color must be a hex code like #FF7043"`, `"Icon must be a single emoji"` |
 | 404 | `"Category not found"` |
 | 409 | `"Category already exists"` |
 
@@ -280,7 +292,7 @@ Auth: yes.
 | 409 | `"Category still has transactions"` |
 | 409 | `"Category still has recurring rules"` (also when the rule is turned off) |
 
-When the delete succeeds, the budgets of the category (every month) are deleted with it.
+When the delete succeeds, the budgets of the category (every month) and its transaction templates are deleted with it.
 
 ---
 
@@ -887,7 +899,7 @@ Auth: yes. Query: `month=YYYY-MM` (default: the current month in Vietnam time), 
     "previousTotals": { "income": 18000000, "expense": 1100000, "balance": 16900000 },
     "changes": { "income": 19.4, "expense": 13.6, "balance": 19.8 },
     "topCategories": [
-      { "categoryId": "6720b1b2c3d4e5f601234568", "name": "Bills", "color": "#F19A52", "icon": null,
+      { "categoryId": "6720b1b2c3d4e5f601234568", "name": "Bills", "color": "#F19A52", "icon": "🧾",
         "total": 1000000, "percent": 80, "previousTotal": 800000, "changePercent": 25 }
     ],
     "dailyExpense": [ { "date": "2025-10-01", "total": 0 }, { "date": "2025-10-02", "total": 0 } ],
@@ -895,7 +907,7 @@ Auth: yes. Query: `month=YYYY-MM` (default: the current month in Vietnam time), 
     "noSpendDays": 27,
     "largestExpense": {
       "_id": "6720c1b2c3d4e5f601234569", "amount": 1000000, "note": "Electricity", "date": "2025-10-10T02:00:00.000Z",
-      "category": { "_id": "6720b1b2c3d4e5f601234568", "name": "Bills", "color": "#F19A52", "icon": null }
+      "category": { "_id": "6720b1b2c3d4e5f601234568", "name": "Bills", "color": "#F19A52", "icon": "🧾" }
     },
     "topTags": [ { "tag": "work", "total": 200000, "count": 2 } ]
   }
@@ -907,7 +919,7 @@ Auth: yes. Query: `month=YYYY-MM` (default: the current month in Vietnam time), 
 |-------|----------------------|
 | `totals`, `previousTotals` | Income, expense and `balance = income - expense` of the month and of the month before |
 | `changes` | `(current - previous) / abs(previous) * 100`, 1 decimal. **`null` when last month is 0.** A positive `expense` change means more spending |
-| `topCategories` | Up to 5 expense categories with an expense this month, biggest first (same total: by name). `percent` = share of the month's expense, 1 decimal. `changePercent` compares with the same category last month (`null` when it was 0). `icon` is `null` for now: categories have no icon yet |
+| `topCategories` | Up to 5 expense categories with an expense this month, biggest first (same total: by name). `percent` = share of the month's expense, 1 decimal. `changePercent` compares with the same category last month (`null` when it was 0). `icon` is the emoji of the category, or `null` when it has none |
 | `dailyExpense` | **Every** day of the month in order (28-31 entries); a day without expenses has `total` 0 |
 | `averagePerDay` | Expense / days that have started, rounded to a whole number. A past month: all its days. The current month: up to and including today. A future month: 0 |
 | `noSpendDays` | Finished days without any expense. Today is not counted (it may still get one). A future month: 0 |
@@ -983,3 +995,93 @@ Built from simple rules (no AI). `severity` is `info`, `warning` or `success`. T
 `link` is a path inside the app. Amounts in `message` are written like the client does (`1.000.000 ₫`).
 
 **Errors**: 400 `"Month must be in YYYY-MM format"`, `"Currency must be a 3-letter ISO code"`.
+
+---
+
+## Bulk actions
+
+Both routes act only on the signed-in user's transactions. An id that does not exist or belongs to another user is
+skipped without an error (the count is just smaller), so the answer never reveals whether such an id exists.
+They are declared before `/transactions/:id`, so `bulk-category` is never read as an id.
+
+### 44. POST /api/transactions/bulk-delete
+Auth: yes.
+
+**Body**
+```json
+{ "ids": ["6720c1b2c3d4e5f601234569", "6720c1b2c3d4e5f60123456a"] }
+```
+
+**200**
+```json
+{ "success": true, "data": { "deleted": 2 } }
+```
+
+**Errors**
+
+| Code | message |
+|------|---------|
+| 400 | `"Ids must be a non-empty array"`, `"You can change at most 200 transactions at a time"` (nothing is deleted), `"Every id must be a valid transaction id"` |
+
+### 45. PATCH /api/transactions/bulk-category
+Auth: yes.
+
+**Body**
+```json
+{ "ids": ["6720c1b2c3d4e5f601234569"], "categoryId": "6720b1b2c3d4e5f601234568" }
+```
+The `type` of every changed transaction is copied from the new category (an expense moved to an income category becomes income).
+
+**200**
+```json
+{ "success": true, "data": { "updated": 1 } }
+```
+`updated` counts the transactions that really changed; one that already had the category is left alone and not counted.
+
+**Errors**
+
+| Code | message |
+|------|---------|
+| 400 | `"Ids must be a non-empty array"`, `"You can change at most 200 transactions at a time"`, `"Every id must be a valid transaction id"`, `"Category id is invalid"` |
+| 404 | `"Category not found"` (does not exist or belongs to another user; nothing is changed) |
+
+---
+
+## Templates
+
+A template is a saved category + amount + note. The quick add dialog shows the templates as chips; a click creates a normal
+transaction dated today through `POST /api/transactions` (the server has no special "use template" route).
+
+Template object: `{ "_id", "name", "category": { "_id", "name", "color", "icon", "type" }, "amount", "note", "createdAt", "updatedAt" }`.
+
+### 39. GET /api/templates
+Auth: yes. Oldest first. **200** – `data` is an array (empty when there are none).
+
+### 40. POST /api/templates
+Auth: yes.
+
+**Body**
+```json
+{ "name": "Morning coffee", "categoryId": "6720b1b2c3d4e5f601234568", "amount": 35000, "note": "Coffee" }
+```
+`note` is optional (default `""`).
+
+**201** – `data` is the new template.
+
+**Errors**
+
+| Code | message |
+|------|---------|
+| 400 | `"Name is required"`, `"Name must be at most 40 characters"`, `"Category id is invalid"`, `"Amount must be greater than 0"`, `"Note must be at most 200 characters"` |
+| 404 | `"Category not found"` (does not exist or belongs to another user) |
+
+### 41. GET /api/templates/:id
+Auth: yes. **200** – `data` is the template. **Errors**: 404 `"Template not found"` (also a malformed id or another user's template).
+
+### 42. PATCH /api/templates/:id
+Auth: yes. **Body**: at least one of `name`, `categoryId`, `amount`, `note`. **200** – `data` is the updated template.
+
+**Errors**: 400 `"Nothing to update"` and the messages of endpoint 40; 404 `"Template not found"` / `"Category not found"`.
+
+### 43. DELETE /api/templates/:id
+Auth: yes. **200** – `{ "success": true, "data": { "_id": "..." } }`. **Errors**: 404 `"Template not found"`.

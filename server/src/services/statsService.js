@@ -36,6 +36,7 @@ export async function getSummary(userId, { month = currentMonth(), currency = "V
           categoryId: "$_id",
           name: "$category.name",
           color: "$category.color",
+          icon: "$category.icon",
           total: 1,
         },
       },

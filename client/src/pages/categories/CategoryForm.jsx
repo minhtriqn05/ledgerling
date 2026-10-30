@@ -9,6 +9,8 @@ import SegmentedControl from '../../components/SegmentedControl/SegmentedControl
 import Button from '../../components/Button/Button.jsx';
 import Alert from '../../components/Alert/Alert.jsx';
 import Icon from '../../components/Icon.jsx';
+import EmojiPicker from '../../components/EmojiPicker/EmojiPicker.jsx';
+import CategoryMark from '../../components/CategoryMark/CategoryMark.jsx';
 import styles from './CategoryForm.module.css';
 
 // The 8 preset category colors, in the fixed order of docs/ui-style.md (--chart-1 … --chart-8 in tokens.css).
@@ -41,6 +43,7 @@ export default function CategoryForm({ category, defaultType, autoFocus, onSaved
   const [name, setName] = useState(category?.name ?? '');
   const [type, setType] = useState(category?.type ?? defaultType);
   const [color, setColor] = useState(category?.color.toUpperCase() ?? colors[0].hex);
+  const [icon, setIcon] = useState(category?.icon ?? null); // one emoji, or null for none
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const toast = useToast();
@@ -54,10 +57,10 @@ export default function CategoryForm({ category, defaultType, autoFocus, onSaved
     setError('');
     setSaving(true);
     try {
-      // The type cannot be changed, so an edit only sends the name and the color.
+      // The type cannot be changed, so an edit only sends the name, the color and the icon (null removes it).
       const saved = isEdit
-        ? await updateCategory(category._id, { name: name.trim(), color })
-        : await createCategory({ name: name.trim(), type, color });
+        ? await updateCategory(category._id, { name: name.trim(), color, icon })
+        : await createCategory({ name: name.trim(), type, color, icon });
       // The page updates the list and opens a fresh form, so there is nothing to reset here.
       onSaved(saved);
     } catch (err) {
@@ -72,7 +75,7 @@ export default function CategoryForm({ category, defaultType, autoFocus, onSaved
         icon={isEdit ? 'edit' : 'plus'}
         tone="sky"
         title={isEdit ? 'Edit category' : 'New category'}
-        subtitle={isEdit ? 'Change the name or color' : 'Name, type and color'}
+        subtitle={isEdit ? 'Change the name, color or icon' : 'Name, type, color and icon'}
       />
 
       <form className={styles.form} onSubmit={handleSubmit}>
@@ -115,11 +118,18 @@ export default function CategoryForm({ category, defaultType, autoFocus, onSaved
           </div>
         </fieldset>
 
-        {/* How the category will look in lists: a chip with a dot in its color. */}
+        <fieldset className={styles.fieldset}>
+          <legend className={styles.legend}>Icon</legend>
+          <EmojiPicker value={icon} onChange={setIcon} disabled={saving} />
+        </fieldset>
+
+        {/* How the category will look in lists: a chip with its icon (or a dot in its color). */}
         <div className={styles.preview}>
           <span className={styles.previewLabel}>Preview</span>
           <span className={styles.chip} style={{ '--tone': color }}>
-            <span className={styles.dot} />
+            <CategoryMark icon={icon}>
+              <span className={styles.dot} />
+            </CategoryMark>
             <span className={styles.chipText}>{name.trim() || 'Category name'}</span>
           </span>
         </div>

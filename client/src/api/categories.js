@@ -9,13 +9,13 @@ export async function getCategories() {
   return response.data.data;
 }
 
-// category: { name, type, color }
+// category: { name, type, color, icon } (icon is optional: one emoji)
 export async function createCategory(category) {
   const response = await api.post('/categories', category);
   return response.data.data;
 }
 
-// changes: { name, color } (the type cannot be changed)
+// changes: any of { name, color, icon } (icon: null removes it; the type cannot be changed)
 export async function updateCategory(id, changes) {
   const response = await api.patch(`/categories/${id}`, changes);
   return response.data.data;

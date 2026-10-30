@@ -1,5 +1,6 @@
 import { formatDate, formatSignedVnd } from '../../utils/format.js';
 import IconButton from '../../components/IconButton/IconButton.jsx';
+import CategoryMark from '../../components/CategoryMark/CategoryMark.jsx';
 import styles from './RuleRow.module.css';
 
 const FREQUENCY_LABELS = { weekly: 'Weekly', monthly: 'Monthly' };
@@ -21,7 +22,9 @@ export default function RuleRow({ rule, toggling, onToggle, onEdit, onDelete }) 
     <li className={styles.row}>
       <div className={styles.main}>
         <span className={styles.category}>
-          <i className={styles.dot} style={{ background: category.color }} aria-hidden="true" />
+          <CategoryMark icon={category.icon}>
+            <i className={styles.dot} style={{ background: category.color }} aria-hidden="true" />
+          </CategoryMark>
           {category.name}
         </span>
         {rule.note && <span className={styles.note}>{rule.note}</span>}

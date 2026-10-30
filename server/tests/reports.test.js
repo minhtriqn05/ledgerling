@@ -112,7 +112,7 @@ describe("GET /api/reports/monthly", () => {
     ]);
     const first = res.body.data.topCategories[0];
     expect(first.color).toMatch(/^#[0-9A-Fa-f]{6}$/);
-    expect(first.icon).toBeNull();
+    expect(first.icon).toBe("🧾"); // the default Bills category has an icon since categories got icons
     expect(first.categoryId).toBeTruthy();
   });
 
@@ -141,7 +141,7 @@ describe("GET /api/reports/monthly", () => {
     expect(data.largestExpense).toMatchObject({
       amount: 1000000,
       note: "Electricity",
-      category: { name: "Bills", icon: null },
+      category: { name: "Bills", icon: "🧾" },
     });
     expect(data.largestExpense.date).toBe("2025-10-10T02:00:00.000Z");
   });

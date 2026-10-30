@@ -86,6 +86,11 @@ router.use(requireAuth);
  *                           color:
  *                             type: string
  *                             example: "#F07D62"
+ *                           icon:
+ *                             type: string
+ *                             nullable: true
+ *                             description: The emoji of the category, or null
+ *                             example: "🍜"
  *                           total:
  *                             type: number
  *                             example: 4800000
@@ -112,7 +117,7 @@ router.use(requireAuth);
  *                 totalExpense: 13600000
  *                 balance: 7900000
  *                 expenseByCategory:
- *                   - { categoryId: 6720b1b2c3d4e5f601234568, name: Food, color: "#F07D62", total: 4800000 }
+ *                   - { categoryId: 6720b1b2c3d4e5f601234568, name: Food, color: "#F07D62", icon: "🍜", total: 4800000 }
  *                   - { categoryId: 6720b1b2c3d4e5f601234571, name: Bills, color: "#F19A52", total: 3200000 }
  *                   - { categoryId: 6720b1b2c3d4e5f601234572, name: Shopping, color: "#7D8CE8", total: 2600000 }
  *                   - { categoryId: 6720b1b2c3d4e5f601234573, name: Transport, color: "#4A9FE3", total: 1700000 }

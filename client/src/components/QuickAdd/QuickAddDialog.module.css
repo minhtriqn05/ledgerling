@@ -1,0 +1,123 @@
+/* Extra styles for the Quick add dialog. The fields, chips and buttons reuse the transaction form's css
+   (pages/transactions/TransactionFormDialog.module.css), so the two dialogs look alike. */
+
+/* ---------- Template chips ---------- */
+.templates {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.templateList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* One chip is two buttons side by side: the name (saves) and a small x (deletes the template). */
+.template {
+  display: inline-flex;
+  align-items: stretch;
+  max-width: 100%;
+  border: 1px solid color-mix(in srgb, var(--tone) 35%, var(--color-surface));
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--tone) 12%, var(--color-surface));
+}
+
+.templateUse,
+.templateRemove {
+  border: none;
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.templateUse {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-1) var(--space-2) var(--space-1) var(--space-3);
+  border-radius: var(--radius-full) 0 0 var(--radius-full);
+  font-weight: var(--font-weight-medium);
+}
+
+.templateName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.templateAmount {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-regular);
+  white-space: nowrap;
+}
+
+.templateRemove {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  border-radius: 0 var(--radius-full) var(--radius-full) 0;
+  color: var(--color-text-muted);
+}
+
+.templateUse:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--tone) 18%, var(--color-surface));
+}
+
+.templateRemove:hover:not(:disabled) {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.templateUse:focus-visible,
+.templateRemove:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+.templateUse:disabled,
+.templateRemove:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ---------- Category groups ---------- */
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.group + .group {
+  margin-top: var(--space-2);
+}
+
+.groupLabel {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+}
+
+/* ---------- Small texts ---------- */
+.understood {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.linkButton {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-primary-text);
+  font: inherit;
+  font-weight: var(--font-weight-medium);
+  text-decoration: underline;
+  cursor: pointer;
+}

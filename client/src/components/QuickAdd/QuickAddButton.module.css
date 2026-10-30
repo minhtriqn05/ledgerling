@@ -1,0 +1,51 @@
+/* Floats over the page in the bottom-right corner. */
+.fab {
+  position: fixed;
+  right: var(--space-5);
+  bottom: var(--space-5);
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--gradient-hero);
+  color: var(--color-hero-text);
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.fab:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.fab:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-md), 0 0 0 4px var(--color-focus-ring);
+}
+
+@media (max-width: 767px) {
+  .fab {
+    right: var(--space-4);
+    bottom: var(--space-4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fab {
+    transition: none;
+  }
+
+  .fab:hover {
+    transform: none;
+  }
+}
+
+@media print {
+  .fab {
+    display: none;
+  }
+}

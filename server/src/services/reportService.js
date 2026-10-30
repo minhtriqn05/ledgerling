@@ -83,7 +83,7 @@ export async function loadMonthlyReport(userId, { month, currency, today }) {
     // 5. The single biggest expense of the month (the latest one when two are equal)
     Transaction.findOne({ ...inMonth, type: "expense" })
       .sort({ amount: -1, date: -1 })
-      .populate("categoryId", "name color")
+      .populate("categoryId", "name color icon")
       .lean(),
   ]);
 
@@ -110,7 +110,7 @@ export async function loadMonthlyReport(userId, { month, currency, today }) {
         categoryId: c.categoryId,
         name: doc.name,
         color: doc.color,
-        // The Category model has no icon yet; it is returned as soon as a category has one
+        // A category saved before icons existed has none
         icon: doc.icon ?? null,
         total: c.total,
         percent: totals.expense > 0 ? round1((c.total / totals.expense) * 100) : 0,

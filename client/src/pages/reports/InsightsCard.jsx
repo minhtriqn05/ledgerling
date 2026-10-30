@@ -4,6 +4,7 @@ import { useLoad } from '../../hooks/useLoad.js';
 import { formatMonth } from '../../utils/vnDate.js';
 import Card, { CardHeader } from '../../components/Card/Card.jsx';
 import Button from '../../components/Button/Button.jsx';
+import LoadingState from '../../components/LoadingState/LoadingState.jsx';
 import Icon from '../../components/Icon.jsx';
 import styles from './InsightsCard.module.css';
 
@@ -21,7 +22,7 @@ export default function InsightsCard({ month }) {
   const { data, loading, error, reload } = useLoad(() => getInsights(month), [month]);
 
   function renderBody() {
-    if (loading) return <p className={styles.note}>Loading insights…</p>;
+    if (loading) return <LoadingState skeleton="rows" count={3}>Loading insights…</LoadingState>;
     if (error) {
       return (
         <div className={styles.invite}>

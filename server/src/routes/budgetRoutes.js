@@ -60,7 +60,7 @@ router.use(requireAuth);
  *               success: true
  *               data:
  *                 - _id: 6720d1b2c3d4e5f601234580
- *                   category: { _id: 6720b1b2c3d4e5f601234571, name: Bills, color: "#F19A52" }
+ *                   category: { _id: 6720b1b2c3d4e5f601234571, name: Bills, color: "#F19A52", icon: "🧾" }
  *                   month: "2026-10"
  *                   amount: 3000000
  *                   spent: 3200000
@@ -70,7 +70,7 @@ router.use(requireAuth);
  *                   createdAt: "2026-10-01T02:00:00.000Z"
  *                   updatedAt: "2026-10-01T02:00:00.000Z"
  *                 - _id: 6720d1b2c3d4e5f601234581
- *                   category: { _id: 6720b1b2c3d4e5f601234568, name: Food, color: "#F07D62" }
+ *                   category: { _id: 6720b1b2c3d4e5f601234568, name: Food, color: "#F07D62", icon: "🍜" }
  *                   month: "2026-10"
  *                   amount: 5000000
  *                   spent: 4250000

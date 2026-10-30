@@ -1,10 +1,22 @@
 import { Router } from "express";
-import { list, exportCsv, importCsv, create, getOne, update, remove } from "../controllers/transactionController.js";
+import {
+  list,
+  exportCsv,
+  importCsv,
+  create,
+  getOne,
+  update,
+  remove,
+  bulkDelete,
+  bulkCategory,
+} from "../controllers/transactionController.js";
 import {
   validateCreateTransaction,
   validateListTransactions,
   validateExportTransactions,
   validateImportTransactions,
+  validateBulkDelete,
+  validateBulkCategory,
   validateUpdateTransaction,
   validateTransactionId,
 } from "../middlewares/validateTransaction.js";
@@ -488,6 +500,134 @@ router.post("/", validateCreateTransaction, create);
  *         $ref: '#/components/responses/Unauthorized'
  */
 router.post("/import", validateImportTransactions, importCsv);
+
+/**
+ * @openapi
+ * /transactions/bulk-delete:
+ *   post:
+ *     summary: Delete many of my transactions at once (1 to 200 ids)
+ *     description: |
+ *       Only transactions of the signed-in user are deleted. An id that does not exist or belongs to another user is
+ *       skipped without an error, so `deleted` can be smaller than the number of ids sent.
+ *     tags: [Transactions]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [ids]
+ *             properties:
+ *               ids:
+ *                 type: array
+ *                 minItems: 1
+ *                 maxItems: 200
+ *                 items:
+ *                   type: string
+ *                 example: [6720c1b2c3d4e5f601234569, 6720c1b2c3d4e5f60123456a]
+ *     responses:
+ *       200:
+ *         description: How many transactions were deleted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     deleted:
+ *                       type: integer
+ *                       example: 2
+ *       400:
+ *         description: Invalid input ("Ids must be a non-empty array", "You can change at most 200 transactions at a time", "Every id must be a valid transaction id")
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: You can change at most 200 transactions at a time
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
+router.post("/bulk-delete", validateBulkDelete, bulkDelete);
+
+/**
+ * @openapi
+ * /transactions/bulk-category:
+ *   patch:
+ *     summary: Move many of my transactions to another category (1 to 200 ids)
+ *     description: |
+ *       The type of every changed transaction is copied from the new category. Only transactions of the signed-in user
+ *       are changed; other ids are skipped without an error. `updated` counts the transactions that really changed
+ *       (one that already had the category is not counted).
+ *     tags: [Transactions]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [ids, categoryId]
+ *             properties:
+ *               ids:
+ *                 type: array
+ *                 minItems: 1
+ *                 maxItems: 200
+ *                 items:
+ *                   type: string
+ *                 example: [6720c1b2c3d4e5f601234569, 6720c1b2c3d4e5f60123456a]
+ *               categoryId:
+ *                 type: string
+ *                 description: Id of one of your categories
+ *                 example: 6720b1b2c3d4e5f601234568
+ *     responses:
+ *       200:
+ *         description: How many transactions were changed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     updated:
+ *                       type: integer
+ *                       example: 2
+ *       400:
+ *         description: Invalid input ("Ids must be a non-empty array", "You can change at most 200 transactions at a time", "Every id must be a valid transaction id", "Category id is invalid")
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Category id is invalid
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       404:
+ *         description: Category not found (it does not exist or belongs to another user)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Category not found
+ */
+router.patch("/bulk-category", validateBulkCategory, bulkCategory);
 
 /**
  * @openapi

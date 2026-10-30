@@ -9,6 +9,18 @@
   padding: var(--space-7) 0;
 }
 
+/* Text that only screen readers get (the skeleton shapes are the visible part). */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .fullScreen {
   display: grid;
   place-items: center;

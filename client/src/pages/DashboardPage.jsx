@@ -14,6 +14,7 @@ import ErrorState from '../components/ErrorState/ErrorState.jsx';
 import Icon from '../components/Icon.jsx';
 import BudgetAlerts from './dashboard/BudgetAlerts.jsx';
 import SavingsGoals from './dashboard/SavingsGoals.jsx';
+import CategoryMark from '../components/CategoryMark/CategoryMark.jsx';
 import InsightsCard from './reports/InsightsCard.jsx';
 import { CategoryDonut, MonthlyExpenseChart } from './dashboard/DashboardCharts.jsx';
 import styles from './DashboardPage.module.css';
@@ -82,7 +83,7 @@ export default function DashboardPage() {
 
   // The page shows one of four states: loading, error, empty or the dashboard.
   function renderContent() {
-    if (loading) return <LoadingState spacious>Loading dashboard…</LoadingState>;
+    if (loading) return <LoadingState skeleton="cards">Loading dashboard…</LoadingState>;
     if (loadError) return <ErrorState message={loadError} onRetry={retry} />;
 
     // Nothing in the 6-month window at all: the cards and charts would only show zeros.
@@ -137,7 +138,9 @@ export default function DashboardPage() {
                   {categories.map((c) => (
                     <li key={c.categoryId} style={{ '--tone': c.color }}>
                       <span className={styles.categoryName}>
-                        <i className={styles.categoryDot} />
+                        <CategoryMark icon={c.icon}>
+                          <i className={styles.categoryDot} />
+                        </CategoryMark>
                         <span>{c.name}</span>
                       </span>
                       <span className={styles.categoryBar} aria-hidden="true">

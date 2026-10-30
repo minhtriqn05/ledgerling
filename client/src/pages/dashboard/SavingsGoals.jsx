@@ -5,6 +5,7 @@ import { formatDate, formatVnd } from '../../utils/format.js';
 import { daysUntil, formatDaysLeft } from '../../utils/goals.js';
 import Card, { CardHeader } from '../../components/Card/Card.jsx';
 import Button from '../../components/Button/Button.jsx';
+import LoadingState from '../../components/LoadingState/LoadingState.jsx';
 import Icon from '../../components/Icon.jsx';
 import styles from './SavingsGoals.module.css';
 
@@ -39,7 +40,7 @@ export default function SavingsGoals() {
 
   function renderBody() {
     if (failed) return <p className={styles.note}>Goals could not be loaded.</p>;
-    if (goals === null) return <p className={styles.note}>Loading goals…</p>;
+    if (goals === null) return <LoadingState skeleton="rows" count={2}>Loading goals…</LoadingState>;
 
     if (goals.length === 0) {
       return (
