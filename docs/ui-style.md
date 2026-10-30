@@ -179,9 +179,9 @@ category color is always shown with its name (chip label, avatar letter, legend 
     (secondary, gets the focus) / Delete (danger). No browser confirm and no dialog.
   - **States:** a centered, muted "Loading categories…" in the list area; an empty state per type
     ("No expense categories yet" + "New category"); a load error is an error alert + "Try again"; a
-    delete error is an error alert above the cards (**Can't delete "Food".** + the server's message,
-    e.g. "Category still has transactions"); a save error is an error alert in the form above the
-    button (e.g. "Category already exists").
+    delete or save error is an error toast with the server's message (e.g. "Category still has
+    transactions", "Category already exists"); a success is a success toast ("Category added",
+    "Category updated", "Category deleted"). Our own checks ("Please enter a name.") stay as an alert in the form.
 - **Login (and Register):** gradient panel with headline and two floating mini cards (saved this
   month, this week's bars) · form with icon inputs (email, password + show button), full-width
   button, link to the other page. On phones the panel becomes a short banner. Register adds a
@@ -205,6 +205,13 @@ The real pages use React components in `client/src/components/` that copy their 
 (previous / next arrows around the month name) and `Modal` (a native `<dialog>` over the dimmed page; Escape, the X
 button and a click outside close it; an element with `data-autofocus` gets the focus). The Transactions page uses
 `Modal` for the add / edit form and for the delete confirmation.
+
+**Toasts** (`components/Toast/` + `context/ToastContext.jsx`): small white cards in the top-right corner
+(full width minus 16px on phones) with a tinted icon tile (income green for success, expense coral for error),
+the message and a close button. They hide by themselves after 3 seconds. Any component calls
+`const toast = useToast(); toast.success('Transaction added')` or `toast.error(getErrorMessage(err))`.
+Used for every add / edit / delete on Categories and Transactions: success messages, and the server's message
+on failure. The stack is a popover, so it also shows above an open dialog.
 
 ## 9. Charts (Recharts) – approved (v5)
 

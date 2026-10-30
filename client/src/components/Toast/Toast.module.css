@@ -1,0 +1,86 @@
+/* The stack. A popover has default browser styles (centered, bordered), so they are reset here. */
+.viewport {
+  position: fixed;
+  inset: auto;
+  top: var(--space-5);
+  right: var(--space-5);
+  width: min(360px, calc(100vw - 2 * var(--space-4)));
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  overflow: visible;
+  flex-direction: column;
+  gap: var(--space-2);
+  pointer-events: none; /* only the toasts themselves react to the mouse */
+}
+
+/* Shown only while it is open (the browser hides a closed popover). */
+.viewport:popover-open {
+  display: flex;
+}
+
+.toast {
+  --tone: var(--color-income);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--tone) 28%, var(--color-border));
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+  pointer-events: auto;
+  animation: slide-in 0.2s ease-out;
+}
+
+.error {
+  --tone: var(--color-expense);
+}
+
+/* Same recipe as the icon tiles: 15% tone, icon in 62% tone + ink. */
+.tile {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--tone) 15%, var(--color-surface));
+  color: color-mix(in srgb, var(--tone) 62%, var(--color-text));
+}
+
+.message {
+  flex: 1;
+  margin: 0;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  color: var(--color-text);
+  overflow-wrap: anywhere;
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(var(--space-4));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+}
+
+/* Phones: a full-width stack with the 16px page padding. */
+@media (max-width: 560px) {
+  .viewport {
+    top: var(--space-4);
+    right: var(--space-4);
+  }
+}

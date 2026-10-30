@@ -1,25 +1,24 @@
 import { useState } from 'react';
 import { deleteTransaction } from '../../api/transactions.js';
 import { getErrorMessage } from '../../api/axios.js';
+import { useToast } from '../../context/ToastContext.jsx';
 import { formatDateDMY, formatSignedVnd } from '../../utils/format.js';
 import Modal from '../../components/Modal/Modal.jsx';
 import Button from '../../components/Button/Button.jsx';
-import Alert from '../../components/Alert/Alert.jsx';
 import styles from './DeleteTransactionDialog.module.css';
 
 // "Are you sure?" step before a transaction is deleted. onDeleted(transaction) runs after the API said OK.
 export default function DeleteTransactionDialog({ transaction, onDeleted, onClose }) {
   const [deleting, setDeleting] = useState(false);
-  const [error, setError] = useState('');
+  const toast = useToast();
 
   async function handleDelete() {
-    setError('');
     setDeleting(true);
     try {
       await deleteTransaction(transaction._id);
       onDeleted(transaction);
     } catch (err) {
-      setError(getErrorMessage(err));
+      toast.error(getErrorMessage(err));
       setDeleting(false);
     }
   }
@@ -34,8 +33,6 @@ export default function DeleteTransactionDialog({ transaction, onDeleted, onClos
         </span>
       </p>
       <p className={styles.text}>This can't be undone.</p>
-
-      {error && <Alert>{error}</Alert>}
 
       <div className={styles.actions}>
         {/* data-autofocus: keyboard users land on the safe choice (see Modal) */}

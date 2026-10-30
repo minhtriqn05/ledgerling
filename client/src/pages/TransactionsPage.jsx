@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { getCategories } from '../api/categories.js';
 import { getTransactions } from '../api/transactions.js';
 import { getErrorMessage } from '../api/axios.js';
+import { useToast } from '../context/ToastContext.jsx';
 import { formatSignedVnd, formatVnd } from '../utils/format.js';
 import { currentMonth, formatMonth, toDateInput } from '../utils/vnDate.js';
 import PageHeader from '../components/PageHeader/PageHeader.jsx';
@@ -46,6 +47,7 @@ export default function TransactionsPage() {
   const [reloadKey, setReloadKey] = useState(0);
   // The open dialog: null, { kind: 'form', transaction } (transaction = null for a new one) or { kind: 'delete', transaction }
   const [dialog, setDialog] = useState(null);
+  const toast = useToast();
 
   // The categories fill the filter and the form. They load once.
   useEffect(() => {
@@ -110,6 +112,7 @@ export default function TransactionsPage() {
 
   // The form calls this with the transaction the API returned (new or updated).
   function handleSaved(saved) {
+    toast.success(dialog.transaction ? 'Transaction updated' : 'Transaction added');
     setDialog(null);
     startLoading();
     // Follow the transaction: if it is in another month, or in a category the filter hides, change the filter.
@@ -120,6 +123,7 @@ export default function TransactionsPage() {
   }
 
   function handleDeleted(deleted) {
+    toast.success('Transaction deleted');
     setDialog(null);
     setTransactions((list) => list.filter((t) => t._id !== deleted._id));
   }

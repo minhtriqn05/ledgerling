@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getCategories, deleteCategory } from '../api/categories.js';
 import { getErrorMessage } from '../api/axios.js';
+import { useToast } from '../context/ToastContext.jsx';
 import PageHeader from '../components/PageHeader/PageHeader.jsx';
 import SegmentedControl from '../components/SegmentedControl/SegmentedControl.jsx';
 import Button from '../components/Button/Button.jsx';
@@ -31,7 +32,7 @@ export default function CategoriesPage() {
   const [activeType, setActiveType] = useState('expense');
   // The form on the right: which category it edits (null = a new one). A new `key` rebuilds it (see openForm).
   const [form, setForm] = useState({ key: 0, category: null, focus: false });
-  const [deleteError, setDeleteError] = useState(null); // { name, message }
+  const toast = useToast();
 
   useEffect(() => {
     let cancelled = false; // StrictMode runs effects twice in dev; ignore the first run's answer
@@ -67,11 +68,11 @@ export default function CategoriesPage() {
 
   function changeType(type) {
     setActiveType(type);
-    setDeleteError(null);
   }
 
   // The form calls this with the category the API returned (new or updated).
   function handleSaved(saved) {
+    toast.success(form.category ? 'Category updated' : 'Category added');
     setCategories((list) => sortByName([...list.filter((c) => c._id !== saved._id), saved]));
     setActiveType(saved.type); // show the list it belongs to
     openForm(null);
@@ -79,14 +80,14 @@ export default function CategoriesPage() {
 
   // A card calls this once its delete is confirmed.
   async function handleDelete(category) {
-    setDeleteError(null);
     try {
       await deleteCategory(category._id);
       setCategories((list) => list.filter((c) => c._id !== category._id));
+      toast.success('Category deleted');
       // If it was open in the form, the form goes back to "New category".
       if (form.category?._id === category._id) openForm(null, false);
     } catch (err) {
-      setDeleteError({ name: category.name, message: getErrorMessage(err) });
+      toast.error(getErrorMessage(err)); // e.g. "Category still has transactions"
     }
   }
 
@@ -133,20 +134,13 @@ export default function CategoriesPage() {
     }
 
     return (
-      <>
-        {deleteError && (
-          <Alert>
-            <strong>Can't delete "{deleteError.name}".</strong> {deleteError.message}
-          </Alert>
-        )}
-        <ul className={styles.grid}>
-          {visible.map((category) => (
-            <li key={category._id}>
-              <CategoryCard category={category} onEdit={openForm} onDelete={handleDelete} />
-            </li>
-          ))}
-        </ul>
-      </>
+      <ul className={styles.grid}>
+        {visible.map((category) => (
+          <li key={category._id}>
+            <CategoryCard category={category} onEdit={openForm} onDelete={handleDelete} />
+          </li>
+        ))}
+      </ul>
     );
   }
 
