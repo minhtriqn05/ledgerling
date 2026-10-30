@@ -49,3 +49,11 @@
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
 }
+
+/* A card is never cut in two between pages when printing */
+@media print {
+  .card {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+}

@@ -14,6 +14,7 @@ import ErrorState from '../components/ErrorState/ErrorState.jsx';
 import Icon from '../components/Icon.jsx';
 import BudgetAlerts from './dashboard/BudgetAlerts.jsx';
 import SavingsGoals from './dashboard/SavingsGoals.jsx';
+import InsightsCard from './reports/InsightsCard.jsx';
 import { CategoryDonut, MonthlyExpenseChart } from './dashboard/DashboardCharts.jsx';
 import styles from './DashboardPage.module.css';
 
@@ -121,6 +122,8 @@ export default function DashboardPage() {
           <BudgetAlerts month={month} />
           <SavingsGoals />
         </section>
+
+        <InsightsCard month={month} />
 
         <section className={styles.chartsRow}>
           <Card>

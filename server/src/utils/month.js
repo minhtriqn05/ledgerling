@@ -71,3 +71,36 @@ export function shiftMonth(month, delta) {
   const shifted = new Date(Date.UTC(year, monthNumber - 1 + delta, 1));
   return shifted.toISOString().slice(0, 7);
 }
+
+// How many days a month has: "2026-02" -> 28. Day 0 of the next month is the last day of this one.
+export function daysInMonth(month) {
+  const [year, monthNumber] = month.split("-").map(Number);
+  return new Date(Date.UTC(year, monthNumber, 0)).getUTCDate();
+}
+
+// Every day of a month, in order: "2026-02" -> ["2026-02-01", ..., "2026-02-28"]
+export function monthDays(month) {
+  return Array.from({ length: daysInMonth(month) }, (_, i) => `${month}-${String(i + 1).padStart(2, "0")}`);
+}
+
+// "2026" -> { from: 2025-12-31T17:00Z, to: 2026-12-31T17:00Z } (the whole year in Vietnam time, to is exclusive)
+export function yearRange(year) {
+  return { from: monthRange(`${year}-01`).from, to: monthRange(`${year}-12`).to };
+}
+
+// The current year in Vietnam time, as "YYYY"
+export function currentYear() {
+  return currentMonth().slice(0, 4);
+}
+
+// How far a month has come, in Vietnam time (today is a "YYYY-MM-DD" string so tests can pick any day):
+// - elapsedDays: days that have started, today included (a past month: all of them, a future month: 0)
+// - completedDays: days that are over, today excluded
+export function monthProgress(month, today = todayInVietnam()) {
+  const total = daysInMonth(month);
+  const todayMonth = today.slice(0, 7);
+  if (month < todayMonth) return { daysInMonth: total, elapsedDays: total, completedDays: total };
+  if (month > todayMonth) return { daysInMonth: total, elapsedDays: 0, completedDays: 0 };
+  const dayNumber = Number(today.slice(8, 10));
+  return { daysInMonth: total, elapsedDays: dayNumber, completedDays: dayNumber - 1 };
+}

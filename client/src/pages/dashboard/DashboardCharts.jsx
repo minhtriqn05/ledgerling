@@ -21,7 +21,7 @@ import styles from './DashboardCharts.module.css';
 const axisTick = () => ({ fill: cssVar('--chart-axis'), fontSize: cssVar('--font-size-xs') });
 
 // Round axis steps so labels read naturally (0, 6M, 12M... instead of 5.5M, 16.5M...).
-function niceTicks(max, count = 4) {
+export function niceTicks(max, count = 4) {
   if (max <= 0) return [0, 1];
   const rawStep = max / count;
   const magnitude = 10 ** Math.floor(Math.log10(rawStep));
@@ -30,7 +30,7 @@ function niceTicks(max, count = 4) {
 }
 
 // Small white card shown on hover.
-function ChartTooltip({ active, payload, label, hideLabel = false }) {
+export function ChartTooltip({ active, payload, label, hideLabel = false }) {
   if (!active || !payload?.length) return null;
   return (
     <div className={styles.tooltip}>

@@ -37,6 +37,12 @@ const options = {
         description:
           "Savings goals of the signed-in user. Money goes in and out through contributions: a positive amount adds money, a negative amount withdraws it, and the saved amount never goes below 0.",
       },
+      {
+        name: "Reports",
+        description:
+          "Monthly and yearly numbers for the Reports page. Months and days are read in Vietnam time (UTC+7). Like the other read routes, they first create the recurring transactions that are due.",
+      },
+      { name: "Insights", description: "Tips built from simple rules on the numbers of a month (no AI)" },
     ],
     components: {
       securitySchemes: {
