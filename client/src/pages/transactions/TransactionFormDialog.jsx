@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { createTransaction, updateTransaction } from '../../api/transactions.js';
 import { getErrorMessage } from '../../api/axios.js';
+import { useToast } from '../../context/ToastContext.jsx';
 import { formatNumber } from '../../utils/format.js';
 import { fromDateInput, toDateInput, todayInput } from '../../utils/vnDate.js';
 import Modal from '../../components/Modal/Modal.jsx';
@@ -31,6 +32,7 @@ export default function TransactionFormDialog({ transaction, categories, onSaved
   const [note, setNote] = useState(transaction?.note ?? '');
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const toast = useToast();
 
   const typeCategories = categories.filter((c) => c.type === type);
 
@@ -69,7 +71,7 @@ export default function TransactionFormDialog({ transaction, categories, onSaved
       // The page closes the dialog and reloads the list.
       onSaved(saved);
     } catch (err) {
-      setError(getErrorMessage(err));
+      toast.error(getErrorMessage(err));
       setSaving(false);
     }
   }

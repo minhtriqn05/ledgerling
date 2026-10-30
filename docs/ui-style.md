@@ -146,14 +146,19 @@ category color is always shown with its name (chip label, avatar letter, legend 
 - **Sidebar:** gradient logo tile, nav items (Dashboard, Transactions, Categories) with line icons,
   active item = primary-soft background + primary-text; a "Saved in October" card (pastel wash +
   mint progress ring); user block (sun-tinted initials) and "Log out" at the bottom.
-- **Phones (≤960px):** the sidebar becomes a fixed **bottom tab bar** (`--tabbar-height` 64px) with
-  four equal tabs – Dashboard, Transactions, Categories, Log out – each an icon above a 12px label.
-  The active tab uses the same primary-soft pill as the sidebar. Page content gets extra bottom
-  padding so the bar never covers it. Implemented in `client/src/components/AppLayout/`.
+- **Navigation items:** one array, `navItems` in `client/src/config/navItems.js` (`label`, `path`, optional
+  `icon`). Adding a page to the menu is one new line there plus its route in `App.jsx`.
+- **Active page:** primary-soft background, primary-text, semibold, plus a 4px primary bar on the left
+  edge (so it is not shown by color alone). The link also gets `aria-current="page"` from React Router.
+- **Narrow screens (<768px):** the sidebar becomes a sticky **top bar** (`--topbar-height` 56px): logo + name on
+  the left, a round menu button on the right (hamburger, turns into an X when open). The button opens a
+  **panel** under the bar (white, 20px radius, `--shadow-lg`) with the same items and "Log out" after a divider.
+  The panel closes on Escape, on a click outside, or after choosing a link. Implemented in
+  `client/src/components/AppLayout/`.
 - **Page header:** title + subtitle on the left; month picker pill and primary action on the right.
 - **Breakpoints:** ≤1100px dashboard stats and the transactions summary cards in 2 columns (balance / net
-  full width), categories form below the list; ≤960px sidebar hidden, a slim app bar (logo + avatar) appears,
-  all rows one column; ≤760px summary cards stacked; ≤640px the transactions table becomes a list (a wider
+  full width), categories form below the list; ≤960px all rows one column; <768px the sidebar turns into
+  the top bar + menu panel; ≤760px summary cards stacked; ≤640px the transactions table becomes a list (a wider
   table cuts the note short with "…", so the edit and delete buttons always fit); ≤560px 16px padding.
   No horizontal page scroll at any width (checked from 320px to 1440px).
 
@@ -180,9 +185,9 @@ category color is always shown with its name (chip label, avatar letter, legend 
     (secondary, gets the focus) / Delete (danger). No browser confirm and no dialog.
   - **States:** a centered, muted "Loading categories…" in the list area; an empty state per type
     ("No expense categories yet" + "New category"); a load error is an error alert + "Try again"; a
-    delete error is an error alert above the cards (**Can't delete "Food".** + the server's message,
-    e.g. "Category still has transactions"); a save error is an error alert in the form above the
-    button (e.g. "Category already exists").
+    delete or save error is an error toast with the server's message (e.g. "Category still has
+    transactions", "Category already exists"); a success is a success toast ("Category added",
+    "Category updated", "Category deleted"). Our own checks ("Please enter a name.") stay as an alert in the form.
 - **Login (and Register):** gradient panel with headline and two floating mini cards (saved this
   month, this week's bars) · form with icon inputs (email, password + show button), full-width
   button, link to the other page. On phones the panel becomes a short banner. Register adds a
@@ -206,6 +211,13 @@ The real pages use React components in `client/src/components/` that copy their 
 (previous / next arrows around the month name) and `Modal` (a native `<dialog>` over the dimmed page; Escape, the X
 button and a click outside close it; an element with `data-autofocus` gets the focus). The Transactions page uses
 `Modal` for the add / edit form and for the delete confirmation.
+
+**Toasts** (`components/Toast/` + `context/ToastContext.jsx`): small white cards in the top-right corner
+(full width minus 16px on phones) with a tinted icon tile (income green for success, expense coral for error),
+the message and a close button. They hide by themselves after 3 seconds. Any component calls
+`const toast = useToast(); toast.success('Transaction added')` or `toast.error(getErrorMessage(err))`.
+Used for every add / edit / delete on Categories and Transactions: success messages, and the server's message
+on failure. The stack is a popover, so it also shows above an open dialog.
 
 ## 9. Charts (Recharts) – approved (v5)
 

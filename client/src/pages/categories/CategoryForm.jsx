@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { createCategory, updateCategory } from '../../api/categories.js';
 import { getErrorMessage } from '../../api/axios.js';
+import { useToast } from '../../context/ToastContext.jsx';
 import { cssVar } from '../../utils/cssVar.js';
 import Card, { CardHeader } from '../../components/Card/Card.jsx';
 import TextField from '../../components/TextField/TextField.jsx';
@@ -42,6 +43,7 @@ export default function CategoryForm({ category, defaultType, autoFocus, onSaved
   const [color, setColor] = useState(category?.color.toUpperCase() ?? colors[0].hex);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const toast = useToast();
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -59,7 +61,7 @@ export default function CategoryForm({ category, defaultType, autoFocus, onSaved
       // The page updates the list and opens a fresh form, so there is nothing to reset here.
       onSaved(saved);
     } catch (err) {
-      setError(getErrorMessage(err));
+      toast.error(getErrorMessage(err)); // e.g. "Category already exists"
       setSaving(false);
     }
   }

@@ -1,0 +1,36 @@
+.page {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: var(--space-5) var(--space-4);
+  background: var(--gradient-page-top) no-repeat top / 100% 320px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  width: min(440px, 100%);
+}
+
+/* The big number uses the hero gradient as its fill. */
+.code {
+  margin: 0;
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-tight);
+  line-height: var(--line-height-tight);
+  background: var(--gradient-hero);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.content > * {
+  width: 100%;
+}
+
+.content > .code {
+  width: auto;
+}

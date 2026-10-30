@@ -17,6 +17,26 @@
   border-right: 1px solid var(--color-border);
 }
 
+/* Brand (+ the menu button on narrow screens). */
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.menuButton {
+  display: none;
+}
+
+/* The links and Log out. On wide screens it fills the sidebar below the brand. */
+.panel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-height: 0;
+}
+
 .brand {
   display: flex;
   align-items: center;
@@ -46,6 +66,7 @@
 
 /* Used by the three links and by the Log out button, so they look the same. */
 .navItem {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -80,6 +101,19 @@
   font-weight: var(--font-weight-semibold);
 }
 
+/* A small bar on the left edge, so the open page is clear even without the color. */
+.navActive::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 4px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  transform: translateY(-50%);
+}
+
 /* Pushes Log out to the bottom of the sidebar. */
 .logout {
   margin-top: auto;
@@ -104,55 +138,77 @@
   padding: var(--space-4) var(--space-6);
 }
 
-/* ---------- Phones: the sidebar becomes a bottom tab bar ---------- */
-@media (max-width: 960px) {
+/* ---------- Narrow screens: the sidebar becomes a top bar with a menu button ---------- */
+@media (max-width: 767px) {
   .layout {
     grid-template-columns: minmax(0, 1fr);
   }
 
   .sidebar {
-    position: fixed;
-    inset: auto 0 0;
     z-index: 10;
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0;
-    height: var(--tabbar-height);
-    /* Padding on all sides, so the active tab is a pill inside the bar instead of a block touching both edges. */
-    padding: var(--space-2);
+    height: auto;
+    padding: 0 var(--space-4);
     border-right: none;
-    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
   }
 
-  .brand {
+  .bar {
+    height: var(--topbar-height);
+  }
+
+  .menuButton {
+    display: grid;
+    place-items: center;
+    width: var(--control-height);
+    height: var(--control-height);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-full);
+    background: var(--color-surface);
+    color: var(--color-text);
+    cursor: pointer;
+  }
+
+  .menuButton:hover {
+    background: var(--color-surface-muted);
+  }
+
+  .menuButton:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--color-focus-ring);
+  }
+
+  /* The dropdown panel under the bar. Hidden until the button opens it. */
+  .panel {
+    position: absolute;
+    top: calc(100% + var(--space-2));
+    right: var(--space-4);
+    left: var(--space-4);
     display: none;
+    flex: none;
+    gap: var(--space-2);
+    padding: var(--space-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-lg);
   }
 
-  /* The links join the same 4-column grid as the Log out button. */
-  .nav {
-    display: contents;
+  .panelOpen {
+    display: flex;
   }
 
-  .navItem {
-    flex-direction: column;
-    justify-content: center;
-    gap: 2px;
-    min-height: 0;
-    padding: var(--space-1);
-    font-size: var(--font-size-xs);
-    text-align: center;
-  }
-
+  /* A thin line between the links and Log out. */
   .logout {
     margin-top: 0;
+    border-top: 1px solid var(--color-border);
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
   }
 
   .main {
     padding: var(--space-4) var(--space-4) 0;
   }
 
-  /* Extra bottom padding keeps the footer above the fixed tab bar. */
   .footer {
-    padding: var(--space-4) var(--space-4) calc(var(--tabbar-height) + var(--space-3));
+    padding: var(--space-4);
   }
 }
