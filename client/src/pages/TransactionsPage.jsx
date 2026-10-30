@@ -9,8 +9,9 @@ import PageHeader from '../components/PageHeader/PageHeader.jsx';
 import MonthPicker from '../components/MonthPicker/MonthPicker.jsx';
 import Card from '../components/Card/Card.jsx';
 import Button from '../components/Button/Button.jsx';
-import Alert from '../components/Alert/Alert.jsx';
 import EmptyState from '../components/EmptyState/EmptyState.jsx';
+import LoadingState from '../components/LoadingState/LoadingState.jsx';
+import ErrorState from '../components/ErrorState/ErrorState.jsx';
 import Icon from '../components/Icon.jsx';
 import TransactionList from './transactions/TransactionList.jsx';
 import TransactionFormDialog from './transactions/TransactionFormDialog.jsx';
@@ -134,24 +135,8 @@ export default function TransactionsPage() {
 
   // The card shows one of four states: loading, error, empty or the list.
   function renderContent() {
-    if (loading) {
-      return (
-        <p className={styles.status} role="status">
-          Loading transactions…
-        </p>
-      );
-    }
-
-    if (loadError) {
-      return (
-        <div className={styles.loadError}>
-          <Alert>{loadError}</Alert>
-          <Button variant="secondary" onClick={retry}>
-            Try again
-          </Button>
-        </div>
-      );
-    }
+    if (loading) return <LoadingState>Loading transactions…</LoadingState>;
+    if (loadError) return <ErrorState message={loadError} onRetry={retry} />;
 
     if (transactions.length === 0) {
       const filtered = categoryId !== 'all';

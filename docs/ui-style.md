@@ -156,10 +156,11 @@ category color is always shown with its name (chip label, avatar letter, legend 
   The panel closes on Escape, on a click outside, or after choosing a link. Implemented in
   `client/src/components/AppLayout/`.
 - **Page header:** title + subtitle on the left; month picker pill and primary action on the right.
-- **Breakpoints:** ≤1100px dashboard stats in 2 columns (hero full width), categories form below the
-  list; ≤960px all rows one column; <768px the sidebar turns into the top bar + menu panel;
-  ≤760px summary cards stacked; ≤640px the transactions table becomes a list; ≤560px 16px padding.
-  No horizontal page scroll at any width (checked at 390px).
+- **Breakpoints:** ≤1100px dashboard stats and the transactions summary cards in 2 columns (balance / net
+  full width), categories form below the list; ≤960px all rows one column; <768px the sidebar turns into
+  the top bar + menu panel; ≤760px summary cards stacked; ≤640px the transactions table becomes a list (a wider
+  table cuts the note short with "…", so the edit and delete buttons always fit); ≤560px 16px padding.
+  No horizontal page scroll at any width (checked from 320px to 1440px).
 
 ## 7. Screens
 

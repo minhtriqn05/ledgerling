@@ -7,6 +7,8 @@ import SegmentedControl from '../components/SegmentedControl/SegmentedControl.js
 import Button from '../components/Button/Button.jsx';
 import Alert from '../components/Alert/Alert.jsx';
 import EmptyState from '../components/EmptyState/EmptyState.jsx';
+import LoadingState from '../components/LoadingState/LoadingState.jsx';
+import ErrorState from '../components/ErrorState/ErrorState.jsx';
 import CategoryCard from './categories/CategoryCard.jsx';
 import CategoryForm from './categories/CategoryForm.jsx';
 import styles from './CategoriesPage.module.css';
@@ -104,24 +106,8 @@ export default function CategoriesPage() {
 
   // The left column shows one of four states: loading, error, empty or the cards.
   function renderList() {
-    if (loading) {
-      return (
-        <p className={styles.status} role="status">
-          Loading categories…
-        </p>
-      );
-    }
-
-    if (loadError) {
-      return (
-        <div className={styles.loadError}>
-          <Alert>{loadError}</Alert>
-          <Button variant="secondary" onClick={retry}>
-            Try again
-          </Button>
-        </div>
-      );
-    }
+    if (loading) return <LoadingState>Loading categories…</LoadingState>;
+    if (loadError) return <ErrorState message={loadError} onRetry={retry} />;
 
     if (visible.length === 0) {
       return (
