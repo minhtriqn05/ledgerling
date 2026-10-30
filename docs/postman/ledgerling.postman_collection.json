@@ -27,6 +27,7 @@
     { "key": "monthEndId", "value": "" },
     { "key": "octFirstId", "value": "" },
     { "key": "novFirstId", "value": "" },
+    { "key": "octCount", "value": "" },
     { "key": "statsCategoryName", "value": "" },
     { "key": "statsCategoryId", "value": "" },
     { "key": "statsIncomeCategoryId", "value": "" },
@@ -1608,7 +1609,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/transactions?month=2026-10",
+              "raw": "{{baseUrl}}/transactions?month=2026-10&limit=100",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1619,10 +1620,14 @@
                 {
                   "key": "month",
                   "value": "2026-10"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
                 }
               ]
             },
-            "description": "October 2026 in Vietnam time. Must contain the 23:30 month-end one and the Oct 1st 00:00 one, but not the Nov 1st 00:30 one."
+            "description": "October 2026 in Vietnam time. Must contain the 23:30 month-end one and the Oct 1st 00:00 one, but not the Nov 1st 00:30 one. limit=100 so the Oct 1st one is not pushed to page 2 when the account has more than 20 October transactions."
           }
         },
         {
@@ -1695,7 +1700,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/transactions?month=2026-10",
+              "raw": "{{baseUrl}}/transactions?month=2026-10&limit=100",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1706,10 +1711,14 @@
                 {
                   "key": "month",
                   "value": "2026-10"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
                 }
               ]
             },
-            "description": "The dates must go from newest to oldest."
+            "description": "The dates must go from newest to oldest (the default sort is -date)."
           }
         },
         {
@@ -2005,6 +2014,2093 @@
           }
         },
         {
+          "name": "List transactions (meta defaults: page 1, limit 20)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('data is still an array', function () {",
+                  "  pm.expect(pm.response.json().data).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('meta has page 1, limit 20 and the page count', function () {",
+                  "  const meta = pm.response.json().meta;",
+                  "  pm.expect(meta).to.have.all.keys('page', 'limit', 'total', 'totalPages');",
+                  "  pm.expect(meta.page).to.eql(1);",
+                  "  pm.expect(meta.limit).to.eql(20);",
+                  "  pm.expect(meta.total).to.be.at.least(3);",
+                  "  pm.expect(meta.totalPages).to.eql(Math.ceil(meta.total / 20));",
+                  "  pm.expect(pm.response.json().data.length).to.be.at.most(20);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                }
+              ]
+            },
+            "description": "Without page and limit the first 20 are returned. October has at least the 3 test transactions."
+          }
+        },
+        {
+          "name": "List transactions (limit=1&page=2)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('One transaction on page 2', function () {",
+                  "  const { data, meta } = pm.response.json();",
+                  "  pm.expect(data.length).to.eql(1);",
+                  "  pm.expect(meta.page).to.eql(2);",
+                  "  pm.expect(meta.limit).to.eql(1);",
+                  "  pm.expect(meta.totalPages).to.eql(meta.total);",
+                  "});",
+                  "",
+                  "pm.test('Page 2 is not the newest one (that is on page 1)', function () {",
+                  "  pm.expect(pm.response.json().data.map((t) => t._id)).to.not.include(pm.collectionVariables.get('monthEndId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10&limit=1&page=2",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "limit",
+                  "value": "1"
+                },
+                {
+                  "key": "page",
+                  "value": "2"
+                }
+              ]
+            },
+            "description": "With limit=1 every page has one transaction, so totalPages = total. The month-end one is the newest of October, so it is on page 1."
+          }
+        },
+        {
+          "name": "List transactions (page after the last one)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Empty array, but total still counts everything', function () {",
+                  "  const { data, meta } = pm.response.json();",
+                  "  pm.expect(data).to.eql([]);",
+                  "  pm.expect(meta.page).to.eql(999);",
+                  "  pm.expect(meta.total).to.be.at.least(3);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10&page=999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "page",
+                  "value": "999"
+                }
+              ]
+            },
+            "description": "Not an error: the page is just empty."
+          }
+        },
+        {
+          "name": "List transactions (q, other case)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Finds the month-end one, whatever the case', function () {",
+                  "  pm.expect(pm.response.json().data.map((t) => t._id)).to.include(pm.collectionVariables.get('monthEndId'));",
+                  "});",
+                  "",
+                  "pm.test('Every note contains the search text', function () {",
+                  "  pm.response.json().data.forEach((t) => pm.expect(t.note.toLowerCase()).to.include('last day of october'));",
+                  "});",
+                  "",
+                  "pm.test('meta.total counts only the matches', function () {",
+                  "  pm.expect(pm.response.json().meta.total).to.eql(pm.response.json().data.length);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10&q=LAST DAY of october",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "q",
+                  "value": "LAST DAY of october"
+                }
+              ]
+            },
+            "description": "The note is \"Last day of October, 23:30\". The search ignores upper / lower case."
+          }
+        },
+        {
+          "name": "List transactions (q with a regex character)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('\"(\" is plain text, so only notes with \"(\" come back', function () {",
+                  "  pm.response.json().data.forEach((t) => pm.expect(t.note).to.include('('));",
+                  "  pm.expect(pm.response.json().data.map((t) => t._id)).to.not.include(pm.collectionVariables.get('monthEndId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10&q=(",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "q",
+                  "value": "("
+                }
+              ]
+            },
+            "description": "\"(\" alone is invalid as a regex. It is escaped, so this is a normal search and not a 500."
+          }
+        },
+        {
+          "name": "List transactions (q empty is ignored)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Same as no search: the month-end one is there', function () {",
+                  "  pm.expect(pm.response.json().data.map((t) => t._id)).to.include(pm.collectionVariables.get('monthEndId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10&q=%20%20&limit=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "q",
+                  "value": "%20%20"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "q is only spaces, so it is trimmed to nothing and ignored."
+          }
+        },
+        {
+          "name": "List transactions (sort=amount)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Amounts go from smallest to biggest', function () {",
+                  "  const amounts = pm.response.json().data.map((t) => t.amount);",
+                  "  pm.expect(amounts.length).to.be.above(1);",
+                  "  for (let i = 1; i < amounts.length; i++) pm.expect(amounts[i - 1]).to.be.at.most(amounts[i]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10&sort=amount&limit=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "sort",
+                  "value": "amount"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "List transactions (sort=-amount)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Amounts go from biggest to smallest', function () {",
+                  "  const amounts = pm.response.json().data.map((t) => t.amount);",
+                  "  pm.expect(amounts.length).to.be.above(1);",
+                  "  for (let i = 1; i < amounts.length; i++) pm.expect(amounts[i - 1]).to.be.at.least(amounts[i]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10&sort=-amount&limit=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "sort",
+                  "value": "-amount"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "List transactions (sort=date, oldest first)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Dates go from oldest to newest', function () {",
+                  "  const dates = pm.response.json().data.map((t) => new Date(t.date).getTime());",
+                  "  pm.expect(dates.length).to.be.above(1);",
+                  "  for (let i = 1; i < dates.length; i++) pm.expect(dates[i - 1]).to.be.at.most(dates[i]);",
+                  "});",
+                  "",
+                  "pm.test('The Oct 1st 00:00 one comes first', function () {",
+                  "  pm.expect(pm.response.json().data[0]._id).to.eql(pm.collectionVariables.get('octFirstId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10&sort=date&limit=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "sort",
+                  "value": "date"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "The Oct 1st 00:00 test transaction is the very first moment of October, so it is first (unless the account has another one at exactly that time)."
+          }
+        },
+        {
+          "name": "List transactions (from=to=2026-10-31, whole day)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Contains the Oct 31st 23:30 one (to includes the whole day)', function () {",
+                  "  pm.expect(pm.response.json().data.map((t) => t._id)).to.include(pm.collectionVariables.get('monthEndId'));",
+                  "});",
+                  "",
+                  "pm.test('Does not contain Nov 1st 00:30 or Oct 1st', function () {",
+                  "  pm.expect(pm.response.json().data.map((t) => t._id)).to.not.include(pm.collectionVariables.get('novFirstId'));",
+                  "  pm.expect(pm.response.json().data.map((t) => t._id)).to.not.include(pm.collectionVariables.get('octFirstId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?from=2026-10-31&to=2026-10-31&limit=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2026-10-31"
+                },
+                {
+                  "key": "to",
+                  "value": "2026-10-31"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "One day in Vietnam time: 2026-10-31T00:00+07:00 (inclusive) to 2026-11-01T00:00+07:00 (exclusive)."
+          }
+        },
+        {
+          "name": "List transactions (from=to=2026-10-01, start of day)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Contains the Oct 1st 00:00 one (from is inclusive)', function () {",
+                  "  pm.expect(pm.response.json().data.map((t) => t._id)).to.include(pm.collectionVariables.get('octFirstId'));",
+                  "});",
+                  "",
+                  "pm.test('Does not contain the Oct 31st one', function () {",
+                  "  pm.expect(pm.response.json().data.map((t) => t._id)).to.not.include(pm.collectionVariables.get('monthEndId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?from=2026-10-01&to=2026-10-01&limit=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2026-10-01"
+                },
+                {
+                  "key": "to",
+                  "value": "2026-10-01"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "List transactions (from only = no end)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Contains Nov 1st 00:30, not the October ones', function () {",
+                  "  pm.expect(pm.response.json().data.map((t) => t._id)).to.include(pm.collectionVariables.get('novFirstId'));",
+                  "  pm.expect(pm.response.json().data.map((t) => t._id)).to.not.include(pm.collectionVariables.get('monthEndId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?from=2026-11-01&limit=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2026-11-01"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Oct 31st 23:30 in Vietnam is before Nov 1st 00:00 +07:00, so it is left out."
+          }
+        },
+        {
+          "name": "List transactions (to only = no start)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('None of the October / November test transactions', function () {",
+                  "  pm.expect(pm.response.json().data.map((t) => t._id)).to.not.include(pm.collectionVariables.get('octFirstId'));",
+                  "  pm.expect(pm.response.json().data.map((t) => t._id)).to.not.include(pm.collectionVariables.get('monthEndId'));",
+                  "  pm.expect(pm.response.json().data.map((t) => t._id)).to.not.include(pm.collectionVariables.get('novFirstId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?to=2026-09-30&limit=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "to",
+                  "value": "2026-09-30"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Everything until the end of Sept 30th (Vietnam time). Oct 1st 00:00 +07:00 is already outside."
+          }
+        },
+        {
+          "name": "List transactions (month and from together)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Use either month or from/to, not both\"', function () {",
+                  "  pm.expect(pm.response.json()).to.eql({ success: false, message: 'Use either month or from/to, not both' });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10&from=2026-10-01",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "from",
+                  "value": "2026-10-01"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "List transactions (from after to)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"From must be before or equal to to\"', function () {",
+                  "  pm.expect(pm.response.json()).to.eql({ success: false, message: 'From must be before or equal to to' });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?from=2026-10-31&to=2026-10-01",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2026-10-31"
+                },
+                {
+                  "key": "to",
+                  "value": "2026-10-01"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "List transactions (from 2026-02-30)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"From must be a date in YYYY-MM-DD format\"', function () {",
+                  "  pm.expect(pm.response.json()).to.eql({ success: false, message: 'From must be a date in YYYY-MM-DD format' });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?from=2026-02-30",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2026-02-30"
+                }
+              ]
+            },
+            "description": "February 30th does not exist."
+          }
+        },
+        {
+          "name": "List transactions (to wrong format)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"To must be a date in YYYY-MM-DD format\"', function () {",
+                  "  pm.expect(pm.response.json()).to.eql({ success: false, message: 'To must be a date in YYYY-MM-DD format' });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?to=31-10-2026",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "to",
+                  "value": "31-10-2026"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "List transactions (q sent twice)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Search must be a string\"', function () {",
+                  "  pm.expect(pm.response.json()).to.eql({ success: false, message: 'Search must be a string' });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?q=a&q=b",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "a"
+                },
+                {
+                  "key": "q",
+                  "value": "b"
+                }
+              ]
+            },
+            "description": "A key sent twice becomes an array on the server."
+          }
+        },
+        {
+          "name": "List transactions (sort invalid)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Sort must be one of date, -date, amount, -amount\"', function () {",
+                  "  pm.expect(pm.response.json()).to.eql({ success: false, message: 'Sort must be one of date, -date, amount, -amount' });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?sort=name",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "name"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "List transactions (page 0)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Page must be a whole number from 1\"', function () {",
+                  "  pm.expect(pm.response.json()).to.eql({ success: false, message: 'Page must be a whole number from 1' });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?page=0",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "List transactions (limit 101)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Limit must be a whole number from 1 to 100\"', function () {",
+                  "  pm.expect(pm.response.json()).to.eql({ success: false, message: 'Limit must be a whole number from 1 to 100' });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?limit=101",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "101"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "List transactions (limit not a number)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Limit must be a whole number from 1 to 100\"', function () {",
+                  "  pm.expect(pm.response.json()).to.eql({ success: false, message: 'Limit must be a whole number from 1 to 100' });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?limit=abc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "abc"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Count - all October (limit=100)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const { data: countRows, meta: countMeta } = pm.response.json();",
+                  "pm.collectionVariables.set('octCount', String(countRows.length));",
+                  "",
+                  "pm.test('meta.total is the real number of transactions', function () {",
+                  "  pm.expect(countMeta.limit).to.eql(100);",
+                  "  pm.expect(countMeta.total).to.eql(countRows.length); // all of them fit on one page of 100",
+                  "  pm.expect(countMeta.totalPages).to.eql(1);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10&limit=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Baseline for the next requests: the real number of October 2026 transactions of this account (up to 100). Saved into {{octCount}}."
+          }
+        },
+        {
+          "name": "List transactions (page=2&limit=5, meta.total matches the real count)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const { data: pageRows, meta: pageMeta } = pm.response.json();",
+                  "const realCount = Number(pm.collectionVariables.get('octCount'));",
+                  "",
+                  "pm.test('meta.total equals the real number of transactions (the baseline)', function () {",
+                  "  pm.expect(pageMeta.total).to.eql(realCount);",
+                  "});",
+                  "",
+                  "pm.test('meta is page 2, limit 5, totalPages = ceil(total / 5)', function () {",
+                  "  pm.expect(pageMeta).to.eql({ page: 2, limit: 5, total: realCount, totalPages: Math.ceil(realCount / 5) });",
+                  "});",
+                  "",
+                  "pm.test('Rows on page 2 = what is left after the first 5, at most 5', function () {",
+                  "  pm.expect(pageRows.length).to.eql(Math.max(0, Math.min(5, realCount - 5)));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10&page=2&limit=5",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "page",
+                  "value": "2"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            },
+            "description": "Needs 'Count - all October' before it. Page 2 of 5 holds transactions 6 to 10 of the month."
+          }
+        },
+        {
+          "name": "List transactions (page 1 + page 2 do not overlap)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Page 1 of the same query is fetched by the script, so the two pages can be compared",
+                  "const overlapPage2Ids = pm.response.json().data.map((t) => t._id);",
+                  "pm.sendRequest({",
+                  "  url: pm.collectionVariables.get('baseUrl') + '/transactions?month=2026-10&page=1&limit=5&sort=-amount',",
+                  "  method: 'GET',",
+                  "  header: { Authorization: 'Bearer ' + pm.collectionVariables.get('token') }",
+                  "}, function (err, res) {",
+                  "  pm.test('Page 1 of the same query answered', function () {",
+                  "    pm.expect(err).to.eql(null);",
+                  "    pm.expect(res.code).to.eql(200);",
+                  "  });",
+                  "  const page1 = res.json().data.map((t) => t._id);",
+                  "  pm.test('No transaction is on both pages (stable sort, even with equal amounts)', function () {",
+                  "    overlapPage2Ids.forEach((id) => pm.expect(page1).to.not.include(id));",
+                  "  });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10&page=2&limit=5&sort=-amount",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "page",
+                  "value": "2"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                },
+                {
+                  "key": "sort",
+                  "value": "-amount"
+                }
+              ]
+            },
+            "description": "sort=-amount has many equal amounts in real data; the server adds createdAt and _id so rows never move between pages."
+          }
+        },
+        {
+          "name": "List transactions (limit=500)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Limit must be a whole number from 1 to 100\"', function () {",
+                  "  pm.expect(pm.response.json()).to.eql({ success: false, message: 'Limit must be a whole number from 1 to 100' });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10&limit=500",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "limit",
+                  "value": "500"
+                }
+              ]
+            },
+            "description": "More than 100 is refused with 400. It is not silently cut to 100."
+          }
+        },
+        {
+          "name": "List transactions (limit=-1)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Limit must be a whole number from 1 to 100\"', function () {",
+                  "  pm.expect(pm.response.json()).to.eql({ success: false, message: 'Limit must be a whole number from 1 to 100' });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?limit=-1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "-1"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "List transactions (limit=10.5)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Limit must be a whole number from 1 to 100\"', function () {",
+                  "  pm.expect(pm.response.json()).to.eql({ success: false, message: 'Limit must be a whole number from 1 to 100' });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?limit=10.5",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10.5"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "List transactions (page=1.5)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Page must be a whole number from 1\"', function () {",
+                  "  pm.expect(pm.response.json()).to.eql({ success: false, message: 'Page must be a whole number from 1' });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?page=1.5",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1.5"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "List transactions (from=2026/10/01)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"From must be a date in YYYY-MM-DD format\"', function () {",
+                  "  pm.expect(pm.response.json()).to.eql({ success: false, message: 'From must be a date in YYYY-MM-DD format' });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?from=2026%2F10%2F01",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2026%2F10%2F01"
+                }
+              ]
+            },
+            "description": "Slashes instead of dashes."
+          }
+        },
+        {
+          "name": "List transactions (from=2026-10-1)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"From must be a date in YYYY-MM-DD format\"', function () {",
+                  "  pm.expect(pm.response.json()).to.eql({ success: false, message: 'From must be a date in YYYY-MM-DD format' });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?from=2026-10-1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2026-10-1"
+                }
+              ]
+            },
+            "description": "The day needs two digits."
+          }
+        },
+        {
+          "name": "List transactions (from=20261001)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"From must be a date in YYYY-MM-DD format\"', function () {",
+                  "  pm.expect(pm.response.json()).to.eql({ success: false, message: 'From must be a date in YYYY-MM-DD format' });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?from=20261001",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "20261001"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "List transactions (from with a time)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"From must be a date in YYYY-MM-DD format\"', function () {",
+                  "  pm.expect(pm.response.json()).to.eql({ success: false, message: 'From must be a date in YYYY-MM-DD format' });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?from=2026-10-01T00:00:00",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2026-10-01T00:00:00"
+                }
+              ]
+            },
+            "description": "from and to are whole days, so a time is not accepted."
+          }
+        },
+        {
+          "name": "List transactions (from empty)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"From must be a date in YYYY-MM-DD format\"', function () {",
+                  "  pm.expect(pm.response.json()).to.eql({ success: false, message: 'From must be a date in YYYY-MM-DD format' });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?from=",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": ""
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "List transactions (to=abc)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"To must be a date in YYYY-MM-DD format\"', function () {",
+                  "  pm.expect(pm.response.json()).to.eql({ success: false, message: 'To must be a date in YYYY-MM-DD format' });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?to=abc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "to",
+                  "value": "abc"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "List transactions (to=2026-13-01)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"To must be a date in YYYY-MM-DD format\"', function () {",
+                  "  pm.expect(pm.response.json()).to.eql({ success: false, message: 'To must be a date in YYYY-MM-DD format' });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?to=2026-13-01",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "to",
+                  "value": "2026-13-01"
+                }
+              ]
+            },
+            "description": "Month 13 does not exist."
+          }
+        },
+        {
+          "name": "List transactions (q special character: .)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Not a regex: every note contains the text, and meta.total counts the same rows', function () {",
+                  "  const { data, meta } = pm.response.json();",
+                  "  data.forEach((t) => pm.expect(t.note.toLowerCase()).to.include(\".\"));",
+                  "  pm.expect(meta.total).to.eql(data.length);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10&q=.&limit=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "q",
+                  "value": "."
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "q=. is searched as plain text. It must not be treated as regex syntax (no 500, no \"match everything\")."
+          }
+        },
+        {
+          "name": "List transactions (q special character: .*)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Not a regex: every note contains the text, and meta.total counts the same rows', function () {",
+                  "  const { data, meta } = pm.response.json();",
+                  "  data.forEach((t) => pm.expect(t.note.toLowerCase()).to.include(\".*\"));",
+                  "  pm.expect(meta.total).to.eql(data.length);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10&q=.*&limit=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "q",
+                  "value": ".*"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "q=.* is searched as plain text. It must not be treated as regex syntax (no 500, no \"match everything\")."
+          }
+        },
+        {
+          "name": "List transactions (q special character: [)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Not a regex: every note contains the text, and meta.total counts the same rows', function () {",
+                  "  const { data, meta } = pm.response.json();",
+                  "  data.forEach((t) => pm.expect(t.note.toLowerCase()).to.include(\"[\"));",
+                  "  pm.expect(meta.total).to.eql(data.length);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10&q=%5B&limit=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "q",
+                  "value": "%5B"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "q=[ is searched as plain text. It must not be treated as regex syntax (no 500, no \"match everything\")."
+          }
+        },
+        {
+          "name": "List transactions (q special character: backslash)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Not a regex: every note contains the text, and meta.total counts the same rows', function () {",
+                  "  const { data, meta } = pm.response.json();",
+                  "  data.forEach((t) => pm.expect(t.note.toLowerCase()).to.include(\"\\\\\"));",
+                  "  pm.expect(meta.total).to.eql(data.length);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10&q=%5C&limit=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "q",
+                  "value": "%5C"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "q=\\ is searched as plain text. It must not be treated as regex syntax (no 500, no \"match everything\")."
+          }
+        },
+        {
+          "name": "List transactions (q special character: +)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Not a regex: every note contains the text, and meta.total counts the same rows', function () {",
+                  "  const { data, meta } = pm.response.json();",
+                  "  data.forEach((t) => pm.expect(t.note.toLowerCase()).to.include(\"+\"));",
+                  "  pm.expect(meta.total).to.eql(data.length);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10&q=%2B&limit=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "q",
+                  "value": "%2B"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "q=+ is searched as plain text. It must not be treated as regex syntax (no 500, no \"match everything\")."
+          }
+        },
+        {
+          "name": "List transactions (q special character: %)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Not a regex: every note contains the text, and meta.total counts the same rows', function () {",
+                  "  const { data, meta } = pm.response.json();",
+                  "  data.forEach((t) => pm.expect(t.note.toLowerCase()).to.include(\"%\"));",
+                  "  pm.expect(meta.total).to.eql(data.length);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10&q=%25&limit=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "q",
+                  "value": "%25"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "q=% is searched as plain text. It must not be treated as regex syntax (no 500, no \"match everything\")."
+          }
+        },
+        {
+          "name": "List transactions (q special character: &)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Not a regex: every note contains the text, and meta.total counts the same rows', function () {",
+                  "  const { data, meta } = pm.response.json();",
+                  "  data.forEach((t) => pm.expect(t.note.toLowerCase()).to.include(\"&\"));",
+                  "  pm.expect(meta.total).to.eql(data.length);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10&q=%26&limit=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "q",
+                  "value": "%26"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "q=& is searched as plain text. It must not be treated as regex syntax (no 500, no \"match everything\")."
+          }
+        },
+        {
+          "name": "List transactions (q special character: ^)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Not a regex: every note contains the text, and meta.total counts the same rows', function () {",
+                  "  const { data, meta } = pm.response.json();",
+                  "  data.forEach((t) => pm.expect(t.note.toLowerCase()).to.include(\"^\"));",
+                  "  pm.expect(meta.total).to.eql(data.length);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10&q=%5E&limit=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "q",
+                  "value": "%5E"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "q=^ is searched as plain text. It must not be treated as regex syntax (no 500, no \"match everything\")."
+          }
+        },
+        {
+          "name": "List transactions (q special character: (a+)+$)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Not a regex: every note contains the text, and meta.total counts the same rows', function () {",
+                  "  const { data, meta } = pm.response.json();",
+                  "  data.forEach((t) => pm.expect(t.note.toLowerCase()).to.include(\"(a+)+$\"));",
+                  "  pm.expect(meta.total).to.eql(data.length);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions?month=2026-10&q=(a%2B)%2B%24&limit=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "q",
+                  "value": "(a%2B)%2B%24"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "q=(a+)+$ is searched as plain text. It must not be treated as regex syntax (no 500, no \"match everything\")."
+          }
+        },
+        {
           "name": "List transactions (other user)",
           "event": [
             {
@@ -2086,6 +4182,177 @@
               ],
               "path": [
                 "transactions"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Export transactions CSV (month=2026-10)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('It is a CSV file named ledgerling-2026-10.csv', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('text/csv');",
+                  "  pm.expect(pm.response.headers.get('Content-Disposition')).to.eql('attachment; filename=\"ledgerling-2026-10.csv\"');",
+                  "});",
+                  "",
+                  "pm.test('Starts with the BOM and the header row', function () {",
+                  "  pm.expect(pm.response.text().charCodeAt(0)).to.eql(0xFEFF);",
+                  "  pm.expect(pm.response.text().slice(1).split('\\r\\n')[0]).to.eql('Date,Type,Category,Amount,Currency,Note');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/export?month=2026-10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "export"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                }
+              ]
+            },
+            "description": "Same filters as the list. In Postman use Send and Download to save the file and open it in Excel."
+          }
+        },
+        {
+          "name": "Export transactions CSV (page and limit are ignored)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200 even with page=abc&limit=1', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/export?month=2026-10&page=abc&limit=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "export"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "page",
+                  "value": "abc"
+                },
+                {
+                  "key": "limit",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "The export is not paged, so page and limit are not checked."
+          }
+        },
+        {
+          "name": "Export transactions CSV (month and from together)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Message is \"Use either month or from/to, not both\"', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql(\"Use either month or from/to, not both\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/export?month=2026-10&from=2026-10-01",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "export"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-10"
+                },
+                {
+                  "key": "from",
+                  "value": "2026-10-01"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Export transactions CSV (no token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/export",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "export"
               ]
             },
             "description": ""
@@ -3620,18 +5887,18 @@
                   "  pm.response.to.have.status(200);",
                   "});",
                   "",
-                  "const data = pm.response.json().data;",
+                  "const summary = pm.response.json().data;",
                   "",
                   "pm.test('Totals of March 2020 in VND', function () {",
-                  "  pm.expect(data.month).to.eql('2020-03');",
-                  "  pm.expect(data.currency).to.eql('VND');",
-                  "  pm.expect(data.totalIncome).to.eql(1000000);",
-                  "  pm.expect(data.totalExpense).to.eql(200000);",
-                  "  pm.expect(data.balance).to.eql(800000);",
+                  "  pm.expect(summary.month).to.eql('2020-03');",
+                  "  pm.expect(summary.currency).to.eql('VND');",
+                  "  pm.expect(summary.totalIncome).to.eql(1000000);",
+                  "  pm.expect(summary.totalExpense).to.eql(200000);",
+                  "  pm.expect(summary.balance).to.eql(800000);",
                   "});",
                   "",
                   "pm.test('Expense per category: the test category with its name and color', function () {",
-                  "  pm.expect(data.expenseByCategory).to.eql([{",
+                  "  pm.expect(summary.expenseByCategory).to.eql([{",
                   "    categoryId: pm.collectionVariables.get('statsCategoryId'),",
                   "    name: pm.collectionVariables.get('statsCategoryName'),",
                   "    color: '#FF7043',",
@@ -3640,9 +5907,9 @@
                   "});",
                   "",
                   "pm.test('byMonth: 6 months ending with March, across the new year', function () {",
-                  "  pm.expect(data.byMonth.map((m) => m.month)).to.eql(['2019-10', '2019-11', '2019-12', '2020-01', '2020-02', '2020-03']);",
-                  "  pm.expect(data.byMonth.map((m) => m.expense)).to.eql([0, 0, 0, 30000, 0, 200000]);",
-                  "  pm.expect(data.byMonth.map((m) => m.income)).to.eql([0, 0, 0, 0, 0, 1000000]);",
+                  "  pm.expect(summary.byMonth.map((m) => m.month)).to.eql(['2019-10', '2019-11', '2019-12', '2020-01', '2020-02', '2020-03']);",
+                  "  pm.expect(summary.byMonth.map((m) => m.expense)).to.eql([0, 0, 0, 30000, 0, 200000]);",
+                  "  pm.expect(summary.byMonth.map((m) => m.income)).to.eql([0, 0, 0, 0, 0, 1000000]);",
                   "});"
                 ]
               }
@@ -3682,11 +5949,11 @@
                   "  pm.response.to.have.status(200);",
                   "});",
                   "",
-                  "const data = pm.response.json().data;",
+                  "const summary = pm.response.json().data;",
                   "",
                   "pm.test('Apr 1st 00:30 Vietnam time counts in April, not March', function () {",
-                  "  pm.expect(data.totalExpense).to.eql(70000);",
-                  "  pm.expect(data.byMonth.slice(-2)).to.eql([",
+                  "  pm.expect(summary.totalExpense).to.eql(70000);",
+                  "  pm.expect(summary.byMonth.slice(-2)).to.eql([",
                   "    { month: '2020-03', income: 1000000, expense: 200000 },",
                   "    { month: '2020-04', income: 0, expense: 70000 },",
                   "  ]);",

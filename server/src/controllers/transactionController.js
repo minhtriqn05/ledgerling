@@ -2,9 +2,23 @@ import * as transactionService from "../services/transactionService.js";
 
 // The user always comes from the token (req.user.id, set by requireAuth).
 
+// data stays an array (one page); meta tells the client how many pages there are
 export async function list(req, res) {
-  const data = await transactionService.listTransactions(req.user.id, req.query);
-  res.status(200).json({ success: true, data });
+  const { items, meta } = await transactionService.listTransactions(req.user.id, req.listQuery);
+  res.status(200).json({ success: true, data: items, meta });
+}
+
+// A file, not JSON: the answer is the CSV text itself
+export async function exportCsv(req, res) {
+  const { filename, csv } = await transactionService.exportTransactions(req.user.id, req.listQuery);
+  res
+    .status(200)
+    .set({
+      "Content-Type": "text/csv; charset=utf-8",
+      "Content-Disposition": `attachment; filename="${filename}"`,
+      "Cache-Control": "no-store", // private data, do not keep it in a cache
+    })
+    .send(csv);
 }
 
 export async function getOne(req, res) {

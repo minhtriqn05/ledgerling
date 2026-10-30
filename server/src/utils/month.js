@@ -22,6 +22,33 @@ export function monthRange(month) {
   };
 }
 
+// A calendar day like "2026-10-15"
+export const DAY_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+
+// false for days that do not exist like "2026-02-30" (Date.UTC would quietly turn it into March 2nd)
+export function isValidDay(day) {
+  if (!DAY_REGEX.test(day)) return false;
+  const [year, monthNumber, dayNumber] = day.split("-").map(Number);
+  return new Date(Date.UTC(year, monthNumber - 1, dayNumber)).toISOString().slice(0, 10) === day;
+}
+
+// "2026-10-15" -> 2026-10-14T17:00Z (00:00 of that day in Vietnam time)
+export function dayStart(day) {
+  const [year, monthNumber, dayNumber] = day.split("-").map(Number);
+  return new Date(Date.UTC(year, monthNumber - 1, dayNumber) - VIETNAM_OFFSET_MS);
+}
+
+// "2026-10-15" -> 2026-10-15T17:00Z (00:00 of the next day in Vietnam time), used as an exclusive end
+export function nextDayStart(day) {
+  const [year, monthNumber, dayNumber] = day.split("-").map(Number);
+  return new Date(Date.UTC(year, monthNumber - 1, dayNumber + 1) - VIETNAM_OFFSET_MS);
+}
+
+// A moment as "YYYY-MM-DD HH:mm" in Vietnam time: 2026-10-27T05:30Z -> "2026-10-27 12:30"
+export function formatVietnamDateTime(date) {
+  return new Date(date.getTime() + VIETNAM_OFFSET_MS).toISOString().slice(0, 16).replace("T", " ");
+}
+
 // shiftMonth("2026-03", -5) -> "2025-10". Date.UTC moves to the right year by itself.
 export function shiftMonth(month, delta) {
   const [year, monthNumber] = month.split("-").map(Number);

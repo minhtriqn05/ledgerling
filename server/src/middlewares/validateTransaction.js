@@ -1,5 +1,5 @@
 import { httpError } from "../utils/httpError.js";
-import { MONTH_REGEX } from "../utils/month.js";
+import { MONTH_REGEX, isValidDay } from "../utils/month.js";
 
 const TYPES = ["income", "expense"];
 const OBJECT_ID_REGEX = /^[0-9a-fA-F]{24}$/;
@@ -87,10 +87,50 @@ export function validateTransactionId(req, res, next) {
   next();
 }
 
-// The optional ?month=, ?type= and ?categoryId= filters. Only checked when present.
-export function validateListTransactions(req, res, next) {
-  const { month, type, categoryId } = req.query;
+// ----- GET /transactions query -----
+// A query value is a string, or an array when the same key is sent twice (?q=a&q=b), which we refuse.
 
+const SORTS = ["date", "-date", "amount", "-amount"];
+const DEFAULT_LIMIT = 20;
+const MAX_LIMIT = 100;
+const WHOLE_NUMBER_REGEX = /^\d+$/;
+
+function checkDay(value, field) {
+  if (typeof value !== "string" || !isValidDay(value)) {
+    throw httpError(400, `${field} must be a date in YYYY-MM-DD format`);
+  }
+  return value;
+}
+
+function checkSearch(value) {
+  if (typeof value !== "string") throw httpError(400, "Search must be a string");
+  const q = value.trim();
+  if (q.length > 100) throw httpError(400, "Search must be at most 100 characters");
+  return q;
+}
+
+function checkPage(value) {
+  const page = typeof value === "string" && WHOLE_NUMBER_REGEX.test(value) ? Number(value) : 0;
+  if (page < 1) throw httpError(400, "Page must be a whole number from 1");
+  return page;
+}
+
+function checkLimit(value) {
+  const limit = typeof value === "string" && WHOLE_NUMBER_REGEX.test(value) ? Number(value) : 0;
+  if (limit < 1 || limit > MAX_LIMIT) {
+    throw httpError(400, `Limit must be a whole number from 1 to ${MAX_LIMIT}`);
+  }
+  return limit;
+}
+
+// Checks the filters that GET /transactions and GET /transactions/export share (everything but page and limit)
+// and returns them cleaned, with the sort default.
+function readFilters(query) {
+  const { month, from, to, type, categoryId, q, sort } = query;
+
+  if (month !== undefined && (from !== undefined || to !== undefined)) {
+    throw httpError(400, "Use either month or from/to, not both");
+  }
   if (month !== undefined && !MONTH_REGEX.test(month)) {
     throw httpError(400, "Month must be in YYYY-MM format");
   }
@@ -100,5 +140,43 @@ export function validateListTransactions(req, res, next) {
   if (categoryId !== undefined && !OBJECT_ID_REGEX.test(categoryId)) {
     throw httpError(400, "Category id is invalid");
   }
+  if (sort !== undefined && !SORTS.includes(sort)) {
+    throw httpError(400, `Sort must be one of ${SORTS.join(", ")}`);
+  }
+
+  const listQuery = { sort: sort ?? "-date" };
+  if (month !== undefined) listQuery.month = month;
+  if (from !== undefined) listQuery.from = checkDay(from, "From");
+  if (to !== undefined) listQuery.to = checkDay(to, "To");
+  // Same format, so comparing the strings compares the days
+  if (listQuery.from && listQuery.to && listQuery.from > listQuery.to) {
+    throw httpError(400, "From must be before or equal to to");
+  }
+  if (type !== undefined) listQuery.type = type;
+  if (categoryId !== undefined) listQuery.categoryId = categoryId;
+  // An empty search (?q= or only spaces) is ignored
+  if (q !== undefined) {
+    const search = checkSearch(q);
+    if (search) listQuery.q = search;
+  }
+
+  return listQuery;
+}
+
+// Every filter is optional. On success the cleaned values, with their defaults, are put in req.listQuery
+// (Express 5 does not let us replace req.query).
+export function validateListTransactions(req, res, next) {
+  const { page, limit } = req.query;
+  const listQuery = readFilters(req.query);
+  listQuery.page = page === undefined ? 1 : checkPage(page);
+  listQuery.limit = limit === undefined ? DEFAULT_LIMIT : checkLimit(limit);
+
+  req.listQuery = listQuery;
+  next();
+}
+
+// The export takes the same filters, but page and limit are ignored (even if they are invalid): it is not paged.
+export function validateExportTransactions(req, res, next) {
+  req.listQuery = readFilters(req.query);
   next();
 }

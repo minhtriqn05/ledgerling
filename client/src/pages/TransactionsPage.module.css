@@ -70,6 +70,14 @@
   white-space: nowrap;
 }
 
+/* Under the cards: they show the whole month, not the filtered list. */
+.summaryNote {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
 /* ---------- Filter ---------- */
 .filters {
   display: flex;
@@ -79,14 +87,65 @@
   margin-bottom: var(--space-4);
 }
 
+/* Search box with the icon inside on the left (design: TransactionsPreview). */
+.search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1 1 100%;
+  min-width: 0;
+}
+
+.search > svg {
+  position: absolute;
+  left: var(--space-3);
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  height: var(--control-height);
+  padding: 0 var(--space-3) 0 calc(var(--space-3) + 28px);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+}
+
+.searchInput::placeholder {
+  color: var(--color-text-muted);
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+/* A label text and its control side by side */
+.field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
 .filterLabel {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-secondary);
 }
 
+/* Under the filter bar while a date range is set */
+.rangeNote {
+  margin: calc(-1 * var(--space-2)) 0 var(--space-4);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+/* Selects and date inputs share one look */
 .select {
-  min-width: 190px;
+  min-width: 150px;
   height: var(--control-height);
   padding: 0 var(--space-3);
   background: var(--color-surface);
@@ -121,8 +180,22 @@
   }
 }
 
+/* Phones: the search box and every filter get a row of their own. */
 @media (max-width: 480px) {
-  .select {
+  .search {
+    flex-basis: 100%;
+  }
+
+  .field {
     flex: 1 1 100%;
+  }
+
+  .select {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .filterLabel {
+    min-width: 56px;
   }
 }
