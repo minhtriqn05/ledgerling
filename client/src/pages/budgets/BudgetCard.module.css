@@ -1,0 +1,121 @@
+/* Added to the Card. The status class (ok / warning / over) sets --tone (bar) and --status-text (last line). */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  height: 100%;
+}
+
+.ok {
+  --tone: var(--color-income);
+  --status-text: var(--color-income-text);
+}
+
+.warning {
+  --tone: var(--accent-sun);
+  --status-text: color-mix(in srgb, var(--accent-sun) 45%, var(--color-text));
+}
+
+.over {
+  --tone: var(--color-expense);
+  --status-text: var(--color-expense-text);
+}
+
+.top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+/* Dot in the category color + name. Long names wrap instead of overflowing the card. */
+.name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  overflow-wrap: anywhere;
+}
+
+.dot {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-full);
+}
+
+/* Pulled into the corner so the icons line up with the top of the name. */
+.actions {
+  display: flex;
+  flex-shrink: 0;
+  margin: calc(var(--space-2) * -1) calc(var(--space-2) * -1) 0 0;
+}
+
+.amounts {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.amounts strong {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.amounts span {
+  color: var(--color-text-secondary);
+}
+
+.track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-muted);
+}
+
+.bar {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--tone);
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.status {
+  color: var(--status-text);
+  font-weight: var(--font-weight-medium);
+}
+
+.percent {
+  color: var(--color-text-secondary);
+}
+
+/* ---------- Delete confirmation ---------- */
+.confirmText {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+/* Two buttons of the same width at the bottom; on a very narrow card they wrap onto two lines. */
+.confirmActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: auto;
+}
+
+.confirmActions > button {
+  flex: 1 1 auto;
+  padding: 0 var(--space-3);
+}
