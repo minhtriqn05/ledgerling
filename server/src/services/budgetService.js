@@ -94,6 +94,26 @@ export async function createBudget(userId, { categoryId, month, amount }) {
   return progressOf(userId, budget);
 }
 
+// Copies the user's budgets of fromMonth to toMonth. A category that already has a budget in toMonth is skipped.
+// Returns how many budgets were created.
+export async function copyBudgets(userId, { fromMonth, toMonth }) {
+  const source = await Budget.find({ userId, month: fromMonth });
+  if (source.length === 0) return { copied: 0 };
+
+  // One upsert per budget: $setOnInsert only writes when the budget does not exist yet, so an existing
+  // budget keeps its amount. The unique index makes this safe even if two requests run at the same time.
+  const result = await Budget.bulkWrite(
+    source.map((b) => ({
+      updateOne: {
+        filter: { userId, categoryId: b.categoryId, month: toMonth },
+        update: { $setOnInsert: { amount: b.amount } },
+        upsert: true,
+      },
+    }))
+  );
+  return { copied: result.upsertedCount };
+}
+
 export async function updateBudget(userId, id, { amount }) {
   const budget = await findOwned(userId, id);
   budget.amount = amount;

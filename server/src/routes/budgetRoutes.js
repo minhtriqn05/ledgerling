@@ -1,7 +1,8 @@
 import { Router } from "express";
-import { list, create, update, remove } from "../controllers/budgetController.js";
+import { list, create, copy, update, remove } from "../controllers/budgetController.js";
 import {
   validateCreateBudget,
+  validateCopyBudgets,
   validateListBudgets,
   validateUpdateBudget,
   validateBudgetId,
@@ -165,6 +166,65 @@ router.get("/", validateListBudgets, list);
  *               message: Budget already exists for this category and month
  */
 router.post("/", validateCreateBudget, create);
+
+/**
+ * @openapi
+ * /budgets/copy:
+ *   post:
+ *     summary: Copy my budgets from one month to another
+ *     description: |
+ *       Creates, in toMonth, a budget with the same category and amount for every budget of fromMonth.
+ *       A category that already has a budget in toMonth is skipped (its amount is not changed).
+ *       If fromMonth has no budgets, nothing is copied and copied is 0.
+ *     tags: [Budgets]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [fromMonth, toMonth]
+ *             properties:
+ *               fromMonth:
+ *                 type: string
+ *                 pattern: '^\d{4}-(0[1-9]|1[0-2])$'
+ *                 example: "2026-09"
+ *               toMonth:
+ *                 type: string
+ *                 pattern: '^\d{4}-(0[1-9]|1[0-2])$'
+ *                 example: "2026-10"
+ *     responses:
+ *       200:
+ *         description: How many budgets were created in toMonth
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     copied:
+ *                       type: integer
+ *                       example: 3
+ *       400:
+ *         description: Invalid input ("From month must be in YYYY-MM format", "To month must be in YYYY-MM format", "From month and to month must be different")
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: From month and to month must be different
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
+router.post("/copy", validateCopyBudgets, copy);
 
 /**
  * @openapi

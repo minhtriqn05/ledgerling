@@ -1,0 +1,81 @@
+.link {
+  color: var(--color-primary-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Same colors as the bars on the Budgets page: yellow from 80%, red from 100%. */
+.warning {
+  --tone: var(--accent-sun);
+  --status-text: color-mix(in srgb, var(--accent-sun) 45%, var(--color-text));
+}
+
+.over {
+  --tone: var(--color-expense);
+  --status-text: var(--color-expense-text);
+}
+
+.item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 52px;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--tone) 12%, var(--color-surface));
+  font-variant-numeric: tabular-nums;
+}
+
+.name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  font-weight: var(--font-weight-medium);
+}
+
+.name > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dot {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+}
+
+.message {
+  color: var(--status-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-align: right;
+}
+
+.percent {
+  font-weight: var(--font-weight-bold);
+  text-align: right;
+}
+
+@media (max-width: 480px) {
+  .item {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .message {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    text-align: left;
+  }
+}

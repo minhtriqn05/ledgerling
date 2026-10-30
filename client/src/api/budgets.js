@@ -18,6 +18,13 @@ export async function createBudget(budget) {
   return response.data.data;
 }
 
+// Copies the budgets of fromMonth to toMonth (categories that already have one are skipped).
+// Returns { copied }: how many budgets were created.
+export async function copyBudgets(fromMonth, toMonth) {
+  const response = await api.post('/budgets/copy', { fromMonth, toMonth });
+  return response.data.data;
+}
+
 // Only the amount can change.
 export async function updateBudget(id, amount) {
   const response = await api.patch(`/budgets/${id}`, { amount });

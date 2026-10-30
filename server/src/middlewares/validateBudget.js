@@ -15,9 +15,9 @@ function checkCategoryId(value) {
   return categoryId;
 }
 
-function checkMonth(value) {
+function checkMonth(value, label = "Month") {
   const month = text(value).trim();
-  if (!MONTH_REGEX.test(month)) throw httpError(400, "Month must be in YYYY-MM format");
+  if (!MONTH_REGEX.test(month)) throw httpError(400, `${label} must be in YYYY-MM format`);
   return month;
 }
 
@@ -38,6 +38,17 @@ export function validateCreateBudget(req, res, next) {
     month: checkMonth(body.month),
     amount: checkAmount(body.amount),
   };
+  next();
+}
+
+export function validateCopyBudgets(req, res, next) {
+  const body = req.body ?? {};
+
+  const fromMonth = checkMonth(body.fromMonth, "From month");
+  const toMonth = checkMonth(body.toMonth, "To month");
+  if (fromMonth === toMonth) throw httpError(400, "From month and to month must be different");
+
+  req.body = { fromMonth, toMonth };
   next();
 }
 

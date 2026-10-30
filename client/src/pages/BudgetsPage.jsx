@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { getCategories } from '../api/categories.js';
-import { getBudgets, deleteBudget } from '../api/budgets.js';
+import { getBudgets, copyBudgets, deleteBudget } from '../api/budgets.js';
 import { getErrorMessage } from '../api/axios.js';
 import { useToast } from '../context/ToastContext.jsx';
-import { currentMonth, formatMonth } from '../utils/vnDate.js';
+import { currentMonth, formatMonth, shiftMonth } from '../utils/vnDate.js';
 import PageHeader from '../components/PageHeader/PageHeader.jsx';
 import MonthPicker from '../components/MonthPicker/MonthPicker.jsx';
 import Button from '../components/Button/Button.jsx';
@@ -32,6 +32,7 @@ export default function BudgetsPage() {
   const [reloadKey, setReloadKey] = useState(0);
   // The open dialog: null or { budget } (budget = null for a new one)
   const [dialog, setDialog] = useState(null);
+  const [copying, setCopying] = useState(false);
   const toast = useToast();
 
   // The categories fill the "Add budget" dialog. They load once.
@@ -90,6 +91,25 @@ export default function BudgetsPage() {
     setBudgets((list) => sortByCategory([...list.filter((b) => b._id !== saved._id), saved]));
   }
 
+  // Copies last month's budgets into the month on screen, then loads the list again.
+  async function handleCopy() {
+    setCopying(true);
+    try {
+      const { copied } = await copyBudgets(shiftMonth(month, -1), month);
+      if (copied === 0) {
+        toast.error(`${formatMonth(shiftMonth(month, -1))} has no budgets to copy`);
+        return;
+      }
+      toast.success(copied === 1 ? '1 budget copied' : `${copied} budgets copied`);
+      setLoading(true);
+      setReloadKey((key) => key + 1);
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    } finally {
+      setCopying(false);
+    }
+  }
+
   // Called by the card after its own "Are you sure?" step. Errors are shown here as a toast.
   async function handleDelete(budget) {
     try {
@@ -118,9 +138,14 @@ export default function BudgetsPage() {
           title={`No budgets in ${formatMonth(month)}`}
           text="Set a monthly limit for an expense category to keep your spending in check."
         >
-          <Button icon="plus" onClick={() => setDialog({ budget: null })}>
-            Add budget
-          </Button>
+          <div className={styles.emptyActions}>
+            <Button icon="plus" onClick={() => setDialog({ budget: null })} disabled={copying}>
+              Add budget
+            </Button>
+            <Button variant="secondary" onClick={handleCopy} disabled={copying}>
+              {copying ? 'Copying…' : 'Copy from last month'}
+            </Button>
+          </div>
         </EmptyState>
       );
     }

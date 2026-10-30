@@ -12,6 +12,11 @@ export async function create(req, res) {
   res.status(201).json({ success: true, data });
 }
 
+export async function copy(req, res) {
+  const data = await budgetService.copyBudgets(req.user.id, req.body);
+  res.status(200).json({ success: true, data });
+}
+
 export async function update(req, res) {
   const data = await budgetService.updateBudget(req.user.id, req.params.id, req.body);
   res.status(200).json({ success: true, data });

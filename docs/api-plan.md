@@ -73,6 +73,7 @@ Swagger UI: `/api-docs` (outside `/api`).
 | 17 | POST | `/api/budgets` | Yes | Create a budget for an expense category and month |
 | 18 | PATCH | `/api/budgets/:id` | Yes | Change the amount of a budget |
 | 19 | DELETE | `/api/budgets/:id` | Yes | Delete a budget |
+| 20 | POST | `/api/budgets/copy` | Yes | Copy my budgets from one month to another |
 
 Every protected route (Auth = Yes) can also return **401** (`"Not authorized, token missing"` /
 `"Not authorized, invalid token"`) and every route can return **500** (`"Internal server error"`).
@@ -493,3 +494,26 @@ Auth: yes. Transactions are not touched.
 ```
 
 **Errors**: 404 `"Budget not found"`.
+
+### 20. POST /api/budgets/copy
+Auth: yes.
+
+Creates, in `toMonth`, a budget with the same category and amount for every budget of `fromMonth`.
+A category that already has a budget in `toMonth` is skipped (its amount is not changed).
+
+**Body**
+```json
+{ "fromMonth": "2026-09", "toMonth": "2026-10" }
+```
+
+**200** – `data.copied` is the number of budgets created. It is `0` when `fromMonth` has no budgets or
+every category already has one in `toMonth`.
+```json
+{ "success": true, "data": { "copied": 3 } }
+```
+
+**Errors**
+
+| Code | message |
+|------|---------|
+| 400 | `"From month must be in YYYY-MM format"`, `"To month must be in YYYY-MM format"`, `"From month and to month must be different"` |
