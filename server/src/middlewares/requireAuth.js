@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import User from "../models/User.js";
 import { httpError } from "../utils/httpError.js";
+import { isDemoEmail } from "../utils/demo.js";
 
 // Protects a route: the client must send "Authorization: Bearer <token>".
 // The signature is checked with JWT_SECRET, then the user is read from the database to compare the token version
@@ -26,12 +27,12 @@ export async function requireAuth(req, res, next) {
     throw httpError(401, "Not authorized, invalid token", "TOKEN_INVALID");
   }
 
-  const user = mongoose.isValidObjectId(payload.sub) ? await User.findById(payload.sub).select("tokenVersion role status").lean() : null;
+  const user = mongoose.isValidObjectId(payload.sub) ? await User.findById(payload.sub).select("tokenVersion role status email").lean() : null;
   // A token made before tokenVersion existed has no "tv"; it counts as version 0
   if (!user || user.status === "disabled" || (payload.tv ?? 0) !== (user.tokenVersion ?? 0)) {
     throw httpError(401, "Not authorized, invalid token", "TOKEN_INVALID");
   }
 
-  req.user = { id: payload.sub, role: user.role ?? "user" };
+  req.user = { id: payload.sub, role: user.role ?? "user", isDemo: isDemoEmail(user.email) };
   next();
 }

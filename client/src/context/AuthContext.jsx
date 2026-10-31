@@ -54,6 +54,13 @@ export function AuthProvider({ children }) {
     saveSession(response.data.data);
   }
 
+  // "Try the demo": the API signs in to the shared demo account (503 when it has not been seeded on that server).
+  // The first call can take a minute while the free Render server wakes up, so no timeout is set.
+  async function loginAsDemo() {
+    const response = await api.post('/auth/demo');
+    saveSession(response.data.data);
+  }
+
   async function register(name, email, password) {
     const response = await api.post('/auth/register', { name, email, password });
     saveSession(response.data.data);
@@ -62,7 +69,7 @@ export function AuthProvider({ children }) {
   // updateUser puts a fresh copy of the user in place (e.g. after the settings changed), without touching the token.
   // saveSession stores a new token with its user: the API sends one after the password changed or after
   // "log out of all devices", because the old token (the one in localStorage) stopped working at that moment.
-  const value = { user, token, loading, login, register, logout: clearSession, updateUser: setUser, saveSession };
+  const value = { user, token, loading, login, loginAsDemo, register, logout: clearSession, updateUser: setUser, saveSession };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

@@ -28,6 +28,11 @@ const admin = await User.create({
 });
 await createDefaultCategories(admin._id);
 
+// The demo account of the "Try the demo" button, with the same sample data `npm run seed` makes on Atlas.
+// The landing page screenshots (e2e/screenshots.spec.js) are taken from it.
+const { seedDemo } = await import("./services/demoSeedService.js");
+await seedDemo({ password: "demo-e2e-secret" });
+
 // app.js reads CLIENT_URL when it is loaded, so it is imported after the variables above are set
 const { default: app } = await import("./app.js");
 

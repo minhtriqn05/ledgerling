@@ -589,6 +589,7 @@
   },
   "settings": {
     "subtitle": "Votre profil, la sécurité de votre compte et l'apparence de Ledgerling.",
+    "demoNote": "Vous utilisez le compte démo partagé. Le mot de passe, les sessions et la suppression du compte ne sont pas disponibles ici.",
     "profile": {
       "title": "Profil",
       "text": "Votre nom apparaît dans le menu.",
@@ -712,6 +713,100 @@
       "enabling": "Activation…"
     }
   },
+  "welcome": {
+    "documentTitle": "Suivi de dépenses personnelles",
+    "eyebrow": "Suivi de dépenses personnelles",
+    "lead": "Ledgerling est une façon simple et sereine de suivre vos revenus et dépenses, de planifier des budgets mensuels et d’épargner pour ce qui compte.",
+    "getStarted": "Commencer",
+    "tryDemo": "Essayer la démo",
+    "demoHint": "Sans inscription. Explorez un compte prêt à l’emploi avec trois mois de données.",
+    "demoStarting": "Démarrage du serveur, cela peut prendre jusqu’à une minute…",
+    "featuresTitle": "Tout ce qu’il faut pour garder la main sur votre argent",
+    "features": {
+      "transactions": {
+        "title": "Suivez chaque transaction",
+        "text": "Ajoutez revenus et dépenses en quelques secondes, avec catégories, étiquettes et saisie rapide comme « café 35k #work »."
+      },
+      "budgets": {
+        "title": "Des budgets qui vous alertent",
+        "text": "Fixez une limite mensuelle par catégorie et soyez prévenu à 80 % et à 100 %."
+      },
+      "recurring": {
+        "title": "Transactions récurrentes",
+        "text": "Le loyer et le salaire s’ajoutent tout seuls au bon jour, chaque semaine ou chaque mois."
+      },
+      "goals": {
+        "title": "Objectifs d’épargne",
+        "text": "Épargnez pour un voyage ou un fonds d’urgence et regardez la progression grandir."
+      },
+      "reports": {
+        "title": "Rapports et analyses",
+        "text": "Rapports mensuels, annuels et en calendrier, avec des analyses claires de vos dépenses."
+      },
+      "devices": {
+        "title": "Pour tous vos appareils",
+        "text": "Installez-la comme une application, utilisez-la en 8 langues et choisissez un thème clair ou sombre."
+      }
+    },
+    "shotsTitle": "Aperçu en action",
+    "shots": {
+      "dashboard": {
+        "alt": "Le tableau de bord Ledgerling avec les totaux du mois, les alertes de budget, les objectifs d’épargne et les graphiques de dépenses",
+        "caption": "Tableau de bord"
+      },
+      "transactions": {
+        "alt": "La liste des transactions avec recherche, filtres et icônes de catégorie",
+        "caption": "Transactions"
+      },
+      "budgets": {
+        "alt": "La page des budgets avec des barres de progression, dont un budget dépassé",
+        "caption": "Budgets"
+      },
+      "goals": {
+        "alt": "La page des objectifs d’épargne avec la progression de chaque objectif",
+        "caption": "Objectifs d’épargne"
+      }
+    },
+    "howTitle": "Comment ça marche",
+    "steps": {
+      "signUp": {
+        "title": "Créez un compte",
+        "text": "Inscrivez-vous en moins d’une minute, ou essayez d’abord la démo."
+      },
+      "addMoney": {
+        "title": "Ajoutez votre argent",
+        "text": "Notez ce que vous gagnez et dépensez, puis fixez budgets et objectifs quand vous êtes prêt."
+      },
+      "seePicture": {
+        "title": "Voyez la vue d’ensemble",
+        "text": "Le tableau de bord et les rapports montrent où va votre argent chaque mois."
+      }
+    },
+    "footerNote": "Projet de cours de développement d’applications web (MSIS207).",
+    "github": "Voir sur GitHub",
+    "opensInNewTab": "(s’ouvre dans un nouvel onglet)"
+  },
+  "onboarding": {
+    "title": "Prenez en main Ledgerling",
+    "subtitle": "Trois étapes rapides et votre tableau de bord prend vie.",
+    "progress": "{{done}} sur {{total}} terminées",
+    "done": "Fait",
+    "todo": "À faire",
+    "steps": {
+      "transaction": {
+        "title": "Ajoutez votre première transaction",
+        "text": "Enregistrez une dépense ou un revenu."
+      },
+      "budget": {
+        "title": "Définissez un budget",
+        "text": "Choisissez une limite mensuelle pour une catégorie."
+      },
+      "goal": {
+        "title": "Créez un objectif d’épargne",
+        "text": "Épargnez pour quelque chose qui vous tient à cœur."
+      }
+    }
+  },
   "errors": {
     "ACCOUNT_DISABLED": "Ce compte a été désactivé",
     "AMOUNT_INVALID": "Le montant doit être supérieur à 0",
@@ -732,6 +827,8 @@
     "CURRENT_PASSWORD_REQUIRED": "Le mot de passe actuel est obligatoire",
     "DATE_INVALID": "Date non valide, utilisez AAAA-MM-JJ HH:mm ou ISO 8601",
     "DEADLINE_IN_PAST": "L'échéance doit être postérieure à aujourd'hui",
+    "DEMO_READ_ONLY": "Cette action n’est pas disponible avec le compte démo",
+    "DEMO_UNAVAILABLE": "La démo n’est pas disponible pour le moment. Veuillez réessayer plus tard.",
     "DEPOSIT_IN_USE": "Supprimer ce versement rendrait le montant épargné négatif",
     "DUPLICATE_VALUE": "Cette valeur existe déjà",
     "EMAIL_INVALID": "E-mail non valide",

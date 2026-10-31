@@ -18,7 +18,7 @@ Swagger UI: `/api-docs` (outside `/api`).
 - **Dates** are ISO 8601 strings; the server stores them in UTC.
 - **Limits** (per IP address, counted in the memory of the server, so they start again after a restart):
   300 requests per 15 minutes to `/api` (`/api/health` is free) and 20 requests per 15 minutes to
-  `POST /auth/login` + `POST /auth/register`. More gets 429 `RATE_LIMITED`. A JSON body can be at most 100 kB
+  `POST /auth/login`, `POST /auth/register` + `POST /auth/demo` (each has its own counter). More gets 429 `RATE_LIMITED`. A JSON body can be at most 100 kB
   (300 kB for `POST /transactions/import`); a bigger one gets 413 `PAYLOAD_TOO_LARGE`.
 - **Input safety**: a body key that starts with `$` or contains `.`, or a query key that starts with `$` or contains `[`
   (for example `?month[$ne]=x`), gets 400 `INVALID_INPUT`. Besides that, every route turns each field into the type it
@@ -35,11 +35,12 @@ Swagger UI: `/api-docs` (outside `/api`).
 | 201 | Created |
 | 400 | Invalid input (validation failed, unknown field value, bad format, body that is not valid JSON → `"Invalid JSON body"`) |
 | 401 | Missing/invalid/expired token (also a token made before the password changed or "log out of all devices", or of a deleted account), wrong email or password at login |
-| 403 | Signed in but not allowed: not an admin on `/api/admin/*` (`FORBIDDEN`), a disabled account at login (`ACCOUNT_DISABLED`), or an admin trying to disable himself or another admin |
+| 403 | Signed in but not allowed: not an admin on `/api/admin/*` (`FORBIDDEN`), a disabled account at login (`ACCOUNT_DISABLED`), an admin trying to disable himself or another admin, or the demo account changing its password, logging out of all devices or deleting itself (`DEMO_READ_ONLY`) |
 | 404 | Not found, belongs to another user, malformed `:id` in the URL, or unknown route (`"Route not found"`) |
 | 409 | Duplicate (email, category name, budget of the same category and month, two transactions of one recurring rule on the same date) or conflict (category still has transactions or recurring rules) |
 | 413 | JSON body bigger than 100 kB (300 kB for the CSV import) → `PAYLOAD_TOO_LARGE` |
 | 429 | Too many requests from one IP address → `RATE_LIMITED` |
+| 503 | `POST /auth/demo` when the demo account has not been seeded → `DEMO_UNAVAILABLE` |
 | 500 | Server error (the answer never holds a stack trace; the details go to the server log) |
 
 ### Error codes
@@ -53,12 +54,13 @@ When the place that throws an error names no specific code, the status gives a d
 |--------|-------|
 | 400 | `VALIDATION_ERROR`, `INVALID_JSON`, `NAME_REQUIRED`, `NAME_TOO_LONG`, `EMAIL_INVALID`, `PASSWORD_REQUIRED`, `PASSWORD_TOO_SHORT`, `PASSWORD_TOO_LONG`, `CURRENT_PASSWORD_REQUIRED`, `NEW_PASSWORD_TOO_SHORT`, `PASSWORD_UNCHANGED`, `WRONG_PASSWORD`, `TYPE_INVALID`, `TYPE_LOCKED`, `COLOR_INVALID`, `ICON_INVALID`, `CATEGORY_REQUIRED`, `AMOUNT_INVALID`, `CURRENCY_INVALID`, `NOTE_TOO_LONG`, `DATE_INVALID`, `TAG_INVALID`, `TOO_MANY_TAGS`, `MONTH_INVALID`, `BUDGET_EXPENSE_ONLY`, `END_BEFORE_START`, `TARGET_INVALID`, `DEADLINE_IN_PAST`, `WITHDRAW_TOO_MUCH`, `DEPOSIT_IN_USE`, `IMPORT_TOO_MANY_ROWS`, `STATUS_INVALID`, `INVALID_INPUT` |
 | 401 | `TOKEN_MISSING`, `TOKEN_INVALID`, `INVALID_CREDENTIALS` |
-| 403 | `FORBIDDEN`, `ACCOUNT_DISABLED`, `CANNOT_DISABLE_SELF`, `CANNOT_DISABLE_ADMIN` |
+| 403 | `FORBIDDEN`, `ACCOUNT_DISABLED`, `CANNOT_DISABLE_SELF`, `CANNOT_DISABLE_ADMIN`, `DEMO_READ_ONLY` |
 | 404 | `USER_NOT_FOUND`, `ROUTE_NOT_FOUND`, `CATEGORY_NOT_FOUND`, `TRANSACTION_NOT_FOUND`, `BUDGET_NOT_FOUND`, `RULE_NOT_FOUND`, `GOAL_NOT_FOUND`, `CONTRIBUTION_NOT_FOUND`, `TEMPLATE_NOT_FOUND`, `NOTIFICATION_NOT_FOUND` |
 | 409 | `EMAIL_TAKEN`, `CATEGORY_EXISTS`, `CATEGORY_IN_USE`, `CATEGORY_HAS_RULES`, `BUDGET_EXISTS`, `DUPLICATE_VALUE` |
 | 413 | `PAYLOAD_TOO_LARGE` |
 | 429 | `RATE_LIMITED` |
 | 500 | `INTERNAL_ERROR` |
+| 503 | `DEMO_UNAVAILABLE` |
 
 Example: `{ "success": false, "message": "Email is already registered", "code": "EMAIL_TAKEN" }`.
 The tables below list the `message` of each endpoint; the matching code is in the table above.
@@ -155,6 +157,7 @@ The tables below list the `message` of each endpoint; the matching code is in th
 | 57 | GET | `/api/admin/stats` | Admin | Totals and the last 30 days: users, active users, transactions |
 | 58 | GET | `/api/admin/users` | Admin | List the accounts with their number of transactions (`?q=&page=&limit=`) |
 | 59 | PATCH | `/api/admin/users/:id/status` | Admin | Disable or enable an account |
+| 60 | POST | `/api/auth/demo` | No | Sign in to the shared demo account (the "Try the demo" button) |
 
 Every protected route (Auth = Yes) can also return **401** (`"Not authorized, token missing"` /
 `"Not authorized, invalid token"`) and every route can return **500** (`"Internal server error"`).
@@ -230,6 +233,29 @@ Auth: no.
 | 401 | `"Invalid email or password"` (same message for unknown email and wrong password) |
 | 403 | `"Account disabled"` (`ACCOUNT_DISABLED`): the password is right but an admin disabled the account. The password is checked first, so someone who does not know it cannot find out that an account is disabled |
 
+### 60. POST /api/auth/demo
+Auth: no. No body. Signs in to the shared demo account (`demo@example.com`) without a password: this is the "Try the demo" button of the
+landing page. The account is made by `cd server && npm run seed` (see below). It shares the rate limit of login and register.
+
+**200** – same shape as login: `data` is `{ "token": "...", "user": { ..., "isDemo": true } }`.
+
+**Errors**
+
+| Code | message |
+|------|---------|
+| 429 | `RATE_LIMITED` |
+| 503 | `"Demo account is not available"` (`DEMO_UNAVAILABLE`): the account has not been seeded on this server (or an admin disabled it) |
+
+The demo account is full of sample data (10 categories with icons, about 90 transactions in the current month and the two before,
+budgets of the current month with one over 100% and one over 80%, two monthly recurring rules Rent and Salary that make their own
+transactions, two savings goals, three templates and a few notifications). Everything else works as for any user, except three actions
+that would lock out the next visitor or destroy the account. They answer **403** `"Not available in the demo account"` (`DEMO_READ_ONLY`):
+`PATCH /users/me/password` (53), `POST /auth/logout-all` (54) and `DELETE /users/me` (56).
+
+**Seed**: `cd server && npm run seed` connects to `MONGODB_URI` and the password of the account comes from `DEMO_PASSWORD` in `server/.env`.
+It deletes and makes again only the documents of the demo user (the user document stays), so it is safe to run twice; run it again any time to
+move the sample dates up to today. Playwright's API (`npm run start:e2e`) seeds the same data in its in-memory database.
+
 ### 4. GET /api/auth/me
 Auth: yes. No body.
 
@@ -256,7 +282,8 @@ Auth: yes. No body.
 
 **Errors**: 401 also if the user in the token no longer exists or the account is disabled.
 
-`role` is `"user"` or `"admin"`; the app shows the Admin page only to an admin. Every user object (register, login, `me`) carries `role` and `status`.
+`role` is `"user"` or `"admin"`; the app shows the Admin page only to an admin. Every user object (register, login, `me`) carries `role`, `status` and `isDemo`.
+`isDemo` is `true` only for the shared demo account (`demo@example.com`); the app then hides the Password, Sessions and Danger zone settings.
 
 `preferences.language` is only there after the user picked a language. The token version (`tokenVersion`) never leaves the server.
 

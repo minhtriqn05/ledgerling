@@ -589,6 +589,7 @@
   },
   "settings": {
     "subtitle": "Dein Profil, die Sicherheit deines Kontos und wie Ledgerling aussieht und sich verhält.",
+    "demoNote": "Du nutzt das gemeinsame Demo-Konto. Passwort, Sitzungen und Kontolöschung sind hier nicht verfügbar.",
     "profile": {
       "title": "Profil",
       "text": "Dein Name erscheint im Menü.",
@@ -712,6 +713,100 @@
       "enabling": "Wird entsperrt…"
     }
   },
+  "welcome": {
+    "documentTitle": "Persönlicher Ausgaben-Tracker",
+    "eyebrow": "Persönlicher Ausgaben-Tracker",
+    "lead": "Ledgerling ist eine ruhige, einfache Art, Einnahmen und Ausgaben zu verfolgen, Monatsbudgets zu planen und für Wünsche zu sparen.",
+    "getStarted": "Loslegen",
+    "tryDemo": "Demo ausprobieren",
+    "demoHint": "Keine Registrierung nötig. Erkunde ein fertiges Konto mit Daten aus drei Monaten.",
+    "demoStarting": "Server wird gestartet, das kann bis zu einer Minute dauern …",
+    "featuresTitle": "Alles, was du brauchst, um dein Geld im Griff zu haben",
+    "features": {
+      "transactions": {
+        "title": "Jede Transaktion im Blick",
+        "text": "Erfasse Einnahmen und Ausgaben in Sekunden – mit Kategorien, Tags und einer Schnelleingabe wie „Kaffee 35k #work“."
+      },
+      "budgets": {
+        "title": "Budgets, die warnen",
+        "text": "Lege pro Kategorie ein Monatslimit fest und werde bei 80 % und 100 % gewarnt."
+      },
+      "recurring": {
+        "title": "Wiederkehrende Buchungen",
+        "text": "Miete und Gehalt werden am richtigen Tag automatisch eingetragen, wöchentlich oder monatlich."
+      },
+      "goals": {
+        "title": "Sparziele",
+        "text": "Spare für eine Reise oder einen Notgroschen und sieh zu, wie der Fortschritt wächst."
+      },
+      "reports": {
+        "title": "Berichte und Erkenntnisse",
+        "text": "Monats-, Jahres- und Kalenderberichte sowie verständliche Erkenntnisse zu deinen Ausgaben."
+      },
+      "devices": {
+        "title": "Für jedes Gerät gemacht",
+        "text": "Installiere sie als App, nutze sie in 8 Sprachen und wähle ein helles oder dunkles Design."
+      }
+    },
+    "shotsTitle": "So sieht es aus",
+    "shots": {
+      "dashboard": {
+        "alt": "Das Ledgerling-Dashboard mit Monatssummen, Budgetwarnungen, Sparzielen und Ausgabendiagrammen",
+        "caption": "Dashboard"
+      },
+      "transactions": {
+        "alt": "Die Transaktionsliste mit Suche, Filtern und Kategorie-Symbolen",
+        "caption": "Transaktionen"
+      },
+      "budgets": {
+        "alt": "Die Budgetseite mit Fortschrittsbalken, ein Budget ist überschritten",
+        "caption": "Budgets"
+      },
+      "goals": {
+        "alt": "Die Sparziel-Seite mit dem Fortschritt jedes Ziels",
+        "caption": "Sparziele"
+      }
+    },
+    "howTitle": "So funktioniert es",
+    "steps": {
+      "signUp": {
+        "title": "Konto erstellen",
+        "text": "Registriere dich in unter einer Minute oder probiere zuerst die Demo aus."
+      },
+      "addMoney": {
+        "title": "Geld erfassen",
+        "text": "Halte fest, was du verdienst und ausgibst, und setze Budgets und Ziele, wenn du bereit bist."
+      },
+      "seePicture": {
+        "title": "Das große Ganze sehen",
+        "text": "Dashboard und Berichte zeigen, wohin dein Geld jeden Monat fließt."
+      }
+    },
+    "footerNote": "Ein Kursprojekt für Webanwendungsentwicklung (MSIS207).",
+    "github": "Auf GitHub ansehen",
+    "opensInNewTab": "(öffnet in einem neuen Tab)"
+  },
+  "onboarding": {
+    "title": "Erste Schritte mit Ledgerling",
+    "subtitle": "Drei kurze Schritte und dein Dashboard füllt sich.",
+    "progress": "{{done}} von {{total}} erledigt",
+    "done": "Erledigt",
+    "todo": "Offen",
+    "steps": {
+      "transaction": {
+        "title": "Erste Transaktion hinzufügen",
+        "text": "Erfasse eine Ausgabe oder eine Einnahme."
+      },
+      "budget": {
+        "title": "Budget festlegen",
+        "text": "Wähle ein Monatslimit für eine Kategorie."
+      },
+      "goal": {
+        "title": "Sparziel erstellen",
+        "text": "Spare für etwas, das du dir wünschst."
+      }
+    }
+  },
   "errors": {
     "ACCOUNT_DISABLED": "Dieses Konto wurde gesperrt",
     "AMOUNT_INVALID": "Der Betrag muss größer als 0 sein",
@@ -732,6 +827,8 @@
     "CURRENT_PASSWORD_REQUIRED": "Das aktuelle Passwort ist erforderlich",
     "DATE_INVALID": "Ungültiges Datum, verwende JJJJ-MM-TT HH:mm oder ISO 8601",
     "DEADLINE_IN_PAST": "Die Frist muss nach dem heutigen Tag liegen",
+    "DEMO_READ_ONLY": "Das ist mit dem Demo-Konto nicht möglich",
+    "DEMO_UNAVAILABLE": "Die Demo ist gerade nicht verfügbar. Bitte versuche es später erneut.",
     "DEPOSIT_IN_USE": "Wird diese Einzahlung gelöscht, wäre der gesparte Betrag negativ",
     "DUPLICATE_VALUE": "Dieser Wert existiert bereits",
     "EMAIL_INVALID": "Ungültige E-Mail-Adresse",

@@ -589,6 +589,7 @@
   },
   "settings": {
     "subtitle": "Your profile, account security and how Ledgerling looks and behaves.",
+    "demoNote": "You are using the shared demo account. Password, sessions and account deletion are not available here.",
     "profile": {
       "title": "Profile",
       "text": "Your name appears in the menu.",
@@ -712,6 +713,100 @@
       "enabling": "Enabling…"
     }
   },
+  "welcome": {
+    "documentTitle": "Personal expense tracker",
+    "eyebrow": "Personal expense tracker",
+    "lead": "Ledgerling is a calm, simple way to track income and expenses, plan monthly budgets and save for the things you want.",
+    "getStarted": "Get started",
+    "tryDemo": "Try the demo",
+    "demoHint": "No sign-up needed. Explore a ready-made account with three months of data.",
+    "demoStarting": "Starting the server, this can take up to a minute…",
+    "featuresTitle": "Everything you need to stay on top of your money",
+    "features": {
+      "transactions": {
+        "title": "Track every transaction",
+        "text": "Add income and expenses in seconds, with categories, tags and a quick-add line like “coffee 35k #work”."
+      },
+      "budgets": {
+        "title": "Budgets that warn you",
+        "text": "Set a monthly limit for each category and get a heads-up at 80% and 100%."
+      },
+      "recurring": {
+        "title": "Recurring transactions",
+        "text": "Rent and salary add themselves on the right day, every week or every month."
+      },
+      "goals": {
+        "title": "Savings goals",
+        "text": "Save for a trip or an emergency fund and watch the progress grow."
+      },
+      "reports": {
+        "title": "Reports and insights",
+        "text": "Monthly, yearly and calendar reports, plus plain-language insights about your spending."
+      },
+      "devices": {
+        "title": "Made for every device",
+        "text": "Install it as an app, use it in 8 languages and pick a light or dark theme."
+      }
+    },
+    "shotsTitle": "See it in action",
+    "shots": {
+      "dashboard": {
+        "alt": "The Ledgerling dashboard with the monthly totals, budget alerts, savings goals and spending charts",
+        "caption": "Dashboard"
+      },
+      "transactions": {
+        "alt": "The transactions list with search, filters and category icons",
+        "caption": "Transactions"
+      },
+      "budgets": {
+        "alt": "The budgets page with progress bars, one budget over its limit",
+        "caption": "Budgets"
+      },
+      "goals": {
+        "alt": "The savings goals page with the progress of each goal",
+        "caption": "Savings goals"
+      }
+    },
+    "howTitle": "How it works",
+    "steps": {
+      "signUp": {
+        "title": "Create an account",
+        "text": "Sign up in under a minute, or try the demo first."
+      },
+      "addMoney": {
+        "title": "Add your money",
+        "text": "Record what you earn and spend, then set budgets and goals when you are ready."
+      },
+      "seePicture": {
+        "title": "See the big picture",
+        "text": "The dashboard and reports show where your money goes every month."
+      }
+    },
+    "footerNote": "A course project for Web Application Development (MSIS207).",
+    "github": "View on GitHub",
+    "opensInNewTab": "(opens in a new tab)"
+  },
+  "onboarding": {
+    "title": "Get started with Ledgerling",
+    "subtitle": "Three quick steps and your dashboard comes alive.",
+    "progress": "{{done}} of {{total}} done",
+    "done": "Done",
+    "todo": "To do",
+    "steps": {
+      "transaction": {
+        "title": "Add your first transaction",
+        "text": "Record an expense or some income."
+      },
+      "budget": {
+        "title": "Set a budget",
+        "text": "Choose a monthly limit for a category."
+      },
+      "goal": {
+        "title": "Create a savings goal",
+        "text": "Save up for something you want."
+      }
+    }
+  },
   "errors": {
     "ACCOUNT_DISABLED": "This account has been disabled",
     "AMOUNT_INVALID": "Amount must be greater than 0",
@@ -732,6 +827,8 @@
     "CURRENT_PASSWORD_REQUIRED": "Current password is required",
     "DATE_INVALID": "Date is invalid, use YYYY-MM-DD HH:mm or ISO 8601",
     "DEADLINE_IN_PAST": "Deadline must be after today",
+    "DEMO_READ_ONLY": "This is not available in the demo account",
+    "DEMO_UNAVAILABLE": "The demo is not available right now. Please try again later.",
     "DEPOSIT_IN_USE": "Deleting this deposit would make the saved amount negative",
     "DUPLICATE_VALUE": "This value already exists",
     "EMAIL_INVALID": "Email is invalid",

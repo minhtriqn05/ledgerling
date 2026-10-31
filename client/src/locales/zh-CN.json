@@ -589,6 +589,7 @@
   },
   "settings": {
     "subtitle": "你的个人资料、账户安全，以及 Ledgerling 的外观和行为。",
+    "demoNote": "你正在使用共享的演示账户。此处不提供密码、登录会话和删除账户功能。",
     "profile": {
       "title": "个人资料",
       "text": "你的名字会显示在菜单中。",
@@ -712,6 +713,100 @@
       "enabling": "正在启用…"
     }
   },
+  "welcome": {
+    "documentTitle": "个人支出记录",
+    "eyebrow": "个人支出记录",
+    "lead": "Ledgerling 以平静简单的方式帮你记录收入与支出、制定每月预算，并为想要的东西攒钱。",
+    "getStarted": "开始使用",
+    "tryDemo": "试用演示",
+    "demoHint": "无需注册。体验一个已有三个月数据的现成账户。",
+    "demoStarting": "正在启动服务器，最多可能需要一分钟…",
+    "featuresTitle": "管好钱包所需的一切",
+    "features": {
+      "transactions": {
+        "title": "记录每一笔交易",
+        "text": "几秒内添加收入和支出，支持分类、标签，以及像“咖啡 35k #work”这样的快速输入。"
+      },
+      "budgets": {
+        "title": "会提醒你的预算",
+        "text": "为每个分类设置月度额度，达到 80% 和 100% 时收到提醒。"
+      },
+      "recurring": {
+        "title": "定期交易",
+        "text": "房租和工资会在正确的日期自动添加，每周或每月一次。"
+      },
+      "goals": {
+        "title": "储蓄目标",
+        "text": "为旅行或应急基金攒钱，看着进度一点点增长。"
+      },
+      "reports": {
+        "title": "报表与洞察",
+        "text": "月度、年度和日历报表，以及通俗易懂的支出洞察。"
+      },
+      "devices": {
+        "title": "适配所有设备",
+        "text": "可安装为应用，支持 8 种语言，并可选择浅色或深色主题。"
+      }
+    },
+    "shotsTitle": "实际效果",
+    "shots": {
+      "dashboard": {
+        "alt": "Ledgerling 仪表盘，显示本月合计、预算提醒、储蓄目标和支出图表",
+        "caption": "仪表盘"
+      },
+      "transactions": {
+        "alt": "交易列表，带搜索、筛选和分类图标",
+        "caption": "交易"
+      },
+      "budgets": {
+        "alt": "预算页面，带进度条，其中一个预算已超支",
+        "caption": "预算"
+      },
+      "goals": {
+        "alt": "储蓄目标页面，显示每个目标的进度",
+        "caption": "储蓄目标"
+      }
+    },
+    "howTitle": "使用方法",
+    "steps": {
+      "signUp": {
+        "title": "创建账户",
+        "text": "不到一分钟即可注册，也可以先试用演示。"
+      },
+      "addMoney": {
+        "title": "记录你的钱",
+        "text": "记下收入和支出，准备好后再设置预算和目标。"
+      },
+      "seePicture": {
+        "title": "纵览全局",
+        "text": "仪表盘和报表会显示你每个月的钱花在了哪里。"
+      }
+    },
+    "footerNote": "网络应用开发（MSIS207）课程项目。",
+    "github": "在 GitHub 上查看",
+    "opensInNewTab": "（在新标签页中打开）"
+  },
+  "onboarding": {
+    "title": "开始使用 Ledgerling",
+    "subtitle": "三个简单步骤，让仪表盘丰富起来。",
+    "progress": "已完成 {{done}}/{{total}}",
+    "done": "已完成",
+    "todo": "待办",
+    "steps": {
+      "transaction": {
+        "title": "添加第一笔交易",
+        "text": "记录一笔支出或收入。"
+      },
+      "budget": {
+        "title": "设置预算",
+        "text": "为某个分类选择月度额度。"
+      },
+      "goal": {
+        "title": "创建储蓄目标",
+        "text": "为想要的东西攒钱。"
+      }
+    }
+  },
   "errors": {
     "ACCOUNT_DISABLED": "此账户已被停用",
     "AMOUNT_INVALID": "金额必须大于 0",
@@ -732,6 +827,8 @@
     "CURRENT_PASSWORD_REQUIRED": "请输入当前密码",
     "DATE_INVALID": "日期无效，请使用 YYYY-MM-DD HH:mm 或 ISO 8601",
     "DEADLINE_IN_PAST": "截止日期必须晚于今天",
+    "DEMO_READ_ONLY": "演示账户无法执行此操作",
+    "DEMO_UNAVAILABLE": "演示暂时不可用，请稍后再试。",
     "DEPOSIT_IN_USE": "删除这笔存入会使已存金额变为负数",
     "DUPLICATE_VALUE": "该值已存在",
     "EMAIL_INVALID": "邮箱无效",

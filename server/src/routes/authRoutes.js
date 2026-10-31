@@ -1,7 +1,8 @@
 import { Router } from "express";
-import { register, login, me, logoutAll } from "../controllers/authController.js";
+import { register, login, demo, me, logoutAll } from "../controllers/authController.js";
 import { validateRegister, validateLogin } from "../middlewares/validateAuth.js";
 import { requireAuth } from "../middlewares/requireAuth.js";
+import { blockDemo } from "../middlewares/blockDemo.js";
 
 const router = Router();
 
@@ -121,6 +122,35 @@ router.post("/login", validateLogin, login);
 
 /**
  * @openapi
+ * /auth/demo:
+ *   post:
+ *     summary: Sign in to the demo account
+ *     description: One click for the "Try the demo" button. Returns a token for the shared demo account (demo@example.com, full of sample data made by `npm run seed`). No body is needed. The demo account cannot change its password, log out of all devices or be deleted (403 DEMO_READ_ONLY). It shares the login rate limit.
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: Signed in as the demo user (user.isDemo is true)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthResponse'
+ *       503:
+ *         description: The demo account has not been seeded on this server (code DEMO_UNAVAILABLE)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Demo account is not available
+ *               code: DEMO_UNAVAILABLE
+ *       429:
+ *         $ref: '#/components/responses/TooManyRequests'
+ */
+router.post("/demo", demo);
+
+/**
+ * @openapi
  * /auth/me:
  *   get:
  *     summary: Get the current user
@@ -170,7 +200,9 @@ router.get("/me", requireAuth, me);
  *               $ref: '#/components/schemas/AuthResponse'
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/DemoReadOnly'
  */
-router.post("/logout-all", requireAuth, logoutAll);
+router.post("/logout-all", requireAuth, blockDemo, logoutAll);
 
 export default router;

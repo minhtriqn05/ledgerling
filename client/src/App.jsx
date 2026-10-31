@@ -22,6 +22,7 @@ const ReportsPage = lazy(() => import('./pages/ReportsPage.jsx'));
 const NotificationsPage = lazy(() => import('./pages/NotificationsPage.jsx'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage.jsx'));
 const AdminPage = lazy(() => import('./pages/AdminPage.jsx'));
+const WelcomePage = lazy(() => import('./pages/WelcomePage.jsx'));
 const LoginPage = lazy(() => import('./pages/LoginPage.jsx'));
 const RegisterPage = lazy(() => import('./pages/RegisterPage.jsx'));
 // null in the production build: the condition is known when building, so that page is not even built
@@ -37,6 +38,9 @@ export default function App() {
       <PreferencesSync />
       <Suspense fallback={<LoadingState fullScreen />}>
         <Routes>
+          {/* The public landing page: for a visitor, "/" leads here (ProtectedRoute); a signed-in user is sent to the Dashboard */}
+          <Route path="/welcome" element={<WelcomePage />} />
+
           {/* Pages without the sidebar */}
           <Route element={<AuthLayout />}>
             <Route path="/login" element={<LoginPage />} />

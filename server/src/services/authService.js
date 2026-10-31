@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import { createDefaultCategories } from "./categoryService.js";
 import { httpError } from "../utils/httpError.js";
+import { DEMO_EMAIL } from "../utils/demo.js";
 
 const SALT_ROUNDS = 10;
 
@@ -50,5 +51,13 @@ export async function login({ email, password }) {
 export async function logoutAll(userId) {
   const user = await User.findByIdAndUpdate(userId, { $inc: { tokenVersion: 1 } }, { returnDocument: "after" });
   if (!user) throw httpError(401, "Not authorized, invalid token", "TOKEN_INVALID");
+  return { token: signToken(user), user };
+}
+
+// "Try the demo": signs in as the demo user without a password. The account is made by `npm run seed`;
+// until then (or after someone deleted it) there is nothing to sign in to.
+export async function loginDemo() {
+  const user = await User.findOne({ email: DEMO_EMAIL });
+  if (!user || user.status === "disabled") throw httpError(503, "Demo account is not available", "DEMO_UNAVAILABLE");
   return { token: signToken(user), user };
 }

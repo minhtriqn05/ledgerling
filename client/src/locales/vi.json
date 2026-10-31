@@ -589,6 +589,7 @@
   },
   "settings": {
     "subtitle": "Hồ sơ, bảo mật tài khoản và cách Ledgerling hiển thị, hoạt động.",
+    "demoNote": "Bạn đang dùng tài khoản demo dùng chung. Mật khẩu, phiên đăng nhập và xoá tài khoản không khả dụng ở đây.",
     "profile": {
       "title": "Hồ sơ",
       "text": "Tên của bạn hiển thị trong menu.",
@@ -712,6 +713,100 @@
       "enabling": "Đang mở khoá…"
     }
   },
+  "welcome": {
+    "documentTitle": "Quản lý chi tiêu cá nhân",
+    "eyebrow": "Quản lý chi tiêu cá nhân",
+    "lead": "Ledgerling giúp bạn theo dõi thu chi, lập ngân sách hằng tháng và tiết kiệm cho những điều bạn muốn một cách nhẹ nhàng, đơn giản.",
+    "getStarted": "Bắt đầu",
+    "tryDemo": "Dùng thử bản demo",
+    "demoHint": "Không cần đăng ký. Khám phá một tài khoản có sẵn với dữ liệu ba tháng.",
+    "demoStarting": "Đang khởi động máy chủ, việc này có thể mất tới một phút…",
+    "featuresTitle": "Mọi thứ bạn cần để nắm rõ tiền bạc",
+    "features": {
+      "transactions": {
+        "title": "Ghi lại mọi giao dịch",
+        "text": "Thêm thu nhập và chi tiêu trong vài giây, kèm danh mục, thẻ và dòng nhập nhanh như “cà phê 35k #work”."
+      },
+      "budgets": {
+        "title": "Ngân sách biết cảnh báo",
+        "text": "Đặt hạn mức hằng tháng cho từng danh mục và nhận cảnh báo khi đạt 80% và 100%."
+      },
+      "recurring": {
+        "title": "Giao dịch định kỳ",
+        "text": "Tiền nhà và lương tự được thêm đúng ngày, hằng tuần hoặc hằng tháng."
+      },
+      "goals": {
+        "title": "Mục tiêu tiết kiệm",
+        "text": "Tiết kiệm cho một chuyến đi hay quỹ khẩn cấp và xem tiến độ tăng dần."
+      },
+      "reports": {
+        "title": "Báo cáo và gợi ý",
+        "text": "Báo cáo theo tháng, năm và lịch, cùng những nhận xét dễ hiểu về chi tiêu của bạn."
+      },
+      "devices": {
+        "title": "Dùng được trên mọi thiết bị",
+        "text": "Cài như một ứng dụng, dùng với 8 ngôn ngữ và chọn giao diện sáng hoặc tối."
+      }
+    },
+    "shotsTitle": "Xem thực tế",
+    "shots": {
+      "dashboard": {
+        "alt": "Trang tổng quan của Ledgerling với tổng thu chi trong tháng, cảnh báo ngân sách, mục tiêu tiết kiệm và biểu đồ chi tiêu",
+        "caption": "Tổng quan"
+      },
+      "transactions": {
+        "alt": "Danh sách giao dịch với tìm kiếm, bộ lọc và biểu tượng danh mục",
+        "caption": "Giao dịch"
+      },
+      "budgets": {
+        "alt": "Trang ngân sách với thanh tiến độ, có một ngân sách vượt hạn mức",
+        "caption": "Ngân sách"
+      },
+      "goals": {
+        "alt": "Trang mục tiêu tiết kiệm với tiến độ của từng mục tiêu",
+        "caption": "Mục tiêu tiết kiệm"
+      }
+    },
+    "howTitle": "Cách hoạt động",
+    "steps": {
+      "signUp": {
+        "title": "Tạo tài khoản",
+        "text": "Đăng ký trong chưa đầy một phút, hoặc dùng thử bản demo trước."
+      },
+      "addMoney": {
+        "title": "Thêm tiền của bạn",
+        "text": "Ghi lại thu và chi, rồi đặt ngân sách và mục tiêu khi bạn sẵn sàng."
+      },
+      "seePicture": {
+        "title": "Nhìn toàn cảnh",
+        "text": "Trang tổng quan và báo cáo cho thấy tiền của bạn đi đâu mỗi tháng."
+      }
+    },
+    "footerNote": "Đồ án môn Phát triển Ứng dụng Web (MSIS207).",
+    "github": "Xem trên GitHub",
+    "opensInNewTab": "(mở trong tab mới)"
+  },
+  "onboarding": {
+    "title": "Bắt đầu với Ledgerling",
+    "subtitle": "Ba bước nhanh là trang tổng quan sẽ có dữ liệu.",
+    "progress": "Đã xong {{done}}/{{total}}",
+    "done": "Xong",
+    "todo": "Chưa làm",
+    "steps": {
+      "transaction": {
+        "title": "Thêm giao dịch đầu tiên",
+        "text": "Ghi lại một khoản chi hoặc thu."
+      },
+      "budget": {
+        "title": "Đặt ngân sách",
+        "text": "Chọn hạn mức hằng tháng cho một danh mục."
+      },
+      "goal": {
+        "title": "Tạo mục tiêu tiết kiệm",
+        "text": "Tiết kiệm cho điều bạn muốn."
+      }
+    }
+  },
   "errors": {
     "ACCOUNT_DISABLED": "Tài khoản này đã bị khoá",
     "AMOUNT_INVALID": "Số tiền phải lớn hơn 0",
@@ -732,6 +827,8 @@
     "CURRENT_PASSWORD_REQUIRED": "Vui lòng nhập mật khẩu hiện tại",
     "DATE_INVALID": "Ngày không hợp lệ, hãy dùng YYYY-MM-DD HH:mm hoặc ISO 8601",
     "DEADLINE_IN_PAST": "Hạn chót phải sau hôm nay",
+    "DEMO_READ_ONLY": "Tài khoản demo không thực hiện được thao tác này",
+    "DEMO_UNAVAILABLE": "Bản demo hiện chưa sẵn sàng. Vui lòng thử lại sau.",
     "DEPOSIT_IN_USE": "Xoá khoản gửi này sẽ làm số tiền đã để dành bị âm",
     "DUPLICATE_VALUE": "Giá trị này đã tồn tại",
     "EMAIL_INVALID": "Email không hợp lệ",

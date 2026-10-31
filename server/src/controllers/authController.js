@@ -22,3 +22,8 @@ export async function logoutAll(req, res) {
   const data = await authService.logoutAll(req.user.id);
   res.status(200).json({ success: true, data });
 }
+
+export async function demo(req, res) {
+  const data = await authService.loginDemo();
+  res.status(200).json({ success: true, data });
+}

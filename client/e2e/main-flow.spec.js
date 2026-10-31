@@ -47,10 +47,10 @@ test('register → add a transaction → see it everywhere → log out', async (
   await expect(expenseCard).toContainText('185,000');
   await expect(page.locator('article', { hasText: 'Balance' })).toContainText('185,000');
 
-  // 6. Log out, then a protected page sends us back to the login page
+  // 6. Log out: a visitor on "/" lands on the landing page, and any other protected page sends us to the login page
   await openMenuIfNeeded(page);
   await page.getByRole('button', { name: 'Log out' }).click();
-  await expect(page).toHaveURL(/\/login$/);
+  await expect(page).toHaveURL(/\/welcome$/);
 
   await page.goto('/transactions');
   await expect(page).toHaveURL(/\/login$/);
