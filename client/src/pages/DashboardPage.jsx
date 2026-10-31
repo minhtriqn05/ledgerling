@@ -7,7 +7,7 @@ import { formatCompact, formatPercent, formatVnd } from '../utils/format.js';
 import { currentMonth, formatMonth, formatMonthShort } from '../utils/vnDate.js';
 import PageHeader from '../components/PageHeader/PageHeader.jsx';
 import MonthPicker from '../components/MonthPicker/MonthPicker.jsx';
-import Card, { CardHeader } from '../components/Card/Card.jsx';
+import CollapsibleCard from '../components/CollapsibleCard/CollapsibleCard.jsx';
 import Button from '../components/Button/Button.jsx';
 import EmptyState from '../components/EmptyState/EmptyState.jsx';
 import LoadingState from '../components/LoadingState/LoadingState.jsx';
@@ -145,8 +145,7 @@ export default function DashboardPage() {
         <InsightsCard month={month} />
 
         <section className={styles.chartsRow}>
-          <Card>
-            <CardHeader icon="pie" tone="sun" title={t('dashboard.spendingByCategory')} subtitle={formatMonth(month)} />
+          <CollapsibleCard id="dashboard.spendingByCategory" icon="pie" tone="sun" title={t('dashboard.spendingByCategory')} subtitle={formatMonth(month)}>
             {categories.length === 0 ? (
               <p className={styles.cardStatus}>{t('dashboard.noExpenses', { month: formatMonth(month) })}</p>
             ) : (
@@ -169,12 +168,11 @@ export default function DashboardPage() {
                 </ul>
               </>
             )}
-          </Card>
+          </CollapsibleCard>
 
-          <Card>
-            <CardHeader icon="chart" tone="sky" title={t('dashboard.expenseByMonth')} subtitle={t('dashboard.last6Months')} />
+          <CollapsibleCard id="dashboard.expenseByMonth" icon="chart" tone="sky" title={t('dashboard.expenseByMonth')} subtitle={t('dashboard.last6Months')}>
             <MonthlyExpenseChart data={monthlyExpense} selected={month} />
-          </Card>
+          </CollapsibleCard>
         </section>
       </>
     );

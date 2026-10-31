@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { shouldIgnoreHotkey, useHotkeys } from './useHotkeys.js';
+import { isCommandKey, shouldIgnoreHotkey, useCommandKey, useHotkeys } from './useHotkeys.js';
 
 // A fake keydown with only the fields the filter reads
 const key = (overrides = {}) => ({
@@ -53,6 +53,45 @@ describe('shouldIgnoreHotkey', () => {
   it('a dialog that is not open does not block', () => {
     document.body.append(document.createElement('dialog'));
     expect(shouldIgnoreHotkey(key())).toBe(false);
+  });
+});
+
+describe('isCommandKey', () => {
+  it('is Ctrl+K and Cmd+K, in either case', () => {
+    expect(isCommandKey(key({ key: 'k', ctrlKey: true }))).toBe(true);
+    expect(isCommandKey(key({ key: 'K', metaKey: true }))).toBe(true);
+  });
+
+  it('is not K alone, another letter, or with more modifiers', () => {
+    expect(isCommandKey(key({ key: 'k' }))).toBe(false);
+    expect(isCommandKey(key({ key: 'j', ctrlKey: true }))).toBe(false);
+    expect(isCommandKey(key({ key: 'k', ctrlKey: true, altKey: true }))).toBe(false);
+    expect(isCommandKey(key({ key: 'k', ctrlKey: true, shiftKey: true }))).toBe(false);
+  });
+});
+
+describe('useCommandKey', () => {
+  function Page({ onCommand }) {
+    useCommandKey(onCommand);
+    return <input aria-label="field" />;
+  }
+
+  it('works also while typing in a field, and the browser is told not to act', async () => {
+    const onCommand = vi.fn();
+    const { getByLabelText } = render(<Page onCommand={onCommand} />);
+    const event = new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, bubbles: true, cancelable: true });
+
+    getByLabelText('field').dispatchEvent(event);
+
+    expect(onCommand).toHaveBeenCalledTimes(1);
+    expect(event.defaultPrevented).toBe(true);
+  });
+
+  it('leaves other keys alone', async () => {
+    const onCommand = vi.fn();
+    render(<Page onCommand={onCommand} />);
+    await userEvent.keyboard('k');
+    expect(onCommand).not.toHaveBeenCalled();
   });
 });
 

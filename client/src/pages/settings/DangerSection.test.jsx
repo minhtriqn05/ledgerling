@@ -47,6 +47,23 @@ describe('DangerSection', () => {
     expect(deleteButton()).toBeEnabled();
   });
 
+  it('tells the browser and password managers to leave both fields alone', () => {
+    const { container } = renderSection();
+    const word = screen.getByLabelText('Type DELETE to confirm');
+    const password = screen.getByLabelText('Your password');
+
+    expect(container.querySelector('form')).toHaveAttribute('autocomplete', 'off');
+    expect(word).toHaveAttribute('autocomplete', 'off');
+    expect(word).toHaveAttribute('name', 'delete-confirmation');
+    expect(password).toHaveAttribute('autocomplete', 'new-password');
+    expect(password).toHaveAttribute('name', 'delete-account-password');
+    for (const field of [word, password]) {
+      expect(field).toHaveValue('');
+      expect(field).toHaveAttribute('data-1p-ignore');
+      expect(field).toHaveAttribute('data-lpignore', 'true');
+    }
+  });
+
   it('wants the word in capitals, exactly', async () => {
     const user = userEvent.setup();
     renderSection();

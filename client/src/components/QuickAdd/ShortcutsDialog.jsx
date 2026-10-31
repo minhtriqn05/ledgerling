@@ -9,6 +9,8 @@ export const SHORTCUTS = [
   { keys: 'N', actionKey: 'shortcuts.quickAdd' },
   { keys: '/', actionKey: 'shortcuts.search' },
   { keys: '?', actionKey: 'shortcuts.help' },
+  { keys: '[', actionKey: 'shortcuts.sidebar' },
+  { keys: 'Ctrl K / ⌘ K', actionKey: 'shortcuts.palette' },
   { keys: 'Esc', actionKey: 'shortcuts.close' },
 ];
 

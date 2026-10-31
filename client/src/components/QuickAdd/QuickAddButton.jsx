@@ -10,7 +10,7 @@ export default function QuickAddButton({ onClick }) {
   const { locked, note } = useOfflineLock();
 
   return (
-    <button type="button" className={styles.fab} aria-label={t('quickAdd.title')} title={note ?? t('quickAdd.tooltip')} disabled={locked} onClick={onClick}>
+    <button type="button" className={styles.fab} aria-label={t('quickAdd.title')} title={note ?? t('quickAdd.tooltip')} disabled={locked} data-tour="quick-add" onClick={onClick}>
       <Icon name="plus" size={26} />
     </button>
   );

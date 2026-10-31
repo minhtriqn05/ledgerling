@@ -4,6 +4,7 @@ import { updateProfile } from '../../api/users.js';
 import { getErrorMessage } from '../../api/axios.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
+import { useUnsavedChanges } from '../../context/UnsavedChangesContext.jsx';
 import Alert from '../../components/Alert/Alert.jsx';
 import Button from '../../components/Button/Button.jsx';
 import Card, { CardHeader } from '../../components/Card/Card.jsx';
@@ -21,6 +22,7 @@ export default function ProfileSection() {
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const trimmed = name.trim();
+  useUnsavedChanges(trimmed !== user.name);
 
   async function handleSubmit(event) {
     event.preventDefault();

@@ -49,6 +49,12 @@ describe('ProtectedRoute', () => {
     expect(screen.queryByText(/Login page/)).not.toBeInTheDocument();
   });
 
+  it('sends somebody whose session expired on the home address to /login, to come back to it', () => {
+    useAuth.mockReturnValue({ user: null, loading: false, sessionExpired: true });
+    renderAt('/');
+    expect(screen.getByText('Login page (from /)')).toBeInTheDocument();
+  });
+
   it('shows the Dashboard at the home address to a signed-in user', () => {
     useAuth.mockReturnValue({ user: { name: 'Tri' }, loading: false });
     renderAt('/');

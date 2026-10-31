@@ -35,7 +35,9 @@
     "totalsFor": "{{period}} 合计",
     "tryAgain": "重试",
     "type": "类型",
-    "viewAll": "查看全部"
+    "viewAll": "查看全部",
+    "back": "返回",
+    "skipToContent": "跳到主要内容"
   },
   "nav": {
     "admin": "管理",
@@ -51,11 +53,15 @@
     "recurring": "定期",
     "reports": "报表",
     "settings": "设置",
-    "transactions": "交易"
+    "transactions": "交易",
+    "toWelcome": "前往首页",
+    "collapseSidebar": "收起侧边栏",
+    "expandSidebar": "展开侧边栏"
   },
   "breadcrumb": {
     "label": "面包屑导航",
-    "transactionDetails": "交易详情"
+    "transactionDetails": "交易详情",
+    "home": "首页"
   },
   "language": {
     "label": "语言"
@@ -133,7 +139,9 @@
     "note": "在输入框中打字时，快捷键不会生效。",
     "quickAdd": "快速添加交易",
     "search": "搜索交易",
-    "title": "键盘快捷键"
+    "title": "键盘快捷键",
+    "sidebar": "收起或展开侧边栏",
+    "palette": "打开命令面板"
   },
   "errorPage": {
     "reload": "重新加载",
@@ -664,6 +672,41 @@
       "button": "安装应用",
       "manual": "您的浏览器没有安装按钮。在 iPhone 或 iPad 上：点按“分享”，然后选择“添加到主屏幕”。在 Android 上：打开浏览器菜单，然后选择“添加到主屏幕”。",
       "installed": "Ledgerling 已安装在此设备上。"
+    },
+    "menuLabel": "设置分区",
+    "sections": {
+      "profile": {
+        "label": "个人资料",
+        "description": "你的头像和姓名"
+      },
+      "security": {
+        "label": "安全",
+        "description": "密码和已登录的设备"
+      },
+      "appearance": {
+        "label": "外观",
+        "description": "浅色、深色或跟随设备"
+      },
+      "preferences": {
+        "label": "偏好",
+        "description": "每周的第一天"
+      },
+      "notifications": {
+        "label": "通知",
+        "description": "你想收到哪些提醒"
+      },
+      "app": {
+        "label": "应用",
+        "description": "在此设备上安装 Ledgerling"
+      },
+      "data": {
+        "label": "数据",
+        "description": "下载你在这里的全部内容"
+      },
+      "danger": {
+        "label": "危险区域",
+        "description": "永久删除你的账户"
+      }
     }
   },
   "avatar": {
@@ -772,7 +815,9 @@
       "enable": "启用",
       "disableFor": "停用 {{name}}",
       "enableFor": "启用 {{name}}",
-      "noAction": "此账户无法更改"
+      "noAction": "此账户无法更改",
+      "pageText": "查找账户，并停用或启用它。",
+      "manage": "管理用户"
     },
     "dialog": {
       "disableText": "{{name}} 将在所有设备上退出登录，在你重新启用账户之前无法登录。其数据会保留。",
@@ -856,7 +901,8 @@
     },
     "footerNote": "UIT · CSBU109.R11.KHBC",
     "github": "在 GitHub 上查看",
-    "opensInNewTab": "（在新标签页中打开）"
+    "opensInNewTab": "（在新标签页中打开）",
+    "openApp": "打开应用"
   },
   "onboarding": {
     "title": "开始使用 Ledgerling",
@@ -960,5 +1006,126 @@
     "banner": "您已离线 – 正在显示已保存的数据",
     "note": "恢复联网前，无法添加、编辑和删除。",
     "locked": "离线时不可用"
+  },
+  "card": {
+    "collapse": "收起{{title}}",
+    "expand": "展开{{title}}"
+  },
+  "unsaved": {
+    "title": "不保存就离开？",
+    "text": "你有尚未保存的更改。如果现在离开，这些更改将会丢失。",
+    "stay": "留下",
+    "leave": "离开"
+  },
+  "userMenu": {
+    "label": "账户",
+    "profile": "个人资料"
+  },
+  "tour": {
+    "open": "查看导览",
+    "skip": "跳过",
+    "next": "下一步",
+    "done": "完成",
+    "counter": "第 {{step}} 步，共 {{total}} 步",
+    "steps": {
+      "quickAdd": {
+        "title": "快速添加",
+        "text": "在任何页面用这个按钮或 N 键添加一笔交易。试试“咖啡 35k #工作”。"
+      },
+      "dashboard": {
+        "title": "概览",
+        "text": "一眼看清本月：收入、支出、余额以及钱花在了哪里。"
+      },
+      "budgets": {
+        "title": "预算",
+        "text": "为每个分类设定上限。达到 80% 和 100% 时会提醒你。"
+      },
+      "reports": {
+        "title": "报告",
+        "text": "查看某个月、全年或支出日历。"
+      },
+      "settings": {
+        "title": "设置",
+        "text": "个人资料、安全、主题、通知和数据，各有自己的分区。"
+      },
+      "account": {
+        "title": "你的账户",
+        "text": "打开此菜单可更改主题、查看快捷键、退出登录或再次查看导览。"
+      }
+    }
+  },
+  "commandPalette": {
+    "open": "搜索…",
+    "title": "跳转到",
+    "placeholder": "输入页面、命令或交易备注",
+    "searchLanguage": "输入语言",
+    "results": "结果",
+    "toggleTheme": "切换主题",
+    "changeLanguage": "更改语言",
+    "searching": "正在搜索你的交易…",
+    "searchFailed": "暂时无法搜索你的交易。",
+    "noResults": "没有找到内容。",
+    "groups": {
+      "pages": "页面",
+      "actions": "命令",
+      "transactions": "交易",
+      "languages": "语言"
+    }
+  },
+  "session": {
+    "title": "登录已过期",
+    "text": "为了你的安全，你已被退出登录。请重新登录，从刚才的地方继续。",
+    "logInAgain": "重新登录"
+  },
+  "legal": {
+    "linksLabel": "关于本站",
+    "about": {
+      "title": "关于",
+      "lead": "Ledgerling 是一款安静、简单的个人记账工具。",
+      "what": {
+        "title": "它能做什么",
+        "text": "你可以记录收入和支出、按分类设定预算、为目标储蓄，并查看月度或年度报告。它支持八种语言，在手机上也能使用。"
+      },
+      "who": {
+        "title": "谁做的",
+        "text": "这是一名学生为 UIT 的“Web 应用与数据库开发”课程（班级 CSBU109.R11.KHBC）完成的期末项目。"
+      },
+      "built": {
+        "title": "如何构建",
+        "text": "客户端使用 React，API 使用 Node.js 和 Express，数据存放在 MongoDB。源代码在 GitHub 上。"
+      }
+    },
+    "privacy": {
+      "title": "隐私",
+      "lead": "用简单的话说明 Ledgerling 保存了你的哪些信息。",
+      "collect": {
+        "title": "保存的内容",
+        "text": "你的姓名、邮箱、头像、经过加密的密码（bcrypt，绝不保存密码本身），以及你输入的一切：交易、分类、预算、规则和目标。没有广告，也没有分析工具。"
+      },
+      "where": {
+        "title": "保存在哪里",
+        "text": "数据保存在 MongoDB Atlas 数据库中；网站运行在 Vercel 和 Render 上。字体来自 Google Fonts。你的浏览器会保存登录令牌以及主题、语言等选择。"
+      },
+      "control": {
+        "title": "你可以做什么",
+        "text": "在设置中，你可以把全部数据下载为一个文件，也可以删除账户，这会移除属于该账户的所有内容。"
+      }
+    },
+    "terms": {
+      "title": "条款",
+      "lead": "Ledgerling 是课程项目，所以这些条款很简短。",
+      "use": {
+        "title": "使用",
+        "text": "请用 Ledgerling 记录你自己的账目。保管好你的密码，不要尝试访问他人的数据或使服务过载。"
+      },
+      "data": {
+        "title": "你的数据",
+        "text": "你输入的内容仍然属于你。管理员可以停用违反这些条款的账户。请为重要内容保留副本：课程结束时，服务可能会停止或被重置。"
+      },
+      "warranty": {
+        "title": "不作保证",
+        "text": "本服务免费，且不提供任何保证。它不提供财务建议，显示的数字是否准确取决于你输入的内容。"
+      }
+    }
   }
 }

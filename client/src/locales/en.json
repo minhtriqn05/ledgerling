@@ -35,7 +35,9 @@
     "totalsFor": "Totals for {{period}}",
     "tryAgain": "Try again",
     "type": "Type",
-    "viewAll": "View all"
+    "viewAll": "View all",
+    "back": "Back",
+    "skipToContent": "Skip to content"
   },
   "nav": {
     "admin": "Admin",
@@ -51,11 +53,15 @@
     "recurring": "Recurring",
     "reports": "Reports",
     "settings": "Settings",
-    "transactions": "Transactions"
+    "transactions": "Transactions",
+    "toWelcome": "Go to the home page",
+    "collapseSidebar": "Collapse sidebar",
+    "expandSidebar": "Expand sidebar"
   },
   "breadcrumb": {
     "label": "Breadcrumb",
-    "transactionDetails": "Transaction details"
+    "transactionDetails": "Transaction details",
+    "home": "Home"
   },
   "language": {
     "label": "Language"
@@ -133,7 +139,9 @@
     "note": "Shortcuts are ignored while you are typing in a field.",
     "quickAdd": "Quick add a transaction",
     "search": "Search your transactions",
-    "title": "Keyboard shortcuts"
+    "title": "Keyboard shortcuts",
+    "sidebar": "Collapse or expand the sidebar",
+    "palette": "Open the command palette"
   },
   "errorPage": {
     "reload": "Reload",
@@ -664,6 +672,41 @@
       "button": "Install app",
       "manual": "Your browser has no install button. On iPhone or iPad: tap Share, then Add to Home Screen. On Android: open the browser menu, then choose Add to Home Screen.",
       "installed": "Ledgerling is installed on this device."
+    },
+    "menuLabel": "Settings sections",
+    "sections": {
+      "profile": {
+        "label": "Profile",
+        "description": "Your avatar and your name"
+      },
+      "security": {
+        "label": "Security",
+        "description": "Password and signed-in devices"
+      },
+      "appearance": {
+        "label": "Appearance",
+        "description": "Light, dark or like your device"
+      },
+      "preferences": {
+        "label": "Preferences",
+        "description": "The first day of the week"
+      },
+      "notifications": {
+        "label": "Notifications",
+        "description": "What you want to hear about"
+      },
+      "app": {
+        "label": "App",
+        "description": "Install Ledgerling on this device"
+      },
+      "data": {
+        "label": "Data",
+        "description": "Download everything you have here"
+      },
+      "danger": {
+        "label": "Danger zone",
+        "description": "Delete your account for good"
+      }
     }
   },
   "avatar": {
@@ -772,7 +815,9 @@
       "enable": "Enable",
       "disableFor": "Disable {{name}}",
       "enableFor": "Enable {{name}}",
-      "noAction": "This account cannot be changed"
+      "noAction": "This account cannot be changed",
+      "pageText": "Find an account, and disable or enable it.",
+      "manage": "Manage users"
     },
     "dialog": {
       "disableText": "{{name}} will be logged out on every device and cannot log in until you enable the account again. Their data is kept.",
@@ -856,7 +901,8 @@
     },
     "footerNote": "UIT · CSBU109.R11.KHBC",
     "github": "View on GitHub",
-    "opensInNewTab": "(opens in a new tab)"
+    "opensInNewTab": "(opens in a new tab)",
+    "openApp": "Open app"
   },
   "onboarding": {
     "title": "Get started with Ledgerling",
@@ -960,5 +1006,126 @@
     "banner": "You're offline – showing saved data",
     "note": "Adding, editing and deleting are turned off until you're back online.",
     "locked": "Not available while you're offline"
+  },
+  "card": {
+    "collapse": "Collapse {{title}}",
+    "expand": "Expand {{title}}"
+  },
+  "unsaved": {
+    "title": "Leave without saving?",
+    "text": "You have changes that are not saved yet. If you leave now, they will be lost.",
+    "stay": "Stay",
+    "leave": "Leave"
+  },
+  "userMenu": {
+    "label": "Account",
+    "profile": "Profile"
+  },
+  "tour": {
+    "open": "Take the tour",
+    "skip": "Skip",
+    "next": "Next",
+    "done": "Done",
+    "counter": "Step {{step}} of {{total}}",
+    "steps": {
+      "quickAdd": {
+        "title": "Quick add",
+        "text": "Add a transaction from any page with this button or the N key. Try “coffee 35k #work”."
+      },
+      "dashboard": {
+        "title": "Dashboard",
+        "text": "Your month at a glance: income, expense, balance and where the money went."
+      },
+      "budgets": {
+        "title": "Budgets",
+        "text": "Set a limit per category. You get a warning at 80% and at 100%."
+      },
+      "reports": {
+        "title": "Reports",
+        "text": "Look at a month, a whole year or a calendar of your spending."
+      },
+      "settings": {
+        "title": "Settings",
+        "text": "Your profile, security, theme, notifications and data, each in its own section."
+      },
+      "account": {
+        "title": "Your account",
+        "text": "Open this menu to change the theme, see the shortcuts, log out or take this tour again."
+      }
+    }
+  },
+  "commandPalette": {
+    "open": "Search…",
+    "title": "Jump to",
+    "placeholder": "Type a page, a command or a transaction note",
+    "searchLanguage": "Type a language",
+    "results": "Results",
+    "toggleTheme": "Toggle theme",
+    "changeLanguage": "Change language",
+    "searching": "Searching your transactions…",
+    "searchFailed": "Your transactions could not be searched right now.",
+    "noResults": "Nothing found.",
+    "groups": {
+      "pages": "Pages",
+      "actions": "Commands",
+      "transactions": "Transactions",
+      "languages": "Languages"
+    }
+  },
+  "session": {
+    "title": "Session expired",
+    "text": "For your safety you were signed out. Log in again to continue where you left off.",
+    "logInAgain": "Log in again"
+  },
+  "legal": {
+    "linksLabel": "About this site",
+    "about": {
+      "title": "About",
+      "lead": "Ledgerling is a calm, simple personal expense tracker.",
+      "what": {
+        "title": "What it does",
+        "text": "You record income and expenses, set budgets per category, save towards goals and read reports of a month or a year. It works in eight languages and on a phone too."
+      },
+      "who": {
+        "title": "Who made it",
+        "text": "It is the final project of one student for the course Web application and database development, class CSBU109.R11.KHBC, at UIT."
+      },
+      "built": {
+        "title": "How it is built",
+        "text": "React on the client, Node.js with Express for the API and MongoDB for the data. The source code is on GitHub."
+      }
+    },
+    "privacy": {
+      "title": "Privacy",
+      "lead": "What Ledgerling keeps about you, in plain words.",
+      "collect": {
+        "title": "What is stored",
+        "text": "Your name, your email, your avatar, a scrambled copy of your password (bcrypt, never the password itself) and everything you enter: transactions, categories, budgets, rules and goals. There are no ads and no analytics."
+      },
+      "where": {
+        "title": "Where it is",
+        "text": "The data is in a MongoDB Atlas database; the site runs on Vercel and Render. The font comes from Google Fonts. Your browser keeps your sign-in token and your choices such as the theme and the language."
+      },
+      "control": {
+        "title": "What you can do",
+        "text": "In Settings you can download all your data as one file, and delete your account, which removes everything that belongs to it."
+      }
+    },
+    "terms": {
+      "title": "Terms",
+      "lead": "Ledgerling is a course project, so these terms are short.",
+      "use": {
+        "title": "Using it",
+        "text": "Use Ledgerling for your own money records. Keep your password to yourself, and do not try to reach the data of other people or to overload the service."
+      },
+      "data": {
+        "title": "Your data",
+        "text": "What you enter stays yours. An admin can disable an account that breaks these terms. Keep a copy of what matters: the service may stop or be reset when the course ends."
+      },
+      "warranty": {
+        "title": "No guarantee",
+        "text": "The service is free and comes without any guarantee. It does not give financial advice, and the numbers it shows are only as good as what you enter."
+      }
+    }
   }
 }

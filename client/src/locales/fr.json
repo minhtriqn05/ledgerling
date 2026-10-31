@@ -35,7 +35,9 @@
     "totalsFor": "Totaux pour {{period}}",
     "tryAgain": "Réessayer",
     "type": "Type",
-    "viewAll": "Tout voir"
+    "viewAll": "Tout voir",
+    "back": "Retour",
+    "skipToContent": "Aller au contenu"
   },
   "nav": {
     "admin": "Administration",
@@ -51,11 +53,15 @@
     "recurring": "Récurrences",
     "reports": "Rapports",
     "settings": "Paramètres",
-    "transactions": "Transactions"
+    "transactions": "Transactions",
+    "toWelcome": "Aller à la page d’accueil",
+    "collapseSidebar": "Réduire la barre latérale",
+    "expandSidebar": "Agrandir la barre latérale"
   },
   "breadcrumb": {
     "label": "Fil d’Ariane",
-    "transactionDetails": "Détails de la transaction"
+    "transactionDetails": "Détails de la transaction",
+    "home": "Accueil"
   },
   "language": {
     "label": "Langue"
@@ -133,7 +139,9 @@
     "note": "Les raccourcis sont ignorés pendant la saisie dans un champ.",
     "quickAdd": "Ajouter rapidement une transaction",
     "search": "Rechercher dans les transactions",
-    "title": "Raccourcis clavier"
+    "title": "Raccourcis clavier",
+    "sidebar": "Réduire ou agrandir la barre latérale",
+    "palette": "Ouvrir la palette de commandes"
   },
   "errorPage": {
     "reload": "Recharger",
@@ -664,6 +672,41 @@
       "button": "Installer l'application",
       "manual": "Votre navigateur n'a pas de bouton d'installation. Sur iPhone ou iPad : touchez Partager, puis Sur l'écran d'accueil. Sur Android : ouvrez le menu du navigateur, puis choisissez Ajouter à l'écran d'accueil.",
       "installed": "Ledgerling est installé sur cet appareil."
+    },
+    "menuLabel": "Sections des réglages",
+    "sections": {
+      "profile": {
+        "label": "Profil",
+        "description": "Votre avatar et votre nom"
+      },
+      "security": {
+        "label": "Sécurité",
+        "description": "Mot de passe et appareils connectés"
+      },
+      "appearance": {
+        "label": "Apparence",
+        "description": "Clair, sombre ou comme votre appareil"
+      },
+      "preferences": {
+        "label": "Préférences",
+        "description": "Le premier jour de la semaine"
+      },
+      "notifications": {
+        "label": "Notifications",
+        "description": "Ce dont vous voulez être informé"
+      },
+      "app": {
+        "label": "Application",
+        "description": "Installer Ledgerling sur cet appareil"
+      },
+      "data": {
+        "label": "Données",
+        "description": "Télécharger tout ce que vous avez ici"
+      },
+      "danger": {
+        "label": "Zone de danger",
+        "description": "Supprimer votre compte pour de bon"
+      }
     }
   },
   "avatar": {
@@ -772,7 +815,9 @@
       "enable": "Activer",
       "disableFor": "Désactiver {{name}}",
       "enableFor": "Activer {{name}}",
-      "noAction": "Ce compte ne peut pas être modifié"
+      "noAction": "Ce compte ne peut pas être modifié",
+      "pageText": "Trouvez un compte, puis désactivez-le ou activez-le.",
+      "manage": "Gérer les utilisateurs"
     },
     "dialog": {
       "disableText": "{{name}} sera déconnecté sur tous les appareils et ne pourra plus se connecter tant que vous n’aurez pas réactivé le compte. Ses données sont conservées.",
@@ -856,7 +901,8 @@
     },
     "footerNote": "UIT · CSBU109.R11.KHBC",
     "github": "Voir sur GitHub",
-    "opensInNewTab": "(s’ouvre dans un nouvel onglet)"
+    "opensInNewTab": "(s’ouvre dans un nouvel onglet)",
+    "openApp": "Ouvrir l’application"
   },
   "onboarding": {
     "title": "Prenez en main Ledgerling",
@@ -960,5 +1006,126 @@
     "banner": "Vous êtes hors ligne – données enregistrées affichées",
     "note": "L'ajout, la modification et la suppression sont désactivés jusqu'au retour de la connexion.",
     "locked": "Indisponible hors ligne"
+  },
+  "card": {
+    "collapse": "Réduire {{title}}",
+    "expand": "Ouvrir {{title}}"
+  },
+  "unsaved": {
+    "title": "Quitter sans enregistrer ?",
+    "text": "Certaines modifications ne sont pas encore enregistrées. Si vous quittez maintenant, elles seront perdues.",
+    "stay": "Rester",
+    "leave": "Quitter"
+  },
+  "userMenu": {
+    "label": "Compte",
+    "profile": "Profil"
+  },
+  "tour": {
+    "open": "Suivre la visite guidée",
+    "skip": "Passer",
+    "next": "Suivant",
+    "done": "Terminé",
+    "counter": "Étape {{step}} sur {{total}}",
+    "steps": {
+      "quickAdd": {
+        "title": "Ajout rapide",
+        "text": "Ajoutez une transaction depuis n’importe quelle page avec ce bouton ou la touche N. Essayez « café 35k #travail »."
+      },
+      "dashboard": {
+        "title": "Tableau de bord",
+        "text": "Votre mois en un coup d’œil : revenus, dépenses, solde et où est allé l’argent."
+      },
+      "budgets": {
+        "title": "Budgets",
+        "text": "Fixez une limite par catégorie. Vous êtes averti à 80 % et à 100 %."
+      },
+      "reports": {
+        "title": "Rapports",
+        "text": "Consultez un mois, une année entière ou le calendrier de vos dépenses."
+      },
+      "settings": {
+        "title": "Réglages",
+        "text": "Profil, sécurité, thème, notifications et données, chacun dans sa section."
+      },
+      "account": {
+        "title": "Votre compte",
+        "text": "Ouvrez ce menu pour changer de thème, voir les raccourcis, vous déconnecter ou revoir cette visite."
+      }
+    }
+  },
+  "commandPalette": {
+    "open": "Rechercher…",
+    "title": "Aller à",
+    "placeholder": "Saisissez une page, une commande ou une note",
+    "searchLanguage": "Saisissez une langue",
+    "results": "Résultats",
+    "toggleTheme": "Changer de thème",
+    "changeLanguage": "Changer de langue",
+    "searching": "Recherche dans vos transactions…",
+    "searchFailed": "Impossible de rechercher dans vos transactions pour le moment.",
+    "noResults": "Aucun résultat.",
+    "groups": {
+      "pages": "Pages",
+      "actions": "Commandes",
+      "transactions": "Transactions",
+      "languages": "Langues"
+    }
+  },
+  "session": {
+    "title": "Session expirée",
+    "text": "Par sécurité, vous avez été déconnecté. Reconnectez-vous pour reprendre là où vous en étiez.",
+    "logInAgain": "Se reconnecter"
+  },
+  "legal": {
+    "linksLabel": "À propos de ce site",
+    "about": {
+      "title": "À propos",
+      "lead": "Ledgerling est un outil de suivi des dépenses personnelles, simple et calme.",
+      "what": {
+        "title": "Ce qu’il fait",
+        "text": "Vous notez vos revenus et vos dépenses, fixez des budgets par catégorie, épargnez pour des objectifs et lisez des rapports par mois ou par année. Il existe en huit langues et fonctionne aussi sur téléphone."
+      },
+      "who": {
+        "title": "Qui l’a créé",
+        "text": "C’est le projet de fin de cours d’un étudiant pour le cours Développement d’applications web et de bases de données, classe CSBU109.R11.KHBC, à l’UIT."
+      },
+      "built": {
+        "title": "Comment il est construit",
+        "text": "React côté client, Node.js avec Express pour l’API et MongoDB pour les données. Le code source est sur GitHub."
+      }
+    },
+    "privacy": {
+      "title": "Confidentialité",
+      "lead": "Ce que Ledgerling conserve à votre sujet, en termes simples.",
+      "collect": {
+        "title": "Ce qui est enregistré",
+        "text": "Votre nom, votre e-mail, votre avatar, une version chiffrée de votre mot de passe (bcrypt, jamais le mot de passe lui-même) et tout ce que vous saisissez : transactions, catégories, budgets, règles et objectifs. Il n’y a ni publicité ni outil d’analyse."
+      },
+      "where": {
+        "title": "Où c’est stocké",
+        "text": "Les données sont dans une base MongoDB Atlas ; le site tourne sur Vercel et Render. La police vient de Google Fonts. Votre navigateur garde votre jeton de connexion et vos choix comme le thème et la langue."
+      },
+      "control": {
+        "title": "Ce que vous pouvez faire",
+        "text": "Dans les réglages, vous pouvez télécharger toutes vos données dans un fichier et supprimer votre compte, ce qui efface tout ce qui lui appartient."
+      }
+    },
+    "terms": {
+      "title": "Conditions",
+      "lead": "Ledgerling est un projet de cours : ces conditions sont donc brèves.",
+      "use": {
+        "title": "Utilisation",
+        "text": "Utilisez Ledgerling pour vos propres comptes. Gardez votre mot de passe pour vous et n’essayez ni d’accéder aux données d’autrui ni de surcharger le service."
+      },
+      "data": {
+        "title": "Vos données",
+        "text": "Ce que vous saisissez reste à vous. Un administrateur peut désactiver un compte qui enfreint ces conditions. Gardez une copie de ce qui compte : le service peut s’arrêter ou être réinitialisé à la fin du cours."
+      },
+      "warranty": {
+        "title": "Aucune garantie",
+        "text": "Le service est gratuit et fourni sans aucune garantie. Il ne donne pas de conseils financiers, et ses chiffres valent ce que valent vos saisies."
+      }
+    }
   }
 }

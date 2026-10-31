@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext.jsx';
 import { getErrorMessage } from '../api/axios.js';
@@ -7,13 +7,15 @@ import { useDocumentTitle } from '../hooks/useDocumentTitle.js';
 import Alert from '../components/Alert/Alert.jsx';
 import Icon from '../components/Icon.jsx';
 import LanguageSwitcher from '../components/LanguageSwitcher/LanguageSwitcher.jsx';
+import LegalLinks from '../components/LegalLinks/LegalLinks.jsx';
 import LoadingState from '../components/LoadingState/LoadingState.jsx';
 import Logo from '../components/Logo/Logo.jsx';
 import Reveal from '../components/Motion/Reveal.jsx';
 import styles from './WelcomePage.module.css';
 
 // The public landing page (/welcome). A visitor who opens the site lands here (ProtectedRoute sends "/" to it);
-// a signed-in user is sent to the Dashboard. "Try the demo" signs in to the shared demo account with one click.
+// a signed-in user can open it too (the logo in the sidebar and the breadcrumb lead here) and sees "Open app" instead of
+// Log in and Get started. "Try the demo" signs in to the shared demo account with one click.
 // All the text is in locales/*.json under "welcome".
 
 const GITHUB_URL = 'https://github.com/minhtriqn05/ledgerling';
@@ -38,21 +40,21 @@ const shotFiles = import.meta.glob('../assets/screenshots/*.jpg', { eager: true,
 
 export default function WelcomePage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { user, loading, loginAsDemo } = useAuth();
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState('');
   useDocumentTitle(t('welcome.documentTitle'));
 
-  // A stored token is still being checked: do not flash the page at someone who is already signed in
+  // A stored token is still being checked: do not show the wrong buttons for a moment
   if (loading) return <LoadingState fullScreen />;
-  if (user) return <Navigate to="/" replace />;
 
   async function handleDemo() {
     setError('');
     setStarting(true);
     try {
-      // On success AuthContext stores the user and the check above moves us to the Dashboard
       await loginAsDemo();
+      navigate('/', { replace: true });
     } catch (err) {
       setError(getErrorMessage(err));
       setStarting(false);
@@ -69,9 +71,15 @@ export default function WelcomePage() {
         </Link>
         <div className={styles.headerActions}>
           <LanguageSwitcher />
-          <Link to="/login" className={styles.headerLink}>
-            {t('auth.logIn')}
-          </Link>
+          {user ? (
+            <Link to="/" className={styles.headerLink}>
+              {t('welcome.openApp')}
+            </Link>
+          ) : (
+            <Link to="/login" className={styles.headerLink}>
+              {t('auth.logIn')}
+            </Link>
+          )}
         </div>
       </header>
 
@@ -83,25 +91,35 @@ export default function WelcomePage() {
           </h1>
           <p className={styles.lead}>{t('welcome.lead')}</p>
 
-          <div className={styles.actions}>
-            <Link to="/register" className={`${styles.cta} ${styles.primary}`}>
-              {t('welcome.getStarted')}
-            </Link>
-            <button type="button" className={`${styles.cta} ${styles.secondary}`} onClick={handleDemo} disabled={starting}>
-              <Icon name="sprout" size={18} />
-              {t('welcome.tryDemo')}
-            </button>
-            <Link to="/login" className={`${styles.cta} ${styles.ghost}`}>
-              {t('auth.logIn')}
-            </Link>
-          </div>
+          {user ? (
+            <div className={styles.actions}>
+              <Link to="/" className={`${styles.cta} ${styles.primary}`}>
+                {t('welcome.openApp')}
+              </Link>
+            </div>
+          ) : (
+            <>
+              <div className={styles.actions}>
+                <Link to="/register" className={`${styles.cta} ${styles.primary}`}>
+                  {t('welcome.getStarted')}
+                </Link>
+                <button type="button" className={`${styles.cta} ${styles.secondary}`} onClick={handleDemo} disabled={starting}>
+                  <Icon name="sprout" size={18} />
+                  {t('welcome.tryDemo')}
+                </button>
+                <Link to="/login" className={`${styles.cta} ${styles.ghost}`}>
+                  {t('auth.logIn')}
+                </Link>
+              </div>
 
-          {/* Always in the page, so a screen reader announces the text when it appears */}
-          <p className={styles.demoStatus} role="status">
-            {starting ? t('welcome.demoStarting') : ''}
-          </p>
-          {error && <Alert>{error}</Alert>}
-          {!starting && !error && <p className={styles.hint}>{t('welcome.demoHint')}</p>}
+              {/* Always in the page, so a screen reader announces the text when it appears */}
+              <p className={styles.demoStatus} role="status">
+                {starting ? t('welcome.demoStarting') : ''}
+              </p>
+              {error && <Alert>{error}</Alert>}
+              {!starting && !error && <p className={styles.hint}>{t('welcome.demoHint')}</p>}
+            </>
+          )}
         </section>
 
         <section className={styles.section} aria-labelledby="welcome-features">
@@ -167,6 +185,7 @@ export default function WelcomePage() {
       <footer className={styles.footer}>
         <Logo size={26} />
         <p>{t('welcome.footerNote')}</p>
+        <LegalLinks className={styles.legalLinks} linkClassName={styles.footerLink} />
         <a href={GITHUB_URL} className={styles.footerLink} target="_blank" rel="noopener noreferrer">
           {t('welcome.github')}
           <span className={styles.srOnly}> {t('welcome.opensInNewTab')}</span>

@@ -37,6 +37,12 @@
   box-shadow: 0 0 0 3px var(--color-focus-ring);
 }
 
+/* The Home icon at the start of the trail */
+.home {
+  display: inline-flex;
+  align-items: center;
+}
+
 .current {
   padding: 2px var(--space-1);
   color: var(--color-text);
@@ -59,28 +65,37 @@
   }
 }
 
-/* A phone: only the level above is shown, as "‹ Reports". The current level stays in the page for screen readers
-   (it has aria-current), it is only hidden from the eye. A page with a single level (Dashboard) shows it as it is. */
+/* A phone: the Home icon, then the level above as "‹ Reports". The current level stays in the page for screen readers
+   (it has aria-current), it is only hidden from the eye. A page right below Home shows "Home › Transactions" as it is. */
 @media (max-width: 767px) {
   .item {
     display: none;
   }
 
-  .item:nth-last-child(2) {
+  .item:first-child {
     display: inline-flex;
   }
 
-  .item:nth-last-child(2) .separator {
+  /* "Home ‹ Reports": the arrow of the level above is enough */
+  .item:first-child:not(:nth-last-child(2)) .separator {
     display: none;
   }
 
-  .item:nth-last-child(2) .backIcon {
+  .item:nth-last-child(2):not(:first-child) {
+    display: inline-flex;
+  }
+
+  .item:nth-last-child(2):not(:first-child) .separator {
+    display: none;
+  }
+
+  .item:nth-last-child(2):not(:first-child) .backIcon {
     display: inline-flex;
     margin-right: calc(var(--space-1) * -1);
     color: var(--color-text-secondary);
   }
 
-  .item:last-child:not(:only-child) {
+  .item:last-child:not(:nth-child(2)) {
     display: block;
     position: absolute;
     width: 1px;
@@ -90,7 +105,7 @@
     white-space: nowrap;
   }
 
-  .item:only-child {
+  .item:last-child:nth-child(2) {
     display: inline-flex;
   }
 

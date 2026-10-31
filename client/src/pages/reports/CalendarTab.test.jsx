@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import CalendarTab from './CalendarTab.jsx';
@@ -44,7 +44,8 @@ describe('CalendarTab', () => {
 
     expect(await screen.findByRole('button', { name: '10 October 2026: spent 1,000,000 ₫' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '1 October 2026: no spending' })).toBeInTheDocument();
-    expect(screen.getAllByRole('button')).toHaveLength(31);
+    // The chevron of the card is a button too: only the ones in the grid are days
+    expect(within(screen.getByRole('group', { name: 'Calendar of October 2026' })).getAllByRole('button')).toHaveLength(31);
     expect(getMonthlyReport).toHaveBeenCalledWith('2026-10');
   });
 

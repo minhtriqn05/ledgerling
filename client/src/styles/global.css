@@ -35,6 +35,11 @@ h4 {
   }
 }
 
+/* The Skip to content link puts the focus on <main>: no ring around the whole page */
+main:focus {
+  outline: none;
+}
+
 /* Form controls do not inherit the page font by default. */
 button,
 input,

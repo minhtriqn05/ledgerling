@@ -29,13 +29,13 @@ function serverAddress() {
 }
 
 export function SocketProvider({ children }) {
-  const { token, logout } = useAuth();
+  const { token, expireSession } = useAuth();
   const [status, setStatus] = useState('reconnecting');
   const listeners = useRef(new Map()); // event name -> Set of handlers
-  // The latest logout, so a new render never opens a new socket
-  const latestLogout = useRef(logout);
+  // The latest function, so a new render never opens a new socket
+  const latestExpire = useRef(expireSession);
   useEffect(() => {
-    latestLogout.current = logout;
+    latestExpire.current = expireSession;
   });
 
   const subscribe = useCallback((event, handler) => {
@@ -76,9 +76,9 @@ export function SocketProvider({ children }) {
     });
 
     socket.on('connect_error', (error) => {
-      // The session ended on another device, by an admin or because the token expired: log out right away
+      // The session ended on another device, by an admin or because the token expired: show the "Session expired" dialog
       if (error.message === 'TOKEN_INVALID') {
-        if (localStorage.getItem('token') === token) latestLogout.current();
+        if (localStorage.getItem('token') === token) latestExpire.current();
         return;
       }
       // Refused by the server for another reason (socket.active is false): it does not try again by itself

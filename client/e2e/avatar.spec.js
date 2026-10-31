@@ -24,7 +24,7 @@ async function register(page, testInfo, label, name = 'Avatar Tester') {
 }
 
 async function openProfile(page) {
-  await page.goto('/settings');
+  await page.goto('/settings/profile');
   await expect(page.getByRole('heading', { name: 'Your avatar' })).toBeVisible();
 }
 
@@ -218,8 +218,8 @@ test('the Admin list shows the avatar of every user', async ({ page }) => {
   await page.getByRole('button', { name: 'Log in' }).click();
   await expect(page.getByRole('heading', { name: 'Dashboard', level: 1 })).toBeVisible();
 
-  await page.goto('/admin');
-  await expect(page.getByRole('heading', { name: 'Admin', level: 1 })).toBeVisible();
+  await page.goto('/admin/users');
+  await expect(page.getByRole('heading', { name: 'Users', level: 1 })).toBeVisible();
   const rows = page.locator('tbody tr');
   await expect(rows.first()).toBeVisible();
   const count = await rows.count();

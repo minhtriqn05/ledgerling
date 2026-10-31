@@ -84,7 +84,7 @@
 
 /* ---------- Danger zone ---------- */
 .danger {
-  border-color: color-mix(in srgb, var(--color-expense) 35%, var(--color-border));
+  border: 1.5px solid var(--color-expense);
 }
 
 .dangerText {

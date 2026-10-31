@@ -80,6 +80,8 @@ export default function RecurringPage() {
       const saved = await toggleRecurringRule(rule._id);
       toast.success(saved.active ? t('recurring.turnedOn') : t('recurring.turnedOff'));
       setRules((list) => list.map((r) => (r._id === saved._id ? saved : r)));
+      // A list that was still on its way (a live refresh) holds the old value: this drops that answer and asks again
+      setReloadKey((key) => key + 1);
     } catch (err) {
       toast.error(getErrorMessage(err));
     } finally {

@@ -6,6 +6,11 @@ import { defineConfig, devices } from '@playwright/test';
 // - the production build on port 5175 (vite preview, in its own folder): the service worker only exists there (e2e/offline.spec.js)
 const API_URL = 'http://localhost:4100/api';
 const APP_URL = 'http://localhost:5174';
+const BUILD_URL = 'http://localhost:5175';
+
+// The guided tour opens for somebody who never saw it, over the whole page. Every test browser starts as if it saw the
+// tour already, so a test can click on the page right after signing in. e2e/ux-polish.spec.js empties this for the tour itself.
+const TOUR_SEEN = [{ name: 'ledgerling.tourSeen', value: '1' }];
 
 export default defineConfig({
   testDir: './e2e',
@@ -17,6 +22,13 @@ export default defineConfig({
     baseURL: APP_URL,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
+    storageState: {
+      cookies: [],
+      origins: [
+        { origin: APP_URL, localStorage: TOUR_SEEN },
+        { origin: BUILD_URL, localStorage: TOUR_SEEN },
+      ],
+    },
   },
   // Every test runs on a desktop and on a phone screen
   projects: [
@@ -43,7 +55,7 @@ export default defineConfig({
     },
     {
       command: 'npm run build -- --outDir dist-e2e && npm run preview -- --outDir dist-e2e --port 5175 --strictPort',
-      url: 'http://localhost:5175',
+      url: BUILD_URL,
       timeout: 120000,
       reuseExistingServer: false,
       env: { VITE_API_URL: API_URL },
