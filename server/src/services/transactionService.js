@@ -2,6 +2,7 @@ import Transaction from "../models/Transaction.js";
 import Category from "../models/Category.js";
 import { httpError } from "../utils/httpError.js";
 import { buildCsv } from "../utils/csv.js";
+import { notifyBudgetThresholds } from "./notificationService.js";
 import {
   currentMonth,
   dayStart,
@@ -125,6 +126,7 @@ export async function createTransaction(userId, data) {
 
   // type is copied from the category so it can never disagree with it
   const transaction = await Transaction.create({ ...data, userId, type: category.type });
+  await notifyBudgetThresholds(userId, transaction);
   return transaction.populate("categoryId", CATEGORY_FIELDS);
 }
 
@@ -138,6 +140,7 @@ export async function updateTransaction(userId, id, changes) {
 
   transaction.set(changes);
   await transaction.save();
+  await notifyBudgetThresholds(userId, transaction);
   // populate again: the category may have changed
   return transaction.populate("categoryId", CATEGORY_FIELDS);
 }

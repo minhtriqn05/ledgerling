@@ -16,12 +16,14 @@ erDiagram
     USER ||--o{ TRANSACTION_TEMPLATE : saves
     CATEGORY ||--o{ TRANSACTION_TEMPLATE : prefills
     GOAL ||--o{ CONTRIBUTION : holds
+    USER ||--o{ NOTIFICATION : receives
 
     USER {
         ObjectId _id PK
         string name
         string email UK "unique, lowercase"
         string passwordHash
+        object preferences "notifications { budget, goals, recurring, weekly }, booleans, default true"
         date createdAt
         date updatedAt
     }
@@ -100,6 +102,20 @@ erDiagram
         date updatedAt
     }
 
+    NOTIFICATION {
+        ObjectId _id PK
+        ObjectId userId FK
+        string type "budget_warning, budget_over, goal_completed, recurring_created, weekly_summary"
+        string title "English text, up to 100 characters"
+        string message "English text, up to 300 characters"
+        string link "path inside the app"
+        object params "numbers and names the text was built from"
+        boolean read "default false"
+        string dedupeKey "unique per user"
+        date createdAt
+        date updatedAt
+    }
+
     CONTRIBUTION {
         ObjectId _id PK
         number amount "whole VND, not 0: positive = deposit, negative = withdrawal"
@@ -132,3 +148,7 @@ erDiagram
 - `Category.icon` is optional: an icon name from the app's icon set (`utensils`, `bus`, ...; list in `server/src/utils/categoryIcons.js`, max 30 characters) or one emoji saved by an older version. `null` = none chosen, and the client then guesses an icon from the name (nothing is written back). Default categories are created with an icon name; stored emoji are never rewritten, the client shows them as the matching line icon.
 - One User has many Transaction Templates (`TransactionTemplate.userId`); one Category has many Templates (`TransactionTemplate.categoryId`). A template has no `type`: the type of a transaction made from it comes from the category.
 - Deleting a Category also deletes its Templates (after the 409 checks for transactions and recurring rules).
+- One User has many Notifications (`Notification.userId`). A notification is unique per user + event: compound unique index on `(userId, dedupeKey)`, so the same event (a budget level, a goal, a week) can never notify twice even when two requests race.
+- Index on Notification: `(userId, read, createdAt -1)` for the list and the unread count.
+- `Notification.params` is an extra field next to the ones in the data model: it keeps the numbers and names, so the app can write the text in the user's language.
+- `User.preferences.notifications` has one boolean per kind (`budget`, `goals`, `recurring`, `weekly`). A user without the field counts as all on. A kind that is off is not created at all.

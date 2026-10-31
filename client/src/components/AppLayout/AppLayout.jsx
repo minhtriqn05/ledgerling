@@ -6,10 +6,12 @@ import ApiStatus from '../ApiStatus/ApiStatus.jsx';
 import Icon from '../Icon.jsx';
 import LanguageSwitcher from '../LanguageSwitcher/LanguageSwitcher.jsx';
 import Logo from '../Logo/Logo.jsx';
+import NotificationBell from '../Notifications/NotificationBell.jsx';
 import QuickAddButton from '../QuickAdd/QuickAddButton.jsx';
 import QuickAddDialog from '../QuickAdd/QuickAddDialog.jsx';
 import ShortcutsDialog from '../QuickAdd/ShortcutsDialog.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
+import { NotificationsProvider } from '../../context/NotificationsContext.jsx';
 import { useHotkeys } from '../../hooks/useHotkeys.js';
 import { navItems } from '../../config/navItems.js';
 import styles from './AppLayout.module.css';
@@ -18,7 +20,16 @@ import styles from './AppLayout.module.css';
 // The page itself is rendered by <Outlet />. The menu items come from config/navItems.js.
 // It also holds what every signed-in page shares: the "+" button / N key (Quick add), and the shortcuts / and ?.
 
+// The bell needs the number of unread notifications, which lives in NotificationsProvider.
 export default function AppLayout() {
+  return (
+    <NotificationsProvider>
+      <Layout />
+    </NotificationsProvider>
+  );
+}
+
+function Layout() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -91,17 +102,21 @@ export default function AppLayout() {
             <Logo size={32} />
           </div>
 
-          {/* Only visible on narrow screens */}
-          <button
-            type="button"
-            className={styles.menuButton}
-            aria-label={menuOpen ? t('nav.closeMenu') : t('nav.openMenu')}
-            aria-expanded={menuOpen}
-            aria-controls="main-menu"
-            onClick={() => setMenuOpen((open) => !open)}
-          >
-            <Icon name={menuOpen ? 'x' : 'menu'} />
-          </button>
+          <div className={styles.barActions}>
+            <NotificationBell />
+
+            {/* Only visible on narrow screens */}
+            <button
+              type="button"
+              className={styles.menuButton}
+              aria-label={menuOpen ? t('nav.closeMenu') : t('nav.openMenu')}
+              aria-expanded={menuOpen}
+              aria-controls="main-menu"
+              onClick={() => setMenuOpen((open) => !open)}
+            >
+              <Icon name={menuOpen ? 'x' : 'menu'} />
+            </button>
+          </div>
         </div>
 
         {/* A column inside the sidebar on wide screens, a dropdown panel on narrow ones */}

@@ -59,7 +59,8 @@ export function AuthProvider({ children }) {
     saveSession(response.data.data);
   }
 
-  const value = { user, token, loading, login, register, logout: clearSession };
+  // updateUser puts a fresh copy of the user in place (e.g. after the settings changed), without touching the token.
+  const value = { user, token, loading, login, register, logout: clearSession, updateUser: setUser };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

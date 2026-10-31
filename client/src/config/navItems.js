@@ -8,4 +8,5 @@ export const navItems = [
   { labelKey: 'nav.recurring', path: '/recurring', icon: 'repeat' },
   { labelKey: 'nav.goals', path: '/goals', icon: 'target' },
   { labelKey: 'nav.reports', path: '/reports', icon: 'reports' },
+  { labelKey: 'nav.notifications', path: '/notifications', icon: 'bell' },
 ];

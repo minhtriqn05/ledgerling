@@ -4,14 +4,15 @@ import styles from './Pager.module.css';
 
 // "47 transactions" on the left, "Previous · Page 2 of 5 · Next" on the right.
 // meta is { page, limit, total, totalPages } from the API; onPage(number) is called with the page to load.
-export default function Pager({ meta, onPage }) {
+// countKey is the (plural) translation key of the total on the left, with {{count}}.
+export default function Pager({ meta, onPage, countKey = 'transactions.count' }) {
   const { t } = useTranslation();
   const { page, total, totalPages } = meta;
 
   return (
     <div className={styles.pager}>
       <span className={styles.total}>
-        {t('transactions.count', { count: total })}
+        {t(countKey, { count: total })}
       </span>
       <nav className={styles.pages} aria-label={t('pager.label')}>
         <button type="button" className={styles.pageButton} disabled={page <= 1} onClick={() => onPage(page - 1)}>

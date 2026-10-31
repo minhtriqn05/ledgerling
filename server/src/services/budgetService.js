@@ -67,6 +67,12 @@ async function progressOf(userId, budget) {
   return withProgress(budget, spent.get(String(budget.categoryId._id)) ?? 0);
 }
 
+// The budget of a category in a month with its progress, or null when there is none (used by the notifications)
+export async function findBudgetProgress(userId, categoryId, month) {
+  const budget = await Budget.findOne({ userId, categoryId, month }).populate("categoryId", CATEGORY_FIELDS);
+  return budget ? progressOf(userId, budget) : null;
+}
+
 export async function listBudgets(userId, { month = currentMonth() }) {
   const budgets = await Budget.find({ userId, month }).populate("categoryId", CATEGORY_FIELDS);
   if (budgets.length === 0) return [];

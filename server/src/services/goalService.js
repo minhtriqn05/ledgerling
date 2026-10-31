@@ -1,6 +1,7 @@
 import Goal from "../models/Goal.js";
 import { httpError } from "../utils/httpError.js";
 import { dayNoon, todayInVietnam } from "../utils/month.js";
+import { notifyGoalCompleted } from "./notificationService.js";
 
 // Filtering by userId as well means another user's goal looks like it does not exist (404)
 async function findOwned(userId, id) {
@@ -96,7 +97,10 @@ export async function addContribution(userId, id, { amount, note, date }) {
     },
     { returnDocument: "after" }
   );
-  if (updated) return withHistory(updated);
+  if (updated) {
+    await notifyGoalCompleted(userId, updated, amount);
+    return withHistory(updated);
+  }
 
   // No match: either the goal is not the user's (404) or the withdrawal is bigger than what was saved (400)
   await findOwned(userId, id);

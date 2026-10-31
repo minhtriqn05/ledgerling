@@ -45,6 +45,7 @@
     "goals": "Goals",
     "logout": "Log out",
     "main": "Main navigation",
+    "notifications": "Notifications",
     "openMenu": "Open menu",
     "recurring": "Recurring",
     "reports": "Reports",
@@ -517,6 +518,72 @@
     "title": "Insights",
     "warning": "Warning"
   },
+  "notifications": {
+    "allRead": "All notifications marked as read",
+    "bellUnread": "Notifications, {{count}} unread",
+    "count_one": "{{count}} notification",
+    "count_other": "{{count}} notifications",
+    "delete": "Delete notification: {{title}}",
+    "deleted": "Notification deleted",
+    "emptyText": "Budget warnings, reached goals, recurring transactions and your weekly summary appear here.",
+    "emptyTitle": "You're all caught up",
+    "emptyUnreadText": "Everything has been read.",
+    "emptyUnreadTitle": "No unread notifications",
+    "filterAll": "All",
+    "filterLabel": "Show",
+    "filterUnread": "Unread",
+    "loading": "Loading notifications…",
+    "markAllRead": "Mark all as read",
+    "settings": {
+      "budget": "Budgets",
+      "budgetHint": "A warning at 80% of a budget and an alert at 100%",
+      "goals": "Savings goals",
+      "goalsHint": "When you reach a goal",
+      "recurring": "Recurring transactions",
+      "recurringHint": "When recurring transactions are added",
+      "weekly": "Weekly summary",
+      "weeklyHint": "What you spent in the last 7 days, once a week"
+    },
+    "settingsSaved": "Settings saved",
+    "settingsText": "Choose which notifications you get. A kind that is off is not created at all.",
+    "settingsTitle": "Notification settings",
+    "time": {
+      "days": "{{count}}d ago",
+      "hours": "{{count}}h ago",
+      "minutes": "{{count}}m ago",
+      "now": "Just now"
+    },
+    "title": "Notifications",
+    "types": {
+      "budget_over": {
+        "message": "{{category}} is over its {{month}} budget: {{spent}} spent of {{amount}}.",
+        "title": "Over budget: {{category}}"
+      },
+      "budget_warning": {
+        "message": "{{category}} has used {{percent}} of its {{month}} budget ({{spent}} of {{amount}}).",
+        "title": "Budget warning: {{category}}"
+      },
+      "goal_completed": {
+        "message": "You saved {{target}} for \"{{goal}}\". Well done!",
+        "title": "Goal reached: {{goal}}"
+      },
+      "recurring_created": {
+        "message_one": "{{count}} recurring transaction was added.",
+        "message_other": "{{count}} recurring transactions were added.",
+        "title": "Recurring transactions added"
+      },
+      "weekly_summary": {
+        "message_one": "You spent {{total}} in {{count}} transaction in the last 7 days. Top category: {{category}}.",
+        "message_other": "You spent {{total}} in {{count}} transactions in the last 7 days. Top category: {{category}}.",
+        "messageEmpty": "You did not spend anything in the last 7 days.",
+        "title": "Your week in numbers"
+      }
+    },
+    "unread": "Unread",
+    "unreadCount_one": "{{count}} unread",
+    "unreadCount_other": "{{count}} unread",
+    "viewAll": "View all notifications"
+  },
   "errors": {
     "AMOUNT_INVALID": "Amount must be greater than 0",
     "BUDGET_EXISTS": "Budget already exists for this category and month",
@@ -551,6 +618,7 @@
     "NETWORK": "Cannot reach the server. Please try again.",
     "NOTE_TOO_LONG": "Note must be at most 200 characters",
     "NOT_FOUND": "Not found",
+    "NOTIFICATION_NOT_FOUND": "Notification not found",
     "PASSWORD_REQUIRED": "Password is required",
     "PASSWORD_TOO_LONG": "Password must be at most 72 characters",
     "PASSWORD_TOO_SHORT": "Password must be at least 6 characters",

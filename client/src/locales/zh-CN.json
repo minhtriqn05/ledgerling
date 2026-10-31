@@ -45,6 +45,7 @@
     "goals": "目标",
     "logout": "退出登录",
     "main": "主导航",
+    "notifications": "通知",
     "openMenu": "打开菜单",
     "recurring": "定期",
     "reports": "报表",
@@ -517,6 +518,72 @@
     "title": "洞察",
     "warning": "警告"
   },
+  "notifications": {
+    "allRead": "已将所有通知标为已读",
+    "bellUnread": "通知，{{count}} 条未读",
+    "count_one": "{{count}} 条通知",
+    "count_other": "{{count}} 条通知",
+    "delete": "删除通知：{{title}}",
+    "deleted": "通知已删除",
+    "emptyText": "预算提醒、已达成的目标、定期交易和每周总结会显示在这里。",
+    "emptyTitle": "已全部看完",
+    "emptyUnreadText": "所有通知都已读。",
+    "emptyUnreadTitle": "没有未读通知",
+    "filterAll": "全部",
+    "filterLabel": "显示",
+    "filterUnread": "未读",
+    "loading": "正在加载通知…",
+    "markAllRead": "全部标为已读",
+    "settings": {
+      "budget": "预算",
+      "budgetHint": "预算用到 80% 时提醒，达到 100% 时警告",
+      "goals": "储蓄目标",
+      "goalsHint": "当你达成一个目标时",
+      "recurring": "定期交易",
+      "recurringHint": "当定期交易被添加时",
+      "weekly": "每周总结",
+      "weeklyHint": "过去 7 天的支出，每周一次"
+    },
+    "settingsSaved": "设置已保存",
+    "settingsText": "选择你要接收的通知。关闭的类型根本不会生成。",
+    "settingsTitle": "通知设置",
+    "time": {
+      "days": "{{count}} 天前",
+      "hours": "{{count}} 小时前",
+      "minutes": "{{count}} 分钟前",
+      "now": "刚刚"
+    },
+    "title": "通知",
+    "types": {
+      "budget_over": {
+        "message": "{{category}} 已超出 {{month}} 的预算：已花 {{spent}}，预算 {{amount}}。",
+        "title": "超出预算：{{category}}"
+      },
+      "budget_warning": {
+        "message": "{{category}} 已用掉 {{month}} 预算的 {{percent}}（{{spent}} / {{amount}}）。",
+        "title": "预算提醒：{{category}}"
+      },
+      "goal_completed": {
+        "message": "你已为“{{goal}}”存够 {{target}}。做得好！",
+        "title": "目标达成：{{goal}}"
+      },
+      "recurring_created": {
+        "message_one": "已添加 {{count}} 笔定期交易。",
+        "message_other": "已添加 {{count}} 笔定期交易。",
+        "title": "已添加定期交易"
+      },
+      "weekly_summary": {
+        "message_one": "过去 7 天你在 {{count}} 笔交易中花了 {{total}}。支出最多的类别：{{category}}。",
+        "message_other": "过去 7 天你在 {{count}} 笔交易中花了 {{total}}。支出最多的类别：{{category}}。",
+        "messageEmpty": "过去 7 天你没有任何支出。",
+        "title": "数字里的这一周"
+      }
+    },
+    "unread": "未读",
+    "unreadCount_one": "{{count}} 条未读",
+    "unreadCount_other": "{{count}} 条未读",
+    "viewAll": "查看全部通知"
+  },
   "errors": {
     "AMOUNT_INVALID": "金额必须大于 0",
     "BUDGET_EXISTS": "该分类本月已有预算",
@@ -551,6 +618,7 @@
     "NETWORK": "无法连接服务器。请重试。",
     "NOTE_TOO_LONG": "备注最多 200 个字符",
     "NOT_FOUND": "未找到",
+    "NOTIFICATION_NOT_FOUND": "找不到通知",
     "PASSWORD_REQUIRED": "请填写密码",
     "PASSWORD_TOO_LONG": "密码最多 72 个字符",
     "PASSWORD_TOO_SHORT": "密码至少需要 6 个字符",

@@ -42,7 +42,7 @@ When the place that throws an error names no specific code, the status gives a d
 |--------|-------|
 | 400 | `VALIDATION_ERROR`, `INVALID_JSON`, `NAME_REQUIRED`, `NAME_TOO_LONG`, `EMAIL_INVALID`, `PASSWORD_REQUIRED`, `PASSWORD_TOO_SHORT`, `PASSWORD_TOO_LONG`, `TYPE_INVALID`, `TYPE_LOCKED`, `COLOR_INVALID`, `ICON_INVALID`, `CATEGORY_REQUIRED`, `AMOUNT_INVALID`, `CURRENCY_INVALID`, `NOTE_TOO_LONG`, `DATE_INVALID`, `TAG_INVALID`, `TOO_MANY_TAGS`, `MONTH_INVALID`, `BUDGET_EXPENSE_ONLY`, `END_BEFORE_START`, `TARGET_INVALID`, `DEADLINE_IN_PAST`, `WITHDRAW_TOO_MUCH`, `DEPOSIT_IN_USE`, `IMPORT_TOO_MANY_ROWS` |
 | 401 | `TOKEN_MISSING`, `TOKEN_INVALID`, `INVALID_CREDENTIALS` |
-| 404 | `ROUTE_NOT_FOUND`, `CATEGORY_NOT_FOUND`, `TRANSACTION_NOT_FOUND`, `BUDGET_NOT_FOUND`, `RULE_NOT_FOUND`, `GOAL_NOT_FOUND`, `CONTRIBUTION_NOT_FOUND`, `TEMPLATE_NOT_FOUND` |
+| 404 | `ROUTE_NOT_FOUND`, `CATEGORY_NOT_FOUND`, `TRANSACTION_NOT_FOUND`, `BUDGET_NOT_FOUND`, `RULE_NOT_FOUND`, `GOAL_NOT_FOUND`, `CONTRIBUTION_NOT_FOUND`, `TEMPLATE_NOT_FOUND`, `NOTIFICATION_NOT_FOUND` |
 | 409 | `EMAIL_TAKEN`, `CATEGORY_EXISTS`, `CATEGORY_IN_USE`, `CATEGORY_HAS_RULES`, `BUDGET_EXISTS`, `DUPLICATE_VALUE` |
 | 500 | `INTERNAL_ERROR` |
 
@@ -126,6 +126,12 @@ The tables below list the `message` of each endpoint; the matching code is in th
 | 43 | DELETE | `/api/templates/:id` | Yes | Delete a template |
 | 44 | POST | `/api/transactions/bulk-delete` | Yes | Delete up to 200 of my transactions at once |
 | 45 | PATCH | `/api/transactions/bulk-category` | Yes | Move up to 200 of my transactions to another category |
+| 46 | GET | `/api/notifications` | Yes | List my notifications, newest first (`?unread=&page=&limit=`) |
+| 47 | GET | `/api/notifications/unread-count` | Yes | How many notifications I have not read |
+| 48 | PATCH | `/api/notifications/read-all` | Yes | Mark all my notifications as read |
+| 49 | PATCH | `/api/notifications/:id/read` | Yes | Mark one notification as read |
+| 50 | DELETE | `/api/notifications/:id` | Yes | Delete a notification |
+| 51 | PATCH | `/api/users/me/preferences` | Yes | Turn the kinds of notifications on or off |
 
 Every protected route (Auth = Yes) can also return **401** (`"Not authorized, token missing"` /
 `"Not authorized, invalid token"`) and every route can return **500** (`"Internal server error"`).
@@ -211,6 +217,7 @@ Auth: yes. No body.
     "_id": "6720a1b2c3d4e5f601234567",
     "name": "Minh Tri",
     "email": "tri@example.com",
+    "preferences": { "notifications": { "budget": true, "goals": true, "recurring": true, "weekly": true } },
     "createdAt": "2026-10-27T03:00:00.000Z",
     "updatedAt": "2026-10-27T03:00:00.000Z"
   }
@@ -1122,3 +1129,97 @@ Auth: yes. **Body**: at least one of `name`, `categoryId`, `amount`, `note`. **2
 
 ### 43. DELETE /api/templates/:id
 Auth: yes. **200** – `{ "success": true, "data": { "_id": "..." } }`. **Errors**: 404 `"Template not found"`.
+
+---
+
+## Notifications
+
+In-app notifications. They are created by the server when something happens, never by the client:
+
+| Type | switch | Created when | `link` | `params` |
+|------|--------|--------------|--------|----------|
+| `budget_warning` | `budget` | An expense is created or edited and the budget of its category in that month reaches 80% | `/budgets?month=YYYY-MM` | `categoryName`, `month`, `percent`, `spent`, `amount` |
+| `budget_over` | `budget` | The same, at 100% (a jump from below 80% past 100% creates only this one) | `/budgets?month=YYYY-MM` | same as above |
+| `goal_completed` | `goals` | A deposit makes `savedAmount` reach `targetAmount` | `/goals` | `goalName`, `targetAmount` |
+| `recurring_created` | `recurring` | A pass of the recurring rules created transactions (one notification for the whole pass) | `/transactions` | `count` |
+| `weekly_summary` | `weekly` | `GET /api/notifications` finds no summary in the last 7 days and the user has at least one transaction | `/reports` | `total`, `count`, `topCategory`, `from`, `to` (last 7 days, Vietnam time) |
+
+- Each event notifies **once**: the notification has a `dedupeKey` (unique per user, not sent to the client), for example
+  `budget:<budgetId>:2026-10:80` or `weekly:2026-W44` (ISO week, Vietnam time). The database refuses a second one.
+- A kind the user turned off in `PATCH /api/users/me/preferences` is not created at all (nothing is stored for it).
+- Only VND expenses count towards a budget, like on the Budgets page. Income and other currencies never notify.
+- There is no cron job. The weekly summary is created by the list route; `unread-count` is polled by the app every minute and creates nothing.
+- Creating a notification never makes the request that caused it fail.
+- `title` and `message` are English text for people reading the API. The app builds its own text, in the user's language,
+  from `type` + `params`.
+
+Notification object: `{ "_id", "type", "title", "message", "link", "params", "read", "createdAt", "updatedAt" }`.
+
+### 46. GET /api/notifications
+Auth: yes. Newest first.
+
+**Query** (all optional)
+
+| Param | Description |
+|-------|-------------|
+| `unread` | `true` = only unread ones. Default `false` |
+| `page` | Whole number from 1. Default 1 |
+| `limit` | 1-50. Default 20 |
+
+**200** – `data` is an array (one page), `meta` is `{ page, limit, total, totalPages }`.
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "6720f1b2c3d4e5f601234701",
+      "type": "budget_warning",
+      "title": "Budget warning: Food",
+      "message": "Food has used 85% of its 2026-10 budget (850,000 VND of 1,000,000 VND).",
+      "link": "/budgets?month=2026-10",
+      "params": { "categoryName": "Food", "month": "2026-10", "percent": 85, "spent": 850000, "amount": 1000000 },
+      "read": false,
+      "createdAt": "2026-10-31T03:00:00.000Z",
+      "updatedAt": "2026-10-31T03:00:00.000Z"
+    }
+  ],
+  "meta": { "page": 1, "limit": 20, "total": 1, "totalPages": 1 }
+}
+```
+
+**Errors**: 400 `"Page must be a whole number from 1"`, `"Limit must be a whole number from 1 to 50"`, `"Unread must be true or false"`.
+
+### 47. GET /api/notifications/unread-count
+Auth: yes. **200** – `{ "success": true, "data": { "count": 3 } }`.
+
+### 48. PATCH /api/notifications/read-all
+Auth: yes. No body. **200** – `{ "success": true, "data": { "updated": 3 } }` (how many were unread; 0 when none).
+
+### 49. PATCH /api/notifications/:id/read
+Auth: yes. No body. **200** – `data` is the notification, now read (also when it already was).
+**Errors**: 404 `"Notification not found"` (also a malformed id or another user's notification).
+
+### 50. DELETE /api/notifications/:id
+Auth: yes. **200** – `{ "success": true, "data": { "_id": "..." } }`. **Errors**: 404 `"Notification not found"`.
+
+---
+
+## Users
+
+### 51. PATCH /api/users/me/preferences
+Auth: yes. Changes only the switches that are sent; the others keep their value. An account made before this field existed counts as all on.
+
+**Body**
+```json
+{ "notifications": { "budget": false } }
+```
+Switches: `budget`, `goals`, `recurring`, `weekly` (booleans). At least one.
+
+**200** – `data` is the user (same as `GET /api/auth/me`), for example
+`"preferences": { "notifications": { "budget": false, "goals": true, "recurring": true, "weekly": true } }`.
+
+**Errors**
+
+| Code | message |
+|------|---------|
+| 400 | `"Nothing to update"`, `"Only notifications can be changed"`, `"Notifications must be an object"`, `"Notifications can only have budget, goals, recurring, weekly"`, `"Notification setting \"budget\" must be true or false"` |
