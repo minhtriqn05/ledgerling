@@ -13,6 +13,7 @@ import ErrorState from '../components/ErrorState/ErrorState.jsx';
 import Reveal from '../components/Motion/Reveal.jsx';
 import CategoryCard from './categories/CategoryCard.jsx';
 import CategoryForm from './categories/CategoryForm.jsx';
+import { useLiveRefresh } from '../hooks/useLiveRefresh.js';
 import styles from './CategoriesPage.module.css';
 
 // Design: CategoriesPreview in pages/styleGuide. The list is on the left (Expense / Income switch + cards),
@@ -38,7 +39,9 @@ export default function CategoriesPage() {
     let cancelled = false; // StrictMode runs effects twice in dev; ignore the first run's answer
     getCategories()
       .then((data) => {
-        if (!cancelled) setCategories(data);
+        if (cancelled) return;
+        setCategories(data);
+        setLoadError('');
       })
       .catch((err) => {
         if (!cancelled) setLoadError(getErrorMessage(err));
@@ -51,6 +54,9 @@ export default function CategoriesPage() {
       cancelled = true;
     };
   }, [reloadKey]);
+
+  // Another device changed something: the cards change in place, the form on the right is left alone
+  useLiveRefresh('categories', () => setReloadKey((key) => key + 1));
 
   function retry() {
     setLoading(true);
@@ -110,7 +116,7 @@ export default function CategoriesPage() {
     if (visible.length === 0) {
       return (
         <EmptyState icon="categories" title={t(`categories.empty.${activeType}`)} text={t(`categories.emptyText.${activeType}`)}>
-          <Button icon="plus" onClick={() => openForm(null)}>
+          <Button needsNetwork icon="plus" onClick={() => openForm(null)}>
             {t('categories.new')}
           </Button>
         </EmptyState>
@@ -131,7 +137,7 @@ export default function CategoriesPage() {
   return (
     <div className={styles.page}>
       <PageHeader title={t('nav.categories')} subtitle={t('categories.subtitle')}>
-        <Button icon="plus" onClick={() => openForm(null)}>
+        <Button needsNetwork icon="plus" onClick={() => openForm(null)}>
           {t('categories.new')}
         </Button>
       </PageHeader>

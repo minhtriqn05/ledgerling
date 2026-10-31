@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getBudgets } from '../../api/budgets.js';
+import { useLoad } from '../../hooks/useLoad.js';
+import { useLiveRefresh } from '../../hooks/useLiveRefresh.js';
 import { formatPercent, formatVnd } from '../../utils/format.js';
 import { formatMonth } from '../../utils/vnDate.js';
 import Card, { CardHeader } from '../../components/Card/Card.jsx';
@@ -18,24 +19,10 @@ export default function BudgetAlerts({ month }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   // null while loading, then the list of budgets of the month
-  const [budgets, setBudgets] = useState(null);
-  const [failed, setFailed] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false; // ignore an outdated answer after the month changed
-    setBudgets(null);
-    setFailed(false);
-    getBudgets(month)
-      .then((data) => {
-        if (!cancelled) setBudgets(data);
-      })
-      .catch(() => {
-        if (!cancelled) setFailed(true);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [month]);
+  const { data, loading, error, refresh } = useLoad(() => getBudgets(month), [month]);
+  const budgets = loading ? null : data;
+  const failed = Boolean(error);
+  useLiveRefresh(['budgets', 'transactions', 'categories'], refresh);
 
   const alerts = (budgets ?? []).filter((b) => b.status !== 'ok').sort((a, b) => b.percent - a.percent);
 
@@ -49,7 +36,7 @@ export default function BudgetAlerts({ month }) {
           <p className={styles.note}>
             {t('dashboard.noBudgets', { month: formatMonth(month) })}
           </p>
-          <Button icon="plus" onClick={() => navigate('/budgets')}>
+          <Button needsNetwork icon="plus" onClick={() => navigate('/budgets')}>
             {t('dashboard.createBudget')}
           </Button>
         </div>

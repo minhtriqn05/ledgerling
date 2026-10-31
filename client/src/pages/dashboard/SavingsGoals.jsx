@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getGoals } from '../../api/goals.js';
+import { useLoad } from '../../hooks/useLoad.js';
+import { useLiveRefresh } from '../../hooks/useLiveRefresh.js';
 import { formatDate, formatPercent, formatVnd } from '../../utils/format.js';
 import { daysUntil, formatDaysLeft } from '../../utils/goals.js';
 import Card, { CardHeader } from '../../components/Card/Card.jsx';
@@ -21,22 +22,9 @@ export default function SavingsGoals() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   // null while loading, then the list of goals
-  const [goals, setGoals] = useState(null);
-  const [failed, setFailed] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false; // StrictMode runs effects twice in dev; ignore the first run's answer
-    getGoals()
-      .then((data) => {
-        if (!cancelled) setGoals(data);
-      })
-      .catch(() => {
-        if (!cancelled) setFailed(true);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const { data: goals, error, refresh } = useLoad(getGoals, []);
+  const failed = Boolean(error);
+  useLiveRefresh('goals', refresh);
 
   const openGoals = (goals ?? []).filter((g) => !g.completed).slice(0, MAX_GOALS);
 
@@ -48,7 +36,7 @@ export default function SavingsGoals() {
       return (
         <div className={styles.invite}>
           <p className={styles.note}>{t('dashboard.goalsInvite')}</p>
-          <Button icon="plus" onClick={() => navigate('/goals')}>
+          <Button needsNetwork icon="plus" onClick={() => navigate('/goals')}>
             {t('dashboard.createGoal')}
           </Button>
         </div>

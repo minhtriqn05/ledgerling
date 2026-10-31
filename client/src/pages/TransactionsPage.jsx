@@ -30,6 +30,7 @@ import BulkDeleteDialog from './transactions/BulkDeleteDialog.jsx';
 import BulkCategoryDialog from './transactions/BulkCategoryDialog.jsx';
 import Pager from './transactions/Pager.jsx';
 import ImportDialog from './transactions/ImportDialog.jsx';
+import { useLiveRefresh } from '../hooks/useLiveRefresh.js';
 import styles from './TransactionsPage.module.css';
 
 // Design: TransactionsPreview in pages/styleGuide. Header with the month picker, three summary cards,
@@ -180,6 +181,13 @@ export default function TransactionsPage() {
       setReloadKey((key) => key + 1);
     },
     onError: (err) => toast.error(getErrorMessage(err)),
+  });
+
+  // Another device changed something: the rows and totals change in place, an open dialog stays open
+  useLiveRefresh('transactions', () => setReloadKey((key) => key + 1));
+  useLiveRefresh('categories', () => {
+    setCategoriesKey((key) => key + 1);
+    setReloadKey((key) => key + 1);
   });
 
   // The "/" key on another page lands here with a request to focus the search box
@@ -474,7 +482,7 @@ export default function TransactionsPage() {
               : t('transactions.emptyText')
           }
         >
-          <Button icon="plus" onClick={() => setDialog({ kind: 'form', transaction: null })}>
+          <Button needsNetwork icon="plus" onClick={() => setDialog({ kind: 'form', transaction: null })}>
             {t('transactions.add')}
           </Button>
         </EmptyState>
@@ -518,13 +526,13 @@ export default function TransactionsPage() {
         subtitle={ready ? `${period} · ${t('transactions.count', { count: total })}` : period}
       >
         <MonthPicker month={month} onChange={changeMonth} />
-        <Button variant="secondary" icon="upload" onClick={() => setDialog({ kind: 'import' })} disabled={loading}>
+        <Button needsNetwork variant="secondary" icon="upload" onClick={() => setDialog({ kind: 'import' })} disabled={loading}>
           {t('import.title')}
         </Button>
-        <Button variant="secondary" icon="download" onClick={handleExport} disabled={!ready || total === 0 || exporting}>
+        <Button needsNetwork variant="secondary" icon="download" onClick={handleExport} disabled={!ready || total === 0 || exporting}>
           {exporting ? t('transactions.exporting') : t('transactions.export')}
         </Button>
-        <Button icon="plus" onClick={() => setDialog({ kind: 'form', transaction: null })} disabled={loading}>
+        <Button needsNetwork icon="plus" onClick={() => setDialog({ kind: 'form', transaction: null })} disabled={loading}>
           {t('transactions.add')}
         </Button>
       </PageHeader>

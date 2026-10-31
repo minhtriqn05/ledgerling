@@ -8,6 +8,7 @@ import { createTransaction } from '../../api/transactions.js';
 import { getErrorMessage } from '../../api/axios.js';
 import { useToast } from '../../context/ToastContext.jsx';
 import { useLoad } from '../../hooks/useLoad.js';
+import { useOfflineLock } from '../../hooks/useOnline.js';
 import { formatNumber, formatVnd } from '../../utils/format.js';
 import { parseQuickAdd } from '../../utils/quickAdd.js';
 import { fromDateInput, todayInput } from '../../utils/vnDate.js';
@@ -29,6 +30,7 @@ import DatePicker from '../DatePicker/DatePicker.jsx';
 // onSaved() runs after a transaction is created; the app then reloads the page that is open. onClose closes the dialog.
 export default function QuickAddDialog({ onSaved, onClose }) {
   const { t } = useTranslation();
+  const { locked, note: lockNote } = useOfflineLock();
   const toast = useToast();
   // The categories and the templates; a failing template list must not stop the user from adding a transaction.
   const { data, loading, error, reload } = useLoad(
@@ -198,7 +200,8 @@ export default function QuickAddDialog({ onSaved, onClose }) {
                   <button
                     type="button"
                     className={styles.templateUse}
-                    disabled={saving}
+                    disabled={saving || locked}
+                    title={lockNote}
                     onClick={() => useTemplate(template)}
                   >
                     <CategoryMark category={template.category} />
@@ -209,7 +212,8 @@ export default function QuickAddDialog({ onSaved, onClose }) {
                     type="button"
                     className={styles.templateRemove}
                     aria-label={t('quickAdd.deleteTemplate', { name: template.name })}
-                    disabled={saving}
+                    disabled={saving || locked}
+                    title={lockNote}
                     onClick={() => removeTemplate(template)}
                   >
                     <Icon name="x" size={14} />
@@ -315,7 +319,7 @@ export default function QuickAddDialog({ onSaved, onClose }) {
           <Button variant="secondary" onClick={onClose} disabled={saving}>
             {t('common.cancel')}
           </Button>
-          <Button type="submit" disabled={saving || loading}>
+          <Button needsNetwork type="submit" disabled={saving || loading}>
             {saving ? t('common.saving') : t('transactions.save')}
           </Button>
         </div>

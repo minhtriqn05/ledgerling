@@ -32,7 +32,7 @@ export default function SessionsSection() {
     <Card>
       <CardHeader icon="shield" tone="mint" title={t('settings.sessions.title')} subtitle={t('settings.sessions.text')} />
       <div className={styles.actions}>
-        <Button variant="secondary" icon="logout" onClick={handleClick} disabled={busy}>
+        <Button needsNetwork variant="secondary" icon="logout" onClick={handleClick} disabled={busy}>
           {busy ? t('settings.sessions.working') : t('settings.sessions.logoutOthers')}
         </Button>
       </div>

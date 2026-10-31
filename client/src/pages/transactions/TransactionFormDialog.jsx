@@ -234,14 +234,14 @@ export default function TransactionFormDialog({ transaction, categories, onSaved
 
         <div className={styles.actions}>
           {isEdit && (
-            <Button variant="danger" className={styles.deleteButton} onClick={() => onDelete(transaction)} disabled={saving}>
+            <Button needsNetwork variant="danger" className={styles.deleteButton} onClick={() => onDelete(transaction)} disabled={saving}>
               {t('common.delete')}
             </Button>
           )}
           <Button variant="secondary" onClick={onClose} disabled={saving}>
             {t('common.cancel')}
           </Button>
-          <Button type="submit" disabled={saving}>
+          <Button needsNetwork type="submit" disabled={saving}>
             {saving ? t('common.saving') : isEdit ? t('common.saveChanges') : t('transactions.save')}
           </Button>
         </div>

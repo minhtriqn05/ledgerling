@@ -11,6 +11,7 @@ import AppearanceSection from './settings/AppearanceSection.jsx';
 import PreferencesSection from './settings/PreferencesSection.jsx';
 import NotificationSettings from './notifications/NotificationSettings.jsx';
 import DataSection from './settings/DataSection.jsx';
+import InstallSection from './settings/InstallSection.jsx';
 import DangerSection from './settings/DangerSection.jsx';
 import styles from './SettingsPage.module.css';
 
@@ -52,6 +53,7 @@ export default function SettingsPage() {
           <div id="notifications">
             <NotificationSettings />
           </div>
+          <InstallSection />
           <DataSection />
           {!isDemo && <DangerSection />}
         </div>

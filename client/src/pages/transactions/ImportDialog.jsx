@@ -250,7 +250,7 @@ export default function ImportDialog({ categories, onImported, onClose }) {
           <Button variant="secondary" onClick={onClose} disabled={importing}>
             {t('common.cancel')}
           </Button>
-          <Button onClick={handleImport} disabled={!rows || validCount === 0 || importing}>
+          <Button needsNetwork onClick={handleImport} disabled={!rows || validCount === 0 || importing}>
             {importing ? t('import.importing') : t('import.action', { count: validCount })}
           </Button>
         </div>

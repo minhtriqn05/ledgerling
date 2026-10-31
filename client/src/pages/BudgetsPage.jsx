@@ -16,6 +16,7 @@ import ErrorState from '../components/ErrorState/ErrorState.jsx';
 import Reveal from '../components/Motion/Reveal.jsx';
 import BudgetCard from './budgets/BudgetCard.jsx';
 import BudgetFormDialog from './budgets/BudgetFormDialog.jsx';
+import { useLiveRefresh } from '../hooks/useLiveRefresh.js';
 import styles from './BudgetsPage.module.css';
 
 // Header with the month picker, then a grid of budget cards.
@@ -72,7 +73,9 @@ export default function BudgetsPage() {
     let cancelled = false;
     getBudgets(month)
       .then((data) => {
-        if (!cancelled) setBudgets(data);
+        if (cancelled) return;
+        setBudgets(data);
+        setLoadError('');
       })
       .catch((err) => {
         if (!cancelled) setLoadError(getErrorMessage(err));
@@ -84,6 +87,13 @@ export default function BudgetsPage() {
       cancelled = true;
     };
   }, [month, reloadKey]);
+
+  // Another device changed something: an expense moves the progress bars, deleting a category removes its budgets
+  useLiveRefresh(['budgets', 'transactions'], () => setReloadKey((key) => key + 1));
+  useLiveRefresh('categories', () => {
+    setCategoriesKey((key) => key + 1);
+    setReloadKey((key) => key + 1);
+  });
 
   function changeMonth(nextMonth) {
     setLoading(true);
@@ -153,10 +163,10 @@ export default function BudgetsPage() {
           text={t('budgets.emptyText')}
         >
           <div className={styles.emptyActions}>
-            <Button icon="plus" onClick={() => setDialog({ budget: null })} disabled={copying}>
+            <Button needsNetwork icon="plus" onClick={() => setDialog({ budget: null })} disabled={copying}>
               {t('budgets.add')}
             </Button>
-            <Button variant="secondary" onClick={handleCopy} disabled={copying}>
+            <Button needsNetwork variant="secondary" onClick={handleCopy} disabled={copying}>
               {copying ? t('budgets.copying') : t('budgets.copyFromLast')}
             </Button>
           </div>
@@ -182,7 +192,7 @@ export default function BudgetsPage() {
         subtitle={ready ? `${formatMonth(month)} · ${t('budgets.count', { count: budgets.length })}` : formatMonth(month)}
       >
         <MonthPicker month={month} onChange={changeMonth} />
-        <Button icon="plus" onClick={() => setDialog({ budget: null })} disabled={!ready}>
+        <Button needsNetwork icon="plus" onClick={() => setDialog({ budget: null })} disabled={!ready}>
           {t('budgets.add')}
         </Button>
       </PageHeader>

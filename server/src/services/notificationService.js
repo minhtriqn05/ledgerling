@@ -4,6 +4,7 @@ import Transaction from "../models/Transaction.js";
 import Category from "../models/Category.js";
 import User from "../models/User.js";
 import { findBudgetProgress } from "./budgetService.js";
+import { emitNotification } from "./realtimeService.js";
 import { httpError } from "../utils/httpError.js";
 import { addDays, dayStart, isoWeekKey, nextDayStart, todayInVietnam, vietnamDay } from "../utils/month.js";
 
@@ -31,7 +32,9 @@ export async function notify(userId, { type, title, message, link = "", params =
   if (!user || user.preferences?.notifications?.[PREFERENCE_OF_TYPE[type]] === false) return null;
 
   try {
-    return await Notification.create({ userId, type, title, message, link, params, dedupeKey });
+    const notification = await Notification.create({ userId, type, title, message, link, params, dedupeKey });
+    emitNotification(userId, notification);
+    return notification;
   } catch (err) {
     // The unique index (userId + dedupeKey) refused it: this event was already notified
     if (err.code === DUPLICATE_KEY) return null;

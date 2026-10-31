@@ -1,4 +1,5 @@
 import * as authService from "../services/authService.js";
+import { disconnectUser } from "../services/realtimeService.js";
 
 // Controllers only translate between HTTP and the service. Express 5 forwards
 // errors thrown in async handlers to errorHandler, so no try/catch is needed.
@@ -21,6 +22,8 @@ export async function login(req, res) {
 export async function logoutAll(req, res) {
   const data = await authService.logoutAll(req.user.id);
   res.status(200).json({ success: true, data });
+  // After the answer, so this device has its new token by the time its old socket closes
+  disconnectUser(req.user.id);
 }
 
 export async function demo(req, res) {

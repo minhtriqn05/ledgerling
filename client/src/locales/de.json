@@ -653,6 +653,13 @@
       "submit": "Mein Konto löschen",
       "deleting": "Wird gelöscht…",
       "deleted": "Dein Konto wurde gelöscht."
+    },
+    "install": {
+      "title": "App installieren",
+      "text": "Lege Ledgerling auf deinem Startbildschirm oder Desktop ab. Die App öffnet sich in einem eigenen Fenster und hat eine Verknüpfung zum Hinzufügen einer Transaktion.",
+      "button": "App installieren",
+      "manual": "Dein Browser hat keine Installationsschaltfläche. Auf iPhone oder iPad: Tippe auf Teilen, dann auf Zum Home-Bildschirm. Auf Android: Öffne das Browsermenü und wähle Zum Startbildschirm hinzufügen.",
+      "installed": "Ledgerling ist auf diesem Gerät installiert."
     }
   },
   "admin": {
@@ -875,5 +882,16 @@
     "VALIDATION_ERROR": "Bitte prüfe deine Eingaben.",
     "WITHDRAW_TOO_MUCH": "Du kannst nicht mehr auszahlen, als gespart ist",
     "WRONG_PASSWORD": "Das Passwort ist falsch"
+  },
+  "live": {
+    "live": "Live",
+    "reconnecting": "Verbindung wird hergestellt…",
+    "liveHint": "Änderungen von deinen anderen Geräten erscheinen hier von selbst.",
+    "reconnectingHint": "Der Server wird gesucht. Änderungen von deinen anderen Geräten erscheinen, sobald er wieder erreichbar ist."
+  },
+  "offline": {
+    "banner": "Du bist offline – gespeicherte Daten werden angezeigt",
+    "note": "Hinzufügen, Bearbeiten und Löschen sind deaktiviert, bis du wieder online bist.",
+    "locked": "Offline nicht verfügbar"
   }
 }

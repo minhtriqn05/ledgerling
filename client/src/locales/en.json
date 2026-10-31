@@ -653,6 +653,13 @@
       "submit": "Delete my account",
       "deleting": "Deleting…",
       "deleted": "Your account was deleted."
+    },
+    "install": {
+      "title": "Install app",
+      "text": "Keep Ledgerling on your home screen or desktop. It opens in its own window and has a shortcut to add a transaction.",
+      "button": "Install app",
+      "manual": "Your browser has no install button. On iPhone or iPad: tap Share, then Add to Home Screen. On Android: open the browser menu, then choose Add to Home Screen.",
+      "installed": "Ledgerling is installed on this device."
     }
   },
   "admin": {
@@ -875,5 +882,16 @@
     "VALIDATION_ERROR": "Please check the values you entered.",
     "WITHDRAW_TOO_MUCH": "You cannot withdraw more than the saved amount",
     "WRONG_PASSWORD": "The password is incorrect"
+  },
+  "live": {
+    "live": "Live",
+    "reconnecting": "Reconnecting…",
+    "liveHint": "Changes from your other devices show up here by themselves.",
+    "reconnectingHint": "Trying to reach the server. Changes from your other devices show up once it is back."
+  },
+  "offline": {
+    "banner": "You're offline – showing saved data",
+    "note": "Adding, editing and deleting are turned off until you're back online.",
+    "locked": "Not available while you're offline"
   }
 }

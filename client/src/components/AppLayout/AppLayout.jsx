@@ -6,14 +6,17 @@ import ApiStatus from '../ApiStatus/ApiStatus.jsx';
 import Avatar from '../Avatar/Avatar.jsx';
 import Icon from '../Icon.jsx';
 import LanguageSwitcher from '../LanguageSwitcher/LanguageSwitcher.jsx';
+import LiveStatus from '../LiveStatus/LiveStatus.jsx';
 import LoadingState from '../LoadingState/LoadingState.jsx';
 import Logo from '../Logo/Logo.jsx';
 import NotificationBell from '../Notifications/NotificationBell.jsx';
+import OfflineBanner from '../OfflineBanner/OfflineBanner.jsx';
 import QuickAddButton from '../QuickAdd/QuickAddButton.jsx';
 import QuickAddDialog from '../QuickAdd/QuickAddDialog.jsx';
 import ShortcutsDialog from '../QuickAdd/ShortcutsDialog.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { NotificationsProvider } from '../../context/NotificationsContext.jsx';
+import { SocketProvider } from '../../context/SocketContext.jsx';
 import { useHotkeys } from '../../hooks/useHotkeys.js';
 import { navItems } from '../../config/navItems.js';
 import styles from './AppLayout.module.css';
@@ -23,11 +26,14 @@ import styles from './AppLayout.module.css';
 // It also holds what every signed-in page shares: the "+" button / N key (Quick add), and the shortcuts / and ?.
 
 // The bell needs the number of unread notifications, which lives in NotificationsProvider.
+// SocketProvider opens the real-time connection; this layout is only on screen for a signed-in user.
 export default function AppLayout() {
   return (
-    <NotificationsProvider>
-      <Layout />
-    </NotificationsProvider>
+    <SocketProvider>
+      <NotificationsProvider>
+        <Layout />
+      </NotificationsProvider>
+    </SocketProvider>
   );
 }
 
@@ -71,6 +77,14 @@ function Layout() {
     '?': () => setShortcutsOpen(true),
   });
 
+  // The "Add transaction" shortcut of the installed app opens /?quickAdd=1 (see the manifest in vite.config.js).
+  // The address is cleaned up at once, so a page reload does not open the dialog again.
+  useEffect(() => {
+    if (!new URLSearchParams(location.search).has('quickAdd')) return;
+    setQuickAddOpen(true);
+    navigate(location.pathname, { replace: true });
+  }, [location.search, location.pathname, navigate]);
+
   // While the panel is open: Escape or a click outside closes it.
   useEffect(() => {
     if (!menuOpen) return;
@@ -102,6 +116,7 @@ function Layout() {
         <div className={styles.bar}>
           <div className={styles.brand}>
             <Logo size={32} />
+            <LiveStatus />
           </div>
 
           <div className={styles.barActions}>
@@ -162,6 +177,7 @@ function Layout() {
 
       <div className={styles.body}>
         <main className={styles.main}>
+          <OfflineBanner />
           {/* A short fade and an 8px slide when another page opens. No exit animation: the new page is there at once. */}
           <motion.div
             key={location.pathname}

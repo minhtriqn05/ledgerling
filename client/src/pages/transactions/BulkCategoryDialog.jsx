@@ -87,7 +87,7 @@ export default function BulkCategoryDialog({ ids, categories, onChanged, onClose
           <Button variant="secondary" onClick={onClose} disabled={saving}>
             {t('common.cancel')}
           </Button>
-          <Button type="submit" disabled={saving}>
+          <Button needsNetwork type="submit" disabled={saving}>
             {saving ? t('common.saving') : t('transactions.changeCategory')}
           </Button>
         </div>

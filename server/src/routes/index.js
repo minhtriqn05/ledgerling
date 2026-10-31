@@ -13,21 +13,23 @@ import templateRoutes from "./templateRoutes.js";
 import notificationRoutes from "./notificationRoutes.js";
 import userRoutes from "./userRoutes.js";
 import adminRoutes from "./adminRoutes.js";
+import { liveChanges } from "../middlewares/liveChanges.js";
 
 const router = Router();
 
 router.use("/auth", authRoutes);
-router.use("/categories", categoryRoutes);
-router.use("/transactions", transactionRoutes);
+// liveChanges: after a write that succeeded, the other devices of the user hear that this resource changed
+router.use("/categories", liveChanges("categories"), categoryRoutes);
+router.use("/transactions", liveChanges("transactions"), transactionRoutes);
 router.use("/stats", statsRoutes);
-router.use("/budgets", budgetRoutes);
+router.use("/budgets", liveChanges("budgets"), budgetRoutes);
 router.use("/tags", tagRoutes);
-router.use("/recurring", recurringRoutes);
-router.use("/goals", goalRoutes);
+router.use("/recurring", liveChanges("recurring"), recurringRoutes);
+router.use("/goals", liveChanges("goals"), goalRoutes);
 router.use("/reports", reportRoutes);
 router.use("/insights", insightRoutes);
-router.use("/templates", templateRoutes);
-router.use("/notifications", notificationRoutes);
+router.use("/templates", liveChanges("templates"), templateRoutes);
+router.use("/notifications", liveChanges("notifications"), notificationRoutes);
 router.use("/users", userRoutes);
 router.use("/admin", adminRoutes);
 

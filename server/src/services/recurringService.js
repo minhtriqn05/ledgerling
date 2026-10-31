@@ -5,6 +5,7 @@ import { httpError } from "../utils/httpError.js";
 import { dayNoon, nextDayStart, todayInVietnam, vietnamDay } from "../utils/month.js";
 import { firstRunDayFrom, nextRunDay } from "../utils/recurrence.js";
 import { notifyRecurringCreated } from "./notificationService.js";
+import { emitDataChanged } from "./realtimeService.js";
 
 // Shows the category's name and color instead of just its id
 const CATEGORY_FIELDS = "name color icon type";
@@ -90,6 +91,11 @@ export async function processDueRules(userId) {
   }
   // One notification for the whole pass, not one per transaction
   await notifyRecurringCreated(userId, created);
+  // This runs inside GET requests, so liveChanges (routes/index.js) never hears about it
+  if (created.length > 0) {
+    emitDataChanged(userId, "transactions");
+    emitDataChanged(userId, "recurring");
+  }
 }
 
 export async function listRules(userId) {

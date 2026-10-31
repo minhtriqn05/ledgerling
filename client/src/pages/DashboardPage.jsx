@@ -21,6 +21,7 @@ import SavingsGoals from './dashboard/SavingsGoals.jsx';
 import CategoryMark from '../components/CategoryMark/CategoryMark.jsx';
 import InsightsCard from './reports/InsightsCard.jsx';
 import { CategoryDonut, MonthlyExpenseChart } from './dashboard/DashboardCharts.jsx';
+import { useLiveRefresh } from '../hooks/useLiveRefresh.js';
 import styles from './DashboardPage.module.css';
 
 // Design: DashboardPreview in pages/styleGuide. Header with the month picker, three number cards,
@@ -60,7 +61,9 @@ export default function DashboardPage() {
     let cancelled = false; // StrictMode runs effects twice in dev; ignore an outdated answer
     getSummary(month)
       .then((data) => {
-        if (!cancelled) setSummary(data);
+        if (cancelled) return;
+        setSummary(data);
+        setLoadError('');
       })
       .catch((err) => {
         if (!cancelled) setLoadError(getErrorMessage(err));
@@ -72,6 +75,9 @@ export default function DashboardPage() {
       cancelled = true;
     };
   }, [month, reloadKey]);
+
+  // Another device changed something: the numbers change in place, without a loading state
+  useLiveRefresh(['transactions', 'categories', 'budgets', 'goals', 'recurring'], () => setReloadKey((key) => key + 1));
 
   // Shows "Loading…" again and clears an old error; every change that reloads the data calls this first.
   function startLoading() {
@@ -106,7 +112,7 @@ export default function DashboardPage() {
             title={t('transactions.noneInMonth', { month: formatMonth(month) })}
             text={t('dashboard.emptyText')}
           >
-            <Button icon="plus" onClick={() => navigate('/transactions')}>
+            <Button needsNetwork icon="plus" onClick={() => navigate('/transactions')}>
               {t('transactions.add')}
             </Button>
           </EmptyState>

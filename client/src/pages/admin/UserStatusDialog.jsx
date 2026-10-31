@@ -40,7 +40,7 @@ export default function UserStatusDialog({ user, onChanged, onClose }) {
         <Button variant="secondary" onClick={onClose} disabled={busy} data-autofocus>
           {t('common.cancel')}
         </Button>
-        <Button variant={disabling ? 'danger' : 'primary'} onClick={handleConfirm} disabled={busy}>
+        <Button needsNetwork variant={disabling ? 'danger' : 'primary'} onClick={handleConfirm} disabled={busy}>
           {busy
             ? t(disabling ? 'admin.dialog.disabling' : 'admin.dialog.enabling')
             : t(disabling ? 'admin.users.disable' : 'admin.users.enable')}

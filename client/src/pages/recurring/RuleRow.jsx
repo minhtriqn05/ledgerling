@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { useOfflineLock } from '../../hooks/useOnline.js';
 import { formatDate, formatSignedVnd } from '../../utils/format.js';
 import IconButton from '../../components/IconButton/IconButton.jsx';
 import CategoryMark from '../../components/CategoryMark/CategoryMark.jsx';
@@ -16,6 +17,7 @@ function nextRunText(rule, t) {
 // `toggling` is true while the switch waits for the API.
 export default function RuleRow({ rule, index = 0, toggling, onToggle, onEdit, onDelete }) {
   const { t } = useTranslation();
+  const { locked, note } = useOfflineLock();
   const { category } = rule;
   const name = rule.note || category.name;
 
@@ -44,15 +46,16 @@ export default function RuleRow({ rule, index = 0, toggling, onToggle, onEdit, o
         className={styles.switch}
         aria-checked={rule.active}
         aria-label={t('recurring.active', { name })}
-        disabled={toggling}
+        disabled={toggling || locked}
+        title={note}
         onClick={() => onToggle(rule)}
       >
         <span className={styles.knob} />
       </button>
 
       <span className={styles.actions}>
-        <IconButton icon="edit" label={t('common.editName', { name })} onClick={() => onEdit(rule)} />
-        <IconButton icon="trash" label={t('common.deleteName', { name })} danger onClick={() => onDelete(rule)} />
+        <IconButton needsNetwork icon="edit" label={t('common.editName', { name })} onClick={() => onEdit(rule)} />
+        <IconButton needsNetwork icon="trash" label={t('common.deleteName', { name })} danger onClick={() => onDelete(rule)} />
       </span>
     </Reveal>
   );

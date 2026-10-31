@@ -113,7 +113,7 @@ export default function MoneyDialog({ goal, mode, onSaved, onClose }) {
           <Button variant="secondary" onClick={onClose} disabled={saving}>
             {t('common.cancel')}
           </Button>
-          <Button type="submit" disabled={saving}>
+          <Button needsNetwork type="submit" disabled={saving}>
             {saving ? t('common.saving') : isWithdraw ? t('goals.withdrawFrom') : t('goals.addTo')}
           </Button>
         </div>

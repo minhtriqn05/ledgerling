@@ -140,12 +140,12 @@ export default function CategoryForm({ category, defaultType, autoFocus, onSaved
             <Button variant="secondary" onClick={onCancel} disabled={saving}>
               {t('common.cancel')}
             </Button>
-            <Button type="submit" disabled={saving}>
+            <Button needsNetwork type="submit" disabled={saving}>
               {saving ? t('common.saving') : t('common.saveChanges')}
             </Button>
           </div>
         ) : (
-          <Button type="submit" block disabled={saving}>
+          <Button needsNetwork type="submit" block disabled={saving}>
             {saving ? t('common.creating') : t('categories.create')}
           </Button>
         )}

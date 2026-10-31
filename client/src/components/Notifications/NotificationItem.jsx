@@ -33,7 +33,7 @@ export default function NotificationItem({ notification, onOpen, onDelete }) {
         )}
       </button>
       {onDelete && (
-        <IconButton
+        <IconButton needsNetwork
           icon="trash"
           danger
           label={t('notifications.delete', { title })}

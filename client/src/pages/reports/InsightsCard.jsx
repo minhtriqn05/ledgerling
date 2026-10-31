@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getInsights } from '../../api/reports.js';
 import { useLoad } from '../../hooks/useLoad.js';
+import { useLiveRefresh } from '../../hooks/useLiveRefresh.js';
 import { formatDayMonth, formatNumber, formatVnd } from '../../utils/format.js';
 import { formatMonth, fromDateInput } from '../../utils/vnDate.js';
 import Card, { CardHeader } from '../../components/Card/Card.jsx';
@@ -43,7 +44,8 @@ function insightText(insight, t, i18n) {
 // so a failed request only affects this card. Four states: loading, error, no insights, the list.
 export default function InsightsCard({ month }) {
   const { t, i18n } = useTranslation();
-  const { data, loading, error, reload } = useLoad(() => getInsights(month), [month]);
+  const { data, loading, error, reload, refresh } = useLoad(() => getInsights(month), [month]);
+  useLiveRefresh(['transactions', 'categories', 'budgets', 'goals'], refresh);
 
   function renderBody() {
     if (loading) return <LoadingState skeleton="rows" count={3}>{t('insights.loading')}</LoadingState>;

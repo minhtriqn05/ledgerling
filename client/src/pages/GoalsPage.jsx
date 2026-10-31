@@ -15,6 +15,7 @@ import GoalFormDialog from './goals/GoalFormDialog.jsx';
 import MoneyDialog from './goals/MoneyDialog.jsx';
 import HistoryDialog from './goals/HistoryDialog.jsx';
 import DeleteGoalDialog from './goals/DeleteGoalDialog.jsx';
+import { useLiveRefresh } from '../hooks/useLiveRefresh.js';
 import styles from './GoalsPage.module.css';
 
 // A grid of savings goal cards. The API sorts them: goals still to reach first (nearest deadline first), completed last.
@@ -34,7 +35,9 @@ export default function GoalsPage() {
     let cancelled = false; // StrictMode runs effects twice in dev; ignore the first run's answer
     getGoals()
       .then((data) => {
-        if (!cancelled) setGoals(data);
+        if (cancelled) return;
+        setGoals(data);
+        setLoadError('');
       })
       .catch((err) => {
         if (!cancelled) setLoadError(getErrorMessage(err));
@@ -46,6 +49,9 @@ export default function GoalsPage() {
       cancelled = true;
     };
   }, [reloadKey]);
+
+  // Another device changed something: the cards change in place, an open dialog stays open
+  useLiveRefresh('goals', () => setReloadKey((key) => key + 1));
 
   function retry() {
     setLoading(true);
@@ -96,7 +102,7 @@ export default function GoalsPage() {
           title={t('goals.emptyTitle')}
           text={t('goals.emptyText')}
         >
-          <Button icon="plus" onClick={() => setDialog({ form: null })}>
+          <Button needsNetwork icon="plus" onClick={() => setDialog({ form: null })}>
             {t('goals.new')}
           </Button>
         </EmptyState>
@@ -131,7 +137,7 @@ export default function GoalsPage() {
             : undefined
         }
       >
-        <Button icon="plus" onClick={() => setDialog({ form: null })} disabled={!ready}>
+        <Button needsNetwork icon="plus" onClick={() => setDialog({ form: null })} disabled={!ready}>
           {t('goals.new')}
         </Button>
       </PageHeader>

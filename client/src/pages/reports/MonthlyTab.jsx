@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getMonthlyReport } from '../../api/reports.js';
 import { useLoad } from '../../hooks/useLoad.js';
+import { useLiveRefresh } from '../../hooks/useLiveRefresh.js';
 import { formatDate, formatPercent, formatVnd } from '../../utils/format.js';
 import { categoryLabel } from '../../utils/emoji.js';
 import { formatMonth } from '../../utils/vnDate.js';
@@ -33,7 +34,8 @@ function Fact({ icon, tone, label, value, detail }) {
 export default function MonthlyTab({ month }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { data: report, loading, error, reload } = useLoad(() => getMonthlyReport(month), [month]);
+  const { data: report, loading, error, reload, refresh } = useLoad(() => getMonthlyReport(month), [month]);
+  useLiveRefresh(['transactions', 'categories'], refresh);
 
   if (loading) return <LoadingState skeleton="cards">{t('reports.loading')}</LoadingState>;
   if (error) return <ErrorState message={error} onRetry={reload} />;
@@ -48,7 +50,7 @@ export default function MonthlyTab({ month }) {
         title={t('transactions.noneInMonth', { month: formatMonth(month) })}
         text={t('reports.emptyText')}
       >
-        <Button icon="plus" onClick={() => navigate('/transactions')}>
+        <Button needsNetwork icon="plus" onClick={() => navigate('/transactions')}>
           {t('transactions.add')}
         </Button>
       </EmptyState>

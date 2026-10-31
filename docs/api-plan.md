@@ -3,6 +3,29 @@
 Base URL: `http://localhost:4000/api` (local), `https://<render-app>.onrender.com/api` (production).
 Swagger UI: `/api-docs` (outside `/api`).
 
+## Real-time events (Socket.IO)
+
+Socket.IO runs on the same server and port as the API (`http://localhost:4000`, path `/socket.io`). Allowed origins: `CLIENT_URL`.
+
+**Connect** with the JWT: `io(url, { auth: { token } })`. The handshake makes the same checks as a protected route
+(signature, `tokenVersion`, account status). A refused connection gets `connect_error` with the code as its message:
+`TOKEN_MISSING` or `TOKEN_INVALID`. Each socket joins the room of its user, and events are only sent to that room.
+
+| Event (server to client) | Payload | When |
+| --- | --- | --- |
+| `data:changed` | `{ resource }` | After any write that succeeded. `resource`: `transactions`, `categories`, `budgets`, `recurring`, `goals`, `templates` or `notifications`. Also when a recurring rule created transactions during a read (`transactions` and `recurring`), and when a notification was created (`notifications`). |
+| `notification:new` | `{ id, type }` | A new notification was created. |
+
+The events hold no user data: a client that hears one asks the normal API again.
+
+A write may send the header `X-Socket-Id: <socket id>`: that socket does not get the `data:changed` of this write, because
+the device that made the change already updated itself.
+
+**The server closes every socket of a user** after log out of all devices, a password change, disabling the account (admin)
+or deleting the account. A device with an old token is then refused with `TOKEN_INVALID`, and the client logs out.
+
+**Try it**: open the app in two browsers with one account and add a transaction in one of them. `server/tests/realtime.test.js` shows it from the client side.
+
 ## Conventions
 
 - **Auth**: protected routes need the header `Authorization: Bearer <token>`.

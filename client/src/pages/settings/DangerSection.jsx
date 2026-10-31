@@ -66,7 +66,7 @@ export default function DangerSection() {
 
         {error && <Alert>{error}</Alert>}
         <div className={styles.actions}>
-          <Button type="submit" variant="danger" icon="trash" disabled={!ready || busy}>
+          <Button needsNetwork type="submit" variant="danger" icon="trash" disabled={!ready || busy}>
             {busy ? t('settings.danger.deleting') : t('settings.danger.submit')}
           </Button>
         </div>

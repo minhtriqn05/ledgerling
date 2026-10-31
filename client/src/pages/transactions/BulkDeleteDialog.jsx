@@ -34,7 +34,7 @@ export default function BulkDeleteDialog({ ids, onDeleted, onClose }) {
         <Button variant="secondary" onClick={onClose} disabled={deleting} data-autofocus>
           {t('common.cancel')}
         </Button>
-        <Button variant="danger" onClick={handleDelete} disabled={deleting}>
+        <Button needsNetwork variant="danger" onClick={handleDelete} disabled={deleting}>
           {deleting ? t('common.deleting') : t('common.delete')}
         </Button>
       </div>

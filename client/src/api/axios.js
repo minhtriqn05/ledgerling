@@ -1,5 +1,6 @@
 import axios from 'axios';
 import i18n from '../i18n/index.js';
+import { clearApiCache } from '../utils/apiCache.js';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -12,11 +13,21 @@ export const DATA_CHANGED_EVENT = 'ledgerling:data-changed';
 // These never cause a notification (and the notification calls update the count themselves)
 const QUIET_PREFIXES = ['/auth/', '/notifications', '/users/'];
 
+// The open socket of this device (context/SocketContext.jsx). A write names it, so the server does not tell
+// this device about its own change; the page already updated itself.
+let socketId = null;
+export function setSocketId(id) {
+  socketId = id;
+}
+
 // Attach the JWT (if any) to every request.
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+  }
+  if (socketId && config.method !== 'get') {
+    config.headers['X-Socket-Id'] = socketId;
   }
   return config;
 });
@@ -36,6 +47,7 @@ api.interceptors.response.use(
     const isAuthRequest = error.config?.url?.startsWith('/auth/');
     if (error.response?.status === 401 && !isAuthRequest) {
       localStorage.removeItem('token');
+      clearApiCache();
       window.location.href = '/login';
     }
     return Promise.reject(error);

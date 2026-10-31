@@ -19,6 +19,8 @@ const options = {
         "Every route can also answer 500 (server error). A body that is not valid JSON gets 400 `Invalid JSON body`.",
         "",
         "**Limits:** each IP address may send 300 requests to `/api` and 20 requests to `/auth/login` + `/auth/register` per 15 minutes (more gets 429 `RATE_LIMITED`; `/health` is free). A JSON body is limited to 100 kB (300 kB for `POST /transactions/import`); a bigger one gets 413 `PAYLOAD_TOO_LARGE`. A body key that starts with `$` or contains `.`, or a query key that starts with `$` or contains `[`, gets 400 `INVALID_INPUT`.",
+        "",
+        "**Real-time:** a signed-in client can also open a Socket.IO connection on this server (`auth: { token }`). After every successful write it receives `data:changed { resource }`, and `notification:new { id, type }` for a new notification. An optional header `X-Socket-Id` on a write skips that socket. See `docs/api-plan.md`.",
       ].join("\n"),
     },
     servers: [{ url: "/api" }],
