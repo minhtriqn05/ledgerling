@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { AnimatePresence } from 'motion/react';
+import { useTranslation } from 'react-i18next';
 import { getCategories } from '../api/categories.js';
 import { getBudgets, copyBudgets, deleteBudget } from '../api/budgets.js';
 import { getErrorMessage } from '../api/axios.js';
@@ -10,6 +12,7 @@ import Button from '../components/Button/Button.jsx';
 import EmptyState from '../components/EmptyState/EmptyState.jsx';
 import LoadingState from '../components/LoadingState/LoadingState.jsx';
 import ErrorState from '../components/ErrorState/ErrorState.jsx';
+import Reveal from '../components/Motion/Reveal.jsx';
 import BudgetCard from './budgets/BudgetCard.jsx';
 import BudgetFormDialog from './budgets/BudgetFormDialog.jsx';
 import styles from './BudgetsPage.module.css';
@@ -22,6 +25,7 @@ function sortByCategory(list) {
 }
 
 export default function BudgetsPage() {
+  const { t } = useTranslation();
   const [month, setMonth] = useState(currentMonth);
   const [categories, setCategories] = useState([]);
   const [budgets, setBudgets] = useState([]);
@@ -86,7 +90,7 @@ export default function BudgetsPage() {
 
   // The form calls this with the budget the API returned (new or updated).
   function handleSaved(saved) {
-    toast.success(dialog.budget ? 'Budget updated' : 'Budget added');
+    toast.success(dialog.budget ? t('budgets.updated') : t('budgets.added'));
     setDialog(null);
     setBudgets((list) => sortByCategory([...list.filter((b) => b._id !== saved._id), saved]));
   }
@@ -97,10 +101,10 @@ export default function BudgetsPage() {
     try {
       const { copied } = await copyBudgets(shiftMonth(month, -1), month);
       if (copied === 0) {
-        toast.error(`${formatMonth(shiftMonth(month, -1))} has no budgets to copy`);
+        toast.error(t('budgets.nothingToCopy', { month: formatMonth(shiftMonth(month, -1)) }));
         return;
       }
-      toast.success(copied === 1 ? '1 budget copied' : `${copied} budgets copied`);
+      toast.success(t('budgets.copied', { count: copied }));
       setLoading(true);
       setReloadKey((key) => key + 1);
     } catch (err) {
@@ -114,7 +118,7 @@ export default function BudgetsPage() {
   async function handleDelete(budget) {
     try {
       await deleteBudget(budget._id);
-      toast.success('Budget deleted');
+      toast.success(t('budgets.deleted'));
       setBudgets((list) => list.filter((b) => b._id !== budget._id));
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -128,22 +132,22 @@ export default function BudgetsPage() {
 
   // The page shows one of four states: loading, error, empty or the grid.
   function renderContent() {
-    if (loading) return <LoadingState skeleton="cards">Loading budgets…</LoadingState>;
+    if (loading) return <LoadingState skeleton="cards">{t('budgets.loading')}</LoadingState>;
     if (loadError) return <ErrorState message={loadError} onRetry={retry} />;
 
     if (budgets.length === 0) {
       return (
         <EmptyState
           icon="wallet"
-          title={`No budgets in ${formatMonth(month)}`}
-          text="Set a monthly limit for an expense category to keep your spending in check."
+          title={t('budgets.noneInMonth', { month: formatMonth(month) })}
+          text={t('budgets.emptyText')}
         >
           <div className={styles.emptyActions}>
             <Button icon="plus" onClick={() => setDialog({ budget: null })} disabled={copying}>
-              Add budget
+              {t('budgets.add')}
             </Button>
             <Button variant="secondary" onClick={handleCopy} disabled={copying}>
-              {copying ? 'Copying…' : 'Copy from last month'}
+              {copying ? t('budgets.copying') : t('budgets.copyFromLast')}
             </Button>
           </div>
         </EmptyState>
@@ -152,10 +156,10 @@ export default function BudgetsPage() {
 
     return (
       <ul className={styles.grid}>
-        {budgets.map((budget) => (
-          <li key={budget._id}>
+        {budgets.map((budget, index) => (
+          <Reveal as="li" key={budget._id} index={index}>
             <BudgetCard budget={budget} onEdit={(b) => setDialog({ budget: b })} onDelete={handleDelete} />
-          </li>
+          </Reveal>
         ))}
       </ul>
     );
@@ -164,26 +168,29 @@ export default function BudgetsPage() {
   return (
     <div className={styles.page}>
       <PageHeader
-        title="Budgets"
-        subtitle={ready ? `${formatMonth(month)} · ${budgets.length} ${budgets.length === 1 ? 'budget' : 'budgets'}` : formatMonth(month)}
+        title={t('nav.budgets')}
+        subtitle={ready ? `${formatMonth(month)} · ${t('budgets.count', { count: budgets.length })}` : formatMonth(month)}
       >
         <MonthPicker month={month} onChange={changeMonth} />
         <Button icon="plus" onClick={() => setDialog({ budget: null })} disabled={!ready}>
-          Add budget
+          {t('budgets.add')}
         </Button>
       </PageHeader>
 
       {renderContent()}
 
-      {dialog && (
-        <BudgetFormDialog
-          budget={dialog.budget}
-          month={month}
-          availableCategories={availableCategories}
-          onSaved={handleSaved}
-          onClose={() => setDialog(null)}
-        />
-      )}
+      <AnimatePresence>
+        {dialog && (
+          <BudgetFormDialog
+            key="budget-form"
+            budget={dialog.budget}
+            month={month}
+            availableCategories={availableCategories}
+            onSaved={handleSaved}
+            onClose={() => setDialog(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

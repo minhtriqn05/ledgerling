@@ -84,7 +84,7 @@ describe("transactions CRUD", () => {
   ])("refuses invalid input (400): %o", async (body, message, withCategory) => {
     const res = await create(owner.token, withCategory ? { categoryId: food._id, ...body } : body);
     expect(res.status).toBe(400);
-    expect(res.body).toEqual({ success: false, message });
+    expect(res.body).toEqual({ success: false, message, code: expect.any(String) });
   });
 
   it("refuses an empty update (400)", async () => {
@@ -169,7 +169,7 @@ describe("deleting a category that still has transactions", () => {
 
     const blocked = await api().delete(`/api/categories/${categoryId}`).set(auth(user.token));
     expect(blocked.status).toBe(409);
-    expect(blocked.body).toEqual({ success: false, message: "Category still has transactions" });
+    expect(blocked.body).toEqual({ success: false, message: "Category still has transactions", code: expect.any(String) });
 
     await api().delete(`/api/transactions/${tx.body.data._id}`).set(auth(user.token));
     const allowed = await api().delete(`/api/categories/${categoryId}`).set(auth(user.token));

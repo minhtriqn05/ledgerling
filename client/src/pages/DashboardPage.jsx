@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { getSummary } from '../api/stats.js';
 import { getErrorMessage } from '../api/axios.js';
-import { formatCompact, formatVnd } from '../utils/format.js';
+import { formatCompact, formatPercent, formatVnd } from '../utils/format.js';
 import { currentMonth, formatMonth, formatMonthShort } from '../utils/vnDate.js';
 import PageHeader from '../components/PageHeader/PageHeader.jsx';
 import MonthPicker from '../components/MonthPicker/MonthPicker.jsx';
@@ -12,6 +13,8 @@ import EmptyState from '../components/EmptyState/EmptyState.jsx';
 import LoadingState from '../components/LoadingState/LoadingState.jsx';
 import ErrorState from '../components/ErrorState/ErrorState.jsx';
 import Icon from '../components/Icon.jsx';
+import CountUp from '../components/Motion/CountUp.jsx';
+import Reveal from '../components/Motion/Reveal.jsx';
 import BudgetAlerts from './dashboard/BudgetAlerts.jsx';
 import SavingsGoals from './dashboard/SavingsGoals.jsx';
 import CategoryMark from '../components/CategoryMark/CategoryMark.jsx';
@@ -24,21 +27,25 @@ import styles from './DashboardPage.module.css';
 // Plan: docs/plans/dashboard.md.
 
 // One of the three number cards. tone: 'income' | 'expense' | 'balance' (balance is the vivid hero card).
-function StatCard({ tone, icon, label, value }) {
+// The amount counts up from 0 when the card appears.
+function StatCard({ tone, icon, label, value, index }) {
   return (
-    <article className={`${styles.statCard} ${styles[tone]}`}>
+    <Reveal as="article" index={index} className={`${styles.statCard} ${styles[tone]}`}>
       <span className={styles.statTile}>
         <Icon name={icon} size={18} />
       </span>
       <div className={styles.statText}>
         <span>{label}</span>
-        <strong>{value}</strong>
+        <strong data-testid={`stat-${tone}`}>
+          <CountUp value={value} format={formatVnd} />
+        </strong>
       </div>
-    </article>
+    </Reveal>
   );
 }
 
 export default function DashboardPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [month, setMonth] = useState(currentMonth);
   const [summary, setSummary] = useState(null);
@@ -83,7 +90,7 @@ export default function DashboardPage() {
 
   // The page shows one of four states: loading, error, empty or the dashboard.
   function renderContent() {
-    if (loading) return <LoadingState skeleton="cards">Loading dashboard…</LoadingState>;
+    if (loading) return <LoadingState skeleton="cards">{t('dashboard.loading')}</LoadingState>;
     if (loadError) return <ErrorState message={loadError} onRetry={retry} />;
 
     // Nothing in the 6-month window at all: the cards and charts would only show zeros.
@@ -92,11 +99,11 @@ export default function DashboardPage() {
       return (
         <EmptyState
           icon="chart"
-          title={`No transactions in ${formatMonth(month)}`}
-          text="Add your first income or expense and the dashboard will fill in."
+          title={t('transactions.noneInMonth', { month: formatMonth(month) })}
+          text={t('dashboard.emptyText')}
         >
           <Button icon="plus" onClick={() => navigate('/transactions')}>
-            Add transaction
+            {t('transactions.add')}
           </Button>
         </EmptyState>
       );
@@ -113,10 +120,10 @@ export default function DashboardPage() {
 
     return (
       <>
-        <section className={styles.stats} aria-label={`Totals for ${formatMonth(month)}`}>
-          <StatCard tone="income" icon="arrowDownLeft" label="Total Income" value={formatVnd(summary.totalIncome)} />
-          <StatCard tone="expense" icon="arrowUpRight" label="Total Expense" value={formatVnd(summary.totalExpense)} />
-          <StatCard tone="balance" icon="wallet" label="Balance" value={formatVnd(summary.balance)} />
+        <section className={styles.stats} aria-label={t('common.totalsFor', { period: formatMonth(month) })}>
+          <StatCard tone="income" index={0} icon="arrowDownLeft" label={t('common.totalIncome')} value={summary.totalIncome} />
+          <StatCard tone="expense" index={1} icon="arrowUpRight" label={t('common.totalExpense')} value={summary.totalExpense} />
+          <StatCard tone="balance" index={2} icon="wallet" label={t('common.balance')} value={summary.balance} />
         </section>
 
         <section className={styles.infoRow}>
@@ -128,9 +135,9 @@ export default function DashboardPage() {
 
         <section className={styles.chartsRow}>
           <Card>
-            <CardHeader icon="pie" tone="sun" title="Spending by category" subtitle={formatMonth(month)} />
+            <CardHeader icon="pie" tone="sun" title={t('dashboard.spendingByCategory')} subtitle={formatMonth(month)} />
             {categories.length === 0 ? (
-              <p className={styles.cardStatus}>No expenses in {formatMonth(month)}.</p>
+              <p className={styles.cardStatus}>{t('dashboard.noExpenses', { month: formatMonth(month) })}</p>
             ) : (
               <>
                 <CategoryDonut data={categories} total={categoryTotal} />
@@ -138,16 +145,14 @@ export default function DashboardPage() {
                   {categories.map((c) => (
                     <li key={c.categoryId} style={{ '--tone': c.color }}>
                       <span className={styles.categoryName}>
-                        <CategoryMark icon={c.icon}>
-                          <i className={styles.categoryDot} />
-                        </CategoryMark>
+                        <CategoryMark category={c} />
                         <span>{c.name}</span>
                       </span>
                       <span className={styles.categoryBar} aria-hidden="true">
                         <span style={{ width: `${(c.total / biggest) * 100}%` }} />
                       </span>
                       <span className={styles.categoryAmount}>{formatCompact(c.total)}</span>
-                      <span className={styles.categoryShare}>{Math.round((c.total / categoryTotal) * 100)}%</span>
+                      <span className={styles.categoryShare}>{formatPercent(Math.round((c.total / categoryTotal) * 100))}</span>
                     </li>
                   ))}
                 </ul>
@@ -156,7 +161,7 @@ export default function DashboardPage() {
           </Card>
 
           <Card>
-            <CardHeader icon="chart" tone="sky" title="Expense by month" subtitle="Last 6 months" />
+            <CardHeader icon="chart" tone="sky" title={t('dashboard.expenseByMonth')} subtitle={t('dashboard.last6Months')} />
             <MonthlyExpenseChart data={monthlyExpense} selected={month} />
           </Card>
         </section>
@@ -166,7 +171,7 @@ export default function DashboardPage() {
 
   return (
     <div className={styles.page}>
-      <PageHeader title="Dashboard" subtitle={`Here is how ${formatMonth(month)} is going.`}>
+      <PageHeader title={t('nav.dashboard')} subtitle={t('dashboard.subtitle', { month: formatMonth(month) })}>
         <MonthPicker month={month} onChange={changeMonth} />
       </PageHeader>
 

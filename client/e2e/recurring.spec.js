@@ -1,6 +1,17 @@
 import { expect, test } from '@playwright/test';
-import { formatDate } from '../src/utils/format.js';
-import { currentMonth, fromDateInput, shiftMonth } from '../src/utils/vnDate.js';
+
+// Playwright runs in Node, and the app's date helpers now need the browser (they follow the chosen language).
+// So the few this test needs are written here: dates as the app shows them in English, in Vietnam time.
+const TIME_ZONE = 'Asia/Ho_Chi_Minh';
+const formatDate = (date) =>
+  new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: TIME_ZONE }).format(new Date(date));
+const currentMonth = () =>
+  new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: TIME_ZONE }).format(new Date()).slice(0, 7);
+const fromDateInput = (day) => `${day}T12:00:00+07:00`;
+function shiftMonth(month, delta) {
+  const [year, number] = month.split('-').map(Number);
+  return new Date(Date.UTC(year, number - 1 + delta, 1)).toISOString().slice(0, 7);
+}
 
 // On a phone the menu is hidden behind a button; on a desktop the sidebar is always visible.
 async function openMenuIfNeeded(page) {
@@ -52,7 +63,7 @@ test('create a rule that started last month → its transactions appear with the
   // 3. The list shows it; both due runs are done, so the next run is the 1st of next month
   const row = page.getByRole('listitem').filter({ hasText: 'Rent' });
   await expect(row.getByText('Bills')).toBeVisible();
-  await expect(row.getByText(/^−3\.500\.000\s₫$/)).toBeVisible();
+  await expect(row.getByText(/^−3,500,000\s₫$/)).toBeVisible();
   await expect(row.getByText('Monthly')).toBeVisible();
   await expect(row.getByText(nextRun)).toBeVisible();
   await expect(page.getByRole('switch', { name: 'Active: Rent' })).toBeChecked();

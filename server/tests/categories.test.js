@@ -82,7 +82,7 @@ describe("categories CRUD", () => {
       .set(auth(owner.token))
       .send({ name: "food", type: "expense", color: "#123456" });
     expect(res.status).toBe(409);
-    expect(res.body).toEqual({ success: false, message: "Category already exists" });
+    expect(res.body).toEqual({ success: false, message: "Category already exists", code: expect.any(String) });
   });
 
   it("allows the same name with the other type", async () => {

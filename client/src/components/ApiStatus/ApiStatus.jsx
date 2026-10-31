@@ -1,17 +1,13 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import api from '../../api/axios.js';
 import styles from './ApiStatus.module.css';
 
 // One-line check that the browser can reach the API (CORS and VITE_API_URL are set up correctly).
 // Calls GET /health through the shared axios instance and shows the result.
 
-const labels = {
-  checking: 'Checking API…',
-  connected: 'API connected',
-  unreachable: 'API unreachable',
-};
-
 export default function ApiStatus() {
+  const { t } = useTranslation();
   const [status, setStatus] = useState('checking');
 
   useEffect(() => {
@@ -31,7 +27,7 @@ export default function ApiStatus() {
   return (
     <p className={`${styles.status} ${styles[status]}`} role="status">
       <span className={styles.dot} aria-hidden="true" />
-      {labels[status]}
+      {t(`apiStatus.${status}`)}
     </p>
   );
 }

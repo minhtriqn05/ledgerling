@@ -1,30 +1,29 @@
+import { useTranslation } from 'react-i18next';
 import { formatDate, formatSignedVnd } from '../../utils/format.js';
 import IconButton from '../../components/IconButton/IconButton.jsx';
 import CategoryMark from '../../components/CategoryMark/CategoryMark.jsx';
+import Reveal from '../../components/Motion/Reveal.jsx';
 import styles from './RuleRow.module.css';
 
-const FREQUENCY_LABELS = { weekly: 'Weekly', monthly: 'Monthly' };
-
 // What the "Next run" column says: a rule that is off or past its end date has no next run.
-function nextRunText(rule) {
-  if (rule.ended) return 'Ended';
-  if (!rule.active) return 'Paused';
+function nextRunText(rule, t) {
+  if (rule.ended) return t('recurring.ended');
+  if (!rule.active) return t('recurring.paused');
   return formatDate(rule.nextRunDate);
 }
 
 // One rule in the list: category dot + name, note, amount, frequency, next run, Active switch, edit and delete.
 // `toggling` is true while the switch waits for the API.
-export default function RuleRow({ rule, toggling, onToggle, onEdit, onDelete }) {
+export default function RuleRow({ rule, index = 0, toggling, onToggle, onEdit, onDelete }) {
+  const { t } = useTranslation();
   const { category } = rule;
   const name = rule.note || category.name;
 
   return (
-    <li className={styles.row}>
+    <Reveal as="li" index={index} className={styles.row}>
       <div className={styles.main}>
         <span className={styles.category}>
-          <CategoryMark icon={category.icon}>
-            <i className={styles.dot} style={{ background: category.color }} aria-hidden="true" />
-          </CategoryMark>
+          <CategoryMark category={category} size="md" />
           {category.name}
         </span>
         {rule.note && <span className={styles.note}>{rule.note}</span>}
@@ -32,11 +31,11 @@ export default function RuleRow({ rule, toggling, onToggle, onEdit, onDelete }) 
 
       <span className={`${styles.amount} ${styles[category.type]}`}>{formatSignedVnd(rule.amount, category.type)}</span>
 
-      <span className={styles.frequency}>{FREQUENCY_LABELS[rule.frequency]}</span>
+      <span className={styles.frequency}>{t(`recurring.${rule.frequency}`)}</span>
 
       <span className={styles.nextRun}>
-        <span className={styles.caption}>Next run</span>
-        {nextRunText(rule)}
+        <span className={styles.caption}>{t('recurring.nextRun')}</span>
+        {nextRunText(rule, t)}
       </span>
 
       <button
@@ -44,7 +43,7 @@ export default function RuleRow({ rule, toggling, onToggle, onEdit, onDelete }) 
         role="switch"
         className={styles.switch}
         aria-checked={rule.active}
-        aria-label={`Active: ${name}`}
+        aria-label={t('recurring.active', { name })}
         disabled={toggling}
         onClick={() => onToggle(rule)}
       >
@@ -52,9 +51,9 @@ export default function RuleRow({ rule, toggling, onToggle, onEdit, onDelete }) 
       </button>
 
       <span className={styles.actions}>
-        <IconButton icon="edit" label={`Edit ${name}`} onClick={() => onEdit(rule)} />
-        <IconButton icon="trash" label={`Delete ${name}`} danger onClick={() => onDelete(rule)} />
+        <IconButton icon="edit" label={t('common.editName', { name })} onClick={() => onEdit(rule)} />
+        <IconButton icon="trash" label={t('common.deleteName', { name })} danger onClick={() => onDelete(rule)} />
       </span>
-    </li>
+    </Reveal>
   );
 }

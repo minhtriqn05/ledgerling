@@ -1,10 +1,11 @@
 import Icon from '../Icon.jsx';
 import styles from './Card.module.css';
 
-// White card with rounded corners. Any other prop (style, aria-label...) goes straight to the <div>.
-export default function Card({ className = '', children, ...rest }) {
+// White card with rounded corners. `lift` makes it rise a little on hover (for cards that stand for one thing).
+// Any other prop (style, aria-label...) goes straight to the <div>.
+export default function Card({ className = '', lift = false, children, ...rest }) {
   return (
-    <div className={`${styles.card} ${className}`} {...rest}>
+    <div className={`${styles.card} ${lift ? styles.lift : ''} ${className}`} {...rest}>
       {children}
     </div>
   );

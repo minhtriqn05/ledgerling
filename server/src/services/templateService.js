@@ -8,13 +8,13 @@ const CATEGORY_FIELDS = "name color icon type";
 // The category must belong to the same user, otherwise it looks like it does not exist (404)
 async function assertOwnedCategory(userId, categoryId) {
   const category = await Category.exists({ _id: categoryId, userId });
-  if (!category) throw httpError(404, "Category not found");
+  if (!category) throw httpError(404, "Category not found", "CATEGORY_NOT_FOUND");
 }
 
 // Filtering by userId as well means another user's template looks like it does not exist (404)
 async function findOwned(userId, id) {
   const template = await TransactionTemplate.findOne({ _id: id, userId }).populate("categoryId", CATEGORY_FIELDS);
-  if (!template) throw httpError(404, "Template not found");
+  if (!template) throw httpError(404, "Template not found", "TEMPLATE_NOT_FOUND");
   return template;
 }
 

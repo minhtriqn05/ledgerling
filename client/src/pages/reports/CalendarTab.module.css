@@ -70,6 +70,14 @@
   text-overflow: ellipsis;
 }
 
+/* On a phone a cell is about 40px wide: "980.000" does not fit, so the amount is left out.
+   The cell keeps its shade, its day number and its accessible name, which still has the amount. */
+@media (max-width: 560px) {
+  .dayAmount {
+    display: none;
+  }
+}
+
 /* Darker = more spent. Coral (the expense color) mixed into white in 4 steps. */
 .level0 {
   background: var(--color-surface-muted);

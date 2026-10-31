@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { getCategories, deleteCategory } from '../api/categories.js';
 import { getErrorMessage } from '../api/axios.js';
 import { useToast } from '../context/ToastContext.jsx';
@@ -9,6 +10,7 @@ import Alert from '../components/Alert/Alert.jsx';
 import EmptyState from '../components/EmptyState/EmptyState.jsx';
 import LoadingState from '../components/LoadingState/LoadingState.jsx';
 import ErrorState from '../components/ErrorState/ErrorState.jsx';
+import Reveal from '../components/Motion/Reveal.jsx';
 import CategoryCard from './categories/CategoryCard.jsx';
 import CategoryForm from './categories/CategoryForm.jsx';
 import styles from './CategoriesPage.module.css';
@@ -16,17 +18,13 @@ import styles from './CategoriesPage.module.css';
 // Design: CategoriesPreview in pages/styleGuide. The list is on the left (Expense / Income switch + cards),
 // the "New category" / "Edit category" form on the right (below the list on smaller screens).
 
-const EMPTY_TEXT = {
-  expense: 'Create one to start grouping your spending.',
-  income: 'Create one to see where your money comes from.',
-};
-
 // Same order as the API: by name, ignoring upper / lower case.
 function sortByName(list) {
   return [...list].sort((a, b) => a.name.localeCompare(b.name, 'en'));
 }
 
 export default function CategoriesPage() {
+  const { t } = useTranslation();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
@@ -74,7 +72,7 @@ export default function CategoriesPage() {
 
   // The form calls this with the category the API returned (new or updated).
   function handleSaved(saved) {
-    toast.success(form.category ? 'Category updated' : 'Category added');
+    toast.success(form.category ? t('categories.updated') : t('categories.added'));
     setCategories((list) => sortByName([...list.filter((c) => c._id !== saved._id), saved]));
     setActiveType(saved.type); // show the list it belongs to
     openForm(null);
@@ -85,7 +83,7 @@ export default function CategoriesPage() {
     try {
       await deleteCategory(category._id);
       setCategories((list) => list.filter((c) => c._id !== category._id));
-      toast.success('Category deleted');
+      toast.success(t('categories.deleted'));
       // If it was open in the form, the form goes back to "New category".
       if (form.category?._id === category._id) openForm(null, false);
     } catch (err) {
@@ -100,20 +98,20 @@ export default function CategoriesPage() {
 
   // The counts appear once the list has loaded.
   const typeOptions = [
-    { value: 'expense', label: ready ? `Expense · ${expenseCount}` : 'Expense' },
-    { value: 'income', label: ready ? `Income · ${incomeCount}` : 'Income' },
+    { value: 'expense', label: ready ? `${t('common.expense')} · ${expenseCount}` : t('common.expense') },
+    { value: 'income', label: ready ? `${t('common.income')} · ${incomeCount}` : t('common.income') },
   ];
 
   // The left column shows one of four states: loading, error, empty or the cards.
   function renderList() {
-    if (loading) return <LoadingState skeleton="cards">Loading categories…</LoadingState>;
+    if (loading) return <LoadingState skeleton="cards">{t('categories.loading')}</LoadingState>;
     if (loadError) return <ErrorState message={loadError} onRetry={retry} />;
 
     if (visible.length === 0) {
       return (
-        <EmptyState icon="categories" title={`No ${activeType} categories yet`} text={EMPTY_TEXT[activeType]}>
+        <EmptyState icon="categories" title={t(`categories.empty.${activeType}`)} text={t(`categories.emptyText.${activeType}`)}>
           <Button icon="plus" onClick={() => openForm(null)}>
-            New category
+            {t('categories.new')}
           </Button>
         </EmptyState>
       );
@@ -121,10 +119,10 @@ export default function CategoriesPage() {
 
     return (
       <ul className={styles.grid}>
-        {visible.map((category) => (
-          <li key={category._id}>
+        {visible.map((category, index) => (
+          <Reveal as="li" key={category._id} index={index}>
             <CategoryCard category={category} onEdit={openForm} onDelete={handleDelete} />
-          </li>
+          </Reveal>
         ))}
       </ul>
     );
@@ -132,16 +130,16 @@ export default function CategoriesPage() {
 
   return (
     <div className={styles.page}>
-      <PageHeader title="Categories" subtitle="Group your money the way you think about it.">
+      <PageHeader title={t('nav.categories')} subtitle={t('categories.subtitle')}>
         <Button icon="plus" onClick={() => openForm(null)}>
-          New category
+          {t('categories.new')}
         </Button>
       </PageHeader>
 
       <div className={styles.layout}>
-        <section className={styles.listColumn} aria-label="Your categories">
+        <section className={styles.listColumn} aria-label={t('categories.yours')}>
           <div className={styles.listHeader}>
-            <SegmentedControl label="Category type" options={typeOptions} value={activeType} onChange={changeType} />
+            <SegmentedControl label={t('categories.typeLabel')} options={typeOptions} value={activeType} onChange={changeType} />
           </div>
           {renderList()}
         </section>

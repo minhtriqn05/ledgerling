@@ -14,8 +14,8 @@ function text(value) {
 // Each helper checks one field and returns the cleaned value, or throws a 400.
 function checkName(value) {
   const name = text(value).trim();
-  if (!name) throw httpError(400, "Name is required");
-  if (name.length > 60) throw httpError(400, "Name must be at most 60 characters");
+  if (!name) throw httpError(400, "Name is required", "NAME_REQUIRED");
+  if (name.length > 60) throw httpError(400, "Name must be at most 60 characters", "NAME_TOO_LONG");
   return name;
 }
 
@@ -26,20 +26,20 @@ function isWholeAmount(value) {
 
 function checkTargetAmount(value) {
   if (!isWholeAmount(value) || value <= 0) {
-    throw httpError(400, "Target amount must be a whole number greater than 0");
+    throw httpError(400, "Target amount must be a whole number greater than 0", "TARGET_INVALID");
   }
   return value;
 }
 
 function checkColor(value) {
   const color = text(value).trim();
-  if (!COLOR_REGEX.test(color)) throw httpError(400, "Color must be a hex code like #FF7043");
+  if (!COLOR_REGEX.test(color)) throw httpError(400, "Color must be a hex code like #FF7043", "COLOR_INVALID");
   return color;
 }
 
 function checkDay(value, field) {
   if (typeof value !== "string" || !isValidDay(value)) {
-    throw httpError(400, `${field} must be a date in YYYY-MM-DD format`);
+    throw httpError(400, `${field} must be a date in YYYY-MM-DD format`, "DATE_INVALID");
   }
   return value;
 }
@@ -50,7 +50,7 @@ function checkDeadline(value, mustBeFuture) {
   if (value === undefined || value === null || value === "") return null;
   const deadline = checkDay(value, "Deadline");
   // Same format, so comparing the strings compares the days
-  if (mustBeFuture && deadline <= todayInVietnam()) throw httpError(400, "Deadline must be after today");
+  if (mustBeFuture && deadline <= todayInVietnam()) throw httpError(400, "Deadline must be after today", "DEADLINE_IN_PAST");
   return deadline;
 }
 
@@ -81,14 +81,14 @@ export function validateContribution(req, res, next) {
   const body = req.body ?? {};
 
   if (!isWholeAmount(body.amount) || body.amount === 0) {
-    throw httpError(400, "Amount must be a whole number other than 0");
+    throw httpError(400, "Amount must be a whole number other than 0", "AMOUNT_INVALID");
   }
 
   let note = "";
   if (body.note !== undefined && body.note !== null) {
     if (typeof body.note !== "string") throw httpError(400, "Note must be a string");
     note = body.note.trim();
-    if (note.length > 200) throw httpError(400, "Note must be at most 200 characters");
+    if (note.length > 200) throw httpError(400, "Note must be at most 200 characters", "NOTE_TOO_LONG");
   }
 
   // A missing date means today; the service fills it in
@@ -99,11 +99,11 @@ export function validateContribution(req, res, next) {
 
 // A malformed id can never match anything, so answer 404 instead of letting Mongoose throw a CastError.
 export function validateGoalId(req, res, next) {
-  if (!OBJECT_ID_REGEX.test(req.params.id)) throw httpError(404, "Goal not found");
+  if (!OBJECT_ID_REGEX.test(req.params.id)) throw httpError(404, "Goal not found", "GOAL_NOT_FOUND");
   next();
 }
 
 export function validateContributionId(req, res, next) {
-  if (!OBJECT_ID_REGEX.test(req.params.contributionId)) throw httpError(404, "Contribution not found");
+  if (!OBJECT_ID_REGEX.test(req.params.contributionId)) throw httpError(404, "Contribution not found", "CONTRIBUTION_NOT_FOUND");
   next();
 }

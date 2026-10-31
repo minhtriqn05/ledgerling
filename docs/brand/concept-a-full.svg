@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 264.2 64" role="img" aria-label="Ledgerling"><defs><linearGradient id="a-full-grad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2874b5"/><stop offset="1" stop-color="#1b7f86"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#a-full-grad)"/>
+<rect x="15" y="25" width="34" height="28" rx="5" fill="#fff"/>
+<path d="M23.5 25V53" stroke="#2874b5" stroke-width="3"/>
+<path d="M30 35H42M30 43H42" stroke="#1b7f86" stroke-width="3.5" stroke-linecap="round"/>
+<path d="M32 25V19" stroke="#a9efcf" stroke-width="3.5" stroke-linecap="round"/>
+<path d="M32 19C32 12 37 8 45 8C45 15 40 19 32 19Z" fill="#a9efcf"/>
+<path d="M32 21C32 16 28 12 20 12C20 18 25 21 32 21Z" fill="#a9efcf"/><g transform="translate(78 10.75) scale(1.55)"><path d="M1.5 3V22H10M14.2 16H26.2A6 6 0 1 0 24.5 20.2M29.4 16a6 6 0 1 0 12 0a6 6 0 1 0 -12 0M41.4 3V22M44.599999999999994 16a6 6 0 1 0 12 0a6 6 0 1 0 -12 0M56.599999999999994 10V23.5A6 6 0 0 1 45.99999999999999 27M59.8 16H71.8A6 6 0 1 0 70.1 20.2M75 10V22M75 15.5C75 12 77.6 10 81.2 10.2M83.8 3V22M88.6 10V22M88.6 4.6v.01M93.39999999999999 10V22M93.39999999999999 15.5A5 5 0 0 1 103.39999999999999 15.5V22M106.6 16a6 6 0 1 0 12 0a6 6 0 1 0 -12 0M118.6 10V23.5A6 6 0 0 1 108 27" fill="none" stroke="#172534" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></g></svg>

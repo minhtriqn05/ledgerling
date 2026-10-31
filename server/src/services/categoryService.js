@@ -10,13 +10,13 @@ const NAME_COLLATION = { locale: "en", strength: 2 };
 
 // Created for every new account. Colors are the presets from docs/ui-style.md (one per category).
 const DEFAULT_CATEGORIES = [
-  { name: "Food", type: "expense", color: "#F07D62", icon: "🍜" },
-  { name: "Transport", type: "expense", color: "#4A9FE3", icon: "🚌" },
-  { name: "Shopping", type: "expense", color: "#7D8CE8", icon: "🛍️" },
-  { name: "Bills", type: "expense", color: "#F19A52", icon: "🧾" },
-  { name: "Entertainment", type: "expense", color: "#22ADA3", icon: "🎬" },
-  { name: "Salary", type: "income", color: "#3DB383", icon: "💰" },
-  { name: "Other Income", type: "income", color: "#5D7FD8", icon: "🎁" },
+  { name: "Food", type: "expense", color: "#F07D62", icon: "utensils" },
+  { name: "Transport", type: "expense", color: "#4A9FE3", icon: "bus" },
+  { name: "Shopping", type: "expense", color: "#7D8CE8", icon: "shopping-bag" },
+  { name: "Bills", type: "expense", color: "#F19A52", icon: "receipt" },
+  { name: "Entertainment", type: "expense", color: "#22ADA3", icon: "clapperboard" },
+  { name: "Salary", type: "income", color: "#3DB383", icon: "banknote" },
+  { name: "Other Income", type: "income", color: "#5D7FD8", icon: "gift" },
 ];
 
 export async function createDefaultCategories(userId) {
@@ -32,7 +32,7 @@ export async function listCategories(userId, { type }) {
 // Filtering by userId as well means another user's category looks like it does not exist (404)
 async function findOwned(userId, id) {
   const category = await Category.findOne({ _id: id, userId });
-  if (!category) throw httpError(404, "Category not found");
+  if (!category) throw httpError(404, "Category not found", "CATEGORY_NOT_FOUND");
   return category;
 }
 
@@ -51,7 +51,7 @@ export async function updateCategory(userId, id, changes) {
       name: changes.name,
       _id: { $ne: category._id },
     }).collation(NAME_COLLATION);
-    if (duplicate) throw httpError(409, "Category already exists");
+    if (duplicate) throw httpError(409, "Category already exists", "CATEGORY_EXISTS");
   }
 
   category.set(changes);
@@ -61,9 +61,9 @@ export async function updateCategory(userId, id, changes) {
 export async function deleteCategory(userId, id) {
   const category = await findOwned(userId, id);
   const inUse = await Transaction.exists({ userId, categoryId: category._id });
-  if (inUse) throw httpError(409, "Category still has transactions");
+  if (inUse) throw httpError(409, "Category still has transactions", "CATEGORY_IN_USE");
   const hasRule = await RecurringRule.exists({ userId, categoryId: category._id });
-  if (hasRule) throw httpError(409, "Category still has recurring rules");
+  if (hasRule) throw httpError(409, "Category still has recurring rules", "CATEGORY_HAS_RULES");
 
   // A budget or a template means nothing without its category, so they go too
   await Budget.deleteMany({ userId, categoryId: category._id });
@@ -75,7 +75,7 @@ export async function deleteCategory(userId, id) {
 export async function createCategory(userId, { name, type, color, icon }) {
   // Friendly message first; the unique index is the safety net if two requests race
   const existing = await Category.findOne({ userId, type, name }).collation(NAME_COLLATION);
-  if (existing) throw httpError(409, "Category already exists");
+  if (existing) throw httpError(409, "Category already exists", "CATEGORY_EXISTS");
 
   return Category.create({ userId, name, type, color, icon: icon ?? null });
 }

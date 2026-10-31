@@ -35,7 +35,7 @@ describe('RuleRow', () => {
 
     expect(screen.getByText('Bills')).toBeInTheDocument();
     expect(screen.getByText('Rent')).toBeInTheDocument();
-    expect(screen.getByText(`−3.500.000${NBSP}₫`)).toBeInTheDocument();
+    expect(screen.getByText(`−3,500,000${NBSP}₫`)).toBeInTheDocument();
     expect(screen.getByText('Monthly')).toBeInTheDocument();
     expect(screen.getByText('30 Nov 2026')).toBeInTheDocument();
   });
@@ -43,7 +43,7 @@ describe('RuleRow', () => {
   it('shows an income rule with a plus', () => {
     renderRow(makeRule({ category: { _id: 'c2', name: 'Salary', color: '#3DB383', type: 'income' }, frequency: 'weekly' }));
 
-    expect(screen.getByText(`+3.500.000${NBSP}₫`)).toBeInTheDocument();
+    expect(screen.getByText(`+3,500,000${NBSP}₫`)).toBeInTheDocument();
     expect(screen.getByText('Weekly')).toBeInTheDocument();
   });
 

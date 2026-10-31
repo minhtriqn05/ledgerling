@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext.jsx';
 import { getErrorMessage } from '../api/axios.js';
 import { isValidEmail } from '../utils/validators.js';
+import { useDocumentTitle } from '../hooks/useDocumentTitle.js';
 import PageTitle from '../components/PageTitle/PageTitle.jsx';
 import TextField from '../components/TextField/TextField.jsx';
 import Button from '../components/Button/Button.jsx';
@@ -10,18 +12,20 @@ import Alert from '../components/Alert/Alert.jsx';
 import styles from './AuthForm.module.css';
 
 export default function LoginPage() {
+  const { t } = useTranslation();
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  useDocumentTitle(t('auth.logIn'));
 
   async function handleSubmit(event) {
     event.preventDefault();
 
     // Basic checks first; the server validates again.
-    if (!isValidEmail(email)) return setError('Please enter a valid email address.');
-    if (!password) return setError('Please enter your password.');
+    if (!isValidEmail(email)) return setError(t('auth.enterValidEmail'));
+    if (!password) return setError(t('auth.enterPassword'));
 
     setError('');
     setSubmitting(true);
@@ -36,15 +40,15 @@ export default function LoginPage() {
   }
 
   return (
-    // noValidate: the browser's own messages follow the browser language, so the checks above show English ones.
+    // noValidate: the browser's own messages follow the browser language, so the checks above show their own.
     <form className={styles.form} onSubmit={handleSubmit} noValidate>
       <div>
-        <PageTitle>Welcome back</PageTitle>
-        <p className={styles.subtitle}>Log in to keep tracking your spending.</p>
+        <PageTitle>{t('auth.welcomeBack')}</PageTitle>
+        <p className={styles.subtitle}>{t('auth.loginSubtitle')}</p>
       </div>
 
       <TextField
-        label="Email"
+        label={t('auth.email')}
         icon="mail"
         type="email"
         autoComplete="email"
@@ -53,7 +57,7 @@ export default function LoginPage() {
         onChange={(event) => setEmail(event.target.value)}
       />
       <TextField
-        label="Password"
+        label={t('auth.password')}
         icon="lock"
         type="password"
         autoComplete="current-password"
@@ -65,13 +69,13 @@ export default function LoginPage() {
       {error && <Alert>{error}</Alert>}
 
       <Button type="submit" block disabled={submitting}>
-        {submitting ? 'Logging in…' : 'Log in'}
+        {submitting ? t('auth.loggingIn') : t('auth.logIn')}
       </Button>
 
       <p className={styles.switch}>
-        New to Ledgerling?{' '}
+        {t('auth.newHere')}{' '}
         <Link to="/register" className={styles.link}>
-          Create an account
+          {t('auth.createAnAccount')}
         </Link>
       </p>
     </form>

@@ -88,8 +88,11 @@ router.get("/", validateListCategories, list);
  *               icon:
  *                 type: string
  *                 nullable: true
- *                 description: Optional. Exactly one emoji; null or "" means no icon.
- *                 example: "🍜"
+ *                 description: |
+ *                   Optional. An icon name from the app's icon set (utensils, coffee, bus, car, receipt, house, banknote...,
+ *                   the full list is in server/src/utils/categoryIcons.js) or one emoji (kept for older clients).
+ *                   null or "" means no icon; the app then picks one from the name.
+ *                 example: utensils
  *     responses:
  *       201:
  *         description: Category created
@@ -200,8 +203,8 @@ router.get("/:id", validateCategoryId, getOne);
  *               icon:
  *                 type: string
  *                 nullable: true
- *                 description: Exactly one emoji; null or "" removes the icon.
- *                 example: "🍔"
+ *                 description: An icon name from the app's icon set or one emoji; null or "" removes the icon.
+ *                 example: coffee
  *     responses:
  *       200:
  *         description: The updated category

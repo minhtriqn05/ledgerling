@@ -9,6 +9,8 @@ import {
   CartesianGrid,
   Tooltip,
 } from 'recharts';
+import { useReducedMotion } from 'motion/react';
+import { useTranslation } from 'react-i18next';
 import { cssVar } from '../../utils/cssVar.js';
 import { formatCompact } from '../../utils/format.js';
 import { formatLongDay } from '../../utils/reports.js';
@@ -25,6 +27,8 @@ const axisTick = () => ({ fill: cssVar('--chart-axis'), fontSize: cssVar('--font
 // Expense of every day of one month as a smooth line.
 // dailyExpense: [{ date: 'YYYY-MM-DD', total }], one entry per day (the monthly report sends them all).
 export function DailyExpenseChart({ dailyExpense, month }) {
+  const { t } = useTranslation();
+  const animate = !useReducedMotion();
   const data = dailyExpense.map((d) => ({
     day: Number(d.date.slice(8, 10)),
     fullLabel: formatLongDay(d.date),
@@ -35,7 +39,7 @@ export function DailyExpenseChart({ dailyExpense, month }) {
   const grid = cssVar('--chart-grid');
 
   return (
-    <div className={styles.chart} role="img" aria-label={`Expense of each day of ${formatMonth(month)}`}>
+    <div className={styles.chart} role="img" aria-label={t('reports.dailyChartLabel', { month: formatMonth(month) })}>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ top: 8, right: 12, bottom: 0, left: 0 }}>
           <CartesianGrid vertical={false} stroke={grid} strokeDasharray="4 6" />
@@ -43,7 +47,8 @@ export function DailyExpenseChart({ dailyExpense, month }) {
           <YAxis
             axisLine={false}
             tickLine={false}
-            width={48}
+            // Wide enough for the longest label in every language ("7,5 Mio." in Deutsch); "auto" measured too narrow
+            width={64}
             ticks={ticks}
             domain={[0, ticks[ticks.length - 1]]}
             tick={axisTick()}
@@ -58,7 +63,10 @@ export function DailyExpenseChart({ dailyExpense, month }) {
           <Line
             type="monotone"
             dataKey="expense"
-            name="Expense"
+            name={t('common.expense')}
+            isAnimationActive={animate}
+            animationDuration={400}
+            animationEasing="ease-out"
             stroke={color}
             strokeWidth={2.5}
             dot={false}
@@ -73,19 +81,30 @@ export function DailyExpenseChart({ dailyExpense, month }) {
 // Income and expense of the 12 months of a year as pairs of capsule bars.
 // months: [{ month: 'YYYY-MM', income, expense }]
 export function YearlyChart({ months, year }) {
+  const { t } = useTranslation();
+  const animate = !useReducedMotion();
   const data = months.map((m) => ({ ...m, label: formatMonthShort(m.month), fullLabel: formatMonth(m.month) }));
   const ticks = niceTicks(Math.max(...data.map((d) => Math.max(d.income, d.expense))));
 
   return (
-    <div className={styles.chart} role="img" aria-label={`Income and expense of each month of ${year}`}>
+    <div className={styles.chart} role="img" aria-label={t('reports.yearlyChartLabel', { year })}>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 8, right: 12, bottom: 0, left: 0 }} barCategoryGap="25%" barGap={3}>
           <CartesianGrid vertical={false} stroke={cssVar('--chart-grid')} strokeDasharray="4 6" />
-          <XAxis dataKey="label" axisLine={false} tickLine={false} tickMargin={10} interval={0} tick={axisTick()} />
+          {/* All 12 months when they fit; on a phone every other label is skipped instead of overlapping */}
+          <XAxis
+            dataKey="label"
+            axisLine={false}
+            tickLine={false}
+            tickMargin={10}
+            interval="preserveStartEnd"
+            minTickGap={4}
+            tick={axisTick()}
+          />
           <YAxis
             axisLine={false}
             tickLine={false}
-            width={48}
+            width={64}
             ticks={ticks}
             domain={[0, ticks[ticks.length - 1]]}
             tick={axisTick()}
@@ -97,8 +116,26 @@ export function YearlyChart({ months, year }) {
               <ChartTooltip active={active} payload={payload} label={payload?.[0]?.payload.fullLabel} />
             )}
           />
-          <Bar dataKey="income" name="Income" fill={cssVar('--color-income')} maxBarSize={10} radius={999} />
-          <Bar dataKey="expense" name="Expense" fill={cssVar('--color-expense')} maxBarSize={10} radius={999} />
+          <Bar
+            dataKey="income"
+            name={t('common.income')}
+            fill={cssVar('--color-income')}
+            maxBarSize={10}
+            radius={999}
+            isAnimationActive={animate}
+            animationDuration={400}
+            animationEasing="ease-out"
+          />
+          <Bar
+            dataKey="expense"
+            name={t('common.expense')}
+            fill={cssVar('--color-expense')}
+            maxBarSize={10}
+            radius={999}
+            isAnimationActive={animate}
+            animationDuration={400}
+            animationEasing="ease-out"
+          />
         </BarChart>
       </ResponsiveContainer>
     </div>
@@ -107,13 +144,15 @@ export function YearlyChart({ months, year }) {
 
 // Small legend for the yearly chart, shown in the card header
 export function YearlyLegend() {
+  const { t } = useTranslation();
+
   return (
     <ul className={styles.legend} aria-hidden="true">
       <li>
-        <i className={`${styles.legendDot} ${styles.incomeDot}`} /> Income
+        <i className={`${styles.legendDot} ${styles.incomeDot}`} /> {t('common.income')}
       </li>
       <li>
-        <i className={`${styles.legendDot} ${styles.expenseDot}`} /> Expense
+        <i className={`${styles.legendDot} ${styles.expenseDot}`} /> {t('common.expense')}
       </li>
     </ul>
   );

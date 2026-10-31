@@ -24,7 +24,7 @@ describe("POST /api/templates", () => {
     expect(res.status).toBe(201);
     expect(res.body.success).toBe(true);
     expect(res.body.data).toMatchObject({ name: "Morning coffee", amount: 35000, note: "Coffee" });
-    expect(res.body.data.category).toMatchObject({ _id: food._id, name: "Food", icon: "🍜", type: "expense" });
+    expect(res.body.data.category).toMatchObject({ _id: food._id, name: "Food", icon: "utensils", type: "expense" });
     expect(res.body.data.userId).toBeUndefined();
     expect(res.body.data.categoryId).toBeUndefined();
   });
@@ -54,7 +54,7 @@ describe("POST /api/templates", () => {
   ])("refuses %s (400)", async (_label, body, message) => {
     const res = await create(owner.token, { ...body, categoryId: body.categoryId === "CAT" ? food._id : body.categoryId });
     expect(res.status).toBe(400);
-    expect(res.body).toEqual({ success: false, message });
+    expect(res.body).toEqual({ success: false, message, code: expect.any(String) });
   });
 
   it("answers 404 for a category of another user", async () => {

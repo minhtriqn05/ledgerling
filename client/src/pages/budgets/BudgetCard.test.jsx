@@ -32,9 +32,9 @@ describe('BudgetCard', () => {
   it('shows spent / amount in VND and how much is left', () => {
     renderCard(makeBudget());
 
-    expect(screen.getByText(`500.000${NBSP}₫`)).toBeInTheDocument();
-    expect(screen.getByText(`/ 1.000.000${NBSP}₫`)).toBeInTheDocument();
-    expect(screen.getByText(`500.000${NBSP}₫ left`)).toBeInTheDocument();
+    expect(screen.getByText(`500,000${NBSP}₫`)).toBeInTheDocument();
+    expect(screen.getByText(`/ 1,000,000${NBSP}₫`)).toBeInTheDocument();
+    expect(screen.getByText(`500,000${NBSP}₫ left`)).toBeInTheDocument();
     expect(screen.getByText('50%')).toBeInTheDocument();
   });
 
@@ -47,7 +47,7 @@ describe('BudgetCard', () => {
     renderCard(makeBudget({ spent: 800000, remaining: 200000, percent: 80, status: 'warning' }));
 
     expect(cardOf()).toHaveClass('warning');
-    expect(screen.getByText(`200.000${NBSP}₫ left`)).toBeInTheDocument();
+    expect(screen.getByText(`200,000${NBSP}₫ left`)).toBeInTheDocument();
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '80');
   });
 
@@ -55,7 +55,7 @@ describe('BudgetCard', () => {
     renderCard(makeBudget({ spent: 1250000, remaining: -250000, percent: 125, status: 'over' }));
 
     expect(cardOf()).toHaveClass('over');
-    expect(screen.getByText(`Over by 250.000${NBSP}₫`)).toBeInTheDocument();
+    expect(screen.getByText(`Over by 250,000${NBSP}₫`)).toBeInTheDocument();
     // The bar never grows past the card
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '100');
     expect(screen.getByRole('progressbar').firstChild).toHaveStyle({ width: '100%' });

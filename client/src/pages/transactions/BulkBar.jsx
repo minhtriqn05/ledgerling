@@ -1,23 +1,26 @@
+import { useTranslation } from 'react-i18next';
 import Button from '../../components/Button/Button.jsx';
 import styles from './BulkBar.module.css';
 
 // The bar above the list while at least one row is ticked: how many, and what can be done with them.
 // It is a role="region" so a screen reader finds it; the count is announced politely when it changes.
 export default function BulkBar({ count, onChangeCategory, onDelete, onClear }) {
+  const { t } = useTranslation();
+
   return (
-    <div className={styles.bar} role="region" aria-label="Bulk actions">
+    <div className={styles.bar} role="region" aria-label={t('transactions.bulkActions')}>
       <span className={styles.count} role="status">
-        {count} selected
+        {t('transactions.selected', { count })}
       </span>
       <div className={styles.actions}>
         <Button variant="secondary" icon="categories" onClick={onChangeCategory}>
-          Change category
+          {t('transactions.changeCategory')}
         </Button>
         <Button variant="danger" icon="trash" onClick={onDelete}>
-          Delete selected
+          {t('transactions.deleteSelected')}
         </Button>
         <Button variant="secondary" onClick={onClear}>
-          Clear selection
+          {t('transactions.clearSelection')}
         </Button>
       </div>
     </div>

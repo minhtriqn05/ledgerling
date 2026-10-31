@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { getGoals } from '../../api/goals.js';
-import { formatDate, formatVnd } from '../../utils/format.js';
+import { formatDate, formatPercent, formatVnd } from '../../utils/format.js';
 import { daysUntil, formatDaysLeft } from '../../utils/goals.js';
 import Card, { CardHeader } from '../../components/Card/Card.jsx';
 import Button from '../../components/Button/Button.jsx';
@@ -17,6 +18,7 @@ const MAX_GOALS = 2;
 // Like the budget alerts, it loads its own data, so a failed request never breaks the rest of the dashboard.
 // The card has five states: loading, error, no goals yet, all completed, or the goals.
 export default function SavingsGoals() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   // null while loading, then the list of goals
   const [goals, setGoals] = useState(null);
@@ -39,15 +41,15 @@ export default function SavingsGoals() {
   const openGoals = (goals ?? []).filter((g) => !g.completed).slice(0, MAX_GOALS);
 
   function renderBody() {
-    if (failed) return <p className={styles.note}>Goals could not be loaded.</p>;
-    if (goals === null) return <LoadingState skeleton="rows" count={2}>Loading goals…</LoadingState>;
+    if (failed) return <p className={styles.note}>{t('dashboard.goalsFailed')}</p>;
+    if (goals === null) return <LoadingState skeleton="rows" count={2}>{t('goals.loading')}</LoadingState>;
 
     if (goals.length === 0) {
       return (
         <div className={styles.invite}>
-          <p className={styles.note}>Save up for something you want. Set a target, add money and follow the progress here.</p>
+          <p className={styles.note}>{t('dashboard.goalsInvite')}</p>
           <Button icon="plus" onClick={() => navigate('/goals')}>
-            Create a goal
+            {t('dashboard.createGoal')}
           </Button>
         </div>
       );
@@ -57,7 +59,7 @@ export default function SavingsGoals() {
       return (
         <p className={styles.allDone}>
           <Icon name="check" size={18} />
-          <span>All goals completed</span>
+          <span>{t('dashboard.goalsDone')}</span>
         </p>
       );
     }
@@ -71,7 +73,7 @@ export default function SavingsGoals() {
                 <i className={styles.dot} aria-hidden="true" />
                 <span>{goal.name}</span>
               </span>
-              <span className={styles.percent}>{goal.progress}%</span>
+              <span className={styles.percent}>{formatPercent(goal.progress)}</span>
             </div>
             <div
               className={styles.track}
@@ -80,7 +82,7 @@ export default function SavingsGoals() {
               aria-valuemin={0}
               aria-valuemax={100}
               aria-valuenow={goal.progress}
-              aria-valuetext={`${goal.progress}% saved`}
+              aria-valuetext={t('goals.percentSaved', { percent: goal.progress })}
             >
               <span className={styles.bar} style={{ width: `${goal.progress}%` }} />
             </div>
@@ -91,7 +93,7 @@ export default function SavingsGoals() {
               <span className={styles.meta}>
                 {goal.deadline
                   ? `${formatDate(goal.deadline)} · ${formatDaysLeft(daysUntil(goal.deadline))}`
-                  : 'No deadline'}
+                  : t('dashboard.noDeadline')}
               </span>
             </div>
           </li>
@@ -102,9 +104,9 @@ export default function SavingsGoals() {
 
   return (
     <Card>
-      <CardHeader icon="target" tone="mint" title="Savings goals" subtitle="Due first">
+      <CardHeader icon="target" tone="mint" title={t('dashboard.savingsGoals')} subtitle={t('dashboard.dueFirst')}>
         <Button variant="secondary" onClick={() => navigate('/goals')}>
-          View all
+          {t('common.viewAll')}
         </Button>
       </CardHeader>
       {renderBody()}

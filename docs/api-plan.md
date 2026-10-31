@@ -8,7 +8,8 @@ Swagger UI: `/api-docs` (outside `/api`).
 - **Auth**: protected routes need the header `Authorization: Bearer <token>`.
   The token comes from `POST /auth/register` or `POST /auth/login`.
 - **Success**: `{ "success": true, "data": ... }`
-- **Error**: `{ "success": false, "message": "..." }`
+- **Error**: `{ "success": false, "message": "...", "code": "..." }`. `message` is English text for people (Postman,
+  logs); `code` is a stable identifier the client translates into the user's language (see [Error codes](#error-codes)).
 - **Ownership**: the user always comes from the token, never from the body. An item that belongs
   to another user is answered with 404, as if it did not exist.
 - **Month filter**: `month=YYYY-MM` covers Vietnam time (UTC+7), from the 1st at 00:00 +07:00
@@ -30,6 +31,24 @@ Swagger UI: `/api-docs` (outside `/api`).
 | 409 | Duplicate (email, category name, budget of the same category and month, two transactions of one recurring rule on the same date) or conflict (category still has transactions or recurring rules) |
 | 500 | Server error |
 
+### Error codes
+
+Every error has a `code`. A code never changes meaning, so the client can show its own translation of
+`errors.<code>` (see `client/src/locales/*.json`); for a code it does not know it shows `message`.
+When the place that throws an error names no specific code, the status gives a default:
+400 `VALIDATION_ERROR`, 401 `UNAUTHORIZED`, 404 `NOT_FOUND`, 409 `CONFLICT`, 500 `INTERNAL_ERROR`.
+
+| Status | Codes |
+|--------|-------|
+| 400 | `VALIDATION_ERROR`, `INVALID_JSON`, `NAME_REQUIRED`, `NAME_TOO_LONG`, `EMAIL_INVALID`, `PASSWORD_REQUIRED`, `PASSWORD_TOO_SHORT`, `PASSWORD_TOO_LONG`, `TYPE_INVALID`, `TYPE_LOCKED`, `COLOR_INVALID`, `ICON_INVALID`, `CATEGORY_REQUIRED`, `AMOUNT_INVALID`, `CURRENCY_INVALID`, `NOTE_TOO_LONG`, `DATE_INVALID`, `TAG_INVALID`, `TOO_MANY_TAGS`, `MONTH_INVALID`, `BUDGET_EXPENSE_ONLY`, `END_BEFORE_START`, `TARGET_INVALID`, `DEADLINE_IN_PAST`, `WITHDRAW_TOO_MUCH`, `DEPOSIT_IN_USE`, `IMPORT_TOO_MANY_ROWS` |
+| 401 | `TOKEN_MISSING`, `TOKEN_INVALID`, `INVALID_CREDENTIALS` |
+| 404 | `ROUTE_NOT_FOUND`, `CATEGORY_NOT_FOUND`, `TRANSACTION_NOT_FOUND`, `BUDGET_NOT_FOUND`, `RULE_NOT_FOUND`, `GOAL_NOT_FOUND`, `CONTRIBUTION_NOT_FOUND`, `TEMPLATE_NOT_FOUND` |
+| 409 | `EMAIL_TAKEN`, `CATEGORY_EXISTS`, `CATEGORY_IN_USE`, `CATEGORY_HAS_RULES`, `BUDGET_EXISTS`, `DUPLICATE_VALUE` |
+| 500 | `INTERNAL_ERROR` |
+
+Example: `{ "success": false, "message": "Email is already registered", "code": "EMAIL_TAKEN" }`.
+The tables below list the `message` of each endpoint; the matching code is in the table above.
+
 ### Validation rules
 
 | Field | Rule |
@@ -40,7 +59,7 @@ Swagger UI: `/api-docs` (outside `/api`).
 | `name` (category) | string, trimmed, 1–30 chars, unique per user + type (case-insensitive) |
 | `type` | `"income"` or `"expense"` |
 | `color` | hex `#RRGGBB` |
-| `icon` (category) | optional; exactly one emoji (one visible character, e.g. `🍜`, `🛍️`). `null` or `""` means no icon. Default categories get one; older categories have `null` |
+| `icon` (category) | optional; an icon name from the app's icon set (e.g. `utensils`, `bus`, `receipt`, `banknote`; the full list is `server/src/utils/categoryIcons.js`) or, for older clients, exactly one emoji (e.g. `🍜`). `null` or `""` means no icon: the client then picks an icon from the name. Default categories get an icon name |
 | `categoryId` | valid ObjectId of one of the user's categories |
 | `amount` | JSON number > 0 (a string like `"45000"` is refused) |
 | `currency` (transaction body) | 3 letters (ISO 4217); lower case is converted to upper case; default `"VND"` |
@@ -226,7 +245,7 @@ Auth: yes.
 
 **200**
 ```json
-{ "success": true, "data": [ { "_id": "...", "name": "Food", "type": "expense", "color": "#FF7043", "icon": "🍜", "createdAt": "...", "updatedAt": "..." } ] }
+{ "success": true, "data": [ { "_id": "...", "name": "Food", "type": "expense", "color": "#FF7043", "icon": "utensils", "createdAt": "...", "updatedAt": "..." } ] }
 ```
 
 **Errors**: 400 `"Type must be income or expense"`.
@@ -236,9 +255,9 @@ Auth: yes.
 
 **Body**
 ```json
-{ "name": "Food", "type": "expense", "color": "#FF7043", "icon": "🍜" }
+{ "name": "Food", "type": "expense", "color": "#FF7043", "icon": "utensils" }
 ```
-`icon` is optional.
+`icon` is optional: an icon name or one emoji.
 
 **201** – `data` is the new category object.
 
@@ -246,7 +265,7 @@ Auth: yes.
 
 | Code | message |
 |------|---------|
-| 400 | `"Name is required"`, `"Name must be at most 30 characters"`, `"Type must be income or expense"`, `"Color must be a hex code like #FF7043"`, `"Icon must be a single emoji"` |
+| 400 | `"Name is required"`, `"Name must be at most 30 characters"`, `"Type must be income or expense"`, `"Color must be a hex code like #FF7043"`, `"Icon must be an icon name or a single emoji"` |
 | 409 | `"Category already exists"` (same name + type for this user, case-insensitive) |
 
 ### 7. GET /api/categories/:id
@@ -261,7 +280,7 @@ Auth: yes.
 
 **Body** (at least one field)
 ```json
-{ "name": "Eating out", "color": "#E53935", "icon": "🍔" }
+{ "name": "Eating out", "color": "#E53935", "icon": "pizza" }
 ```
 `icon: null` (or `""`) removes the icon.
 `type` cannot be changed (it is copied into every transaction of this category).
@@ -272,7 +291,7 @@ Auth: yes.
 
 | Code | message |
 |------|---------|
-| 400 | `"Nothing to update"`, `"Type cannot be changed"` (any `type` in the body, even the same value), `"Name is required"`, `"Name must be at most 30 characters"`, `"Color must be a hex code like #FF7043"`, `"Icon must be a single emoji"` |
+| 400 | `"Nothing to update"`, `"Type cannot be changed"` (any `type` in the body, even the same value), `"Name is required"`, `"Name must be at most 30 characters"`, `"Color must be a hex code like #FF7043"`, `"Icon must be an icon name or a single emoji"` |
 | 404 | `"Category not found"` |
 | 409 | `"Category already exists"` |
 
@@ -478,7 +497,8 @@ An empty value (`""` or `null`) counts as missing. `userId` and any other field 
   "data": {
     "imported": 1,
     "failed": 1,
-    "errors": [ { "row": 2, "message": "Category \"Unknown\" (expense) not found" } ]
+    "errors": [ { "row": 2, "message": "Category \"Unknown\" (expense) not found",
+                  "code": "IMPORT_CATEGORY_NOT_FOUND", "params": { "name": "Unknown", "type": "expense" } } ]
   }
 }
 ```
@@ -492,6 +512,7 @@ An empty value (`""` or `null`) counts as missing. `userId` and any other field 
 Row messages (in `errors`): the validation messages of endpoint 11 (`"Amount must be greater than 0"`, tags messages...),
 `"Type must be income or expense"`, `"Category is required"`, `"Date is invalid, use YYYY-MM-DD HH:mm or ISO 8601"`,
 `"Row must be an object"` and `"Category \"X\" (expense) not found"`.
+Every row error also has a `code` (the codes of the table above, plus `IMPORT_CATEGORY_NOT_FOUND` with `params: { name, type }`).
 Sending the same rows twice saves them twice (no duplicate check). The JSON body limit is 300 kB.
 
 ### 23. GET /api/tags
@@ -969,9 +990,11 @@ Auth: yes. Query: `month=YYYY-MM` (default: the current month), `currency` (defa
     "insights": [
       { "type": "category-up", "severity": "warning",
         "message": "You spent 200.000 ₫ (25%) more on Bills than last month.",
+        "code": "CATEGORY_UP", "params": { "amount": 200000, "percent": 25, "category": "Bills" },
         "link": "/transactions?month=2025-10&category=6720b1b2c3d4e5f601234568" },
       { "type": "savings-rate", "severity": "success",
         "message": "Great! You saved 94% of your income in October 2025.",
+        "code": "SAVINGS_GOOD", "params": { "rate": 94, "month": "2025-10", "target": 20 },
         "link": "/reports?tab=monthly&month=2025-10" }
     ]
   }
@@ -993,6 +1016,20 @@ Built from simple rules (no AI). `severity` is `info`, `warning` or `success`. T
 | `largest-expense` | The biggest single expense of the month, `link` opens its day | info |
 
 `link` is a path inside the app. Amounts in `message` are written like the client does (`1.000.000 ₫`).
+
+`message` is English. `code` and `params` let the client write the sentence in the user's language
+(`insights.codes.<code>` in the locale files); amounts in `params` are VND numbers, `month` is `YYYY-MM`, `day` is `YYYY-MM-DD`.
+
+| `code` | `params` |
+|--------|----------|
+| `CATEGORY_UP`, `CATEGORY_DOWN` | `amount`, `percent`, `category` |
+| `BUDGET_OVER`, `BUDGET_FORECAST` | `spent`, `budget`, `projected`, `category` |
+| `SAVINGS_GOOD`, `SAVINGS_LOW` | `rate`, `month`, `target` |
+| `SAVINGS_NEGATIVE` | `amount`, `month`, `rate` |
+| `SAVINGS_NO_INCOME` | `amount`, `month` |
+| `NO_SPEND_DAYS` | `count`, `month` |
+| `NO_SPEND_NONE` | `month` |
+| `LARGEST_EXPENSE` | `amount`, `category`, `day` |
 
 **Errors**: 400 `"Month must be in YYYY-MM format"`, `"Currency must be a 3-letter ISO code"`.
 

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Icon from '../Icon.jsx';
 import styles from './TagInput.module.css';
 
@@ -16,6 +17,7 @@ export function cleanTag(text) {
 // A tag is added with Enter, comma or space, or when the box loses focus (so a tag typed just before
 // pressing Save is not lost). Backspace in the empty box removes the last tag.
 export default function TagInput({ id, value, onChange, suggestions = [], disabled = false }) {
+  const { t } = useTranslation();
   const [text, setText] = useState('');
   const [error, setError] = useState('');
   const full = value.length >= MAX_TAGS;
@@ -24,7 +26,7 @@ export default function TagInput({ id, value, onChange, suggestions = [], disabl
     const tag = cleanTag(raw);
     if (!tag) return;
     if (!TAG_REGEX.test(tag)) {
-      setError('A tag has 1-20 letters, digits or hyphens.');
+      setError(t('tags.invalid'));
       return;
     }
     setError('');
@@ -62,7 +64,7 @@ export default function TagInput({ id, value, onChange, suggestions = [], disabl
             <button
               type="button"
               className={styles.remove}
-              aria-label={`Remove tag ${tag}`}
+              aria-label={t('tags.remove', { tag })}
               onClick={() => removeTag(tag)}
               disabled={disabled}
             >
@@ -80,7 +82,7 @@ export default function TagInput({ id, value, onChange, suggestions = [], disabl
           }}
           onKeyDown={handleKeyDown}
           onBlur={() => addTag(text)}
-          placeholder={full ? `Up to ${MAX_TAGS} tags` : value.length === 0 ? 'Add a tag, press Enter' : ''}
+          placeholder={full ? t('tags.upTo', { max: MAX_TAGS }) : value.length === 0 ? t('tags.placeholder') : ''}
           maxLength={21}
           autoComplete="off"
           disabled={disabled || full}
@@ -94,7 +96,7 @@ export default function TagInput({ id, value, onChange, suggestions = [], disabl
       )}
 
       {!full && shown.length > 0 && (
-        <div className={styles.suggestions} aria-label="Tag suggestions">
+        <div className={styles.suggestions} aria-label={t('tags.suggestions')}>
           {shown.map((s) => (
             <button
               key={s.tag}

@@ -47,8 +47,9 @@ router.use(requireAuth);
  *     responses:
  *       200:
  *         description: |
- *           Each insight has a `type`, a `severity` (info, warning or success), an English `message` and a `link`
- *           to the page of the app that shows the details.
+ *           Each insight has a `type`, a `severity` (info, warning or success), an English `message`, a `link`
+ *           to the page of the app that shows the details, and a `code` with its `params` (the raw numbers and names
+ *           of the sentence), so a client can write the sentence in another language.
  *           Example request: GET /api/insights?month=2026-10
  *         content:
  *           application/json:
@@ -74,6 +75,14 @@ router.use(requireAuth);
  *                             example: savings-rate
  *                           severity: { type: string, enum: [info, warning, success], example: success }
  *                           message: { type: string, example: "Great! You saved 94% of your income in October 2026." }
+ *                           code:
+ *                             type: string
+ *                             enum: [CATEGORY_UP, CATEGORY_DOWN, BUDGET_OVER, BUDGET_FORECAST, NO_SPEND_NONE, NO_SPEND_DAYS, SAVINGS_NO_INCOME, SAVINGS_NEGATIVE, SAVINGS_GOOD, SAVINGS_LOW, LARGEST_EXPENSE]
+ *                             example: SAVINGS_GOOD
+ *                           params:
+ *                             type: object
+ *                             description: The values of the sentence; amounts are VND numbers, month is YYYY-MM, day is YYYY-MM-DD
+ *                             example: { rate: 94, month: "2026-10", target: 20 }
  *                           link: { type: string, example: "/reports?tab=monthly&month=2026-10" }
  *       400:
  *         description: Invalid query ("Month must be in YYYY-MM format", "Currency must be a 3-letter ISO code")

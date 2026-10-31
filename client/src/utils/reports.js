@@ -1,3 +1,6 @@
+import i18n from '../i18n/index.js';
+import { currentLocale, formatPercent } from './format.js';
+
 // Helpers for the Reports page: how a change is shown, and the month grid of the Calendar tab.
 // A month is "YYYY-MM", a day is "YYYY-MM-DD" (Vietnam time, like everything the API sends).
 
@@ -8,20 +11,21 @@
 // and `description` the full sentence for screen readers, so color and arrow are never the only signal.
 export function describeChange(percent, kind) {
   if (percent === null || percent === undefined) {
-    return { direction: 'none', tone: 'neutral', label: 'No data last month', description: 'No data last month' };
+    const label = i18n.t('reports.noDataLastMonth');
+    return { direction: 'none', tone: 'neutral', label, description: label };
   }
   if (percent === 0) {
-    return { direction: 'flat', tone: 'neutral', label: '0%', description: 'No change from last month' };
+    return { direction: 'flat', tone: 'neutral', label: formatPercent(0), description: i18n.t('reports.noChange') };
   }
 
   const up = percent > 0;
   const good = kind === 'expense' ? !up : up;
-  const size = `${Math.abs(percent)}%`;
+  const size = formatPercent(Math.abs(percent));
   return {
     direction: up ? 'up' : 'down',
     tone: good ? 'good' : 'bad',
     label: size,
-    description: `${up ? 'Up' : 'Down'} ${size} from last month`,
+    description: i18n.t(up ? 'reports.upFromLastMonth' : 'reports.downFromLastMonth', { size }),
   };
 }
 
@@ -54,6 +58,13 @@ export function buildCalendar(month, dailyExpense) {
   return { cells, max };
 }
 
+// The short names of the days of a week that starts on Monday: ['Mon', 'Tue', ...] in the user's language.
+export function weekdayLabels() {
+  const format = new Intl.DateTimeFormat(currentLocale(), { weekday: 'short', timeZone: 'UTC' });
+  // 1 January 2024 was a Monday
+  return Array.from({ length: 7 }, (_, index) => format.format(new Date(Date.UTC(2024, 0, 1 + index))));
+}
+
 // The Transactions page showing one day: '/transactions?from=2026-10-10&to=2026-10-10'
 export function dayTransactionsPath(day) {
   return `/transactions?from=${day}&to=${day}`;
@@ -62,7 +73,7 @@ export function dayTransactionsPath(day) {
 // "2026-10-09" -> "9 October 2026" (the accessible name of a calendar cell)
 export function formatLongDay(day) {
   const [year, month, dayNumber] = day.split('-').map(Number);
-  return new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(
+  return new Intl.DateTimeFormat(currentLocale(), { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(
     new Date(Date.UTC(year, month - 1, dayNumber))
   );
 }

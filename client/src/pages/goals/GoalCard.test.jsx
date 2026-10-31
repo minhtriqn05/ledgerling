@@ -41,9 +41,9 @@ describe('GoalCard', () => {
     renderCard(makeGoal());
 
     expect(screen.getByText('New laptop')).toBeInTheDocument();
-    expect(screen.getByText(`1.000.000${NBSP}₫`)).toBeInTheDocument();
-    expect(screen.getByText(`/ 3.000.000${NBSP}₫`)).toBeInTheDocument();
-    expect(screen.getByText(`2.000.000${NBSP}₫ to go`)).toBeInTheDocument();
+    expect(screen.getByText(`1,000,000${NBSP}₫`)).toBeInTheDocument();
+    expect(screen.getByText(`/ 3,000,000${NBSP}₫`)).toBeInTheDocument();
+    expect(screen.getByText(`2,000,000${NBSP}₫ to go`)).toBeInTheDocument();
     expect(screen.getByText('33.3%')).toBeInTheDocument();
 
     const bar = screen.getByRole('progressbar', { name: 'New laptop' });
@@ -57,8 +57,8 @@ describe('GoalCard', () => {
 
     expect(screen.getByText('Due 28 Jan 2027')).toBeInTheDocument();
     expect(screen.getByText('90 days left')).toBeInTheDocument();
-    // 2.000.000 left, 90 days = 3 months
-    expect(screen.getByText(`Save 666.667${NBSP}₫ per month to reach it`)).toBeInTheDocument();
+    // 2,000,000 left, 90 days = 3 months
+    expect(screen.getByText(`Save 666,667${NBSP}₫ per month to reach it`)).toBeInTheDocument();
   });
 
   it('says "Due today" and has no per-month line on the deadline day', () => {

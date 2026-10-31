@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { AnimatePresence } from 'motion/react';
+import { useTranslation } from 'react-i18next';
 import { getCategories } from '../api/categories.js';
 import { getRecurringRules, toggleRecurringRule } from '../api/recurring.js';
 import { getErrorMessage } from '../api/axios.js';
@@ -16,6 +18,7 @@ import styles from './RecurringPage.module.css';
 
 // The user's weekly and monthly rules. A rule creates real transactions by itself when they are due.
 export default function RecurringPage() {
+  const { t } = useTranslation();
   const [categories, setCategories] = useState([]);
   const [rules, setRules] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -55,13 +58,13 @@ export default function RecurringPage() {
 
   // Loads the list again: a rule that starts in the past has already created transactions, so its next run changed.
   function handleSaved() {
-    toast.success(dialog.form ? 'Rule updated' : 'Rule added');
+    toast.success(dialog.form ? t('recurring.updated') : t('recurring.added'));
     setDialog(null);
     reload();
   }
 
   function handleDeleted(rule) {
-    toast.success('Rule deleted');
+    toast.success(t('recurring.deleted'));
     setDialog(null);
     setRules((list) => list.filter((r) => r._id !== rule._id));
   }
@@ -70,7 +73,7 @@ export default function RecurringPage() {
     setTogglingId(rule._id);
     try {
       const saved = await toggleRecurringRule(rule._id);
-      toast.success(saved.active ? 'Rule turned on' : 'Rule turned off');
+      toast.success(saved.active ? t('recurring.turnedOn') : t('recurring.turnedOff'));
       setRules((list) => list.map((r) => (r._id === saved._id ? saved : r)));
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -83,18 +86,18 @@ export default function RecurringPage() {
 
   // The page shows one of four states: loading, error, empty or the list.
   function renderContent() {
-    if (loading) return <LoadingState skeleton="rows">Loading rules…</LoadingState>;
+    if (loading) return <LoadingState skeleton="rows">{t('recurring.loading')}</LoadingState>;
     if (loadError) return <ErrorState message={loadError} onRetry={reload} />;
 
     if (rules.length === 0) {
       return (
         <EmptyState
           icon="repeat"
-          title="No recurring rules yet"
-          text="Add your rent, salary or subscriptions once, and their transactions are created for you when they are due."
+          title={t('recurring.emptyTitle')}
+          text={t('recurring.emptyText')}
         >
           <Button icon="plus" onClick={() => setDialog({ form: null })}>
-            Add rule
+            {t('recurring.add')}
           </Button>
         </EmptyState>
       );
@@ -103,9 +106,10 @@ export default function RecurringPage() {
     return (
       <Card>
         <ul className={styles.list}>
-          {rules.map((rule) => (
+          {rules.map((rule, index) => (
             <RuleRow
               key={rule._id}
+              index={index}
               rule={rule}
               toggling={togglingId === rule._id}
               onToggle={handleToggle}
@@ -121,22 +125,24 @@ export default function RecurringPage() {
   return (
     <div className={styles.page}>
       <PageHeader
-        title="Recurring"
-        subtitle={ready ? `${rules.length} ${rules.length === 1 ? 'rule' : 'rules'}` : undefined}
+        title={t('nav.recurring')}
+        subtitle={ready ? t('recurring.count', { count: rules.length }) : undefined}
       >
         <Button icon="plus" onClick={() => setDialog({ form: null })} disabled={!ready}>
-          Add rule
+          {t('recurring.add')}
         </Button>
       </PageHeader>
 
       {renderContent()}
 
-      {dialog && 'form' in dialog && (
-        <RuleFormDialog rule={dialog.form} categories={categories} onSaved={handleSaved} onClose={() => setDialog(null)} />
-      )}
-      {dialog?.delete && (
-        <DeleteRuleDialog rule={dialog.delete} onDeleted={handleDeleted} onClose={() => setDialog(null)} />
-      )}
+      <AnimatePresence>
+        {dialog && 'form' in dialog && (
+          <RuleFormDialog key="form" rule={dialog.form} categories={categories} onSaved={handleSaved} onClose={() => setDialog(null)} />
+        )}
+        {dialog?.delete && (
+          <DeleteRuleDialog key="delete" rule={dialog.delete} onDeleted={handleDeleted} onClose={() => setDialog(null)} />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

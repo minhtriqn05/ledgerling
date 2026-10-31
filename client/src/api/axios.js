@@ -1,4 +1,5 @@
 import axios from 'axios';
+import i18n from '../i18n/index.js';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -28,13 +29,18 @@ api.interceptors.response.use(
   }
 );
 
+// An error from the API in the user's language: { code, message, params } -> the translation of errors.<code>.
+// A code the client does not know (or no code at all) shows the English message of the server.
+export function translateApiError({ code, message, params } = {}) {
+  if (code && i18n.exists(`errors.${code}`, params)) return i18n.t(`errors.${code}`, params);
+  return message || i18n.t('errors.UNKNOWN');
+}
+
 // The text to show the user when a request failed.
-// The API always answers errors with { success: false, message }; no response at all means the server is unreachable.
+// The API always answers errors with { success: false, message, code }; no response at all means the server is unreachable.
 export function getErrorMessage(error) {
-  if (error.response) {
-    return error.response.data?.message || 'Something went wrong. Please try again.';
-  }
-  return 'Cannot reach the server. Please try again.';
+  if (error.response) return translateApiError(error.response.data);
+  return i18n.t('errors.NETWORK');
 }
 
 export default api;

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Trans, useTranslation } from 'react-i18next';
 import { createBudget, updateBudget } from '../../api/budgets.js';
 import { getErrorMessage } from '../../api/axios.js';
 import { useToast } from '../../context/ToastContext.jsx';
@@ -17,6 +18,7 @@ import styles from './BudgetFormDialog.module.css';
 // availableCategories: the expense categories that have no budget in `month` yet (only used when adding).
 // onSaved(budget) receives the budget returned by the API.
 export default function BudgetFormDialog({ budget, month, availableCategories, onSaved, onClose }) {
+  const { t } = useTranslation();
   const isEdit = Boolean(budget);
 
   const [categoryId, setCategoryId] = useState('');
@@ -34,8 +36,8 @@ export default function BudgetFormDialog({ budget, month, availableCategories, o
     event.preventDefault();
 
     // Basic checks first; the server validates again.
-    if (!isEdit && !categoryId) return setError('Please choose a category.');
-    if (!Number(amount)) return setError('Please enter an amount greater than 0.');
+    if (!isEdit && !categoryId) return setError(t('form.chooseCategory'));
+    if (!Number(amount)) return setError(t('form.enterAmount'));
 
     setError('');
     setSaving(true);
@@ -52,26 +54,27 @@ export default function BudgetFormDialog({ budget, month, availableCategories, o
   }
 
   return (
-    <Modal title={isEdit ? 'Edit budget' : 'Add budget'} onClose={onClose} busy={saving}>
+    <Modal title={isEdit ? t('budgets.edit') : t('budgets.add')} onClose={onClose} busy={saving}>
       <form className={styles.form} onSubmit={handleSubmit} noValidate>
         <p className={styles.month}>{formatMonth(month)}</p>
 
         <fieldset className={styles.fieldset}>
-          <legend className={styles.label}>Category</legend>
+          <legend className={styles.label}>{t('common.category')}</legend>
           {isEdit ? (
             // The category cannot change after the budget is created.
             <div className={styles.categoryPicker}>
               <span className={`${styles.chip} ${styles.chipSelected}`} style={{ '--tone': budget.category.color }}>
-                <CategoryMark icon={budget.category.icon}>
-                  <i className={styles.dot} />
-                </CategoryMark>
+                <CategoryMark category={budget.category} />
                 {budget.category.name}
               </span>
             </div>
           ) : availableCategories.length === 0 ? (
             <p className={styles.hint}>
-              Every expense category already has a budget in {formatMonth(month)}. <Link to="/categories">Create a new category</Link> to
-              add another.
+              <Trans
+                i18nKey="budgets.allHaveBudget"
+                values={{ month: formatMonth(month) }}
+                components={{ link: <Link to="/categories" /> }}
+              />
             </p>
           ) : (
             <div className={styles.categoryPicker}>
@@ -90,9 +93,7 @@ export default function BudgetFormDialog({ budget, month, availableCategories, o
                     {selected ? (
                       <Icon name="check" size={14} />
                     ) : (
-                      <CategoryMark icon={c.icon}>
-                        <i className={styles.dot} />
-                      </CategoryMark>
+                      <CategoryMark category={c} />
                     )}
                     {c.name}
                   </button>
@@ -104,7 +105,7 @@ export default function BudgetFormDialog({ budget, month, availableCategories, o
 
         <div className={styles.field}>
           <label className={styles.label} htmlFor="budget-amount">
-            Monthly limit
+            {t('budgets.monthlyLimit')}
           </label>
           <div className={styles.amountBox}>
             <input
@@ -125,10 +126,10 @@ export default function BudgetFormDialog({ budget, month, availableCategories, o
 
         <div className={styles.actions}>
           <Button variant="secondary" onClick={onClose} disabled={saving}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button type="submit" disabled={saving || (!isEdit && availableCategories.length === 0)}>
-            {saving ? 'Saving…' : isEdit ? 'Save changes' : 'Save budget'}
+            {saving ? t('common.saving') : isEdit ? t('common.saveChanges') : t('budgets.save')}
           </Button>
         </div>
       </form>

@@ -20,21 +20,21 @@ function checkCategoryId(value) {
 
 function checkAmount(value) {
   if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) {
-    throw httpError(400, "Amount must be greater than 0");
+    throw httpError(400, "Amount must be greater than 0", "AMOUNT_INVALID");
   }
   return value;
 }
 
 function checkCurrency(value) {
   const currency = text(value).trim().toUpperCase();
-  if (!CURRENCY_REGEX.test(currency)) throw httpError(400, "Currency must be a 3-letter ISO code");
+  if (!CURRENCY_REGEX.test(currency)) throw httpError(400, "Currency must be a 3-letter ISO code", "CURRENCY_INVALID");
   return currency;
 }
 
 function checkNote(value) {
   if (typeof value !== "string") throw httpError(400, "Note must be a string");
   const note = value.trim();
-  if (note.length > 200) throw httpError(400, "Note must be at most 200 characters");
+  if (note.length > 200) throw httpError(400, "Note must be at most 200 characters", "NOTE_TOO_LONG");
   return note;
 }
 
@@ -42,7 +42,7 @@ function checkNote(value) {
 function checkDate(value) {
   const date = typeof value === "string" && ISO_DATE_REGEX.test(value) ? new Date(value) : null;
   if (!date || Number.isNaN(date.getTime())) {
-    throw httpError(400, "Date is invalid, use ISO 8601 like 2026-10-27T12:30:00+07:00");
+    throw httpError(400, "Date is invalid, use ISO 8601 like 2026-10-27T12:30:00+07:00", "DATE_INVALID");
   }
   return date;
 }
@@ -51,11 +51,12 @@ function checkDate(value) {
 const TAG_REGEX = /^[a-z0-9-]{1,20}$/;
 const MAX_TAGS = 5;
 const TAG_MESSAGE = "Each tag must be 1-20 letters, digits or hyphens";
+const TAG_CODE = "TAG_INVALID";
 
 // One tag, lower-cased. Used for ?tag= and for every item of a tags array.
 function checkTag(value) {
   const tag = text(value).trim().toLowerCase();
-  if (!TAG_REGEX.test(tag)) throw httpError(400, TAG_MESSAGE);
+  if (!TAG_REGEX.test(tag)) throw httpError(400, TAG_MESSAGE, TAG_CODE);
   return tag;
 }
 
@@ -63,7 +64,7 @@ function checkTag(value) {
 function checkTags(value) {
   if (!Array.isArray(value)) throw httpError(400, "Tags must be an array");
   const tags = [...new Set(value.map(checkTag))];
-  if (tags.length > MAX_TAGS) throw httpError(400, `A transaction can have at most ${MAX_TAGS} tags`);
+  if (tags.length > MAX_TAGS) throw httpError(400, `A transaction can have at most ${MAX_TAGS} tags`, "TOO_MANY_TAGS");
   return tags;
 }
 
@@ -105,7 +106,7 @@ export function validateUpdateTransaction(req, res, next) {
 
 // A malformed id can never match anything, so answer 404 instead of letting Mongoose throw a CastError.
 export function validateTransactionId(req, res, next) {
-  if (!OBJECT_ID_REGEX.test(req.params.id)) throw httpError(404, "Transaction not found");
+  if (!OBJECT_ID_REGEX.test(req.params.id)) throw httpError(404, "Transaction not found", "TRANSACTION_NOT_FOUND");
   next();
 }
 
@@ -119,7 +120,7 @@ const WHOLE_NUMBER_REGEX = /^\d+$/;
 
 function checkDay(value, field) {
   if (typeof value !== "string" || !isValidDay(value)) {
-    throw httpError(400, `${field} must be a date in YYYY-MM-DD format`);
+    throw httpError(400, `${field} must be a date in YYYY-MM-DD format`, "DATE_INVALID");
   }
   return value;
 }
@@ -154,10 +155,10 @@ function readFilters(query) {
     throw httpError(400, "Use either month or from/to, not both");
   }
   if (month !== undefined && !MONTH_REGEX.test(month)) {
-    throw httpError(400, "Month must be in YYYY-MM format");
+    throw httpError(400, "Month must be in YYYY-MM format", "MONTH_INVALID");
   }
   if (type !== undefined && !TYPES.includes(type)) {
-    throw httpError(400, "Type must be income or expense");
+    throw httpError(400, "Type must be income or expense", "TYPE_INVALID");
   }
   if (categoryId !== undefined && !OBJECT_ID_REGEX.test(categoryId)) {
     throw httpError(400, "Category id is invalid");
@@ -223,7 +224,7 @@ function checkImportDate(value) {
 
   const [, day, hour = "00", minute = "00", second = "00"] = match;
   if (!isValidDay(day) || Number(hour) > 23 || Number(minute) > 59 || Number(second) > 59) {
-    throw httpError(400, "Date is invalid, use YYYY-MM-DD HH:mm or ISO 8601");
+    throw httpError(400, "Date is invalid, use YYYY-MM-DD HH:mm or ISO 8601", "DATE_INVALID");
   }
   return new Date(`${day}T${hour}:${minute}:${second}+07:00`);
 }
@@ -236,9 +237,9 @@ function cleanImportRow(raw) {
   }
 
   const type = text(raw.type).trim().toLowerCase();
-  if (!TYPES.includes(type)) throw httpError(400, "Type must be income or expense");
+  if (!TYPES.includes(type)) throw httpError(400, "Type must be income or expense", "TYPE_INVALID");
   const categoryName = text(raw.category).trim();
-  if (!categoryName) throw httpError(400, "Category is required");
+  if (!categoryName) throw httpError(400, "Category is required", "CATEGORY_REQUIRED");
 
   const row = { type, categoryName, amount: checkAmount(raw.amount) };
   if (!isBlank(raw.date)) row.date = checkImportDate(raw.date);
@@ -254,7 +255,7 @@ export function validateImportTransactions(req, res, next) {
   const rows = req.body?.rows;
   if (!Array.isArray(rows) || rows.length === 0) throw httpError(400, "Rows must be a non-empty array");
   if (rows.length > MAX_IMPORT_ROWS) {
-    throw httpError(400, `You can import at most ${MAX_IMPORT_ROWS} rows at a time`);
+    throw httpError(400, `You can import at most ${MAX_IMPORT_ROWS} rows at a time`, "IMPORT_TOO_MANY_ROWS");
   }
 
   req.importRows = [];
@@ -265,7 +266,7 @@ export function validateImportTransactions(req, res, next) {
       req.importRows.push({ row, ...cleanImportRow(raw) });
     } catch (err) {
       if (!err.status) throw err; // a bug, not a bad row
-      req.importErrors.push({ row, message: err.message });
+      req.importErrors.push({ row, message: err.message, code: err.code });
     }
   });
   next();

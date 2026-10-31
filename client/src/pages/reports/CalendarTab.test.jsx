@@ -7,7 +7,7 @@ import { getMonthlyReport } from '../../api/reports.js';
 
 vi.mock('../../api/reports.js', () => ({ getMonthlyReport: vi.fn() }));
 
-// October 2026: 31 days, 10 Oct has 1.000.000 ₫, 3 Oct has 120.000 ₫
+// October 2026: 31 days, 10 Oct has 1,000,000 ₫, 3 Oct has 120,000 ₫
 function makeReport() {
   const dailyExpense = Array.from({ length: 31 }, (_, i) => {
     const date = `2026-10-${String(i + 1).padStart(2, '0')}`;
@@ -42,7 +42,7 @@ describe('CalendarTab', () => {
     getMonthlyReport.mockResolvedValue(makeReport());
     renderTab();
 
-    expect(await screen.findByRole('button', { name: '10 October 2026: spent 1.000.000 ₫' })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: '10 October 2026: spent 1,000,000 ₫' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '1 October 2026: no spending' })).toBeInTheDocument();
     expect(screen.getAllByRole('button')).toHaveLength(31);
     expect(getMonthlyReport).toHaveBeenCalledWith('2026-10');

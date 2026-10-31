@@ -1,0 +1,74 @@
+/* The amount on a soft tint of its money color. */
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--tone) 10%, var(--color-surface));
+}
+
+.income {
+  --tone: var(--color-income);
+  --money: var(--color-income-text);
+}
+
+.expense {
+  --tone: var(--color-expense);
+  --money: var(--color-expense-text);
+}
+
+.amount {
+  color: var(--money);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.heroNote {
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.facts {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  margin: 0;
+}
+
+.facts > div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.facts dt {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+}
+
+.facts dd {
+  margin: 0;
+  font-weight: var(--font-weight-medium);
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.recurring {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}

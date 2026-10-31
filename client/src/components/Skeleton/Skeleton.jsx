@@ -1,6 +1,6 @@
 import styles from './Skeleton.module.css';
 
-// A grey, softly pulsing block that holds the place of text or a picture while data loads.
+// A grey block with a light that sweeps over it (a shimmer), which holds the place of text or a picture while data loads.
 // width / height are any CSS length; round makes it a circle or a pill.
 export default function Skeleton({ width = '100%', height = '1em', round = false }) {
   return (

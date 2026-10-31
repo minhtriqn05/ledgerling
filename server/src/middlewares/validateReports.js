@@ -8,7 +8,7 @@ const MAX_YEAR = 2100;
 
 function checkCurrency(currency) {
   if (currency !== undefined && !CURRENCY_REGEX.test(currency)) {
-    throw httpError(400, "Currency must be a 3-letter ISO code");
+    throw httpError(400, "Currency must be a 3-letter ISO code", "CURRENCY_INVALID");
   }
 }
 
@@ -16,7 +16,7 @@ function checkCurrency(currency) {
 export function validateMonthQuery(req, res, next) {
   const { month, currency } = req.query;
   if (month !== undefined && !MONTH_REGEX.test(month)) {
-    throw httpError(400, "Month must be in YYYY-MM format");
+    throw httpError(400, "Month must be in YYYY-MM format", "MONTH_INVALID");
   }
   checkCurrency(currency);
   next();

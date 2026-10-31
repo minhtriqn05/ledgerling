@@ -9,6 +9,12 @@
   background: transparent;
   color: var(--color-text-secondary);
   cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+}
+
+.button:active:not(:disabled) {
+  transform: scale(0.92);
 }
 
 .button:hover {

@@ -79,12 +79,12 @@ test('set a limit → spend past 80% and 100% → the bar and the Dashboard aler
   await dialog.getByRole('button', { name: 'Cancel' }).click();
   await expect(dialog).toBeHidden();
 
-  // 3. A limit of 1.000.000 ₫ for Food, nothing spent yet: green bar
+  // 3. A limit of 1,000,000 ₫ for Food, nothing spent yet: green bar
   await addBudget(page, 'Food', 1000000);
   await expect(page.getByText('Budget added')).toBeVisible();
   let { track, fill } = progressOf(page, 'Food');
   await expect(track).toHaveAttribute('aria-valuetext', '0% used');
-  await expect(page.getByText(/^1\.000\.000\s₫ left$/)).toBeVisible();
+  await expect(page.getByText(/^1,000,000\s₫ left$/)).toBeVisible();
   await expect(fill).toHaveCSS('background-color', green);
 
   // 4. 70% used: still green, and the Dashboard says everything is fine
@@ -98,17 +98,17 @@ test('set a limit → spend past 80% and 100% → the bar and the Dashboard aler
   await expect(page.getByRole('heading', { name: 'Budget alerts' })).toBeVisible();
   await expect(page.getByText('All budgets on track')).toBeVisible();
 
-  // 5. Exactly 80% (700.000 + 100.000 of 1.000.000): the bar turns yellow and the Dashboard warns
+  // 5. Exactly 80% (700,000 + 100,000 of 1,000,000): the bar turns yellow and the Dashboard warns
   await addFoodExpense(page, 100000);
   await page.goto('/budgets');
   ({ track, fill } = progressOf(page, 'Food'));
   await expect(track).toHaveAttribute('aria-valuetext', '80% used');
   await expect(fill).toHaveCSS('background-color', yellow);
-  await expect(page.getByText(/^200\.000\s₫ left$/)).toBeVisible();
+  await expect(page.getByText(/^200,000\s₫ left$/)).toBeVisible();
 
   await page.goto('/');
   await expect(page.getByText('All budgets on track')).toHaveCount(0);
-  const warning = page.getByRole('listitem').filter({ hasText: /Food.*200\.000\s₫ left.*80%/ });
+  const warning = page.getByRole('listitem').filter({ hasText: /Food.*200,000\s₫ left.*80%/ });
   await expect(warning).toBeVisible();
 
   // 6. Exactly 100%: the bar turns red
@@ -124,11 +124,11 @@ test('set a limit → spend past 80% and 100% → the bar and the Dashboard aler
   // 7. Past the limit: "Over by" on both pages
   await addFoodExpense(page, 50000);
   await page.goto('/budgets');
-  await expect(page.getByText(/^Over by 50\.000\s₫$/)).toBeVisible();
+  await expect(page.getByText(/^Over by 50,000\s₫$/)).toBeVisible();
   await expect(progressOf(page, 'Food').track).toHaveAttribute('aria-valuetext', '105% used');
 
   await page.goto('/');
-  await expect(page.getByRole('listitem').filter({ hasText: /Food.*Over by 50\.000\s₫.*105%/ })).toBeVisible();
+  await expect(page.getByRole('listitem').filter({ hasText: /Food.*Over by 50,000\s₫.*105%/ })).toBeVisible();
 
   // 8. "Manage budgets" goes to the Budgets page
   await page.getByRole('button', { name: 'Manage budgets' }).click();
@@ -163,7 +163,7 @@ test('copy from last month → edit → delete with confirmation', async ({ page
   await page.getByRole('button', { name: 'Copy from last month' }).click();
   await expect(page.getByText('2 budgets copied')).toBeVisible();
   await expect(page.getByRole('progressbar')).toHaveCount(2);
-  await expect(page.getByText(/^500\.000\s₫ left$/)).toBeVisible();
+  await expect(page.getByText(/^500,000\s₫ left$/)).toBeVisible();
 
   // 3. Edit Food: the category is fixed, only the limit changes
   await page.getByRole('button', { name: 'Edit the Food budget' }).click();
@@ -172,7 +172,7 @@ test('copy from last month → edit → delete with confirmation', async ({ page
   await editDialog.getByRole('button', { name: 'Save changes' }).click();
   await expect(editDialog).toBeHidden();
   await expect(page.getByText('Budget updated')).toBeVisible();
-  await expect(page.getByText(/^800\.000\s₫ left$/)).toBeVisible();
+  await expect(page.getByText(/^800,000\s₫ left$/)).toBeVisible();
 
   // 4. The dialog only offers expense categories that have no budget in this month yet
   await page.getByRole('button', { name: 'Add budget' }).first().click();

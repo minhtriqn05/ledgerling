@@ -1,4 +1,5 @@
 import Papa from 'papaparse';
+import i18n from '../i18n/index.js';
 
 // Reads the CSV file of "Import CSV" and checks its rows before they are sent (POST /transactions/import).
 // The columns are the ones of the export: Date, Type, Category, Amount, Currency, Note, Tags.
@@ -56,13 +57,11 @@ export function parseCsvText(text) {
   const missing = REQUIRED_COLUMNS.filter((name) => !columns.includes(name));
   if (missing.length > 0) {
     const names = missing.map((name) => name[0].toUpperCase() + name.slice(1));
-    return { error: `The file has no ${names.join(', ')} column. Use a file exported from Ledgerling.` };
+    return { error: i18n.t('import.noColumn', { names: names.join(', ') }) };
   }
-  if (result.data.length === 0) return { error: 'The file has no rows.' };
+  if (result.data.length === 0) return { error: i18n.t('import.noRows') };
   if (result.data.length > MAX_IMPORT_ROWS) {
-    return {
-      error: `The file has ${result.data.length} rows. You can import at most ${MAX_IMPORT_ROWS} rows at a time.`,
-    };
+    return { error: i18n.t('import.tooManyRows', { count: result.data.length, max: MAX_IMPORT_ROWS }) };
   }
 
   const cell = (record, name) => (record[name] ?? '').trim();
@@ -88,20 +87,20 @@ function isValidDate(text) {
   return ISO_START_REGEX.test(text) && !Number.isNaN(Date.parse(text));
 }
 
-// The first problem of a row as the same message the server gives, or '' when the row is fine.
+// The first problem of a row as the same message the server gives (by its code), or '' when the row is fine.
 // categories: the user's categories ({ name, type }), because a row can only use a category that already exists.
 export function validateImportRow(row, categories) {
-  if (!TYPES.includes(row.type)) return 'Type must be income or expense';
-  if (!row.category) return 'Category is required';
-  if (typeof row.amount !== 'number' || row.amount <= 0) return 'Amount must be greater than 0';
-  if (!isValidDate(row.date)) return 'Date is invalid, use YYYY-MM-DD HH:mm or ISO 8601';
-  if (row.currency && !CURRENCY_REGEX.test(row.currency)) return 'Currency must be a 3-letter ISO code';
-  if (row.note.length > 200) return 'Note must be at most 200 characters';
-  if (row.tags.length > MAX_TAGS) return `A transaction can have at most ${MAX_TAGS} tags`;
-  if (row.tags.some((tag) => !TAG_REGEX.test(tag))) return 'Each tag must be 1-20 letters, digits or hyphens';
+  if (!TYPES.includes(row.type)) return i18n.t('errors.TYPE_INVALID');
+  if (!row.category) return i18n.t('errors.CATEGORY_REQUIRED');
+  if (typeof row.amount !== 'number' || row.amount <= 0) return i18n.t('errors.AMOUNT_INVALID');
+  if (!isValidDate(row.date)) return i18n.t('errors.DATE_INVALID');
+  if (row.currency && !CURRENCY_REGEX.test(row.currency)) return i18n.t('errors.CURRENCY_INVALID');
+  if (row.note.length > 200) return i18n.t('errors.NOTE_TOO_LONG');
+  if (row.tags.length > MAX_TAGS) return i18n.t('errors.TOO_MANY_TAGS');
+  if (row.tags.some((tag) => !TAG_REGEX.test(tag))) return i18n.t('errors.TAG_INVALID');
 
   const name = row.category.toLowerCase();
   const exists = categories.some((c) => c.type === row.type && c.name.toLowerCase() === name);
-  if (!exists) return `Category "${row.category}" (${row.type}) not found`;
+  if (!exists) return i18n.t('errors.IMPORT_CATEGORY_NOT_FOUND', { name: row.category, type: row.type });
   return '';
 }

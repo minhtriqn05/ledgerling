@@ -230,7 +230,7 @@ describe("budgets: input checks and access", () => {
     for (const month of ["2026-13", "2026-1", "october", "2026-10-01"]) {
       const res = await api().get(`/api/budgets?month=${month}`).set(auth(user.token));
       expect(res.status).toBe(400);
-      expect(res.body).toEqual({ success: false, message: "Month must be in YYYY-MM format" });
+      expect(res.body).toEqual({ success: false, message: "Month must be in YYYY-MM format", code: expect.any(String) });
     }
   });
 

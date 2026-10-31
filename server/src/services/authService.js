@@ -16,7 +16,7 @@ function signToken(userId) {
 export async function register({ name, email, password }) {
   // Friendly message first; the unique index on email is the safety net if two requests race
   const existing = await User.findOne({ email });
-  if (existing) throw httpError(409, "Email is already registered");
+  if (existing) throw httpError(409, "Email is already registered", "EMAIL_TAKEN");
 
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
   const user = await User.create({ name, email, passwordHash });
@@ -29,7 +29,7 @@ export async function register({ name, email, password }) {
 export async function getCurrentUser(userId) {
   // A valid token can outlive its account (e.g. the user was deleted), so check the database
   const user = await User.findById(userId);
-  if (!user) throw httpError(401, "Not authorized, invalid token");
+  if (!user) throw httpError(401, "Not authorized, invalid token", "TOKEN_INVALID");
   return user;
 }
 
@@ -37,7 +37,7 @@ export async function login({ email, password }) {
   const user = await User.findOne({ email });
   // Same message for an unknown email and a wrong password, so nobody can learn which emails exist
   const ok = user && (await bcrypt.compare(password, user.passwordHash));
-  if (!ok) throw httpError(401, "Invalid email or password");
+  if (!ok) throw httpError(401, "Invalid email or password", "INVALID_CREDENTIALS");
 
   return { token: signToken(user._id), user };
 }

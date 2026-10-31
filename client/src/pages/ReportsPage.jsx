@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { currentMonth, formatMonth } from '../utils/vnDate.js';
 import PageHeader from '../components/PageHeader/PageHeader.jsx';
 import MonthPicker from '../components/MonthPicker/MonthPicker.jsx';
@@ -16,9 +17,9 @@ import styles from './ReportsPage.module.css';
 // links show the same report, and the insights on the Dashboard can link straight to a tab.
 
 const TABS = [
-  { id: 'monthly', label: 'Monthly', icon: 'chart' },
-  { id: 'yearly', label: 'Yearly', icon: 'reports' },
-  { id: 'calendar', label: 'Calendar', icon: 'calendar' },
+  { id: 'monthly', icon: 'chart' },
+  { id: 'yearly', icon: 'reports' },
+  { id: 'calendar', icon: 'calendar' },
 ];
 
 const MONTH_REGEX = /^\d{4}-(0[1-9]|1[0-2])$/;
@@ -38,13 +39,8 @@ function readParams(searchParams) {
   };
 }
 
-const SUBTITLES = {
-  monthly: (month) => `How ${formatMonth(month)} compares with last month.`,
-  yearly: (month, year) => `Income and expense of every month of ${year}.`,
-  calendar: () => 'See which days you spent the most. Click a day to open its transactions.',
-};
-
 export default function ReportsPage() {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { tab, month, year } = readParams(searchParams);
   const tabRefs = useRef({});
@@ -78,7 +74,7 @@ export default function ReportsPage() {
 
   return (
     <div className={styles.page}>
-      <PageHeader title="Reports" subtitle={SUBTITLES[tab](month, year)}>
+      <PageHeader title={t('nav.reports')} subtitle={t(`reports.subtitle.${tab}`, { month: formatMonth(month), year })}>
         <div className={styles.noPrint}>
           {tab === 'yearly' ? (
             <YearPicker year={year} onChange={(nextYear) => changePeriod({ year: nextYear })} />
@@ -87,29 +83,29 @@ export default function ReportsPage() {
           )}
         </div>
         <Button variant="secondary" icon="print" className={styles.noPrint} onClick={() => window.print()}>
-          Print
+          {t('reports.print')}
         </Button>
       </PageHeader>
 
-      <div className={`${styles.tabs} ${styles.noPrint}`} role="tablist" aria-label="Report type">
-        {TABS.map((t, index) => (
+      <div className={`${styles.tabs} ${styles.noPrint}`} role="tablist" aria-label={t('reports.type')}>
+        {TABS.map((item, index) => (
           <button
-            key={t.id}
+            key={item.id}
             ref={(element) => {
-              tabRefs.current[t.id] = element;
+              tabRefs.current[item.id] = element;
             }}
             type="button"
             role="tab"
-            id={`reports-tab-${t.id}`}
-            aria-selected={tab === t.id}
+            id={`reports-tab-${item.id}`}
+            aria-selected={tab === item.id}
             aria-controls="reports-panel"
-            tabIndex={tab === t.id ? 0 : -1}
-            className={`${styles.tab} ${tab === t.id ? styles.tabSelected : ''}`}
-            onClick={() => selectTab(t.id)}
+            tabIndex={tab === item.id ? 0 : -1}
+            className={`${styles.tab} ${tab === item.id ? styles.tabSelected : ''}`}
+            onClick={() => selectTab(item.id)}
             onKeyDown={(event) => handleTabKeyDown(event, index)}
           >
-            <Icon name={t.icon} size={16} />
-            {t.label}
+            <Icon name={item.icon} size={16} />
+            {t(`reports.tabs.${item.id}`)}
           </button>
         ))}
       </div>

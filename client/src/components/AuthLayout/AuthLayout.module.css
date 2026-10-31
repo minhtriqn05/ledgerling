@@ -172,9 +172,16 @@
 
 /* ---------- Form side ---------- */
 .formSide {
+  position: relative;
   display: grid;
   place-items: center;
-  padding: var(--space-6);
+  padding: var(--space-7) var(--space-6);
+}
+
+.language {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
 }
 
 /* ---------- Responsive ---------- */
@@ -200,6 +207,6 @@
 
   .visual,
   .formSide {
-    padding: var(--space-5) var(--space-4);
+    padding: calc(var(--space-7) + var(--space-4)) var(--space-4) var(--space-5);
   }
 }

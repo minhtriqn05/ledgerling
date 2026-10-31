@@ -235,7 +235,7 @@ describe("insights as a list", () => {
     expect(ranks).toEqual([...ranks].sort((a, b) => a - b));
     expect(typesOf(insights)).not.toContain("largest-expense");
     for (const insight of insights) {
-      expect(Object.keys(insight).sort()).toEqual(["link", "message", "severity", "type"]);
+      expect(Object.keys(insight).sort()).toEqual(["code", "link", "message", "params", "severity", "type"]);
       expect(["info", "warning", "success"]).toContain(insight.severity);
     }
   });
@@ -287,30 +287,40 @@ describe("GET /api/insights", () => {
         type: "category-up",
         severity: "warning",
         message: "You spent 200.000 ₫ (25%) more on Bills than last month.",
+        code: "CATEGORY_UP",
+        params: { amount: 200000, percent: 25, category: "Bills" },
         link: expect.stringMatching(/^\/transactions\?month=2025-10&category=[0-9a-f]{24}$/),
       },
       {
         type: "category-down",
         severity: "success",
         message: "Nice! You spent 100.000 ₫ (100%) less on Shopping than last month.",
+        code: "CATEGORY_DOWN",
+        params: { amount: 100000, percent: 100, category: "Shopping" },
         link: expect.stringMatching(/^\/transactions\?month=2025-10&category=[0-9a-f]{24}$/),
       },
       {
         type: "savings-rate",
         severity: "success",
         message: "Great! You saved 94% of your income in October 2025.",
+        code: "SAVINGS_GOOD",
+        params: { rate: 94, month: "2025-10", target: 20 },
         link: "/reports?tab=monthly&month=2025-10",
       },
       {
         type: "no-spend-days",
         severity: "success",
         message: "You had 28 no-spend days in October 2025.",
+        code: "NO_SPEND_DAYS",
+        params: { count: 28, month: "2025-10" },
         link: "/reports?tab=calendar&month=2025-10",
       },
       {
         type: "largest-expense",
         severity: "info",
         message: "Your largest expense was 1.000.000 ₫ on Bills (10 Oct).",
+        code: "LARGEST_EXPENSE",
+        params: { amount: 1000000, category: "Bills", day: "2025-10-10" },
         link: "/transactions?from=2025-10-10&to=2025-10-10",
       },
     ]);

@@ -22,18 +22,20 @@
 
   /* ---------- Soft washes ---------- */
   --gradient-soft: linear-gradient(135deg, #dceefc 0%, #e3f6ed 100%); /* pastel sky to mint */
-  --gradient-page-top: linear-gradient(180deg, #e4f0fb 0%, rgba(228, 240, 251, 0) 100%); /* light sky band */
+  --gradient-banner: linear-gradient(115deg, #d9ebfb 0%, #dff3ec 100%); /* the page header banner */
+  --color-logo-accent: #a9efcf;   /* the ruled lines of the logo */
 
   /* ---------- Surfaces ---------- */
-  --color-bg: #f4f7fa;            /* page background */
+  --color-bg: #edf3f8;            /* the canvas: a little deeper, so white panels stand out */
   --color-surface: #ffffff;       /* cards, tables, inputs, sidebar */
-  --color-surface-muted: #eff4f8; /* table header, hover rows, progress tracks */
+  --color-surface-muted: #f1f5f9; /* table rows, hover states */
+  --color-skeleton: #e6edf4;      /* loading placeholders: a tint, so the shimmer shows on white cards */
   --color-overlay: rgba(23, 37, 52, 0.45); /* behind dialogs */
 
   /* ---------- Text ---------- */
   --color-text: #172534;          /* deep navy ink */
   --color-text-secondary: #4a5868;
-  --color-text-muted: #617082;    /* hints, dates, axis labels (on white or page bg only) */
+  --color-text-muted: #5b6a7c;    /* hints, dates, axis labels (on white or the canvas: 4.6:1 or more) */
 
   /* ---------- Borders ---------- */
   --color-border: #e3eaf1;
@@ -76,12 +78,18 @@
   /* Single-series bar charts: pastel capsules on a light track, one bar highlighted. */
   --chart-bar: #8fc2ec;
   --chart-bar-track: #eef4fa;
+  /* The free part of a progress bar: pale diagonal stripes */
+  --pattern-track: repeating-linear-gradient(135deg, #e3edf6 0 4px, #f2f7fb 4px 8px);
   --chart-highlight: #2874b5;
   --chart-grid: #e3eaf1;
   --chart-axis: #617082;
 
   /* ---------- Typography ---------- */
   --font-sans: 'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* Be Vietnam Pro has no Chinese, Japanese or Korean letters: those come from the system, picked by <html lang>. */
+  --font-sans-zh: 'Be Vietnam Pro', 'PingFang SC', 'Microsoft YaHei UI', 'Noto Sans SC', system-ui, sans-serif;
+  --font-sans-ja: 'Be Vietnam Pro', 'Hiragino Sans', 'Yu Gothic UI', 'Noto Sans JP', system-ui, sans-serif;
+  --font-sans-ko: 'Be Vietnam Pro', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', system-ui, sans-serif;
 
   --font-size-xs: 0.75rem;   /* 12px: captions, table header, axis labels */
   --font-size-sm: 0.875rem;  /* 14px: body text, inputs, table rows */
@@ -113,17 +121,41 @@
   --radius-sm: 8px;     /* swatches, small badges */
   --radius-md: 12px;    /* inputs, nav items, tiles, avatars, tooltips */
   --radius-lg: 20px;    /* cards, tables, chart panels, dialogs */
-  --radius-xl: 28px;    /* the app frame */
+  --radius-xl: 24px;    /* the sidebar, page banner, drawer */
   --radius-full: 999px; /* buttons, pills, chips, chart capsules */
 
   /* ---------- Shadows (navy tint, very soft) ---------- */
-  --shadow-sm: 0 1px 2px rgba(23, 37, 52, 0.04), 0 2px 6px rgba(23, 37, 52, 0.04);
-  --shadow-md: 0 12px 32px rgba(23, 37, 52, 0.08);
-  --shadow-lg: 0 24px 64px rgba(23, 37, 52, 0.18); /* dialogs, floating cards */
+  /* A negative spread keeps a shadow tight under the element, without a grey halo. */
+  --shadow-sm: 0 1px 2px rgba(23, 37, 52, 0.04), 0 4px 12px -4px rgba(23, 37, 52, 0.06);
+  --shadow-md: 0 12px 28px -10px rgba(23, 37, 52, 0.18);
+  --shadow-lg: 0 24px 60px -20px rgba(23, 37, 52, 0.36); /* dialogs, floating cards */
+  /* A lit top edge, and a shadow in the button's own color */
+  --shadow-primary: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 8px 18px -8px rgba(40, 116, 181, 0.6);
+  --shadow-danger: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 8px 18px -8px rgba(189, 63, 54, 0.55);
+
+  /* ---------- Motion ---------- */
+  /* Every animation lasts 150–400ms and uses this curve. All of it stops with prefers-reduced-motion (global.css). */
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --duration-fast: 150ms;  /* hover, press */
+  --duration-base: 220ms;  /* the sliding menu pill, cards */
+  --duration-slow: 320ms;  /* the drawer */
 
   /* ---------- Layout ---------- */
-  --sidebar-width: 240px;
+  --sidebar-width: 248px;
+  --frame-gap: 12px;      /* around the floating sidebar */
   --topbar-height: 56px;  /* top bar with the menu button on narrow screens */
   --content-max-width: 1200px;
   --control-height: 40px; /* buttons and inputs share one height */
+}
+
+:lang(zh-CN) {
+  --font-sans: var(--font-sans-zh);
+}
+
+:lang(ja) {
+  --font-sans: var(--font-sans-ja);
+}
+
+:lang(ko) {
+  --font-sans: var(--font-sans-ko);
 }

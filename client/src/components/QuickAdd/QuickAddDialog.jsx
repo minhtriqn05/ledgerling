@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Trans, useTranslation } from 'react-i18next';
 import { getCategories } from '../../api/categories.js';
 import { getTags } from '../../api/tags.js';
 import { deleteTemplate, getTemplates } from '../../api/templates.js';
@@ -26,6 +27,7 @@ import styles from './QuickAddDialog.module.css';
 //   3. The fields (amount, category chips, date, note, tags), which can be changed before saving.
 // onSaved() runs after a transaction is created; the app then reloads the page that is open. onClose closes the dialog.
 export default function QuickAddDialog({ onSaved, onClose }) {
+  const { t } = useTranslation();
   const toast = useToast();
   // The categories and the templates; a failing template list must not stop the user from adding a transaction.
   const { data, loading, error, reload } = useLoad(
@@ -77,9 +79,9 @@ export default function QuickAddDialog({ onSaved, onClose }) {
     event.preventDefault();
 
     // Basic checks first; the server validates again.
-    if (!Number(amount)) return setFormError('Please enter an amount greater than 0.');
-    if (!categoryId) return setFormError('Please choose a category.');
-    if (!date) return setFormError('Please pick a date.');
+    if (!Number(amount)) return setFormError(t('form.enterAmount'));
+    if (!categoryId) return setFormError(t('form.chooseCategory'));
+    if (!date) return setFormError(t('form.pickDate'));
 
     setFormError('');
     setSaving(true);
@@ -91,7 +93,7 @@ export default function QuickAddDialog({ onSaved, onClose }) {
         tags,
         date: fromDateInput(date),
       });
-      toast.success('Transaction added');
+      toast.success(t('transactions.added'));
       onSaved();
       onClose();
     } catch (err) {
@@ -110,7 +112,7 @@ export default function QuickAddDialog({ onSaved, onClose }) {
         note: template.note,
         date: fromDateInput(todayInput()),
       });
-      toast.success(`Added "${template.name}"`);
+      toast.success(t('quickAdd.templateUsed', { name: template.name }));
       onSaved();
       onClose();
     } catch (err) {
@@ -123,20 +125,20 @@ export default function QuickAddDialog({ onSaved, onClose }) {
     try {
       await deleteTemplate(template._id);
       setRemovedTemplates((ids) => [...ids, template._id]);
-      toast.success(`Template "${template.name}" deleted`);
+      toast.success(t('quickAdd.templateDeleted', { name: template.name }));
     } catch (err) {
       toast.error(getErrorMessage(err));
     }
   }
 
   function renderCategories() {
-    if (loading) return <p className={form.hint}>Loading categories…</p>;
+    if (loading) return <p className={form.hint}>{t('categories.loading')}</p>;
     if (error) {
       return (
         <p className={form.hint}>
           {error}{' '}
           <button type="button" className={styles.linkButton} onClick={reload}>
-            Try again
+            {t('common.tryAgain')}
           </button>
         </p>
       );
@@ -144,7 +146,7 @@ export default function QuickAddDialog({ onSaved, onClose }) {
     if (categories.length === 0) {
       return (
         <p className={form.hint}>
-          No categories yet. <Link to="/categories">Create one</Link> first.
+          <Trans i18nKey="quickAdd.noCategories" components={{ link: <Link to="/categories" /> }} />
         </p>
       );
     }
@@ -154,7 +156,7 @@ export default function QuickAddDialog({ onSaved, onClose }) {
       if (group.length === 0) return null;
       return (
         <div key={type} className={styles.group}>
-          <span className={styles.groupLabel}>{type === 'expense' ? 'Expense' : 'Income'}</span>
+          <span className={styles.groupLabel}>{t(`common.${type}`)}</span>
           <div className={form.categoryPicker}>
             {group.map((c) => {
               const selected = c._id === categoryId;
@@ -171,9 +173,7 @@ export default function QuickAddDialog({ onSaved, onClose }) {
                   {selected ? (
                     <Icon name="check" size={14} />
                   ) : (
-                    <CategoryMark icon={c.icon}>
-                      <i className={form.dot} />
-                    </CategoryMark>
+                    <CategoryMark category={c} />
                   )}
                   {c.name}
                 </button>
@@ -186,11 +186,11 @@ export default function QuickAddDialog({ onSaved, onClose }) {
   }
 
   return (
-    <Modal title="Quick add" onClose={onClose} busy={saving}>
+    <Modal title={t('quickAdd.title')} onClose={onClose} busy={saving}>
       <form className={form.form} onSubmit={handleSubmit} noValidate>
         {templates.length > 0 && (
-          <section className={styles.templates} aria-label="Templates">
-            <span className={form.label}>Templates · one click saves</span>
+          <section className={styles.templates} aria-label={t('quickAdd.templates')}>
+            <span className={form.label}>{t('quickAdd.templatesHint')}</span>
             <ul className={styles.templateList}>
               {templates.map((template) => (
                 <li key={template._id} className={styles.template} style={{ '--tone': template.category.color }}>
@@ -200,16 +200,14 @@ export default function QuickAddDialog({ onSaved, onClose }) {
                     disabled={saving}
                     onClick={() => useTemplate(template)}
                   >
-                    <CategoryMark icon={template.category.icon}>
-                      <i className={form.dot} />
-                    </CategoryMark>
+                    <CategoryMark category={template.category} />
                     <span className={styles.templateName}>{template.name}</span>
                     <span className={styles.templateAmount}>{formatVnd(template.amount)}</span>
                   </button>
                   <button
                     type="button"
                     className={styles.templateRemove}
-                    aria-label={`Delete template ${template.name}`}
+                    aria-label={t('quickAdd.deleteTemplate', { name: template.name })}
                     disabled={saving}
                     onClick={() => removeTemplate(template)}
                   >
@@ -223,13 +221,13 @@ export default function QuickAddDialog({ onSaved, onClose }) {
 
         <div className={form.field}>
           <label className={form.label} htmlFor="quick-text">
-            Quick text
+            {t('quickAdd.text')}
           </label>
           <input
             id="quick-text"
             className={form.input}
             autoComplete="off"
-            placeholder="coffee 35k #work · salary 15tr yesterday"
+            placeholder={t('quickAdd.placeholder')}
             data-autofocus
             value={smart}
             onChange={changeSmart}
@@ -238,15 +236,15 @@ export default function QuickAddDialog({ onSaved, onClose }) {
           {smart.trim() && (
             <p className={styles.understood} role="status">
               {parsed.amount
-                ? 'Filled in below. Change anything before you save.'
-                : 'No amount found in the text. Type one below.'}
+                ? t('quickAdd.filled')
+                : t('quickAdd.noAmount')}
             </p>
           )}
         </div>
 
         <div className={form.field}>
           <label className={form.label} htmlFor="quick-amount">
-            Amount
+            {t('common.amount')}
           </label>
           <div className={form.amountBox}>
             <input
@@ -264,14 +262,14 @@ export default function QuickAddDialog({ onSaved, onClose }) {
         </div>
 
         <fieldset className={form.fieldset}>
-          <legend className={form.label}>Category</legend>
+          <legend className={form.label}>{t('common.category')}</legend>
           {renderCategories()}
         </fieldset>
 
         <div className={form.row}>
           <div className={form.field}>
             <label className={form.label} htmlFor="quick-date">
-              Date
+              {t('common.date')}
             </label>
             <input
               id="quick-date"
@@ -284,13 +282,13 @@ export default function QuickAddDialog({ onSaved, onClose }) {
           </div>
           <div className={form.field}>
             <label className={form.label} htmlFor="quick-note">
-              Note
+              {t('common.note')}
             </label>
             <input
               id="quick-note"
               className={form.input}
               autoComplete="off"
-              placeholder="Optional"
+              placeholder={t('common.optional')}
               maxLength={200}
               value={note}
               onChange={(event) => setField('note', event.target.value)}
@@ -301,7 +299,7 @@ export default function QuickAddDialog({ onSaved, onClose }) {
 
         <div className={form.field}>
           <label className={form.label} htmlFor="quick-tags">
-            Tags
+            {t('common.tags')}
           </label>
           <TagInput
             id="quick-tags"
@@ -316,10 +314,10 @@ export default function QuickAddDialog({ onSaved, onClose }) {
 
         <div className={form.actions}>
           <Button variant="secondary" onClick={onClose} disabled={saving}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button type="submit" disabled={saving || loading}>
-            {saving ? 'Saving…' : 'Save transaction'}
+            {saving ? t('common.saving') : t('transactions.save')}
           </Button>
         </div>
       </form>

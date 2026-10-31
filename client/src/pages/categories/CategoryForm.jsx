@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { createCategory, updateCategory } from '../../api/categories.js';
 import { getErrorMessage } from '../../api/axios.js';
 import { useToast } from '../../context/ToastContext.jsx';
@@ -9,31 +10,31 @@ import SegmentedControl from '../../components/SegmentedControl/SegmentedControl
 import Button from '../../components/Button/Button.jsx';
 import Alert from '../../components/Alert/Alert.jsx';
 import Icon from '../../components/Icon.jsx';
-import EmojiPicker from '../../components/EmojiPicker/EmojiPicker.jsx';
+import IconPicker from '../../components/IconPicker/IconPicker.jsx';
 import CategoryMark from '../../components/CategoryMark/CategoryMark.jsx';
 import styles from './CategoryForm.module.css';
 
 // The 8 preset category colors, in the fixed order of docs/ui-style.md (--chart-1 … --chart-8 in tokens.css).
 const PRESETS = [
-  { token: '--chart-1', name: 'Sky' },
-  { token: '--chart-2', name: 'Coral' },
-  { token: '--chart-3', name: 'Teal' },
-  { token: '--chart-4', name: 'Apricot' },
-  { token: '--chart-5', name: 'Periwinkle' },
-  { token: '--chart-6', name: 'Mint' },
-  { token: '--chart-7', name: 'Cornflower' },
-  { token: '--chart-8', name: 'Lime' },
-];
-
-const TYPE_OPTIONS = [
-  { value: 'expense', label: 'Expense', tone: 'expense' },
-  { value: 'income', label: 'Income', tone: 'income' },
+  { token: '--chart-1', name: 'sky' },
+  { token: '--chart-2', name: 'coral' },
+  { token: '--chart-3', name: 'teal' },
+  { token: '--chart-4', name: 'apricot' },
+  { token: '--chart-5', name: 'periwinkle' },
+  { token: '--chart-6', name: 'mint' },
+  { token: '--chart-7', name: 'cornflower' },
+  { token: '--chart-8', name: 'lime' },
 ];
 
 // "New category" form, or "Edit category" when `category` is given.
 // The page gives the form a new `key` each time it opens it, so the fields below start again from the props.
 // onSaved(category) receives the category returned by the API.
 export default function CategoryForm({ category, defaultType, autoFocus, onSaved, onCancel }) {
+  const { t } = useTranslation();
+  const typeOptions = [
+    { value: 'expense', label: t('common.expense'), tone: 'expense' },
+    { value: 'income', label: t('common.income'), tone: 'income' },
+  ];
   const isEdit = Boolean(category);
 
   // The API stores a hex code like "#F07D62", so each preset's value is read from its token
@@ -43,7 +44,7 @@ export default function CategoryForm({ category, defaultType, autoFocus, onSaved
   const [name, setName] = useState(category?.name ?? '');
   const [type, setType] = useState(category?.type ?? defaultType);
   const [color, setColor] = useState(category?.color.toUpperCase() ?? colors[0].hex);
-  const [icon, setIcon] = useState(category?.icon ?? null); // one emoji, or null for none
+  const [icon, setIcon] = useState(category?.icon ?? null); // an icon name (older categories: an emoji), or null for Auto
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const toast = useToast();
@@ -52,7 +53,7 @@ export default function CategoryForm({ category, defaultType, autoFocus, onSaved
     event.preventDefault();
 
     // Basic check first; the server validates again.
-    if (!name.trim()) return setError('Please enter a name.');
+    if (!name.trim()) return setError(t('form.enterName'));
 
     setError('');
     setSaving(true);
@@ -74,14 +75,14 @@ export default function CategoryForm({ category, defaultType, autoFocus, onSaved
       <CardHeader
         icon={isEdit ? 'edit' : 'plus'}
         tone="sky"
-        title={isEdit ? 'Edit category' : 'New category'}
-        subtitle={isEdit ? 'Change the name, color or icon' : 'Name, type, color and icon'}
+        title={isEdit ? t('categories.edit') : t('categories.new')}
+        subtitle={isEdit ? t('categories.editSubtitle') : t('categories.newSubtitle')}
       />
 
       <form className={styles.form} onSubmit={handleSubmit}>
         <TextField
-          label="Name"
-          placeholder="e.g. Coffee"
+          label={t('common.name')}
+          placeholder={t('categories.namePlaceholder')}
           autoComplete="off"
           maxLength={30}
           autoFocus={autoFocus}
@@ -91,13 +92,13 @@ export default function CategoryForm({ category, defaultType, autoFocus, onSaved
 
         {/* fieldset + legend give each group of buttons a name that screen readers announce. */}
         <fieldset className={styles.fieldset}>
-          <legend className={styles.legend}>Type</legend>
-          <SegmentedControl block options={TYPE_OPTIONS} value={type} onChange={setType} disabled={isEdit} />
-          {isEdit && <p className={styles.hint}>Type can't be changed after a category is created.</p>}
+          <legend className={styles.legend}>{t('common.type')}</legend>
+          <SegmentedControl block options={typeOptions} value={type} onChange={setType} disabled={isEdit} />
+          {isEdit && <p className={styles.hint}>{t('categories.typeLocked')}</p>}
         </fieldset>
 
         <fieldset className={styles.fieldset}>
-          <legend className={styles.legend}>Color</legend>
+          <legend className={styles.legend}>{t('common.color')}</legend>
           <div className={styles.swatches}>
             {colors.map((preset) => {
               const selected = preset.hex === color;
@@ -107,7 +108,7 @@ export default function CategoryForm({ category, defaultType, autoFocus, onSaved
                   type="button"
                   className={`${styles.swatch} ${selected ? styles.swatchSelected : ''}`}
                   style={{ '--tone': `var(${preset.token})` }}
-                  aria-label={preset.name}
+                  aria-label={t(`colors.${preset.name}`)}
                   aria-pressed={selected}
                   onClick={() => setColor(preset.hex)}
                 >
@@ -119,18 +120,16 @@ export default function CategoryForm({ category, defaultType, autoFocus, onSaved
         </fieldset>
 
         <fieldset className={styles.fieldset}>
-          <legend className={styles.legend}>Icon</legend>
-          <EmojiPicker value={icon} onChange={setIcon} disabled={saving} />
+          <legend className={styles.legend}>{t('common.icon')}</legend>
+          <IconPicker value={icon} onChange={setIcon} color={color} disabled={saving} />
         </fieldset>
 
-        {/* How the category will look in lists: a chip with its icon (or a dot in its color). */}
+        {/* How the category will look in lists: a chip with its icon. */}
         <div className={styles.preview}>
-          <span className={styles.previewLabel}>Preview</span>
+          <span className={styles.previewLabel}>{t('common.preview')}</span>
           <span className={styles.chip} style={{ '--tone': color }}>
-            <CategoryMark icon={icon}>
-              <span className={styles.dot} />
-            </CategoryMark>
-            <span className={styles.chipText}>{name.trim() || 'Category name'}</span>
+            <CategoryMark category={{ name, color, icon }} />
+            <span className={styles.chipText}>{name.trim() || t('categories.namePreview')}</span>
           </span>
         </div>
 
@@ -139,15 +138,15 @@ export default function CategoryForm({ category, defaultType, autoFocus, onSaved
         {isEdit ? (
           <div className={styles.actions}>
             <Button variant="secondary" onClick={onCancel} disabled={saving}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="submit" disabled={saving}>
-              {saving ? 'Saving…' : 'Save changes'}
+              {saving ? t('common.saving') : t('common.saveChanges')}
             </Button>
           </div>
         ) : (
           <Button type="submit" block disabled={saving}>
-            {saving ? 'Creating…' : 'Create category'}
+            {saving ? t('common.creating') : t('categories.create')}
           </Button>
         )}
       </form>

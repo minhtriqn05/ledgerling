@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { AnimatePresence } from 'motion/react';
+import { useTranslation } from 'react-i18next';
 import { getGoals } from '../api/goals.js';
 import { getErrorMessage } from '../api/axios.js';
 import { useToast } from '../context/ToastContext.jsx';
@@ -7,6 +9,7 @@ import Button from '../components/Button/Button.jsx';
 import EmptyState from '../components/EmptyState/EmptyState.jsx';
 import LoadingState from '../components/LoadingState/LoadingState.jsx';
 import ErrorState from '../components/ErrorState/ErrorState.jsx';
+import Reveal from '../components/Motion/Reveal.jsx';
 import GoalCard from './goals/GoalCard.jsx';
 import GoalFormDialog from './goals/GoalFormDialog.jsx';
 import MoneyDialog from './goals/MoneyDialog.jsx';
@@ -16,6 +19,7 @@ import styles from './GoalsPage.module.css';
 
 // A grid of savings goal cards. The API sorts them: goals still to reach first (nearest deadline first), completed last.
 export default function GoalsPage() {
+  const { t } = useTranslation();
   const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
@@ -60,19 +64,19 @@ export default function GoalsPage() {
   }
 
   function handleFormSaved(saved) {
-    toast.success(dialog.form ? 'Goal updated' : 'Goal added');
+    toast.success(dialog.form ? t('goals.updated') : t('goals.added'));
     setDialog(null);
     showSaved(saved);
   }
 
   function handleMoneySaved(saved) {
-    toast.success(dialog.mode === 'withdraw' ? 'Money withdrawn' : 'Money added');
+    toast.success(dialog.mode === 'withdraw' ? t('goals.withdrawn') : t('goals.moneyAdded'));
     setDialog(null);
     showSaved(saved);
   }
 
   function handleDeleted(goal) {
-    toast.success('Goal deleted');
+    toast.success(t('goals.deleted'));
     setDialog(null);
     setGoals((list) => list.filter((g) => g._id !== goal._id));
   }
@@ -82,18 +86,18 @@ export default function GoalsPage() {
 
   // The page shows one of four states: loading, error, empty or the grid.
   function renderContent() {
-    if (loading) return <LoadingState skeleton="cards">Loading goals…</LoadingState>;
+    if (loading) return <LoadingState skeleton="cards">{t('goals.loading')}</LoadingState>;
     if (loadError) return <ErrorState message={loadError} onRetry={retry} />;
 
     if (goals.length === 0) {
       return (
         <EmptyState
           icon="target"
-          title="No savings goals yet"
-          text="Set a target for something you are saving for, then add money to it and watch the progress grow."
+          title={t('goals.emptyTitle')}
+          text={t('goals.emptyText')}
         >
           <Button icon="plus" onClick={() => setDialog({ form: null })}>
-            New goal
+            {t('goals.new')}
           </Button>
         </EmptyState>
       );
@@ -101,8 +105,8 @@ export default function GoalsPage() {
 
     return (
       <ul className={styles.grid}>
-        {goals.map((goal) => (
-          <li key={goal._id}>
+        {goals.map((goal, index) => (
+          <Reveal as="li" key={goal._id} index={index}>
             <GoalCard
               goal={goal}
               onAddMoney={(g) => setDialog({ money: g, mode: 'add' })}
@@ -111,7 +115,7 @@ export default function GoalsPage() {
               onEdit={(g) => setDialog({ form: g })}
               onDelete={(g) => setDialog({ delete: g })}
             />
-          </li>
+          </Reveal>
         ))}
       </ul>
     );
@@ -120,32 +124,34 @@ export default function GoalsPage() {
   return (
     <div className={styles.page}>
       <PageHeader
-        title="Goals"
+        title={t('nav.goals')}
         subtitle={
           ready
-            ? `${goals.length} ${goals.length === 1 ? 'goal' : 'goals'} · ${completedCount} completed`
+            ? `${t('goals.count', { count: goals.length })} · ${t('goals.completedCount', { count: completedCount })}`
             : undefined
         }
       >
         <Button icon="plus" onClick={() => setDialog({ form: null })} disabled={!ready}>
-          New goal
+          {t('goals.new')}
         </Button>
       </PageHeader>
 
       {renderContent()}
 
-      {dialog && 'form' in dialog && (
-        <GoalFormDialog goal={dialog.form} onSaved={handleFormSaved} onClose={() => setDialog(null)} />
-      )}
-      {dialog?.money && (
-        <MoneyDialog goal={dialog.money} mode={dialog.mode} onSaved={handleMoneySaved} onClose={() => setDialog(null)} />
-      )}
-      {dialog?.history && (
-        <HistoryDialog goal={dialog.history} onChanged={showSaved} onClose={() => setDialog(null)} />
-      )}
-      {dialog?.delete && (
-        <DeleteGoalDialog goal={dialog.delete} onDeleted={handleDeleted} onClose={() => setDialog(null)} />
-      )}
+      <AnimatePresence>
+        {dialog && 'form' in dialog && (
+          <GoalFormDialog key="form" goal={dialog.form} onSaved={handleFormSaved} onClose={() => setDialog(null)} />
+        )}
+        {dialog?.money && (
+          <MoneyDialog key="money" goal={dialog.money} mode={dialog.mode} onSaved={handleMoneySaved} onClose={() => setDialog(null)} />
+        )}
+        {dialog?.history && (
+          <HistoryDialog key="history" goal={dialog.history} onChanged={showSaved} onClose={() => setDialog(null)} />
+        )}
+        {dialog?.delete && (
+          <DeleteGoalDialog key="delete" goal={dialog.delete} onDeleted={handleDeleted} onClose={() => setDialog(null)} />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

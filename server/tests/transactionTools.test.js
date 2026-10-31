@@ -242,18 +242,18 @@ describe("POST /api/transactions/import", () => {
     expect(res.body.data.imported).toBe(2);
     expect(res.body.data.failed).toBe(12);
     expect(res.body.data.errors).toEqual([
-      { row: 2, message: "Amount must be greater than 0" },
-      { row: 3, message: "Date is invalid, use ISO 8601 like 2026-10-27T12:30:00+07:00" },
-      { row: 4, message: "Date is invalid, use YYYY-MM-DD HH:mm or ISO 8601" },
-      { row: 5, message: "Date is invalid, use YYYY-MM-DD HH:mm or ISO 8601" },
-      { row: 6, message: "Type must be income or expense" },
-      { row: 7, message: "Category is required" },
-      { row: 8, message: "Amount must be greater than 0" },
-      { row: 9, message: "Currency must be a 3-letter ISO code" },
-      { row: 10, message: "Note must be at most 200 characters" },
-      { row: 11, message: "Each tag must be 1-20 letters, digits or hyphens" },
-      { row: 12, message: "A transaction can have at most 5 tags" },
-      { row: 13, message: "Row must be an object" },
+      { row: 2, message: "Amount must be greater than 0", code: "AMOUNT_INVALID" },
+      { row: 3, message: "Date is invalid, use ISO 8601 like 2026-10-27T12:30:00+07:00", code: "DATE_INVALID" },
+      { row: 4, message: "Date is invalid, use YYYY-MM-DD HH:mm or ISO 8601", code: "DATE_INVALID" },
+      { row: 5, message: "Date is invalid, use YYYY-MM-DD HH:mm or ISO 8601", code: "DATE_INVALID" },
+      { row: 6, message: "Type must be income or expense", code: "TYPE_INVALID" },
+      { row: 7, message: "Category is required", code: "CATEGORY_REQUIRED" },
+      { row: 8, message: "Amount must be greater than 0", code: "AMOUNT_INVALID" },
+      { row: 9, message: "Currency must be a 3-letter ISO code", code: "CURRENCY_INVALID" },
+      { row: 10, message: "Note must be at most 200 characters", code: "NOTE_TOO_LONG" },
+      { row: 11, message: "Each tag must be 1-20 letters, digits or hyphens", code: "TAG_INVALID" },
+      { row: 12, message: "A transaction can have at most 5 tags", code: "TOO_MANY_TAGS" },
+      { row: 13, message: "Row must be an object", code: "VALIDATION_ERROR" },
     ]);
 
     const saved = await list("month=2026-10", importer.token);
@@ -269,8 +269,18 @@ describe("POST /api/transactions/import", () => {
 
     expect(res.body.data.imported).toBe(0);
     expect(res.body.data.errors).toEqual([
-      { row: 1, message: 'Category "Groceries" (expense) not found' },
-      { row: 2, message: 'Category "Food" (income) not found' },
+      {
+        row: 1,
+        message: 'Category "Groceries" (expense) not found',
+        code: "IMPORT_CATEGORY_NOT_FOUND",
+        params: { name: "Groceries", type: "expense" },
+      },
+      {
+        row: 2,
+        message: 'Category "Food" (income) not found',
+        code: "IMPORT_CATEGORY_NOT_FOUND",
+        params: { name: "Food", type: "income" },
+      },
     ]);
     const categories = await api().get("/api/categories").set(auth(importer.token));
     expect(categories.body.data.map((c) => c.name)).not.toContain("Groceries");

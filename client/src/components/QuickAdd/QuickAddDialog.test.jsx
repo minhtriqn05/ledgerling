@@ -1,5 +1,5 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import QuickAddDialog from './QuickAddDialog.jsx';
@@ -72,7 +72,7 @@ describe('QuickAddDialog: the text line', () => {
     await renderReady();
     await userEvent.type(quickText(), 'coffee 35k #work');
 
-    expect(amountBox()).toHaveValue('35.000');
+    expect(amountBox()).toHaveValue('35,000');
     expect(chip('Food')).toHaveAttribute('aria-pressed', 'true');
     expect(chip('Transport')).toHaveAttribute('aria-pressed', 'false');
     expect(screen.getByLabelText('Note')).toHaveValue('coffee');
@@ -127,7 +127,7 @@ describe('QuickAddDialog: the text line', () => {
 
     await userEvent.type(quickText(), ' 99k #work');
 
-    expect(amountBox()).toHaveValue('50.000'); // not 99.000
+    expect(amountBox()).toHaveValue('50,000'); // not 99,000
     expect(chip('Transport')).toHaveAttribute('aria-pressed', 'true'); // not Food
     // fields that were not touched still follow the text
     expect(screen.getByRole('button', { name: 'Remove tag work' })).toBeInTheDocument();
@@ -203,8 +203,9 @@ describe('QuickAddDialog: the fields', () => {
     await renderReady();
     expect(screen.getByText('Expense')).toBeInTheDocument();
     expect(screen.getByText('Income')).toBeInTheDocument();
-    expect(screen.getByText('🍜')).toBeInTheDocument();
-    expect(screen.getByText('🚌')).toBeInTheDocument();
+    // Every chip has its icon tile
+    const chips = screen.getAllByRole('button', { pressed: false }).filter((button) => within(button).queryByTestId('category-mark'));
+    expect(chips.length).toBeGreaterThanOrEqual(2);
   });
 });
 
@@ -230,7 +231,7 @@ describe('QuickAddDialog: templates', () => {
 
   it('shows the amount on the chip', async () => {
     renderDialog();
-    expect(await screen.findByRole('button', { name: /Morning coffee.*35\.000/ })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: /Morning coffee.*35,000/ })).toBeInTheDocument();
   });
 
   it('shows no template row when there are no templates', async () => {

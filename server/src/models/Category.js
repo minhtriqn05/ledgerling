@@ -8,8 +8,9 @@ const categorySchema = new mongoose.Schema(
     type: { type: String, required: true, enum: ["income", "expense"] },
     // Hex code like #FF7043
     color: { type: String, required: true, match: /^#[0-9A-Fa-f]{6}$/ },
-    // One emoji like "🍜" (checked by the request validation). null = no icon.
-    icon: { type: String, default: null, maxlength: 16 },
+    // An icon name like "utensils", or one emoji like "🍜" on older categories (checked by the request validation).
+    // null = no icon chosen: the client guesses one from the name.
+    icon: { type: String, default: null, maxlength: 30 },
   },
   // Adds createdAt and updatedAt
   { timestamps: true }

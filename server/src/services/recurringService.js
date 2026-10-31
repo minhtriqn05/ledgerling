@@ -14,13 +14,13 @@ const DUPLICATE_KEY = 11000;
 // The category must belong to the same user, otherwise it looks like it does not exist (404)
 async function checkOwnedCategory(userId, categoryId) {
   const category = await Category.exists({ _id: categoryId, userId });
-  if (!category) throw httpError(404, "Category not found");
+  if (!category) throw httpError(404, "Category not found", "CATEGORY_NOT_FOUND");
 }
 
 // Filtering by userId as well means another user's rule looks like it does not exist (404)
 async function findOwned(userId, id) {
   const rule = await RecurringRule.findOne({ _id: id, userId }).populate("categoryId", CATEGORY_FIELDS);
-  if (!rule) throw httpError(404, "Recurring rule not found");
+  if (!rule) throw httpError(404, "Recurring rule not found", "RULE_NOT_FOUND");
   return rule;
 }
 

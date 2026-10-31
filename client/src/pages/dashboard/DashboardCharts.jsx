@@ -10,6 +10,8 @@ import {
   PieChart,
   Pie,
 } from 'recharts';
+import { useTranslation } from 'react-i18next';
+import { useReducedMotion } from 'motion/react';
 import { cssVar } from '../../utils/cssVar.js';
 import { formatCompact, formatVnd } from '../../utils/format.js';
 import styles from './DashboardCharts.module.css';
@@ -40,7 +42,7 @@ export function ChartTooltip({ active, payload, label, hideLabel = false }) {
         return (
           <p key={item.name} className={styles.tooltipRow}>
             {color && <span className={styles.dot} style={{ background: color }} />}
-            <span>{item.payload?.icon ? `${item.payload.icon} ${item.name}` : item.name}</span>
+            <span>{item.name}</span>
             <strong>{formatVnd(item.value)}</strong>
           </p>
         );
@@ -52,10 +54,12 @@ export function ChartTooltip({ active, payload, label, hideLabel = false }) {
 // Share of spending per category: a thin ring of rounded segments with small gaps, the total in the middle.
 // data: [{ name, color (hex of the category), total }]
 export function CategoryDonut({ data, total }) {
+  const { t } = useTranslation();
+  const animate = !useReducedMotion();
   const pieData = data.map((c) => ({ ...c, fill: c.color }));
 
   return (
-    <div className={styles.donut} role="img" aria-label={`Spending by category, total ${formatVnd(total)}`}>
+    <div className={styles.donut} role="img" aria-label={t('dashboard.donutLabel', { total: formatVnd(total) })}>
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
@@ -69,13 +73,16 @@ export function CategoryDonut({ data, total }) {
             startAngle={90}
             endAngle={-270}
             stroke="none"
+            isAnimationActive={animate}
+            animationDuration={400}
+            animationEasing="ease-out"
           />
           <Tooltip content={<ChartTooltip hideLabel />} />
         </PieChart>
       </ResponsiveContainer>
       <div className={styles.donutCenter}>
         <strong>{formatCompact(total)}&nbsp;₫</strong>
-        <span>spent</span>
+        <span>{t('dashboard.spent')}</span>
       </div>
     </div>
   );
@@ -84,6 +91,8 @@ export function CategoryDonut({ data, total }) {
 // Expense of the last months: pastel capsules; the selected month uses the sky-to-teal gradient.
 // data: [{ month: 'YYYY-MM', label: 'Oct', expense }], selected: the 'YYYY-MM' to highlight.
 export function MonthlyExpenseChart({ data, selected }) {
+  const { t } = useTranslation();
+  const animate = !useReducedMotion();
   const bar = cssVar('--chart-bar');
   const grid = cssVar('--chart-grid');
   const from = cssVar('--color-hero-from');
@@ -91,7 +100,7 @@ export function MonthlyExpenseChart({ data, selected }) {
   const ticks = niceTicks(Math.max(...data.map((d) => d.expense)));
 
   return (
-    <div className={styles.barChart} role="img" aria-label="Expense of the last 6 months">
+    <div className={styles.barChart} role="img" aria-label={t('dashboard.barLabel')}>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 8, right: 12, bottom: 0, left: 0 }} barCategoryGap="30%">
           <defs>
@@ -105,14 +114,23 @@ export function MonthlyExpenseChart({ data, selected }) {
           <YAxis
             axisLine={false}
             tickLine={false}
-            width={48}
+            // Wide enough for the longest label in every language ("7,5 Mio." in Deutsch); "auto" measured too narrow
+            width={64}
             ticks={ticks}
             domain={[0, ticks[ticks.length - 1]]}
             tick={axisTick()}
             tickFormatter={formatCompact}
           />
           <Tooltip cursor={false} content={<ChartTooltip />} />
-          <Bar dataKey="expense" name="Expense" maxBarSize={24} radius={999}>
+          <Bar
+            dataKey="expense"
+            name={t('common.expense')}
+            maxBarSize={24}
+            radius={999}
+            isAnimationActive={animate}
+            animationDuration={400}
+            animationEasing="ease-out"
+          >
             {data.map((d) => (
               <Cell key={d.month} fill={d.month === selected ? 'url(#dashboard-selected-fill)' : bar} />
             ))}

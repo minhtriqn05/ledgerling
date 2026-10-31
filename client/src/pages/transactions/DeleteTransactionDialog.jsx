@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { deleteTransaction } from '../../api/transactions.js';
 import { getErrorMessage } from '../../api/axios.js';
 import { useToast } from '../../context/ToastContext.jsx';
@@ -9,6 +10,7 @@ import styles from './DeleteTransactionDialog.module.css';
 
 // "Are you sure?" step before a transaction is deleted. onDeleted(transaction) runs after the API said OK.
 export default function DeleteTransactionDialog({ transaction, onDeleted, onClose }) {
+  const { t } = useTranslation();
   const [deleting, setDeleting] = useState(false);
   const toast = useToast();
 
@@ -24,7 +26,7 @@ export default function DeleteTransactionDialog({ transaction, onDeleted, onClos
   }
 
   return (
-    <Modal title="Delete this transaction?" onClose={onClose} busy={deleting}>
+    <Modal title={t('transactions.deleteQuestion')} onClose={onClose} busy={deleting}>
       <p className={styles.summary}>
         <strong>{transaction.note || transaction.category.name}</strong>
         <span>
@@ -32,15 +34,15 @@ export default function DeleteTransactionDialog({ transaction, onDeleted, onClos
           {formatSignedVnd(transaction.amount, transaction.type)}
         </span>
       </p>
-      <p className={styles.text}>This can't be undone.</p>
+      <p className={styles.text}>{t('common.cannotUndo')}</p>
 
       <div className={styles.actions}>
         {/* data-autofocus: keyboard users land on the safe choice (see Modal) */}
         <Button variant="secondary" onClick={onClose} disabled={deleting} data-autofocus>
-          Cancel
+          {t('common.cancel')}
         </Button>
         <Button variant="danger" onClick={handleDelete} disabled={deleting}>
-          {deleting ? 'Deleting…' : 'Delete'}
+          {deleting ? t('common.deleting') : t('common.delete')}
         </Button>
       </div>
     </Modal>

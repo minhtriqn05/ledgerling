@@ -1,4 +1,5 @@
 import { useId, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Icon from '../Icon.jsx';
 import styles from './TextField.module.css';
 
@@ -6,6 +7,7 @@ import styles from './TextField.module.css';
 // type="password" also gets a button on the right that shows or hides the password.
 // Any other prop (value, onChange, autoComplete, maxLength...) goes straight to the <input>.
 export default function TextField({ label, icon, type = 'text', ...rest }) {
+  const { t } = useTranslation();
   const id = useId();
   const [visible, setVisible] = useState(false);
   const isPassword = type === 'password';
@@ -27,7 +29,7 @@ export default function TextField({ label, icon, type = 'text', ...rest }) {
           <button
             type="button"
             className={styles.toggle}
-            aria-label="Show password"
+            aria-label={t('auth.showPassword')}
             aria-pressed={visible}
             onClick={() => setVisible((current) => !current)}
           >
