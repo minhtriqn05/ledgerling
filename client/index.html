@@ -3,10 +3,41 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ledgerling</title>
+    <title>Ledgerling – Personal expense tracker</title>
+    <meta
+      name="description"
+      content="Ledgerling is a calm, simple personal expense tracker. Track income and expenses, set monthly budgets, save for goals and see reports. Try the demo, no sign-up needed."
+    />
+    <link rel="canonical" href="__SITE_URL__/" />
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <!--
+      Open Graph (Facebook, LinkedIn, Zalo, Discord...) and Twitter card: the preview of a shared link.
+      They need full addresses, so __SITE_URL__ is replaced at build time by the plugin in vite.config.js.
+      og-image.png (1200x630) is made by `npm run og-image` from scripts/og-image.html.
+    -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Ledgerling" />
+    <meta property="og:title" content="Ledgerling – Personal expense tracker" />
+    <meta
+      property="og:description"
+      content="Track income and expenses, set monthly budgets, save for goals and see where your money goes. Try the demo, no sign-up needed."
+    />
+    <meta property="og:url" content="__SITE_URL__/" />
+    <meta property="og:image" content="__SITE_URL__/og-image.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Ledgerling: know where your money goes" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Ledgerling – Personal expense tracker" />
+    <meta
+      name="twitter:description"
+      content="Track income and expenses, set monthly budgets, save for goals and see where your money goes. Try the demo, no sign-up needed."
+    />
+    <meta name="twitter:image" content="__SITE_URL__/og-image.png" />
+    <meta name="twitter:image:alt" content="Ledgerling: know where your money goes" />
     <meta name="theme-color" content="#2874b5" />
     <!--
       Applies the saved color theme before the page is drawn, so a dark theme never flashes white on load.

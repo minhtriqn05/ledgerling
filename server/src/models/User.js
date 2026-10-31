@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { LANGUAGE_CODES } from "../utils/languages.js";
+import { isDemoEmail } from "../utils/demo.js";
 
 const userSchema = new mongoose.Schema(
   {
@@ -39,6 +40,8 @@ userSchema.set("toJSON", {
     delete ret.passwordHash;
     delete ret.tokenVersion;
     delete ret.__v;
+    // The app hides the settings that would lock other visitors out of the shared demo account
+    ret.isDemo = isDemoEmail(ret.email);
     return ret;
   },
 });

@@ -65,7 +65,7 @@ export default function YearlyTab({ year }) {
 
       <Card>
         <CardHeader icon="transactions" tone="mint" title={t('reports.monthByMonth')} subtitle={year} />
-        <div className={styles.tableWrap}>
+        <div className={styles.tableWrap} role="region" tabIndex={0} aria-label={t('reports.monthByMonth')}>
           <table className={styles.table}>
             <thead>
               <tr>

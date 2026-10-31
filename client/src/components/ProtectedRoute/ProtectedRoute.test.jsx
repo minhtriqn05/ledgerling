@@ -18,7 +18,9 @@ function renderAt(path) {
     <MemoryRouter initialEntries={[path]}>
       <Routes>
         <Route path="/login" element={<LoginStub />} />
+        <Route path="/welcome" element={<p>Welcome page</p>} />
         <Route element={<ProtectedRoute />}>
+          <Route path="/" element={<p>Dashboard page</p>} />
           <Route path="/transactions" element={<p>Transactions page</p>} />
         </Route>
       </Routes>
@@ -38,6 +40,19 @@ describe('ProtectedRoute', () => {
     renderAt('/transactions');
     expect(screen.getByText('Login page (from /transactions)')).toBeInTheDocument();
     expect(screen.queryByText('Transactions page')).not.toBeInTheDocument();
+  });
+
+  it('sends a visitor who opens the home address to the landing page, not to /login', () => {
+    useAuth.mockReturnValue({ user: null, loading: false });
+    renderAt('/');
+    expect(screen.getByText('Welcome page')).toBeInTheDocument();
+    expect(screen.queryByText(/Login page/)).not.toBeInTheDocument();
+  });
+
+  it('shows the Dashboard at the home address to a signed-in user', () => {
+    useAuth.mockReturnValue({ user: { name: 'Tri' }, loading: false });
+    renderAt('/');
+    expect(screen.getByText('Dashboard page')).toBeInTheDocument();
   });
 
   it('waits while a stored token is being checked, without redirecting', () => {

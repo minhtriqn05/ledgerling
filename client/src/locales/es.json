@@ -589,6 +589,7 @@
   },
   "settings": {
     "subtitle": "Tu perfil, la seguridad de tu cuenta y cómo se ve y se comporta Ledgerling.",
+    "demoNote": "Estás usando la cuenta demo compartida. La contraseña, las sesiones y la eliminación de la cuenta no están disponibles aquí.",
     "profile": {
       "title": "Perfil",
       "text": "Tu nombre aparece en el menú.",
@@ -712,6 +713,100 @@
       "enabling": "Activando…"
     }
   },
+  "welcome": {
+    "documentTitle": "Control de gastos personales",
+    "eyebrow": "Control de gastos personales",
+    "lead": "Ledgerling es una forma tranquila y sencilla de seguir tus ingresos y gastos, planificar presupuestos mensuales y ahorrar para lo que quieres.",
+    "getStarted": "Empezar",
+    "tryDemo": "Probar la demo",
+    "demoHint": "Sin registro. Explora una cuenta lista con tres meses de datos.",
+    "demoStarting": "Iniciando el servidor, puede tardar hasta un minuto…",
+    "featuresTitle": "Todo lo que necesitas para controlar tu dinero",
+    "features": {
+      "transactions": {
+        "title": "Registra cada movimiento",
+        "text": "Añade ingresos y gastos en segundos, con categorías, etiquetas y una línea rápida como «café 35k #work»."
+      },
+      "budgets": {
+        "title": "Presupuestos que avisan",
+        "text": "Fija un límite mensual por categoría y recibe un aviso al 80 % y al 100 %."
+      },
+      "recurring": {
+        "title": "Movimientos recurrentes",
+        "text": "El alquiler y el sueldo se añaden solos el día correcto, cada semana o cada mes."
+      },
+      "goals": {
+        "title": "Metas de ahorro",
+        "text": "Ahorra para un viaje o un fondo de emergencia y mira cómo crece el progreso."
+      },
+      "reports": {
+        "title": "Informes y análisis",
+        "text": "Informes mensuales, anuales y de calendario, con análisis claros de tus gastos."
+      },
+      "devices": {
+        "title": "Para todos tus dispositivos",
+        "text": "Instálala como app, úsala en 8 idiomas y elige un tema claro u oscuro."
+      }
+    },
+    "shotsTitle": "Míralo en acción",
+    "shots": {
+      "dashboard": {
+        "alt": "El panel de Ledgerling con los totales del mes, alertas de presupuesto, metas de ahorro y gráficos de gastos",
+        "caption": "Panel"
+      },
+      "transactions": {
+        "alt": "La lista de movimientos con búsqueda, filtros e iconos de categoría",
+        "caption": "Movimientos"
+      },
+      "budgets": {
+        "alt": "La página de presupuestos con barras de progreso, uno de ellos superado",
+        "caption": "Presupuestos"
+      },
+      "goals": {
+        "alt": "La página de metas de ahorro con el progreso de cada meta",
+        "caption": "Metas de ahorro"
+      }
+    },
+    "howTitle": "Cómo funciona",
+    "steps": {
+      "signUp": {
+        "title": "Crea una cuenta",
+        "text": "Regístrate en menos de un minuto o prueba primero la demo."
+      },
+      "addMoney": {
+        "title": "Añade tu dinero",
+        "text": "Anota lo que ganas y gastas, y fija presupuestos y metas cuando quieras."
+      },
+      "seePicture": {
+        "title": "Mira el panorama completo",
+        "text": "El panel y los informes muestran a dónde va tu dinero cada mes."
+      }
+    },
+    "footerNote": "Un proyecto del curso de Desarrollo de Aplicaciones Web (MSIS207).",
+    "github": "Ver en GitHub",
+    "opensInNewTab": "(se abre en una pestaña nueva)"
+  },
+  "onboarding": {
+    "title": "Empieza con Ledgerling",
+    "subtitle": "Tres pasos rápidos y tu panel cobra vida.",
+    "progress": "{{done}} de {{total}} hechos",
+    "done": "Hecho",
+    "todo": "Pendiente",
+    "steps": {
+      "transaction": {
+        "title": "Añade tu primer movimiento",
+        "text": "Registra un gasto o un ingreso."
+      },
+      "budget": {
+        "title": "Fija un presupuesto",
+        "text": "Elige un límite mensual para una categoría."
+      },
+      "goal": {
+        "title": "Crea una meta de ahorro",
+        "text": "Ahorra para algo que quieres."
+      }
+    }
+  },
   "errors": {
     "ACCOUNT_DISABLED": "Esta cuenta ha sido desactivada",
     "AMOUNT_INVALID": "El importe debe ser mayor que 0",
@@ -732,6 +827,8 @@
     "CURRENT_PASSWORD_REQUIRED": "La contraseña actual es obligatoria",
     "DATE_INVALID": "Fecha no válida, usa AAAA-MM-DD HH:mm o ISO 8601",
     "DEADLINE_IN_PAST": "La fecha límite debe ser posterior a hoy",
+    "DEMO_READ_ONLY": "Esto no está disponible en la cuenta demo",
+    "DEMO_UNAVAILABLE": "La demo no está disponible ahora. Inténtalo de nuevo más tarde.",
     "DEPOSIT_IN_USE": "Eliminar este depósito dejaría el importe ahorrado en negativo",
     "DUPLICATE_VALUE": "Este valor ya existe",
     "EMAIL_INVALID": "El correo electrónico no es válido",

@@ -28,11 +28,13 @@ function normalizeError(err) {
   }
   // Anything unexpected is a 500 with a fixed message: the real error (and its stack trace) goes to the server log only,
   // never into the answer, in production or anywhere else
+  // 503 is the exception: the service threw it on purpose ("Demo account is not available"), so its message is safe to show
   const status = err.status || 500;
+  const unexpected = status >= 500 && status !== 503;
   return {
     status,
-    message: status >= 500 ? "Internal server error" : err.message,
-    code: status >= 500 ? DEFAULT_CODES[500] : err.code ?? DEFAULT_CODES[status] ?? "REQUEST_ERROR",
+    message: unexpected ? "Internal server error" : err.message,
+    code: unexpected ? DEFAULT_CODES[500] : err.code ?? DEFAULT_CODES[status] ?? "REQUEST_ERROR",
   };
 }
 
@@ -40,6 +42,6 @@ function normalizeError(err) {
 // eslint-disable-next-line no-unused-vars
 export function errorHandler(err, req, res, next) {
   const { status, message, code } = normalizeError(err);
-  if (status >= 500) console.error(err);
+  if (status >= 500 && status !== 503) console.error(err);
   res.status(status).json({ success: false, message, code });
 }

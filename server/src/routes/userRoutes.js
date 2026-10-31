@@ -13,6 +13,7 @@ import {
   validateDeleteAccount,
 } from "../middlewares/validateUser.js";
 import { requireAuth } from "../middlewares/requireAuth.js";
+import { blockDemo } from "../middlewares/blockDemo.js";
 
 const router = Router();
 
@@ -110,9 +111,11 @@ router.use(requireAuth);
  *               code: WRONG_PASSWORD
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/DemoReadOnly'
  */
 router.patch("/me", validateProfile, updateProfile);
-router.delete("/me", validateDeleteAccount, deleteAccount);
+router.delete("/me", blockDemo, validateDeleteAccount, deleteAccount);
 
 /**
  * @openapi
@@ -159,8 +162,10 @@ router.delete("/me", validateDeleteAccount, deleteAccount);
  *               code: WRONG_PASSWORD
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/DemoReadOnly'
  */
-router.patch("/me/password", validatePasswordChange, changePassword);
+router.patch("/me/password", blockDemo, validatePasswordChange, changePassword);
 
 /**
  * @openapi

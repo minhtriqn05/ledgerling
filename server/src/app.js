@@ -54,6 +54,7 @@ export function createApp({ rateLimit = rateLimitWanted() } = {}) {
     app.use("/api", apiLimiter());
     app.use("/api/auth/login", authLimiter());
     app.use("/api/auth/register", authLimiter());
+    app.use("/api/auth/demo", authLimiter());
   }
   app.use((req, res, next) => (req.path === IMPORT_PATH ? importJson : defaultJson)(req, res, next));
   app.use("/api", rejectOperators);

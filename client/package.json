@@ -10,7 +10,9 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "generate-pwa-assets": "pwa-assets-generator",
-    "i18n:check": "node scripts/i18n-check.js"
+    "i18n:check": "node scripts/i18n-check.js",
+    "og-image": "node scripts/capture-og.mjs",
+    "screenshots": "playwright test -c playwright.screenshots.config.js"
   },
   "dependencies": {
     "axios": "^1.21.0",
@@ -26,6 +28,7 @@
     "recharts": "^3.10.1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
     "@playwright/test": "^1.64.1",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",

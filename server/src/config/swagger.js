@@ -95,6 +95,15 @@ const options = {
             },
           },
         },
+        DemoReadOnly: {
+          description: "The shared demo account cannot do this (code DEMO_READ_ONLY)",
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/ErrorResponse" },
+              example: { success: false, message: "Not available in the demo account", code: "DEMO_READ_ONLY" },
+            },
+          },
+        },
         TooManyRequests: {
           description: "More requests from this IP address than allowed in 15 minutes",
           content: {
@@ -133,6 +142,7 @@ const options = {
             email: { type: "string", example: "tri@example.com" },
             role: { type: "string", enum: ["user", "admin"], description: "Only an admin can open the Admin pages", example: "user" },
             status: { type: "string", enum: ["active", "disabled"], description: "A disabled account cannot log in", example: "active" },
+            isDemo: { type: "boolean", description: "true for the shared demo account (demo@example.com): the app hides the password, sessions and delete-account settings", example: false },
             preferences: {
               type: "object",
               properties: {

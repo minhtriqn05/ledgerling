@@ -108,7 +108,7 @@ export default function MonthlyTab({ month }) {
           {topCategories.length === 0 ? (
             <p className={styles.note}>{t('dashboard.noExpenses', { month: formatMonth(month) })}</p>
           ) : (
-            <div className={styles.tableWrap}>
+            <div className={styles.tableWrap} role="region" tabIndex={0} aria-label={t('reports.topCategories')}>
               <table className={styles.table}>
                 <thead>
                   <tr>

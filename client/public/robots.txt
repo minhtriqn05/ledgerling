@@ -1,0 +1,4 @@
+# Ledgerling is a public landing page plus a private app. Everything may be crawled; the signed-in pages
+# only show a login redirect to a crawler.
+User-agent: *
+Allow: /

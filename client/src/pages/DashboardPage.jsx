@@ -16,6 +16,7 @@ import Icon from '../components/Icon.jsx';
 import CountUp from '../components/Motion/CountUp.jsx';
 import Reveal from '../components/Motion/Reveal.jsx';
 import BudgetAlerts from './dashboard/BudgetAlerts.jsx';
+import GetStarted from './dashboard/GetStarted.jsx';
 import SavingsGoals from './dashboard/SavingsGoals.jsx';
 import CategoryMark from '../components/CategoryMark/CategoryMark.jsx';
 import InsightsCard from './reports/InsightsCard.jsx';
@@ -96,16 +97,20 @@ export default function DashboardPage() {
     // Nothing in the 6-month window at all: the cards and charts would only show zeros.
     const hasData = summary.byMonth.some((m) => m.income > 0 || m.expense > 0);
     if (!hasData) {
+      // The "Get started" card shows the first steps and ticks the budget and goal steps by itself.
       return (
-        <EmptyState
-          icon="chart"
-          title={t('transactions.noneInMonth', { month: formatMonth(month) })}
-          text={t('dashboard.emptyText')}
-        >
-          <Button icon="plus" onClick={() => navigate('/transactions')}>
-            {t('transactions.add')}
-          </Button>
-        </EmptyState>
+        <>
+          <GetStarted />
+          <EmptyState
+            icon="chart"
+            title={t('transactions.noneInMonth', { month: formatMonth(month) })}
+            text={t('dashboard.emptyText')}
+          >
+            <Button icon="plus" onClick={() => navigate('/transactions')}>
+              {t('transactions.add')}
+            </Button>
+          </EmptyState>
+        </>
       );
     }
 
