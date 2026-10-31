@@ -11,6 +11,8 @@ process.env.JWT_SECRET = "e2e-secret";
 process.env.JWT_EXPIRES_IN = "1h";
 // The Vite dev server that Playwright opens
 process.env.CLIENT_URL = "http://localhost:5174";
+// The tests make hundreds of requests from one address, so the rate limits (src/app.js) are off
+process.env.RATE_LIMIT_OFF = "true";
 
 const mongod = await MongoMemoryServer.create();
 await mongoose.connect(mongod.getUri());

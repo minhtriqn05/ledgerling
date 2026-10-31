@@ -57,6 +57,8 @@ const router = Router();
  *             example:
  *               success: false
  *               message: Email is already registered
+ *       429:
+ *         $ref: '#/components/responses/TooManyRequests'
  */
 router.post("/register", validateRegister, register);
 
@@ -112,6 +114,8 @@ router.post("/register", validateRegister, register);
  *               success: false
  *               message: Account disabled
  *               code: ACCOUNT_DISABLED
+ *       429:
+ *         $ref: '#/components/responses/TooManyRequests'
  */
 router.post("/login", validateLogin, login);
 

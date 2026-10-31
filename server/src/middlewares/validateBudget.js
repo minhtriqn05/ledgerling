@@ -74,7 +74,7 @@ export function validateBudgetId(req, res, next) {
 // The optional ?month= filter. Only checked when it is present.
 export function validateListBudgets(req, res, next) {
   const { month } = req.query;
-  if (month !== undefined && !MONTH_REGEX.test(month)) {
+  if (month !== undefined && (typeof month !== "string" || !MONTH_REGEX.test(month))) {
     throw httpError(400, "Month must be in YYYY-MM format", "MONTH_INVALID");
   }
   next();

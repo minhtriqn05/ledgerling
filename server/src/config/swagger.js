@@ -17,6 +17,8 @@ const options = {
         "Success: `{ \"success\": true, \"data\": ... }`. Error: `{ \"success\": false, \"message\": \"...\", \"code\": \"...\" }`.",
         "`message` is English text for people; `code` is a stable identifier such as `EMAIL_TAKEN`, `INVALID_CREDENTIALS`, `CATEGORY_IN_USE` or `VALIDATION_ERROR`, which a client can translate.",
         "Every route can also answer 500 (server error). A body that is not valid JSON gets 400 `Invalid JSON body`.",
+        "",
+        "**Limits:** each IP address may send 300 requests to `/api` and 20 requests to `/auth/login` + `/auth/register` per 15 minutes (more gets 429 `RATE_LIMITED`; `/health` is free). A JSON body is limited to 100 kB (300 kB for `POST /transactions/import`); a bigger one gets 413 `PAYLOAD_TOO_LARGE`. A body key that starts with `$` or contains `.`, or a query key that starts with `$` or contains `[`, gets 400 `INVALID_INPUT`.",
       ].join("\n"),
     },
     servers: [{ url: "/api" }],
@@ -90,6 +92,24 @@ const options = {
             "application/json": {
               schema: { $ref: "#/components/schemas/ErrorResponse" },
               example: { success: false, message: "You do not have permission to do this", code: "FORBIDDEN" },
+            },
+          },
+        },
+        TooManyRequests: {
+          description: "More requests from this IP address than allowed in 15 minutes",
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/ErrorResponse" },
+              example: { success: false, message: "Too many requests, please try again later", code: "RATE_LIMITED" },
+            },
+          },
+        },
+        PayloadTooLarge: {
+          description: "The JSON body is bigger than the limit (100 kB, or 300 kB for the CSV import)",
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/ErrorResponse" },
+              example: { success: false, message: "Request body is too large", code: "PAYLOAD_TOO_LARGE" },
             },
           },
         },

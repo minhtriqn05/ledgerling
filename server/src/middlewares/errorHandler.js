@@ -10,6 +10,10 @@ function normalizeError(err) {
   if (err.type === "entity.parse.failed") {
     return { status: 400, message: "Invalid JSON body", code: "INVALID_JSON" };
   }
+  // Body bigger than the limit of express.json() (see app.js)
+  if (err.type === "entity.too.large") {
+    return { status: 413, message: "Request body is too large", code: "PAYLOAD_TOO_LARGE" };
+  }
   // Mongoose schema validation failed
   if (err.name === "ValidationError") {
     return { status: 400, message: err.message, code: "VALIDATION_ERROR" };
@@ -22,11 +26,13 @@ function normalizeError(err) {
   if (err.code === 11000) {
     return { status: 409, message: "Duplicate value", code: "DUPLICATE_VALUE" };
   }
+  // Anything unexpected is a 500 with a fixed message: the real error (and its stack trace) goes to the server log only,
+  // never into the answer, in production or anywhere else
   const status = err.status || 500;
   return {
     status,
-    message: status === 500 ? "Internal server error" : err.message,
-    code: status === 500 ? DEFAULT_CODES[500] : err.code ?? DEFAULT_CODES[status] ?? "REQUEST_ERROR",
+    message: status >= 500 ? "Internal server error" : err.message,
+    code: status >= 500 ? DEFAULT_CODES[500] : err.code ?? DEFAULT_CODES[status] ?? "REQUEST_ERROR",
   };
 }
 
@@ -34,6 +40,6 @@ function normalizeError(err) {
 // eslint-disable-next-line no-unused-vars
 export function errorHandler(err, req, res, next) {
   const { status, message, code } = normalizeError(err);
-  if (status === 500) console.error(err);
+  if (status >= 500) console.error(err);
   res.status(status).json({ success: false, message, code });
 }

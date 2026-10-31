@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
@@ -6,6 +6,7 @@ import ApiStatus from '../ApiStatus/ApiStatus.jsx';
 import Avatar from '../Avatar/Avatar.jsx';
 import Icon from '../Icon.jsx';
 import LanguageSwitcher from '../LanguageSwitcher/LanguageSwitcher.jsx';
+import LoadingState from '../LoadingState/LoadingState.jsx';
 import Logo from '../Logo/Logo.jsx';
 import NotificationBell from '../Notifications/NotificationBell.jsx';
 import QuickAddButton from '../QuickAdd/QuickAddButton.jsx';
@@ -168,7 +169,10 @@ function Layout() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.22, ease: [0.22, 0.61, 0.36, 1] }}
           >
-            <Outlet key={pageKey} />
+            {/* The page is downloaded the first time it opens (see App.jsx); the sidebar stays on screen meanwhile */}
+            <Suspense fallback={<LoadingState spacious />}>
+              <Outlet key={pageKey} />
+            </Suspense>
           </motion.div>
         </main>
         <footer className={styles.footer}>

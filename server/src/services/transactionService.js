@@ -16,7 +16,7 @@ const CATEGORY_FIELDS = "name color icon";
 
 // The category must belong to the same user, otherwise it looks like it does not exist (404)
 async function findOwnedCategory(userId, categoryId) {
-  const category = await Category.findOne({ _id: categoryId, userId });
+  const category = await Category.findOne({ _id: categoryId, userId }).select("type").lean();
   if (!category) throw httpError(404, "Category not found", "CATEGORY_NOT_FOUND");
   return category;
 }
@@ -155,7 +155,7 @@ export async function deleteTransaction(userId, id) {
 // the rows it already refused. A row whose category (name + type) is not one of the user's categories is
 // refused here: categories are never created by an import. Only the good rows are saved.
 export async function importTransactions(userId, rows, errors) {
-  const categories = await Category.find({ userId });
+  const categories = await Category.find({ userId }).select("name type").lean();
   const byNameAndType = new Map(categories.map((c) => [`${c.type}:${c.name.toLowerCase()}`, c]));
 
   const docs = [];

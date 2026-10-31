@@ -16,6 +16,14 @@ Swagger UI: `/api-docs` (outside `/api`).
   to the 1st of the next month at 00:00 +07:00.
   Example `2026-10` → `2026-09-30T17:00:00.000Z` ≤ date < `2026-10-31T17:00:00.000Z`.
 - **Dates** are ISO 8601 strings; the server stores them in UTC.
+- **Limits** (per IP address, counted in the memory of the server, so they start again after a restart):
+  300 requests per 15 minutes to `/api` (`/api/health` is free) and 20 requests per 15 minutes to
+  `POST /auth/login` + `POST /auth/register`. More gets 429 `RATE_LIMITED`. A JSON body can be at most 100 kB
+  (300 kB for `POST /transactions/import`); a bigger one gets 413 `PAYLOAD_TOO_LARGE`.
+- **Input safety**: a body key that starts with `$` or contains `.`, or a query key that starts with `$` or contains `[`
+  (for example `?month[$ne]=x`), gets 400 `INVALID_INPUT`. Besides that, every route turns each field into the type it
+  expects (string, number, ObjectId) before it reaches the database; a query value sent twice (`?month=a&month=b`) is refused.
+- **Security headers** (helmet) are on every answer, and answers are gzip-compressed when the client accepts it.
 - **Updates** use PATCH: send only the fields you want to change (at least one). The exception is
   `PUT /recurring/:id`, which replaces the whole rule.
 
@@ -30,7 +38,9 @@ Swagger UI: `/api-docs` (outside `/api`).
 | 403 | Signed in but not allowed: not an admin on `/api/admin/*` (`FORBIDDEN`), a disabled account at login (`ACCOUNT_DISABLED`), or an admin trying to disable himself or another admin |
 | 404 | Not found, belongs to another user, malformed `:id` in the URL, or unknown route (`"Route not found"`) |
 | 409 | Duplicate (email, category name, budget of the same category and month, two transactions of one recurring rule on the same date) or conflict (category still has transactions or recurring rules) |
-| 500 | Server error |
+| 413 | JSON body bigger than 100 kB (300 kB for the CSV import) → `PAYLOAD_TOO_LARGE` |
+| 429 | Too many requests from one IP address → `RATE_LIMITED` |
+| 500 | Server error (the answer never holds a stack trace; the details go to the server log) |
 
 ### Error codes
 
@@ -41,11 +51,13 @@ When the place that throws an error names no specific code, the status gives a d
 
 | Status | Codes |
 |--------|-------|
-| 400 | `VALIDATION_ERROR`, `INVALID_JSON`, `NAME_REQUIRED`, `NAME_TOO_LONG`, `EMAIL_INVALID`, `PASSWORD_REQUIRED`, `PASSWORD_TOO_SHORT`, `PASSWORD_TOO_LONG`, `CURRENT_PASSWORD_REQUIRED`, `NEW_PASSWORD_TOO_SHORT`, `PASSWORD_UNCHANGED`, `WRONG_PASSWORD`, `TYPE_INVALID`, `TYPE_LOCKED`, `COLOR_INVALID`, `ICON_INVALID`, `CATEGORY_REQUIRED`, `AMOUNT_INVALID`, `CURRENCY_INVALID`, `NOTE_TOO_LONG`, `DATE_INVALID`, `TAG_INVALID`, `TOO_MANY_TAGS`, `MONTH_INVALID`, `BUDGET_EXPENSE_ONLY`, `END_BEFORE_START`, `TARGET_INVALID`, `DEADLINE_IN_PAST`, `WITHDRAW_TOO_MUCH`, `DEPOSIT_IN_USE`, `IMPORT_TOO_MANY_ROWS`, `STATUS_INVALID` |
+| 400 | `VALIDATION_ERROR`, `INVALID_JSON`, `NAME_REQUIRED`, `NAME_TOO_LONG`, `EMAIL_INVALID`, `PASSWORD_REQUIRED`, `PASSWORD_TOO_SHORT`, `PASSWORD_TOO_LONG`, `CURRENT_PASSWORD_REQUIRED`, `NEW_PASSWORD_TOO_SHORT`, `PASSWORD_UNCHANGED`, `WRONG_PASSWORD`, `TYPE_INVALID`, `TYPE_LOCKED`, `COLOR_INVALID`, `ICON_INVALID`, `CATEGORY_REQUIRED`, `AMOUNT_INVALID`, `CURRENCY_INVALID`, `NOTE_TOO_LONG`, `DATE_INVALID`, `TAG_INVALID`, `TOO_MANY_TAGS`, `MONTH_INVALID`, `BUDGET_EXPENSE_ONLY`, `END_BEFORE_START`, `TARGET_INVALID`, `DEADLINE_IN_PAST`, `WITHDRAW_TOO_MUCH`, `DEPOSIT_IN_USE`, `IMPORT_TOO_MANY_ROWS`, `STATUS_INVALID`, `INVALID_INPUT` |
 | 401 | `TOKEN_MISSING`, `TOKEN_INVALID`, `INVALID_CREDENTIALS` |
 | 403 | `FORBIDDEN`, `ACCOUNT_DISABLED`, `CANNOT_DISABLE_SELF`, `CANNOT_DISABLE_ADMIN` |
 | 404 | `USER_NOT_FOUND`, `ROUTE_NOT_FOUND`, `CATEGORY_NOT_FOUND`, `TRANSACTION_NOT_FOUND`, `BUDGET_NOT_FOUND`, `RULE_NOT_FOUND`, `GOAL_NOT_FOUND`, `CONTRIBUTION_NOT_FOUND`, `TEMPLATE_NOT_FOUND`, `NOTIFICATION_NOT_FOUND` |
 | 409 | `EMAIL_TAKEN`, `CATEGORY_EXISTS`, `CATEGORY_IN_USE`, `CATEGORY_HAS_RULES`, `BUDGET_EXISTS`, `DUPLICATE_VALUE` |
+| 413 | `PAYLOAD_TOO_LARGE` |
+| 429 | `RATE_LIMITED` |
 | 500 | `INTERNAL_ERROR` |
 
 Example: `{ "success": false, "message": "Email is already registered", "code": "EMAIL_TAKEN" }`.

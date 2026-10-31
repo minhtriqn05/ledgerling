@@ -18,6 +18,8 @@ const budgetSchema = new mongoose.Schema(
 
 // One budget per category and month for each user
 budgetSchema.index({ userId: 1, categoryId: 1, month: 1 }, { unique: true });
+// The list of one month (GET /budgets?month=) and the copy from one month to another
+budgetSchema.index({ userId: 1, month: 1 });
 
 // userId and __v are internal. categoryId is always populated, so it is returned as "category".
 budgetSchema.set("toJSON", {

@@ -24,6 +24,8 @@ const transactionSchema = new mongoose.Schema(
 
 // Speeds up the monthly list: filter by user and month, newest first
 transactionSchema.index({ userId: 1, date: -1 });
+// The category filter of the list, newest first
+transactionSchema.index({ userId: 1, categoryId: 1, date: -1 });
 // Speeds up the tag filter and the tag list (one entry per tag of each transaction)
 transactionSchema.index({ userId: 1, tags: 1 });
 // A rule never creates two transactions for the same date, even when requests run at the same time.

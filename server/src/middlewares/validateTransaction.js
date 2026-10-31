@@ -154,13 +154,13 @@ function readFilters(query) {
   if (month !== undefined && (from !== undefined || to !== undefined)) {
     throw httpError(400, "Use either month or from/to, not both");
   }
-  if (month !== undefined && !MONTH_REGEX.test(month)) {
+  if (month !== undefined && (typeof month !== "string" || !MONTH_REGEX.test(month))) {
     throw httpError(400, "Month must be in YYYY-MM format", "MONTH_INVALID");
   }
   if (type !== undefined && !TYPES.includes(type)) {
     throw httpError(400, "Type must be income or expense", "TYPE_INVALID");
   }
-  if (categoryId !== undefined && !OBJECT_ID_REGEX.test(categoryId)) {
+  if (categoryId !== undefined && (typeof categoryId !== "string" || !OBJECT_ID_REGEX.test(categoryId))) {
     throw httpError(400, "Category id is invalid");
   }
   if (sort !== undefined && !SORTS.includes(sort)) {
