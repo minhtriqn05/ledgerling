@@ -145,7 +145,7 @@ test('a switch that is off creates no notification of that kind', async ({ page 
   //    the notifications is what makes this week's summary.
   await page.goto('/notifications');
   await expect(page.getByText('Your week in numbers')).toBeVisible();
-  await page.goto('/settings');
+  await page.goto('/settings/notifications');
   await expect(budgetSwitch).not.toBeChecked();
   await budgetSwitch.check();
   await expect(budgetSwitch).toBeChecked();

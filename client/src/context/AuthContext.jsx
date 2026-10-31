@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import api from '../api/axios.js';
 import { clearApiCache } from '../utils/apiCache.js';
+import { SESSION_EXPIRED_EVENT } from '../utils/sessionEvents.js';
 
 // Holds the signed-in user and the JWT for the whole app.
 // The token is also kept in localStorage (see CLAUDE.md) so the session survives a page refresh;
@@ -16,6 +17,19 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   // True while a stored token is being checked with GET /auth/me. Without a token there is nothing to wait for.
   const [loading, setLoading] = useState(() => Boolean(localStorage.getItem('token')));
+  // The API refused the token while the app was open. The user stays, so the page stays behind the "Session expired"
+  // dialog; the flag also tells ProtectedRoute to go to /login (and come back here) instead of the landing page.
+  const [sessionExpired, setSessionExpired] = useState(false);
+
+  // A request (api/axios.js) was answered with 401: the token is already gone. The closed token also ends the socket.
+  useEffect(() => {
+    function handleExpired() {
+      setToken(null);
+      setSessionExpired(true);
+    }
+    window.addEventListener(SESSION_EXPIRED_EVENT, handleExpired);
+    return () => window.removeEventListener(SESSION_EXPIRED_EVENT, handleExpired);
+  }, []);
 
   // On first load: if a token is stored, ask the API who it belongs to.
   useEffect(() => {
@@ -46,6 +60,7 @@ export function AuthProvider({ children }) {
     localStorage.setItem('token', token);
     setToken(token);
     setUser(user);
+    setSessionExpired(false);
   }
 
   function clearSession() {
@@ -54,6 +69,24 @@ export function AuthProvider({ children }) {
     clearApiCache();
     setToken(null);
     setUser(null);
+  }
+
+  // A normal "Log out": no trace of a session that expired before it
+  function logout() {
+    clearSession();
+    setSessionExpired(false);
+  }
+
+  // The socket heard that the token stopped working (see SocketContext): the same dialog as a 401
+  function expireSession() {
+    window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT));
+    localStorage.removeItem('token');
+    clearApiCache();
+  }
+
+  // "Log in again" in the dialog: the user goes, sessionExpired stays, so ProtectedRoute remembers this page in state.from
+  function endExpiredSession() {
+    clearSession();
   }
 
   // login and register throw when the API answers with an error, so the page can show the message.
@@ -77,7 +110,20 @@ export function AuthProvider({ children }) {
   // updateUser puts a fresh copy of the user in place (e.g. after the settings changed), without touching the token.
   // saveSession stores a new token with its user: the API sends one after the password changed or after
   // "log out of all devices", because the old token (the one in localStorage) stopped working at that moment.
-  const value = { user, token, loading, login, loginAsDemo, register, logout: clearSession, updateUser: setUser, saveSession };
+  const value = {
+    user,
+    token,
+    loading,
+    login,
+    loginAsDemo,
+    register,
+    logout,
+    updateUser: setUser,
+    saveSession,
+    sessionExpired,
+    expireSession,
+    endExpiredSession,
+  };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

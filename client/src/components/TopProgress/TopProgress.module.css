@@ -1,0 +1,43 @@
+.track {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 40;
+  height: 3px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* A short piece of the hero gradient that keeps crossing the window */
+.bar {
+  display: block;
+  width: 40%;
+  height: 100%;
+  border-radius: 0 var(--radius-full) var(--radius-full) 0;
+  background: var(--gradient-hero);
+  animation: cross 1.1s var(--ease-out) infinite;
+}
+
+@keyframes cross {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}
+
+/* No movement: the bar simply fills the edge while something loads */
+@media (prefers-reduced-motion: reduce) {
+  .bar {
+    width: 100%;
+    border-radius: 0;
+  }
+}
+
+@media print {
+  .track {
+    display: none;
+  }
+}

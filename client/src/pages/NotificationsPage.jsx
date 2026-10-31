@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { deleteNotification, getNotifications, markAllRead, markRead } from '../api/notifications.js';
@@ -32,25 +32,30 @@ export default function NotificationsPage() {
   const [meta, setMeta] = useState({ page: 1, limit: PAGE_SIZE, total: 0, totalPages: 0 });
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
+  // The number of the newest request: a slower answer to an older one (another filter) must not replace the list
+  const latestRequest = useRef(0);
 
   // Loads the page on screen. `silent` keeps the list in place (no loading text) for a refresh after a change.
   const load = useCallback(
     async ({ silent = false } = {}) => {
+      latestRequest.current += 1;
+      const request = latestRequest.current;
       if (!silent) {
         setLoading(true);
         setLoadError('');
       }
       try {
         const result = await getNotifications({ page, limit: PAGE_SIZE, unread: filter === 'unread' });
+        if (request !== latestRequest.current) return;
         setItems(result.items);
         setMeta(result.meta);
         setLoadError('');
         // Listing may have made the weekly summary, so the number on the bell can have changed
         refreshUnread();
       } catch (err) {
-        if (!silent) setLoadError(getErrorMessage(err));
+        if (!silent && request === latestRequest.current) setLoadError(getErrorMessage(err));
       } finally {
-        setLoading(false);
+        if (request === latestRequest.current) setLoading(false);
       }
     },
     [page, filter, refreshUnread]
@@ -137,7 +142,7 @@ export default function NotificationsPage() {
         title={t('nav.notifications')}
         subtitle={!loading && !loadError ? t('notifications.unreadCount', { count: unread }) : undefined}
       >
-        <Button variant="secondary" icon="settings" onClick={() => navigate('/settings#notifications')}>
+        <Button variant="secondary" icon="settings" onClick={() => navigate('/settings/notifications')}>
           {t('notifications.settingsLink')}
         </Button>
         <Button needsNetwork variant="secondary" icon="check" onClick={handleMarkAll} disabled={unread === 0}>

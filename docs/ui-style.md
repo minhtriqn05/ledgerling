@@ -48,7 +48,7 @@ Principles:
 | v3 | Sage green on soft paper | Too dark and muted; the ochre category color was disliked; charts looked like library defaults. |
 | v4 | Sky & Mint, pastel | Brighter and softer; charts redesigned in the asklepios style. Felt a bit monotonous. |
 | v5 | Sky & Mint + accents | Vivid sky-to-teal hero, colored icon tiles, savings ring, tinted summary cards, category stripes and bars. All MVP screens designed. |
-| **v6 (current)** | **Sky & Mint, refined + motion** | New "Ruled L" logo (`docs/brand/`), floating sidebar on a deeper canvas, banner page headers, pill rows, tight negative-spread shadows, short motion, line icons for categories instead of letters, 8 languages. Ideas from porto-exp, see `docs/brand/inspiration.md`. |
+| **v6 (current)** | **Sky & Mint, refined + motion** | New "Ruled L" logo (`docs/brand/`), floating sidebar on a deeper canvas, banner page headers, pill rows, tight negative-spread shadows, short motion, line icons for categories instead of letters, 8 languages. Ideas from porto-exp, see `docs/brand/inspiration.md`. Later: Settings in sections, folding sidebar and cards, command palette. |
 
 ## 3. Color palette
 
@@ -212,13 +212,35 @@ Movements stay within 150–400ms; only the skeleton shimmer repeats while data 
 
 - **App frame:** a floating white sidebar (248px, `--radius-xl`, `--frame-gap` 12px around it) on the `--color-bg`
   canvas + the main area (32px padding).
-- **Sidebar:** the logo (`components/Logo/`: the mark + the wordmark drawn as strokes), nav items with line icons,
-  active item = primary-soft pill + primary-text; the language switcher; user block (sun-tinted initials) and
-  "Log out" at the bottom.
+- **Sidebar:** the logo (`components/Logo/`: the mark + the wordmark drawn as strokes; a link to `/welcome`), the search
+  button of the command palette, nav items with line icons, active item = primary-soft pill + primary-text; at the
+  bottom the language switcher and the fold button, then the account card, which opens the user menu.
+- **Folded sidebar:** the fold button or the `[` key shrink it to `--sidebar-width-collapsed` (72px): only icons, the name
+  of each one in a dark tooltip next to it on hover and keyboard focus. The column width moves in `--duration-base`, off with
+  prefers-reduced-motion. The choice is kept in localStorage (`ledgerling.sidebarCollapsed`). A phone has no sidebar to fold.
+- **User menu** (`components/UserMenu/`): a `Popover` with Profile, Settings, Theme (three round icon buttons), Keyboard
+  shortcuts, Take the tour and Log out. Arrows move the focus, Escape goes back to the card.
+- **Command palette** (`components/CommandPalette/`): Ctrl+K / Cmd+K, or the search button. A text box over a list grouped
+  in Pages, Commands and Transactions (search by note, from 2 letters, 250ms after the last key). Accents do not matter when typing.
+- **Guided tour** (`components/Tour/`, steps in `utils/tour.js`): a native `<dialog>` with a hole in the dark made by the big
+  shadow of a transparent box, and a card next to the element. On a phone the menu opens for the steps inside it. It starts
+  once per browser (`ledgerling.tourSeen`) and comes back from the user menu.
+- **Top progress bar** (`components/TopProgress/`): 3px of the hero gradient along the top edge, after a page change and while
+  requests are on their way, not for anything shorter than 120ms. With reduced motion it is a still bar.
+- **Skip link** (`components/SkipLink/`): the first stop of the Tab key, hidden until it has the focus.
+- **Session expired** (`components/SessionExpiredDialog/`): a 401 shows a dialog over the page; the login comes back to that page.
 - **Logo:** "Ruled L", see `docs/brand/README.md`. The same mark is the favicon and the PWA icons.
-- **Language switcher** (`components/LanguageSwitcher/`): our `Select` (pill variant) with the lucide "languages" icon, each
-  language written in its own language; the list opens upward when the sidebar has no room below. In the sidebar, in the phone menu and on Login / Register. English is the default; the choice
-  is kept in localStorage.
+- **Language switcher** (`components/LanguageSwitcher/`): our `Select` (pill variant) closed as a globe + the short code (EN, VI,
+  FR, DE, ES, ZH, JA, KO); only the code in the folded sidebar. The list has each language written in its own language, its
+  code and a tick on the current one, and opens upward when the sidebar has no room below. In the sidebar, in the phone menu
+  and on the public pages. English is the default; the choice is kept in localStorage.
+- **Breadcrumb** (`components/Breadcrumbs/`, trail in `config/breadcrumbs.js`): starts with a Home icon to `/welcome`, then
+  the page and the level below it. On a phone: the Home icon and "‹ the level above".
+- **Back** (`components/BackButton/`): a quiet pill "‹ Back" on a page below another one (a section of Settings, Admin / Users,
+  the transaction drawer) and on About, Privacy and Terms.
+- **Collapsible cards** (`components/CollapsibleCard/`): the large cards of the Dashboard and Reports fold up to their title
+  with a chevron in the corner, one state per card in localStorage. A grid row moves between 1fr and 0fr; the content stays
+  mounted, so a chart does not draw again. Printing opens every card.
 - **Navigation items:** one array, `navItems` in `client/src/config/navItems.js` (`label`, `path`, optional
   `icon`). Adding a page to the menu is one new line there plus its route in `App.jsx`.
 - **Active page:** primary-soft background, primary-text, semibold, plus a 4px primary bar on the left
@@ -264,6 +286,13 @@ Movements stay within 150–400ms; only the skeleton shimmer repeats while data 
     delete or save error is an error toast with the server's message (e.g. "Category still has
     transactions", "Category already exists"); a success is a success toast ("Category added",
     "Category updated", "Category deleted"). Our own checks ("Please enter a name.") stay as an alert in the form.
+- **Settings:** one section at a time, each with its own address (`/settings/profile`, `security`, `appearance`, `preferences`,
+  `notifications`, `app`, `data`, `danger`; the list is `config/settingsSections.js`). From 960px: a sticky column on the left
+  (icon tile, name, one line of text) and the open section on the right; `/settings` opens Profile. Below 960px: `/settings` is
+  the list as cards, a section has the page to itself with "‹ Back" to the list. Danger zone stands apart, with a red border
+  in the menu cards and around its own card. Leaving Profile or Security with unsaved changes asks first
+  (`context/UnsavedChangesContext.jsx`).
+- **About, Privacy, Terms** (`pages/StaticPage.jsx`): one white card of short text, linked from the footer of `/welcome`.
 - **Login (and Register):** gradient panel with headline and two floating mini cards (saved this
   month, this week's bars) · form with icon inputs (email, password + show button), full-width
   button, link to the other page. On phones the panel becomes a short banner. Register adds a

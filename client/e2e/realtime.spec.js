@@ -94,17 +94,20 @@ test('the bell counts a new notification at once', async ({ browser, request, ba
   await context.close();
 });
 
-test('log out of all devices: the other browser is logged out by itself', async ({ browser, request, baseURL }, testInfo) => {
+test('log out of all devices: the other browser says the session expired by itself, and its button leads to the login', async ({ browser, request, baseURL }, testInfo) => {
   const account = await newAccount(request);
   const options = { baseURL, ...testInfo.project.use };
-  const here = await openDevice(browser, account, '/settings', options);
+  const here = await openDevice(browser, account, '/settings/security', options);
   const there = await openDevice(browser, account, '/transactions', options);
 
   await here.page.getByRole('button', { name: 'Log out of all other devices' }).click();
 
-  await expect(there.page).toHaveURL(/\/login$/, { timeout: 10000 });
+  const expired = there.page.getByRole('dialog', { name: 'Session expired' });
+  await expect(expired).toBeVisible({ timeout: 10000 });
+  await expired.getByRole('button', { name: 'Log in again' }).click();
+  await expect(there.page).toHaveURL(/\/login$/);
   // This device got a new token and connects again
-  await expect(here.page).toHaveURL(/\/settings$/);
+  await expect(here.page).toHaveURL(/\/settings\/security$/);
   await expect(here.page.getByTestId('live-status')).toHaveAttribute('data-status', 'live', { timeout: 10000 });
 
   await Promise.all([here.context.close(), there.context.close()]);

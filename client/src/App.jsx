@@ -7,6 +7,8 @@ import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute.jsx';
 import AdminRoute from './components/AdminRoute/AdminRoute.jsx';
 import LoadingState from './components/LoadingState/LoadingState.jsx';
 import PreferencesSync from './components/PreferencesSync/PreferencesSync.jsx';
+import SkipLink from './components/SkipLink/SkipLink.jsx';
+import TopProgress from './components/TopProgress/TopProgress.jsx';
 
 // Every page is its own file in the build, downloaded the first time its address opens (code splitting).
 // The first page then loads only its own code, and the Recharts library only comes with the pages that draw charts.
@@ -22,7 +24,9 @@ const ReportsPage = lazy(() => import('./pages/ReportsPage.jsx'));
 const NotificationsPage = lazy(() => import('./pages/NotificationsPage.jsx'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage.jsx'));
 const AdminPage = lazy(() => import('./pages/AdminPage.jsx'));
+const AdminUsersPage = lazy(() => import('./pages/AdminUsersPage.jsx'));
 const WelcomePage = lazy(() => import('./pages/WelcomePage.jsx'));
+const StaticPage = lazy(() => import('./pages/StaticPage.jsx'));
 const LoginPage = lazy(() => import('./pages/LoginPage.jsx'));
 const RegisterPage = lazy(() => import('./pages/RegisterPage.jsx'));
 // null in the production build: the condition is known when building, so that page is not even built
@@ -35,11 +39,18 @@ export default function App() {
 
   return (
     <>
+      <SkipLink />
+      <TopProgress />
       <PreferencesSync />
       <Suspense fallback={<LoadingState fullScreen />}>
         <Routes>
-          {/* The public landing page: for a visitor, "/" leads here (ProtectedRoute); a signed-in user is sent to the Dashboard */}
+          {/* The public landing page: for a visitor, "/" leads here (ProtectedRoute); a signed-in user can open it too and sees "Open app" */}
           <Route path="/welcome" element={<WelcomePage />} />
+
+          {/* Short pages of text, open to everybody */}
+          <Route path="/about" element={<StaticPage page="about" />} />
+          <Route path="/privacy" element={<StaticPage page="privacy" />} />
+          <Route path="/terms" element={<StaticPage page="terms" />} />
 
           {/* Pages without the sidebar */}
           <Route element={<AuthLayout />}>
@@ -58,10 +69,12 @@ export default function App() {
               <Route path="/goals" element={<GoalsPage />} />
               <Route path="/reports" element={<ReportsPage />} />
               <Route path="/notifications" element={<NotificationsPage />} />
-              <Route path="/settings" element={<SettingsPage />} />
+              {/* /settings/profile, /settings/security...: the page reads the section from the address */}
+              <Route path="/settings/:section?" element={<SettingsPage />} />
               {/* Only for an admin; anybody else is sent to the Dashboard */}
               <Route element={<AdminRoute />}>
                 <Route path="/admin" element={<AdminPage />} />
+                <Route path="/admin/users" element={<AdminUsersPage />} />
               </Route>
             </Route>
           </Route>

@@ -5,7 +5,7 @@ import { useLoad } from '../../hooks/useLoad.js';
 import { useLiveRefresh } from '../../hooks/useLiveRefresh.js';
 import { formatDayMonth, formatNumber, formatVnd } from '../../utils/format.js';
 import { formatMonth, fromDateInput } from '../../utils/vnDate.js';
-import Card, { CardHeader } from '../../components/Card/Card.jsx';
+import CollapsibleCard from '../../components/CollapsibleCard/CollapsibleCard.jsx';
 import Button from '../../components/Button/Button.jsx';
 import LoadingState from '../../components/LoadingState/LoadingState.jsx';
 import Icon from '../../components/Icon.jsx';
@@ -42,7 +42,8 @@ function insightText(insight, t, i18n) {
 // "Insights" card: up to 6 tips about a month, built by the API from simple rules (GET /api/insights).
 // Used on the Dashboard and on the Monthly tab of Reports. Like the other dashboard cards it loads its own data,
 // so a failed request only affects this card. Four states: loading, error, no insights, the list.
-export default function InsightsCard({ month }) {
+// cardId: each page remembers on its own whether the card is folded.
+export default function InsightsCard({ month, cardId = 'dashboard.insights' }) {
   const { t, i18n } = useTranslation();
   const { data, loading, error, reload, refresh } = useLoad(() => getInsights(month), [month]);
   useLiveRefresh(['transactions', 'categories', 'budgets', 'goals'], refresh);
@@ -89,9 +90,8 @@ export default function InsightsCard({ month }) {
   }
 
   return (
-    <Card aria-label={t('insights.title')}>
-      <CardHeader icon="bulb" tone="periwinkle" title={t('insights.title')} subtitle={formatMonth(month)} />
+    <CollapsibleCard id={cardId} icon="bulb" tone="periwinkle" title={t('insights.title')} subtitle={formatMonth(month)} aria-label={t('insights.title')}>
       {renderBody()}
-    </Card>
+    </CollapsibleCard>
   );
 }

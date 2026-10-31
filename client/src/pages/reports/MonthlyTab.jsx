@@ -7,6 +7,7 @@ import { formatDate, formatPercent, formatVnd } from '../../utils/format.js';
 import { categoryLabel } from '../../utils/emoji.js';
 import { formatMonth } from '../../utils/vnDate.js';
 import Card, { CardHeader } from '../../components/Card/Card.jsx';
+import CollapsibleCard from '../../components/CollapsibleCard/CollapsibleCard.jsx';
 import Button from '../../components/Button/Button.jsx';
 import EmptyState from '../../components/EmptyState/EmptyState.jsx';
 import LoadingState from '../../components/LoadingState/LoadingState.jsx';
@@ -97,16 +98,14 @@ export default function MonthlyTab({ month }) {
       </section>
 
       <section className={styles.row}>
-        <Card className={styles.chartCard}>
-          <CardHeader icon="chart" tone="coral" title={t('reports.dailyExpense')} subtitle={formatMonth(month)} />
+        <CollapsibleCard id="reports.dailyExpense" className={styles.chartCard} icon="chart" tone="coral" title={t('reports.dailyExpense')} subtitle={formatMonth(month)}>
           <DailyExpenseChart dailyExpense={report.dailyExpense} month={month} />
-        </Card>
-        <InsightsCard month={month} />
+        </CollapsibleCard>
+        <InsightsCard month={month} cardId="reports.insights" />
       </section>
 
       <section className={styles.row}>
-        <Card>
-          <CardHeader icon="pie" tone="sun" title={t('reports.topCategories')} subtitle={t('reports.whereMoneyWent')} />
+        <CollapsibleCard id="reports.topCategories" icon="pie" tone="sun" title={t('reports.topCategories')} subtitle={t('reports.whereMoneyWent')}>
           {topCategories.length === 0 ? (
             <p className={styles.note}>{t('dashboard.noExpenses', { month: formatMonth(month) })}</p>
           ) : (
@@ -140,10 +139,9 @@ export default function MonthlyTab({ month }) {
               </table>
             </div>
           )}
-        </Card>
+        </CollapsibleCard>
 
-        <Card>
-          <CardHeader icon="categories" tone="periwinkle" title={t('reports.topTags')} subtitle={t('reports.expenseByTag')} />
+        <CollapsibleCard id="reports.topTags" icon="categories" tone="periwinkle" title={t('reports.topTags')} subtitle={t('reports.expenseByTag')}>
           {topTags.length === 0 ? (
             <p className={styles.note}>{t('reports.noTags', { month: formatMonth(month) })}</p>
           ) : (
@@ -159,7 +157,7 @@ export default function MonthlyTab({ month }) {
               ))}
             </ul>
           )}
-        </Card>
+        </CollapsibleCard>
       </section>
     </div>
   );

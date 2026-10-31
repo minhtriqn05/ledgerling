@@ -146,6 +146,7 @@
 
   /* ---------- Layout ---------- */
   --sidebar-width: 248px;
+  --sidebar-width-collapsed: 72px; /* only the icons */
   --frame-gap: 12px;      /* around the floating sidebar */
   --topbar-height: 56px;  /* top bar with the menu button on narrow screens */
   --content-max-width: 1200px;

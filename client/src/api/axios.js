@@ -1,6 +1,8 @@
 import axios from 'axios';
 import i18n from '../i18n/index.js';
 import { clearApiCache } from '../utils/apiCache.js';
+import { requestFinished, requestStarted } from '../utils/requestTracker.js';
+import { SESSION_EXPIRED_EVENT } from '../utils/sessionEvents.js';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -20,8 +22,21 @@ export function setSocketId(id) {
   socketId = id;
 }
 
+// The bell asks for its number in the background: that must not move the bar at the top of the page.
+const BACKGROUND_PREFIXES = ['/notifications'];
+
+function finishTracking(config) {
+  if (!config?.tracked) return;
+  config.tracked = false;
+  requestFinished();
+}
+
 // Attach the JWT (if any) to every request.
 api.interceptors.request.use((config) => {
+  if (!BACKGROUND_PREFIXES.some((prefix) => config.url?.startsWith(prefix))) {
+    config.tracked = true;
+    requestStarted();
+  }
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -32,11 +47,13 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// On 401 (missing/invalid/expired token), drop the token and go to the login page.
+// On 401 (missing/invalid/expired token), drop the token and tell the app: AuthContext shows the "Session expired"
+// dialog, so the page stays on screen and the login comes back to it.
 // Requests to /auth/* are skipped: a wrong password (login) or a stale token at start-up (me)
 // is handled by AuthContext and the login page, which show their own message.
 api.interceptors.response.use(
   (response) => {
+    finishTracking(response.config);
     const { method, url = '' } = response.config;
     if (method !== 'get' && !QUIET_PREFIXES.some((prefix) => url.startsWith(prefix))) {
       window.dispatchEvent(new Event(DATA_CHANGED_EVENT));
@@ -44,11 +61,12 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
+    finishTracking(error.config);
     const isAuthRequest = error.config?.url?.startsWith('/auth/');
     if (error.response?.status === 401 && !isAuthRequest) {
       localStorage.removeItem('token');
       clearApiCache();
-      window.location.href = '/login';
+      window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT));
     }
     return Promise.reject(error);
   }

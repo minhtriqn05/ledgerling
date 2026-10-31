@@ -69,7 +69,8 @@ test('logging out deletes the saved API answers', async ({ page }) => {
 
   const menu = page.getByRole('button', { name: 'Open menu' });
   if (await menu.isVisible()) await menu.click();
-  await page.getByRole('button', { name: 'Log out' }).click();
+  await page.getByTestId('account').click();
+  await page.getByRole('menuitem', { name: 'Log out' }).click();
   await expect(page).toHaveURL(/\/(login|welcome)$/);
   await page.waitForTimeout(300);
   expect(await page.evaluate(() => caches.has('ledgerling-api'))).toBe(false);
@@ -93,7 +94,7 @@ test('Settings offers the install: the button with the browser event, the instru
   await page.goto('/welcome');
   await page.getByRole('button', { name: 'Try the demo' }).click();
   await expect(page.getByRole('heading', { name: 'Dashboard', level: 1 })).toBeVisible();
-  await page.goto('/settings');
+  await page.goto('/settings/app');
   await expect(page.getByRole('heading', { name: 'Settings', level: 1 })).toBeVisible();
 
   // Chrome decides by itself when to send the event, so the test sends one

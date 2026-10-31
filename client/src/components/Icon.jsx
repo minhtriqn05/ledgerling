@@ -126,6 +126,37 @@ const paths = {
     </>
   ),
   menu: <path d="M4 7h16M4 12h16M4 17h16" />,
+  // A house, the first item of the breadcrumb
+  home: (
+    <>
+      <path d="m3 11 9-8 9 8" />
+      <path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5" />
+      <path d="M10 21v-6h4v6" />
+    </>
+  ),
+  globe: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3 12h18" />
+      <path d="M12 3c2.5 2.5 3.8 5.6 3.8 9s-1.3 6.5-3.8 9c-2.5-2.5-3.8-5.6-3.8-9S9.5 5.5 12 3z" />
+    </>
+  ),
+  // The sidebar: two chevrons that point the way it will move
+  chevronsLeft: <path d="m11 17-5-5 5-5M18 17l-5-5 5-5" />,
+  chevronsRight: <path d="m13 17 5-5-5-5M6 17l5-5-5-5" />,
+  keyboard: (
+    <>
+      <rect x="2" y="6" width="20" height="12" rx="2" />
+      <path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10" />
+    </>
+  ),
+  // A compass, for the guided tour
+  compass: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="m15.5 8.5-2 5-5 2 2-5z" />
+    </>
+  ),
   arrowUp: <path d="M12 19V5M5 12l7-7 7 7" />,
   arrowDown: <path d="M12 5v14M19 12l-7 7-7-7" />,
   // Three bars on a baseline, for Reports
@@ -166,6 +197,7 @@ const paths = {
   x: <path d="M18 6 6 18M6 6l12 12" />,
   chevronLeft: <path d="m15 18-6-6 6-6" />,
   chevronRight: <path d="m9 18 6-6-6-6" />,
+  chevronDown: <path d="m6 9 6 6 6-6" />,
   arrowDownLeft: <path d="M17 7 7 17M17 17H7V7" />,
   arrowUpRight: <path d="M7 17 17 7M7 7h10v10" />,
   chart: (

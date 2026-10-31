@@ -35,7 +35,9 @@
     "totalsFor": "{{period}} の合計",
     "tryAgain": "再試行",
     "type": "種類",
-    "viewAll": "すべて表示"
+    "viewAll": "すべて表示",
+    "back": "戻る",
+    "skipToContent": "本文へ移動"
   },
   "nav": {
     "admin": "管理",
@@ -51,11 +53,15 @@
     "recurring": "定期",
     "reports": "レポート",
     "settings": "設定",
-    "transactions": "取引"
+    "transactions": "取引",
+    "toWelcome": "トップページへ",
+    "collapseSidebar": "サイドバーを折りたたむ",
+    "expandSidebar": "サイドバーを広げる"
   },
   "breadcrumb": {
     "label": "パンくずリスト",
-    "transactionDetails": "取引の詳細"
+    "transactionDetails": "取引の詳細",
+    "home": "ホーム"
   },
   "language": {
     "label": "言語"
@@ -133,7 +139,9 @@
     "note": "入力欄に入力している間、ショートカットは無効です。",
     "quickAdd": "取引をすばやく追加",
     "search": "取引を検索",
-    "title": "キーボードショートカット"
+    "title": "キーボードショートカット",
+    "sidebar": "サイドバーの折りたたみ・展開",
+    "palette": "コマンドパレットを開く"
   },
   "errorPage": {
     "reload": "再読み込み",
@@ -664,6 +672,41 @@
       "button": "アプリをインストール",
       "manual": "お使いのブラウザにはインストールボタンがありません。iPhone または iPad：共有をタップし、ホーム画面に追加を選びます。Android：ブラウザのメニューを開き、ホーム画面に追加を選びます。",
       "installed": "Ledgerling はこのデバイスにインストールされています。"
+    },
+    "menuLabel": "設定のセクション",
+    "sections": {
+      "profile": {
+        "label": "プロフィール",
+        "description": "アバターと名前"
+      },
+      "security": {
+        "label": "セキュリティ",
+        "description": "パスワードとログイン中の端末"
+      },
+      "appearance": {
+        "label": "外観",
+        "description": "ライト、ダーク、端末に合わせる"
+      },
+      "preferences": {
+        "label": "表示設定",
+        "description": "週の始まりの曜日"
+      },
+      "notifications": {
+        "label": "通知",
+        "description": "受け取りたいお知らせ"
+      },
+      "app": {
+        "label": "アプリ",
+        "description": "この端末に Ledgerling をインストール"
+      },
+      "data": {
+        "label": "データ",
+        "description": "ここにあるものをすべてダウンロード"
+      },
+      "danger": {
+        "label": "危険な操作",
+        "description": "アカウントを完全に削除"
+      }
     }
   },
   "avatar": {
@@ -772,7 +815,9 @@
       "enable": "有効にする",
       "disableFor": "{{name}} を停止",
       "enableFor": "{{name}} を有効にする",
-      "noAction": "このアカウントは変更できません"
+      "noAction": "このアカウントは変更できません",
+      "pageText": "アカウントを検索し、無効化または有効化します。",
+      "manage": "ユーザーを管理"
     },
     "dialog": {
       "disableText": "{{name}} はすべての端末でログアウトされ、アカウントを再び有効にするまでログインできません。データは残ります。",
@@ -856,7 +901,8 @@
     },
     "footerNote": "UIT · CSBU109.R11.KHBC",
     "github": "GitHub で見る",
-    "opensInNewTab": "（新しいタブで開きます）"
+    "opensInNewTab": "（新しいタブで開きます）",
+    "openApp": "アプリを開く"
   },
   "onboarding": {
     "title": "Ledgerling をはじめよう",
@@ -960,5 +1006,126 @@
     "banner": "オフラインです – 保存済みのデータを表示しています",
     "note": "オンラインに戻るまで、追加・編集・削除はできません。",
     "locked": "オフラインでは利用できません"
+  },
+  "card": {
+    "collapse": "{{title}}を折りたたむ",
+    "expand": "{{title}}を開く"
+  },
+  "unsaved": {
+    "title": "保存せずに移動しますか？",
+    "text": "保存していない変更があります。今移動すると、変更は失われます。",
+    "stay": "とどまる",
+    "leave": "移動する"
+  },
+  "userMenu": {
+    "label": "アカウント",
+    "profile": "プロフィール"
+  },
+  "tour": {
+    "open": "ツアーを見る",
+    "skip": "スキップ",
+    "next": "次へ",
+    "done": "完了",
+    "counter": "ステップ {{step}} / {{total}}",
+    "steps": {
+      "quickAdd": {
+        "title": "クイック追加",
+        "text": "このボタンか N キーで、どのページからでも取引を追加できます。「コーヒー 35k #仕事」と入力してみましょう。"
+      },
+      "dashboard": {
+        "title": "ダッシュボード",
+        "text": "今月の収入、支出、残高、お金の行き先がひと目でわかります。"
+      },
+      "budgets": {
+        "title": "予算",
+        "text": "カテゴリごとに上限を設定できます。80% と 100% で警告が出ます。"
+      },
+      "reports": {
+        "title": "レポート",
+        "text": "1 か月、1 年、または支出カレンダーで確認できます。"
+      },
+      "settings": {
+        "title": "設定",
+        "text": "プロフィール、セキュリティ、テーマ、通知、データをそれぞれのセクションで管理します。"
+      },
+      "account": {
+        "title": "あなたのアカウント",
+        "text": "このメニューからテーマの変更、ショートカットの確認、ログアウト、ツアーの再表示ができます。"
+      }
+    }
+  },
+  "commandPalette": {
+    "open": "検索…",
+    "title": "移動先",
+    "placeholder": "ページ、コマンド、取引のメモを入力",
+    "searchLanguage": "言語を入力",
+    "results": "結果",
+    "toggleTheme": "テーマを切り替える",
+    "changeLanguage": "言語を変更する",
+    "searching": "取引を検索しています…",
+    "searchFailed": "現在、取引を検索できません。",
+    "noResults": "見つかりませんでした。",
+    "groups": {
+      "pages": "ページ",
+      "actions": "コマンド",
+      "transactions": "取引",
+      "languages": "言語"
+    }
+  },
+  "session": {
+    "title": "セッションの期限切れ",
+    "text": "安全のためログアウトしました。もう一度ログインすると、続きから再開できます。",
+    "logInAgain": "再度ログイン"
+  },
+  "legal": {
+    "linksLabel": "このサイトについて",
+    "about": {
+      "title": "概要",
+      "lead": "Ledgerling は、シンプルで落ち着いた個人向けの家計管理ツールです。",
+      "what": {
+        "title": "できること",
+        "text": "収入と支出の記録、カテゴリごとの予算設定、目標に向けた貯蓄、月次や年次のレポートの確認ができます。8 言語に対応し、スマートフォンでも使えます。"
+      },
+      "who": {
+        "title": "作った人",
+        "text": "UIT の授業「Web アプリケーションとデータベース開発」（クラス CSBU109.R11.KHBC）で、学生 1 人が制作した最終プロジェクトです。"
+      },
+      "built": {
+        "title": "作り方",
+        "text": "クライアントは React、API は Node.js と Express、データは MongoDB です。ソースコードは GitHub にあります。"
+      }
+    },
+    "privacy": {
+      "title": "プライバシー",
+      "lead": "Ledgerling が保存する情報をわかりやすく説明します。",
+      "collect": {
+        "title": "保存するもの",
+        "text": "名前、メールアドレス、アバター、暗号化したパスワード（bcrypt。パスワードそのものは保存しません）、そして入力した取引、カテゴリ、予算、ルール、目標です。広告や分析ツールはありません。"
+      },
+      "where": {
+        "title": "保存場所",
+        "text": "データは MongoDB Atlas のデータベースにあり、サイトは Vercel と Render で動いています。フォントは Google Fonts から読み込みます。ブラウザにはログイン用トークンと、テーマや言語などの選択が保存されます。"
+      },
+      "control": {
+        "title": "できること",
+        "text": "設定から全データを 1 つのファイルでダウンロードできます。アカウントを削除すると、そのアカウントのものはすべて消去されます。"
+      }
+    },
+    "terms": {
+      "title": "利用規約",
+      "lead": "Ledgerling は授業の課題なので、規約は短くまとめています。",
+      "use": {
+        "title": "利用について",
+        "text": "Ledgerling はご自身のお金の記録に使ってください。パスワードは他人に教えず、他の人のデータへのアクセスやサービスに過大な負荷をかける行為はしないでください。"
+      },
+      "data": {
+        "title": "あなたのデータ",
+        "text": "入力した内容はあなたのものです。規約に違反するアカウントは管理者が無効化することがあります。大切なものはコピーを保管してください。授業の終了時にサービスを停止またはリセットすることがあります。"
+      },
+      "warranty": {
+        "title": "保証なし",
+        "text": "本サービスは無料で、いかなる保証もありません。金融上の助言は行いません。表示される数字の正確さは入力内容によります。"
+      }
+    }
   }
 }

@@ -3,9 +3,9 @@ import PageTitle from '../PageTitle/PageTitle.jsx';
 import styles from './PageHeader.module.css';
 
 // Top of every signed-in page: a soft banner with the title and subtitle on the left, the page's main actions
-// (children) on the right. The title also becomes the text of the browser tab.
-export default function PageHeader({ title, subtitle, children }) {
-  useDocumentTitle(title);
+// (children) on the right. The title also becomes the text of the browser tab, unless documentTitle names a part of the page.
+export default function PageHeader({ title, subtitle, documentTitle, children }) {
+  useDocumentTitle(documentTitle ?? title);
 
   return (
     <header className={styles.header}>

@@ -26,7 +26,7 @@ vi.mock('socket.io-client', () => ({
 }));
 vi.mock('./AuthContext.jsx', () => ({ useAuth: vi.fn() }));
 
-const logout = vi.fn();
+const expireSession = vi.fn();
 
 function Listener({ onEvent }) {
   useSocketEvent('data:changed', (payload) => onEvent('data:changed', payload));
@@ -45,12 +45,12 @@ function renderProvider(onEvent = vi.fn()) {
 beforeEach(() => {
   vi.stubEnv('VITE_API_URL', 'http://api.test:4000/api');
   localStorage.setItem('token', 'token-1');
-  useAuth.mockReturnValue({ token: 'token-1', logout });
+  useAuth.mockReturnValue({ token: 'token-1', expireSession });
 });
 
 afterEach(() => {
   sockets.length = 0;
-  logout.mockClear();
+  expireSession.mockClear();
   localStorage.clear();
   vi.useRealTimers();
   vi.unstubAllEnvs();
@@ -65,7 +65,7 @@ describe('SocketProvider', () => {
   });
 
   it('does not connect without a token', () => {
-    useAuth.mockReturnValue({ token: null, logout });
+    useAuth.mockReturnValue({ token: null, expireSession });
     renderProvider();
     expect(sockets).toHaveLength(0);
   });
@@ -78,7 +78,7 @@ describe('SocketProvider', () => {
 
   it('opens a new socket for a new token', () => {
     const { rerender } = renderProvider();
-    useAuth.mockReturnValue({ token: 'token-2', logout });
+    useAuth.mockReturnValue({ token: 'token-2', expireSession });
     rerender(
       <SocketProvider>
         <span />
@@ -114,23 +114,23 @@ describe('SocketProvider', () => {
     expect(onEvent).toHaveBeenCalledWith('reconnected');
   });
 
-  it('logs out when the server refuses the token of this session', () => {
+  it('shows the Session expired dialog when the server refuses the token of this session', () => {
     renderProvider();
     act(() => sockets[0].fire('connect_error', new Error('TOKEN_INVALID')));
-    expect(logout).toHaveBeenCalledTimes(1);
+    expect(expireSession).toHaveBeenCalledTimes(1);
   });
 
-  it('does not log out when the refused token was already replaced on this device', () => {
+  it('says nothing when the refused token was already replaced on this device', () => {
     renderProvider();
     localStorage.setItem('token', 'token-2');
     act(() => sockets[0].fire('connect_error', new Error('TOKEN_INVALID')));
-    expect(logout).not.toHaveBeenCalled();
+    expect(expireSession).not.toHaveBeenCalled();
   });
 
-  it('does not log out on a network problem', () => {
+  it('says nothing on a network problem', () => {
     renderProvider();
     act(() => sockets[0].fire('connect_error', new Error('xhr poll error')));
-    expect(logout).not.toHaveBeenCalled();
+    expect(expireSession).not.toHaveBeenCalled();
   });
 
   it('asks again after the server closed the socket, unless a new token replaced it first', () => {
@@ -141,7 +141,7 @@ describe('SocketProvider', () => {
     expect(sockets[0].connect).toHaveBeenCalledTimes(1);
 
     act(() => sockets[0].fire('disconnect', 'io server disconnect'));
-    useAuth.mockReturnValue({ token: 'token-2', logout });
+    useAuth.mockReturnValue({ token: 'token-2', expireSession });
     rerender(
       <SocketProvider>
         <span />

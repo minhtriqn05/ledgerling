@@ -35,7 +35,9 @@
     "totalsFor": "Tổng cộng {{period}}",
     "tryAgain": "Thử lại",
     "type": "Loại",
-    "viewAll": "Xem tất cả"
+    "viewAll": "Xem tất cả",
+    "back": "Quay lại",
+    "skipToContent": "Bỏ qua, đến nội dung chính"
   },
   "nav": {
     "admin": "Quản trị",
@@ -51,11 +53,15 @@
     "recurring": "Định kỳ",
     "reports": "Báo cáo",
     "settings": "Cài đặt",
-    "transactions": "Giao dịch"
+    "transactions": "Giao dịch",
+    "toWelcome": "Về trang giới thiệu",
+    "collapseSidebar": "Thu gọn thanh bên",
+    "expandSidebar": "Mở rộng thanh bên"
   },
   "breadcrumb": {
     "label": "Đường dẫn trang",
-    "transactionDetails": "Chi tiết giao dịch"
+    "transactionDetails": "Chi tiết giao dịch",
+    "home": "Trang giới thiệu"
   },
   "language": {
     "label": "Ngôn ngữ"
@@ -133,7 +139,9 @@
     "note": "Phím tắt không hoạt động khi bạn đang gõ trong một ô nhập.",
     "quickAdd": "Thêm nhanh giao dịch",
     "search": "Tìm giao dịch",
-    "title": "Phím tắt"
+    "title": "Phím tắt",
+    "sidebar": "Thu gọn hoặc mở rộng thanh bên",
+    "palette": "Mở bảng lệnh"
   },
   "errorPage": {
     "reload": "Tải lại",
@@ -664,6 +672,41 @@
       "button": "Cài đặt ứng dụng",
       "manual": "Trình duyệt của bạn không có nút cài đặt. Trên iPhone hoặc iPad: chạm Chia sẻ, rồi Thêm vào MH chính. Trên Android: mở menu trình duyệt, rồi chọn Thêm vào màn hình chính.",
       "installed": "Ledgerling đã được cài trên thiết bị này."
+    },
+    "menuLabel": "Các mục cài đặt",
+    "sections": {
+      "profile": {
+        "label": "Hồ sơ",
+        "description": "Ảnh đại diện và tên của bạn"
+      },
+      "security": {
+        "label": "Bảo mật",
+        "description": "Mật khẩu và các thiết bị đang đăng nhập"
+      },
+      "appearance": {
+        "label": "Giao diện",
+        "description": "Sáng, tối hoặc theo thiết bị"
+      },
+      "preferences": {
+        "label": "Tùy chọn",
+        "description": "Ngày đầu tuần"
+      },
+      "notifications": {
+        "label": "Thông báo",
+        "description": "Những điều bạn muốn được báo"
+      },
+      "app": {
+        "label": "Ứng dụng",
+        "description": "Cài Ledgerling lên thiết bị này"
+      },
+      "data": {
+        "label": "Dữ liệu",
+        "description": "Tải về toàn bộ dữ liệu của bạn"
+      },
+      "danger": {
+        "label": "Vùng nguy hiểm",
+        "description": "Xóa vĩnh viễn tài khoản của bạn"
+      }
     }
   },
   "avatar": {
@@ -772,7 +815,9 @@
       "enable": "Mở khoá",
       "disableFor": "Khoá {{name}}",
       "enableFor": "Mở khoá {{name}}",
-      "noAction": "Không thể thay đổi tài khoản này"
+      "noAction": "Không thể thay đổi tài khoản này",
+      "pageText": "Tìm tài khoản, khóa hoặc mở khóa tài khoản đó.",
+      "manage": "Quản lý người dùng"
     },
     "dialog": {
       "disableText": "{{name}} sẽ bị đăng xuất trên mọi thiết bị và không đăng nhập được cho đến khi bạn mở khoá lại. Dữ liệu của họ vẫn được giữ.",
@@ -856,7 +901,8 @@
     },
     "footerNote": "UIT · CSBU109.R11.KHBC",
     "github": "Xem trên GitHub",
-    "opensInNewTab": "(mở trong tab mới)"
+    "opensInNewTab": "(mở trong tab mới)",
+    "openApp": "Mở ứng dụng"
   },
   "onboarding": {
     "title": "Bắt đầu với Ledgerling",
@@ -960,5 +1006,126 @@
     "banner": "Bạn đang ngoại tuyến – đang hiển thị dữ liệu đã lưu",
     "note": "Thêm, sửa và xoá sẽ bị tắt cho đến khi bạn có mạng trở lại.",
     "locked": "Không dùng được khi ngoại tuyến"
+  },
+  "card": {
+    "collapse": "Thu gọn {{title}}",
+    "expand": "Mở {{title}}"
+  },
+  "unsaved": {
+    "title": "Rời đi mà không lưu?",
+    "text": "Bạn có thay đổi chưa được lưu. Nếu rời trang bây giờ, các thay đổi đó sẽ mất.",
+    "stay": "Ở lại",
+    "leave": "Rời đi"
+  },
+  "userMenu": {
+    "label": "Tài khoản",
+    "profile": "Hồ sơ"
+  },
+  "tour": {
+    "open": "Xem hướng dẫn",
+    "skip": "Bỏ qua",
+    "next": "Tiếp",
+    "done": "Xong",
+    "counter": "Bước {{step}} / {{total}}",
+    "steps": {
+      "quickAdd": {
+        "title": "Thêm nhanh",
+        "text": "Thêm giao dịch từ mọi trang bằng nút này hoặc phím N. Thử gõ “cà phê 35k #work”."
+      },
+      "dashboard": {
+        "title": "Tổng quan",
+        "text": "Xem nhanh tháng của bạn: thu, chi, số dư và tiền đã đi đâu."
+      },
+      "budgets": {
+        "title": "Ngân sách",
+        "text": "Đặt hạn mức cho từng danh mục. Bạn được cảnh báo khi đạt 80% và 100%."
+      },
+      "reports": {
+        "title": "Báo cáo",
+        "text": "Xem theo tháng, cả năm hoặc lịch chi tiêu của bạn."
+      },
+      "settings": {
+        "title": "Cài đặt",
+        "text": "Hồ sơ, bảo mật, giao diện, thông báo và dữ liệu, mỗi thứ một mục riêng."
+      },
+      "account": {
+        "title": "Tài khoản của bạn",
+        "text": "Mở menu này để đổi giao diện, xem phím tắt, đăng xuất hoặc xem lại hướng dẫn."
+      }
+    }
+  },
+  "commandPalette": {
+    "open": "Tìm kiếm…",
+    "title": "Đi đến",
+    "placeholder": "Gõ tên trang, lệnh hoặc ghi chú giao dịch",
+    "searchLanguage": "Gõ tên ngôn ngữ",
+    "results": "Kết quả",
+    "toggleTheme": "Đổi sáng/tối",
+    "changeLanguage": "Đổi ngôn ngữ",
+    "searching": "Đang tìm trong giao dịch của bạn…",
+    "searchFailed": "Hiện không tìm được trong giao dịch của bạn.",
+    "noResults": "Không tìm thấy gì.",
+    "groups": {
+      "pages": "Trang",
+      "actions": "Lệnh",
+      "transactions": "Giao dịch",
+      "languages": "Ngôn ngữ"
+    }
+  },
+  "session": {
+    "title": "Hết phiên đăng nhập",
+    "text": "Để an toàn, bạn đã được đăng xuất. Hãy đăng nhập lại để tiếp tục từ chỗ đang dở.",
+    "logInAgain": "Đăng nhập lại"
+  },
+  "legal": {
+    "linksLabel": "Về trang web này",
+    "about": {
+      "title": "Giới thiệu",
+      "lead": "Ledgerling là ứng dụng ghi chép chi tiêu cá nhân đơn giản, nhẹ nhàng.",
+      "what": {
+        "title": "Ứng dụng làm gì",
+        "text": "Bạn ghi lại thu chi, đặt ngân sách theo danh mục, tiết kiệm cho các mục tiêu và xem báo cáo theo tháng hoặc năm. Ứng dụng có tám ngôn ngữ và dùng tốt trên điện thoại."
+      },
+      "who": {
+        "title": "Ai làm ra",
+        "text": "Đây là đồ án cuối kỳ của một sinh viên cho môn Phát triển ứng dụng web và cơ sở dữ liệu, lớp CSBU109.R11.KHBC, tại UIT."
+      },
+      "built": {
+        "title": "Được xây dựng thế nào",
+        "text": "React ở phía giao diện, Node.js với Express cho API và MongoDB để lưu dữ liệu. Mã nguồn có trên GitHub."
+      }
+    },
+    "privacy": {
+      "title": "Quyền riêng tư",
+      "lead": "Ledgerling lưu gì về bạn, nói bằng lời dễ hiểu.",
+      "collect": {
+        "title": "Những gì được lưu",
+        "text": "Tên, email, ảnh đại diện, bản mã hóa của mật khẩu (bcrypt, không bao giờ là mật khẩu gốc) và mọi thứ bạn nhập: giao dịch, danh mục, ngân sách, quy tắc và mục tiêu. Không có quảng cáo và không có công cụ phân tích."
+      },
+      "where": {
+        "title": "Lưu ở đâu",
+        "text": "Dữ liệu nằm trong cơ sở dữ liệu MongoDB Atlas; trang web chạy trên Vercel và Render. Phông chữ lấy từ Google Fonts. Trình duyệt của bạn giữ mã đăng nhập và các lựa chọn như giao diện, ngôn ngữ."
+      },
+      "control": {
+        "title": "Bạn có thể làm gì",
+        "text": "Trong Cài đặt, bạn có thể tải toàn bộ dữ liệu về thành một tệp và xóa tài khoản, thao tác này xóa mọi thứ thuộc về tài khoản đó."
+      }
+    },
+    "terms": {
+      "title": "Điều khoản",
+      "lead": "Ledgerling là đồ án môn học nên điều khoản rất ngắn.",
+      "use": {
+        "title": "Sử dụng",
+        "text": "Dùng Ledgerling để ghi chép tiền bạc của chính bạn. Giữ kín mật khẩu, không tìm cách truy cập dữ liệu của người khác hoặc làm quá tải dịch vụ."
+      },
+      "data": {
+        "title": "Dữ liệu của bạn",
+        "text": "Những gì bạn nhập vẫn là của bạn. Quản trị viên có thể khóa tài khoản vi phạm các điều khoản này. Hãy giữ bản sao những gì quan trọng: dịch vụ có thể dừng hoặc được đặt lại khi môn học kết thúc."
+      },
+      "warranty": {
+        "title": "Không bảo đảm",
+        "text": "Dịch vụ miễn phí và không kèm bất kỳ bảo đảm nào. Ứng dụng không đưa ra lời khuyên tài chính, và các con số chỉ chính xác theo những gì bạn nhập."
+      }
+    }
   }
 }

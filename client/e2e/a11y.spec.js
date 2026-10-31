@@ -48,6 +48,14 @@ test.describe('public pages', () => {
     await expect(page.getByRole('heading', { name: 'Welcome back', level: 1 })).toBeVisible();
     await expectNoSeriousViolations(page);
   });
+
+  for (const [name, path] of [['About', '/about'], ['Privacy', '/privacy'], ['Terms', '/terms']]) {
+    test(name, async ({ page }) => {
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name, level: 1 })).toBeVisible();
+      await expectNoSeriousViolations(page);
+    });
+  }
 });
 
 test.describe('signed-in pages (demo account)', () => {
@@ -57,6 +65,7 @@ test.describe('signed-in pages (demo account)', () => {
     { name: 'Budgets', path: '/budgets', heading: 'Budgets' },
     { name: 'Reports', path: '/reports', heading: 'Reports' },
     { name: 'Settings', path: '/settings', heading: 'Settings' },
+    { name: 'Settings > Appearance', path: '/settings/appearance', heading: 'Settings' },
   ];
 
   for (const { name, path, heading } of pages) {
@@ -67,6 +76,37 @@ test.describe('signed-in pages (demo account)', () => {
       await expectNoSeriousViolations(page);
     });
   }
+});
+
+test.describe('what opens over a page', () => {
+  test('the sidebar folded, the user menu and the command palette', async ({ page }, testInfo) => {
+    await signInAsDemo(page);
+    if (testInfo.project.name !== 'mobile') {
+      await page.getByTestId('sidebar-toggle').click();
+      await expectNoSeriousViolations(page);
+    }
+
+    const menuButton = page.getByRole('button', { name: 'Open menu' });
+    if (await menuButton.isVisible()) await menuButton.click();
+    await page.getByTestId('account').click();
+    await expect(page.getByRole('menu')).toBeVisible();
+    await expectNoSeriousViolations(page);
+
+    await page.keyboard.press('Escape');
+    await page.keyboard.press('Control+k');
+    await expect(page.getByTestId('command-input')).toBeFocused();
+    await expectNoSeriousViolations(page);
+  });
+
+  test.describe('for somebody who has not seen the tour', () => {
+    test.use({ storageState: { cookies: [], origins: [] } });
+
+    test('the tour', async ({ page }) => {
+      await signInAsDemo(page);
+      await expect(page.getByTestId('tour')).toBeVisible();
+      await expectNoSeriousViolations(page);
+    });
+  });
 });
 
 test('the landing page has a visible focus ring on its actions, and a sensible heading order', async ({ page }) => {

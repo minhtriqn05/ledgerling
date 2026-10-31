@@ -5,7 +5,7 @@ import { useLoad } from '../../hooks/useLoad.js';
 import { useLiveRefresh } from '../../hooks/useLiveRefresh.js';
 import { formatVnd } from '../../utils/format.js';
 import { formatMonthName, formatMonthShort } from '../../utils/vnDate.js';
-import Card, { CardHeader } from '../../components/Card/Card.jsx';
+import CollapsibleCard from '../../components/CollapsibleCard/CollapsibleCard.jsx';
 import Button from '../../components/Button/Button.jsx';
 import EmptyState from '../../components/EmptyState/EmptyState.jsx';
 import LoadingState from '../../components/LoadingState/LoadingState.jsx';
@@ -49,8 +49,13 @@ export default function YearlyTab({ year }) {
         <StatCard tone="balance" icon="wallet" label={t('common.balance')} value={formatVnd(totals.balance)} />
       </section>
 
-      <Card>
-        <CardHeader icon="chart" tone="sky" title={t('reports.incomeExpenseByMonth')} subtitle={year}>
+      <CollapsibleCard
+        id="reports.incomeExpenseByMonth"
+        icon="chart"
+        tone="sky"
+        title={t('reports.incomeExpenseByMonth')}
+        subtitle={year}
+        actions={
           <div className={styles.headerExtra}>
             {topExpenseMonth && (
               <p className={styles.topMonth}>
@@ -61,12 +66,12 @@ export default function YearlyTab({ year }) {
             )}
             <YearlyLegend />
           </div>
-        </CardHeader>
+        }
+      >
         <YearlyChart months={months} year={year} />
-      </Card>
+      </CollapsibleCard>
 
-      <Card>
-        <CardHeader icon="transactions" tone="mint" title={t('reports.monthByMonth')} subtitle={year} />
+      <CollapsibleCard id="reports.monthByMonth" icon="transactions" tone="mint" title={t('reports.monthByMonth')} subtitle={year}>
         <div className={styles.tableWrap} role="region" tabIndex={0} aria-label={t('reports.monthByMonth')}>
           <table className={styles.table}>
             <thead>
@@ -89,7 +94,7 @@ export default function YearlyTab({ year }) {
             </tbody>
           </table>
         </div>
-      </Card>
+      </CollapsibleCard>
     </div>
   );
 }

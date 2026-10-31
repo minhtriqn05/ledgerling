@@ -53,6 +53,11 @@ test('an admin sees the statistics, finds a user and disables and enables the ac
   await expect(page.getByRole('img', { name: 'Line chart: new users per day over the last 30 days' })).toBeVisible();
   await expect(page.getByRole('img', { name: 'Line chart: transactions per day over the last 30 days' })).toBeVisible();
 
+  // The table of accounts is one level below
+  await page.getByRole('button', { name: 'Manage users' }).click();
+  await expect(page).toHaveURL(/\/admin\/users$/);
+  await expect(page.getByRole('heading', { name: 'Users', level: 1 })).toBeVisible();
+
   // Search finds the new account (the admin is in the table too, with no button on its own row)
   await page.getByLabel('Search by name or email').fill(target.email);
   const row = page.getByRole('row').filter({ hasText: target.email });

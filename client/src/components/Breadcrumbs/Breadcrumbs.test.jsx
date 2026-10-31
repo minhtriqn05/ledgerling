@@ -29,10 +29,10 @@ describe('Breadcrumbs', () => {
     expect(trail().getAllByRole('listitem')).toHaveLength(3);
   });
 
-  it('shows Dashboard / Reports / Yearly, with links above the current item and aria-current on the last one', () => {
+  it('shows Home / Reports / Yearly, with links above the current item and aria-current on the last one', () => {
     renderAt('/reports?tab=yearly');
 
-    expect(trail().getByRole('link', { name: 'Dashboard' })).toHaveAttribute('href', '/');
+    expect(trail().getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/welcome');
     expect(trail().getByRole('link', { name: 'Reports' })).toHaveAttribute('href', '/reports');
     const current = trail().getByText('Yearly');
     expect(current).toHaveAttribute('aria-current', 'page');
@@ -41,22 +41,24 @@ describe('Breadcrumbs', () => {
     expect(document.querySelectorAll('[aria-current="page"]')).toHaveLength(1);
   });
 
-  it('shows just "Dashboard" on the Dashboard', () => {
+  it('shows Home / Dashboard on the Dashboard, and Home is an icon', () => {
     renderAt('/');
 
-    expect(trail().getAllByRole('listitem')).toHaveLength(1);
+    expect(trail().getAllByRole('listitem')).toHaveLength(2);
     expect(trail().getByText('Dashboard')).toHaveAttribute('aria-current', 'page');
-    expect(trail().queryByRole('link')).not.toBeInTheDocument();
+    const home = trail().getByRole('link', { name: 'Home' });
+    expect(home).toHaveTextContent('');
+    expect(home.querySelector('svg')).toBeInTheDocument();
   });
 
   it('shows Settings / Profile and Admin / Users', () => {
-    const { unmount } = renderAt('/settings');
-    expect(trail().getByRole('link', { name: 'Settings' })).toBeInTheDocument();
+    const { unmount } = renderAt('/settings/profile');
+    expect(trail().getByRole('link', { name: 'Settings' })).toHaveAttribute('href', '/settings');
     expect(trail().getByText('Profile')).toHaveAttribute('aria-current', 'page');
     unmount();
 
-    renderAt('/admin');
-    expect(trail().getByRole('link', { name: 'Admin' })).toBeInTheDocument();
+    renderAt('/admin/users');
+    expect(trail().getByRole('link', { name: 'Admin' })).toHaveAttribute('href', '/admin');
     expect(trail().getByText('Users')).toHaveAttribute('aria-current', 'page');
   });
 
@@ -68,19 +70,19 @@ describe('Breadcrumbs', () => {
   it('has a link to the level above that goes there when it is clicked', async () => {
     const user = userEvent.setup();
     render(
-      <MemoryRouter initialEntries={['/settings']}>
+      <MemoryRouter initialEntries={['/settings/profile']}>
         <BreadcrumbProvider>
           <Breadcrumbs />
           <Routes>
-            <Route path="/" element={<p>the dashboard page</p>} />
+            <Route path="/welcome" element={<p>the landing page</p>} />
             <Route path="*" element={<p>another page</p>} />
           </Routes>
         </BreadcrumbProvider>
       </MemoryRouter>
     );
 
-    await user.click(trail().getByRole('link', { name: 'Dashboard' }));
-    expect(screen.getByText('the dashboard page')).toBeInTheDocument();
+    await user.click(trail().getByRole('link', { name: 'Home' }));
+    expect(screen.getByText('the landing page')).toBeInTheDocument();
   });
 
   it('adds the level a page opened on top of itself, and its page item closes it instead of navigating', async () => {

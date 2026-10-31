@@ -4,23 +4,30 @@
   gap: var(--space-5);
 }
 
-/* Two columns of cards of different heights; one column below 900px */
-.columns {
+/* The menu of sections on the left, the open section on the right; one column below 960px */
+.layout {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 300px minmax(0, 1fr);
   gap: var(--space-5);
   align-items: start;
 }
 
-.column {
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.section {
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
   min-width: 0;
 }
 
-@media (max-width: 900px) {
-  .columns {
+@media (max-width: 959px) {
+  .layout {
     grid-template-columns: minmax(0, 1fr);
   }
 }

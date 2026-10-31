@@ -4,6 +4,7 @@ import { changePassword } from '../../api/users.js';
 import { getErrorMessage } from '../../api/axios.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
+import { useUnsavedChanges } from '../../context/UnsavedChangesContext.jsx';
 import { passwordChangeProblem } from '../../utils/validators.js';
 import Alert from '../../components/Alert/Alert.jsx';
 import Button from '../../components/Button/Button.jsx';
@@ -23,6 +24,7 @@ export default function PasswordSection() {
   const [confirm, setConfirm] = useState('');
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  useUnsavedChanges(Boolean(current || next || confirm));
 
   async function handleSubmit(event) {
     event.preventDefault();

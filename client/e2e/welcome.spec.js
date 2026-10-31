@@ -134,23 +134,36 @@ test('the demo account has 3 months of transactions, two rules and no hand-made 
   expect(rules.data.map((rule) => rule.category.name).sort()).toEqual(['Rent', 'Salary']);
 });
 
-test('a signed-in user who opens /welcome goes to the Dashboard', async ({ page }) => {
+test('a signed-in user who opens /welcome stays there and sees Open app instead of Log in and Get started', async ({ page }) => {
   await tryTheDemo(page);
 
   await page.goto('/welcome');
+  await expect(page).toHaveURL(/\/welcome$/);
+  await expect(page.getByRole('heading', { name: 'Know where your money goes.', level: 1 })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Log in' })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'Get started' })).toHaveCount(0);
+
+  await page.getByRole('link', { name: 'Open app' }).last().click();
   await expect(page).toHaveURL(/\/$/);
   await expect(page.getByRole('heading', { name: 'Dashboard', level: 1 })).toBeVisible();
 });
 
-test('Settings hides Password, Sessions and Danger zone for the demo account', async ({ page }) => {
+test('Settings has no Security and Danger zone for the demo account, also when the address is typed', async ({ page }) => {
   await tryTheDemo(page);
-  await openMenuIfNeeded(page);
-  await page.getByRole('link', { name: 'Settings' }).click();
+  await page.goto('/settings/profile');
 
   await expect(page.getByRole('heading', { name: 'Settings', level: 1 })).toBeVisible();
   await expect(page.getByText('You are using the shared demo account')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Profile' })).toBeVisible();
+  await page.goto('/settings/appearance');
   await expect(page.getByRole('heading', { name: 'Appearance' })).toBeVisible();
+
+  for (const hidden of ['security', 'danger']) {
+    await page.goto(`/settings/${hidden}`);
+    await expect(page).toHaveURL(/\/settings(\/profile)?$/);
+    await expect(page.getByRole('link', { name: /^Security/ })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /^Danger zone/ })).toHaveCount(0);
+  }
   for (const hidden of ['Password', 'Sessions', 'Danger zone']) {
     await expect(page.getByRole('heading', { name: hidden, exact: true })).toHaveCount(0);
   }

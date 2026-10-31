@@ -130,9 +130,19 @@ li[role='presentation'] + li[role='presentation'] .groupLabel {
 }
 
 .optionLabel,
+.hint,
 .check {
   position: relative;
   z-index: 1;
+}
+
+/* The small code on the right of an option (EN, VI...) */
+.hint {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.04em;
 }
 
 .optionLabel {

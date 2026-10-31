@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import WelcomePage from './WelcomePage.jsx';
@@ -88,12 +88,37 @@ describe('WelcomePage', () => {
     expect(screen.getByRole('status')).toBeEmptyDOMElement();
   });
 
-  it('sends a signed-in user to the Dashboard', () => {
+  it('opens the Dashboard after the demo signed in', async () => {
+    const user = userEvent.setup();
+    loginAsDemo.mockResolvedValue();
+    renderPage();
+
+    await user.click(screen.getByRole('button', { name: 'Try the demo' }));
+    expect(await screen.findByText('Dashboard page')).toBeInTheDocument();
+  });
+
+  it('shows a signed-in user the page with Open app instead of Log in, Get started and the demo', () => {
     useAuth.mockReturnValue({ user: { name: 'Tri' }, loading: false, loginAsDemo });
     renderPage();
 
-    expect(screen.getByText('Dashboard page')).toBeInTheDocument();
-    expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Know where your money goes.');
+    // The header and the hero both have it
+    const openApp = screen.getAllByRole('link', { name: 'Open app' });
+    expect(openApp).toHaveLength(2);
+    for (const link of openApp) expect(link).toHaveAttribute('href', '/');
+    expect(screen.queryByRole('link', { name: 'Log in' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Get started' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Try the demo' })).not.toBeInTheDocument();
+    expect(screen.queryByText('Dashboard page')).not.toBeInTheDocument();
+  });
+
+  it('links to About, Privacy and Terms in the footer', () => {
+    renderPage();
+
+    const links = screen.getByRole('navigation', { name: 'About this site' });
+    expect(within(links).getByRole('link', { name: 'About' })).toHaveAttribute('href', '/about');
+    expect(within(links).getByRole('link', { name: 'Privacy' })).toHaveAttribute('href', '/privacy');
+    expect(within(links).getByRole('link', { name: 'Terms' })).toHaveAttribute('href', '/terms');
   });
 
   it('waits while a stored token is being checked, without showing the page or redirecting', () => {

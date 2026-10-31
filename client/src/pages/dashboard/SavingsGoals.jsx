@@ -5,7 +5,7 @@ import { useLoad } from '../../hooks/useLoad.js';
 import { useLiveRefresh } from '../../hooks/useLiveRefresh.js';
 import { formatDate, formatPercent, formatVnd } from '../../utils/format.js';
 import { daysUntil, formatDaysLeft } from '../../utils/goals.js';
-import Card, { CardHeader } from '../../components/Card/Card.jsx';
+import CollapsibleCard from '../../components/CollapsibleCard/CollapsibleCard.jsx';
 import Button from '../../components/Button/Button.jsx';
 import LoadingState from '../../components/LoadingState/LoadingState.jsx';
 import Icon from '../../components/Icon.jsx';
@@ -91,13 +91,19 @@ export default function SavingsGoals() {
   }
 
   return (
-    <Card>
-      <CardHeader icon="target" tone="mint" title={t('dashboard.savingsGoals')} subtitle={t('dashboard.dueFirst')}>
+    <CollapsibleCard
+      id="dashboard.savingsGoals"
+      icon="target"
+      tone="mint"
+      title={t('dashboard.savingsGoals')}
+      subtitle={t('dashboard.dueFirst')}
+      actions={
         <Button variant="secondary" onClick={() => navigate('/goals')}>
           {t('common.viewAll')}
         </Button>
-      </CardHeader>
+      }
+    >
       {renderBody()}
-    </Card>
+    </CollapsibleCard>
   );
 }

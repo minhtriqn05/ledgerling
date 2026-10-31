@@ -2,6 +2,7 @@ import { act, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import api from '../api/axios.js';
 import { clearApiCache } from '../utils/apiCache.js';
+import { SESSION_EXPIRED_EVENT } from '../utils/sessionEvents.js';
 import { AuthProvider, useAuth } from './AuthContext.jsx';
 
 vi.mock('../api/axios.js', () => ({ default: { get: vi.fn(), post: vi.fn() } }));
@@ -49,6 +50,49 @@ describe('the session at start-up', () => {
     renderAuth();
     await screen.findByText('nobody');
     expect(localStorage.getItem('token')).toBe('mine');
+  });
+});
+
+describe('a session that expires while the app is open', () => {
+  const start = () => {
+    renderAuth();
+    act(() => auth.saveSession(session('a')));
+  };
+
+  it('keeps the user on screen and raises the flag when the API said 401', () => {
+    start();
+    act(() => window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT)));
+
+    expect(auth.sessionExpired).toBe(true);
+    expect(auth.user.name).toBe('User a');
+    expect(auth.token).toBeNull(); // this also closes the socket
+  });
+
+  it('does the same when the socket heard it first, and then the token is gone', () => {
+    start();
+    act(() => auth.expireSession());
+
+    expect(auth.sessionExpired).toBe(true);
+    expect(auth.user.name).toBe('User a');
+    expect(localStorage.getItem('token')).toBeNull();
+  });
+
+  it('"Log in again" removes the user but keeps the flag, a new login clears it', () => {
+    start();
+    act(() => auth.expireSession());
+    act(() => auth.endExpiredSession());
+    expect(auth.user).toBeNull();
+    expect(auth.sessionExpired).toBe(true);
+
+    act(() => auth.saveSession(session('a')));
+    expect(auth.sessionExpired).toBe(false);
+  });
+
+  it('a normal log out clears the flag', () => {
+    start();
+    act(() => auth.expireSession());
+    act(() => auth.logout());
+    expect(auth.sessionExpired).toBe(false);
   });
 });
 

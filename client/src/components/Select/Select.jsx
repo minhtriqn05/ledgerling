@@ -30,6 +30,8 @@ export function findByText(flat, text, from) {
 // A soft pill slides behind the highlighted option, and the chosen one gets a check mark.
 // The label comes from a <label htmlFor={id}> next to it, or from the `label` prop (aria-label).
 // variant: 'field' (like a text input) or 'pill' (rounded, e.g. the language switcher).
+// An option can have a `short` text for the closed button and a `hint` on its right in the list (the language codes).
+// showChevron: false leaves the arrow out of the button.
 export default function Select({
   id,
   value,
@@ -38,6 +40,7 @@ export default function Select({
   label,
   icon = null,
   variant = 'field',
+  showChevron = true,
   disabled = false,
   className = '',
   'data-testid': testId,
@@ -163,10 +166,10 @@ export default function Select({
         onBlur={() => setOpen(false)}
       >
         {icon}
-        <span className={styles.value} lang={selected?.lang}>
-          {selected?.label}
+        <span className={styles.value} lang={selected?.short ? undefined : selected?.lang}>
+          {selected?.short ?? selected?.label}
         </span>
-        <ChevronDown size={16} className={styles.chevron} aria-hidden="true" />
+        {showChevron && <ChevronDown size={16} className={styles.chevron} aria-hidden="true" />}
       </button>
 
       {/* onMouseDown: a click in the list must not move the focus away from the button (that closes the list) */}
@@ -197,6 +200,12 @@ export default function Select({
                   >
                     {isActive && <motion.span layoutId="highlight" className={styles.highlight} transition={{ duration: 0.16, ease: EASE }} />}
                     <span className={styles.optionLabel}>{option.label}</span>
+                    {/* Only for the eye: the name of the option is its label */}
+                    {option.hint && (
+                      <span className={styles.hint} aria-hidden="true" lang="en">
+                        {option.hint}
+                      </span>
+                    )}
                     {isSelected && (
                       <motion.span
                         className={styles.check}

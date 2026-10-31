@@ -1,10 +1,11 @@
 import { Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import ApiStatus from '../ApiStatus/ApiStatus.jsx';
 import Avatar from '../Avatar/Avatar.jsx';
 import Breadcrumbs from '../Breadcrumbs/Breadcrumbs.jsx';
+import CommandPalette from '../CommandPalette/CommandPalette.jsx';
 import Icon from '../Icon.jsx';
 import LanguageSwitcher from '../LanguageSwitcher/LanguageSwitcher.jsx';
 import LiveStatus from '../LiveStatus/LiveStatus.jsx';
@@ -15,17 +16,26 @@ import OfflineBanner from '../OfflineBanner/OfflineBanner.jsx';
 import QuickAddButton from '../QuickAdd/QuickAddButton.jsx';
 import QuickAddDialog from '../QuickAdd/QuickAddDialog.jsx';
 import ShortcutsDialog from '../QuickAdd/ShortcutsDialog.jsx';
+import SessionExpiredDialog from '../SessionExpiredDialog/SessionExpiredDialog.jsx';
+import Tour from '../Tour/Tour.jsx';
+import UserMenu from '../UserMenu/UserMenu.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { BreadcrumbProvider } from '../../context/BreadcrumbContext.jsx';
 import { NotificationsProvider } from '../../context/NotificationsContext.jsx';
 import { SocketProvider } from '../../context/SocketContext.jsx';
-import { useHotkeys } from '../../hooks/useHotkeys.js';
+import { useCommandKey, useHotkeys } from '../../hooks/useHotkeys.js';
+import { NARROW_SCREEN, useMediaQuery } from '../../hooks/useMediaQuery.js';
+import { useStoredBoolean } from '../../hooks/useStoredBoolean.js';
+import { useTour } from '../../hooks/useTour.js';
 import { navItems } from '../../config/navItems.js';
 import styles from './AppLayout.module.css';
 
+const SIDEBAR_KEY = 'ledgerling.sidebarCollapsed';
+
 // Shared layout for signed-in pages: a sidebar on wide screens, a top bar with a menu button below 768px.
 // The page itself is rendered by <Outlet />. The menu items come from config/navItems.js.
-// It also holds what every signed-in page shares: the "+" button / N key (Quick add), and the shortcuts / and ?.
+// It also holds what every signed-in page shares: the "+" button / N key (Quick add), the shortcuts / and ? and [,
+// the command palette (Ctrl+K), the guided tour and the "Session expired" dialog.
 
 // The bell needs the number of unread notifications, which lives in NotificationsProvider.
 // SocketProvider opens the real-time connection; this layout is only on screen for a signed-in user.
@@ -41,15 +51,23 @@ export default function AppLayout() {
   );
 }
 
+// The sections of Settings share one page: the menu next to them must not fade when another one opens
+const pageKeyOf = (pathname) => (pathname.startsWith('/settings') ? '/settings' : pathname);
+
 function Layout() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const reduced = useReducedMotion();
-  const { user, logout } = useAuth();
+  const { user, logout, sessionExpired } = useAuth();
+  const narrow = useMediaQuery(NARROW_SCREEN);
+  const [collapsedChoice, setCollapsedChoice] = useStoredBoolean(SIDEBAR_KEY);
+  const collapsed = collapsedChoice && !narrow; // a phone has the top bar instead of a sidebar
   const [menuOpen, setMenuOpen] = useState(false); // only matters on narrow screens
   const [quickAddOpen, setQuickAddOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const tour = useTour();
   // Changing this key makes React build the open page again, so it loads its data again after a Quick add.
   const [pageKey, setPageKey] = useState(0);
   const sidebarRef = useRef(null);
@@ -66,7 +84,7 @@ function Layout() {
     // A closed phone menu measures 0, so going from a narrow to a wide window needs a new measurement
     window.addEventListener('resize', measure);
     return () => window.removeEventListener('resize', measure);
-  }, [location.pathname, menuOpen, i18n.resolvedLanguage]);
+  }, [location.pathname, menuOpen, i18n.resolvedLanguage, collapsed]);
 
   // "/" jumps to the search box of the Transactions page (and opens that page first if it is not the one shown)
   function focusSearch() {
@@ -79,7 +97,11 @@ function Layout() {
     n: () => setQuickAddOpen(true),
     '/': focusSearch,
     '?': () => setShortcutsOpen(true),
+    '[': () => setCollapsedChoice((value) => !value),
   });
+
+  // Ctrl+K: also while typing in a field, but never on top of another dialog
+  useCommandKey(() => setPaletteOpen((open) => (open ? false : !document.querySelector('dialog[open]'))));
 
   // The "Add transaction" shortcut of the installed app opens /?quickAdd=1 (see the manifest in vite.config.js).
   // The address is cleaned up at once, so a page reload does not open the dialog again.
@@ -89,7 +111,7 @@ function Layout() {
     navigate(location.pathname, { replace: true });
   }, [location.search, location.pathname, navigate]);
 
-  // While the panel is open: Escape or a click outside closes it.
+  // While the panel is open: Escape or a click outside closes it. The tour may open it and has its own buttons outside it.
   useEffect(() => {
     if (!menuOpen) return;
 
@@ -97,7 +119,7 @@ function Layout() {
       if (event.key === 'Escape') setMenuOpen(false);
     }
     function handlePointerDown(event) {
-      if (!sidebarRef.current.contains(event.target)) setMenuOpen(false);
+      if (!sidebarRef.current.contains(event.target) && !event.target.closest?.('[data-keep-menu]')) setMenuOpen(false);
     }
 
     document.addEventListener('keydown', handleKeyDown);
@@ -114,12 +136,20 @@ function Layout() {
     navigate('/login', { replace: true });
   }
 
+  function closeTour() {
+    tour.finish();
+    if (narrow) setMenuOpen(false);
+  }
+
   return (
-    <div className={styles.layout}>
+    <div className={`${styles.layout} ${collapsed ? styles.collapsed : ''}`} data-sidebar={collapsed ? 'collapsed' : 'open'}>
       <aside className={styles.sidebar} ref={sidebarRef}>
         <div className={styles.bar}>
           <div className={styles.brand}>
-            <Logo size={32} />
+            {/* The way back to the landing page, also for somebody who is signed in */}
+            <Link to="/welcome" className={styles.logoLink} title={t('nav.toWelcome')} data-testid="sidebar-logo">
+              <Logo size={32} showName={!collapsed} />
+            </Link>
             <LiveStatus />
           </div>
 
@@ -148,6 +178,22 @@ function Layout() {
 
         {/* A column inside the sidebar on wide screens, a dropdown panel on narrow ones */}
         <div id="main-menu" className={`${styles.panel} ${menuOpen ? styles.panelOpen : ''}`}>
+          <button
+            type="button"
+            className={`${styles.navItem} ${styles.searchButton}`}
+            data-tooltip={t('commandPalette.open')}
+            onClick={() => {
+              setMenuOpen(false);
+              setPaletteOpen(true);
+            }}
+          >
+            <Icon name="search" />
+            <span className={styles.navLabel}>{t('commandPalette.open')}</span>
+            <kbd className={styles.searchKey} aria-hidden="true">
+              {/Mac|iPhone|iPad/.test(navigator.platform) ? '⌘K' : 'Ctrl K'}
+            </kbd>
+          </button>
+
           <nav className={styles.nav} ref={navRef} aria-label={t('nav.main')}>
             {indicator && <span className={styles.indicator} style={{ top: indicator.top, height: indicator.height }} aria-hidden="true" />}
             {navItems.filter((item) => !item.adminOnly || user?.role === 'admin').map((item) => (
@@ -156,6 +202,8 @@ function Layout() {
                 to={item.path}
                 end={item.path === '/'}
                 className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navActive : ''}`}
+                data-tooltip={t(item.labelKey)}
+                data-tour={`nav:${item.path}`}
                 onClick={() => setMenuOpen(false)}
               >
                 {item.icon && <Icon name={item.icon} />}
@@ -165,22 +213,30 @@ function Layout() {
           </nav>
 
           <div className={styles.panelFooter}>
+            <div className={styles.footerRow}>
+              <LanguageSwitcher className={styles.language} />
+              {/* The small button that folds the sidebar; a phone has no sidebar to fold */}
+              <button
+                type="button"
+                className={styles.collapseButton}
+                aria-label={collapsed ? t('nav.expandSidebar') : t('nav.collapseSidebar')}
+                aria-expanded={!collapsed}
+                data-tooltip={collapsed ? t('nav.expandSidebar') : t('nav.collapseSidebar')}
+                data-testid="sidebar-toggle"
+                onClick={() => setCollapsedChoice((value) => !value)}
+              >
+                <Icon name={collapsed ? 'chevronsRight' : 'chevronsLeft'} size={18} />
+              </button>
+            </div>
             {user && (
-              <div className={styles.account} data-testid="account">
-                <Avatar name={user.name} avatar={user.avatar} />
-                <span className={styles.accountText}>
-                  <strong className={styles.accountName} data-testid="account-name">
-                    {user.name}
-                  </strong>
-                  <span className={styles.accountEmail}>{user.email}</span>
-                </span>
-              </div>
+              <UserMenu
+                user={user}
+                onShortcuts={() => setShortcutsOpen(true)}
+                onTour={tour.start}
+                onLogout={handleLogout}
+                onLeave={() => setMenuOpen(false)}
+              />
             )}
-            <LanguageSwitcher className={styles.language} />
-            <button type="button" className={`${styles.navItem} ${styles.logout}`} onClick={handleLogout}>
-              <Icon name="logout" />
-              <span className={styles.navLabel}>{t('nav.logout')}</span>
-            </button>
           </div>
         </div>
       </aside>
@@ -188,11 +244,11 @@ function Layout() {
       <div className={styles.body}>
         <main className={styles.main}>
           <OfflineBanner />
-          {/* "Dashboard / Reports / Monthly", made from the address (config/breadcrumbs.js) */}
+          {/* "Home / Reports / Monthly", made from the address (config/breadcrumbs.js) */}
           <Breadcrumbs />
           {/* A short fade and an 8px slide when another page opens. No exit animation: the new page is there at once. */}
           <motion.div
-            key={location.pathname}
+            key={pageKeyOf(location.pathname)}
             initial={reduced ? false : { opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.22, ease: [0.22, 0.61, 0.36, 1] }}
@@ -217,7 +273,10 @@ function Layout() {
           <QuickAddDialog key="quick-add" onSaved={() => setPageKey((key) => key + 1)} onClose={() => setQuickAddOpen(false)} />
         )}
         {shortcutsOpen && <ShortcutsDialog key="shortcuts" onClose={() => setShortcutsOpen(false)} />}
+        {paletteOpen && <CommandPalette key="palette" onClose={() => setPaletteOpen(false)} onQuickAdd={() => setQuickAddOpen(true)} />}
+        {sessionExpired && <SessionExpiredDialog key="session" />}
       </AnimatePresence>
+      {tour.open && <Tour onClose={closeTour} menuOpen={menuOpen} onStepChange={(step) => narrow && setMenuOpen(Boolean(step.inMenu))} />}
     </div>
   );
 }

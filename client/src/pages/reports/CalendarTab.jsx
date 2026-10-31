@@ -7,7 +7,7 @@ import { useLiveRefresh } from '../../hooks/useLiveRefresh.js';
 import { formatCompact, formatVnd } from '../../utils/format.js';
 import { buildCalendar, dayTransactionsPath, formatLongDay, weekdayLabels } from '../../utils/reports.js';
 import { formatMonth } from '../../utils/vnDate.js';
-import Card, { CardHeader } from '../../components/Card/Card.jsx';
+import CollapsibleCard from '../../components/CollapsibleCard/CollapsibleCard.jsx';
 import LoadingState from '../../components/LoadingState/LoadingState.jsx';
 import ErrorState from '../../components/ErrorState/ErrorState.jsx';
 import styles from './CalendarTab.module.css';
@@ -30,13 +30,18 @@ export default function CalendarTab({ month, weekStartsOn }) {
   const { cells } = buildCalendar(month, report.dailyExpense, weekStart);
 
   return (
-    <Card>
-      <CardHeader icon="calendar" tone="teal" title={t('reports.calendarTitle')} subtitle={formatMonth(month)}>
+    <CollapsibleCard
+      id="reports.calendar"
+      icon="calendar"
+      tone="teal"
+      title={t('reports.calendarTitle')}
+      subtitle={formatMonth(month)}
+      actions={
         <p className={styles.total}>
           {t('reports.spentThisMonth')} <strong>{formatVnd(report.totals.expense)}</strong>
         </p>
-      </CardHeader>
-
+      }
+    >
       <div className={styles.grid} role="group" aria-label={t('reports.calendarOf', { month: formatMonth(month) })}>
         {weekdayLabels(weekStart).map((weekday) => (
           <span key={weekday} className={styles.weekday} aria-hidden="true">
@@ -74,6 +79,6 @@ export default function CalendarTab({ month, weekStartsOn }) {
         <span>{t('reports.more')}</span>
       </div>
       <p className={styles.hint}>{t('reports.calendarHint')}</p>
-    </Card>
+    </CollapsibleCard>
   );
 }

@@ -1,0 +1,100 @@
+/* The dialog covers the window; it has no color of its own, the dark part is the shadow of .spot */
+.overlay {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: none;
+  background: transparent;
+  color: var(--color-text);
+}
+
+.overlay::backdrop {
+  background: transparent;
+}
+
+/* A hole in the dark: a transparent box with a huge shadow around it, that moves from element to element */
+.spot {
+  position: fixed;
+  border-radius: var(--radius-md);
+  box-shadow: 0 0 0 2px var(--color-primary), 0 0 0 200vmax var(--color-overlay);
+  pointer-events: none;
+  transition: top var(--duration-slow) var(--ease-out), left var(--duration-slow) var(--ease-out),
+    width var(--duration-slow) var(--ease-out), height var(--duration-slow) var(--ease-out);
+}
+
+.dim {
+  position: fixed;
+  inset: 0;
+  background: var(--color-overlay);
+}
+
+.card {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: min(340px, calc(100vw - 24px));
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+  transition: top var(--duration-slow) var(--ease-out), left var(--duration-slow) var(--ease-out);
+}
+
+.counter {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.title {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+}
+
+.text {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.moves {
+  display: inline-flex;
+  gap: var(--space-2);
+}
+
+.skip {
+  padding: var(--space-2);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+
+.skip:hover {
+  color: var(--color-text);
+  text-decoration: underline;
+}
+
+.skip:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}

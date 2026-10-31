@@ -57,6 +57,8 @@ test('a new name shows in the menu at once, and after a reload', async ({ page }
   // Settings is in the menu
   await page.getByRole('link', { name: 'Settings' }).click();
   await expect(page.getByRole('heading', { name: 'Settings', level: 1 })).toBeVisible();
+  // A wide screen opens Profile; a phone first shows the list of sections
+  if (testInfo.project.name === 'mobile') await page.getByRole('link', { name: /^Profile/ }).click();
 
   // The save button is off until the name changes
   const save = page.getByRole('button', { name: 'Save changes' });
@@ -85,7 +87,7 @@ test('a new name shows in the menu at once, and after a reload', async ({ page }
 test('dark mode is applied at once, kept after F5, and follows the account to another device', async ({ page }, testInfo) => {
   const email = await register(page, testInfo, 'theme');
   const html = page.locator('html');
-  await page.goto('/settings');
+  await page.goto('/settings/appearance');
   await expect(page.getByRole('radio', { name: 'System' })).toHaveAttribute('aria-checked', 'true');
 
   // Dark: the page changes colors at once
@@ -111,7 +113,8 @@ test('dark mode is applied at once, kept after F5, and follows the account to an
 
   // Another device has no theme in localStorage: after signing in it gets the one saved on the account
   await openMenuIfNeeded(page);
-  await page.getByRole('button', { name: 'Log out', exact: true }).click();
+  await page.getByTestId('account').click();
+  await page.getByRole('menuitem', { name: 'Log out' }).click();
   await page.evaluate(() => localStorage.removeItem('ledgerling.theme'));
   await page.reload();
   await expect(html).toHaveAttribute('data-theme', 'light');
@@ -123,7 +126,7 @@ test('dark mode is applied at once, kept after F5, and follows the account to an
   await expect(html).toHaveAttribute('data-theme', 'dark');
 
   // Back to light
-  await page.goto('/settings');
+  await page.goto('/settings/appearance');
   await page.getByRole('radio', { name: 'Light' }).click();
   await expect(html).toHaveAttribute('data-theme', 'light');
 });
@@ -142,7 +145,7 @@ test('change the password, then log in with the new one (the old token stops wor
   const oldToken = await otherDeviceToken(page, email);
   expect(await statusOf(page, oldToken)).toBe(200);
 
-  await page.goto('/settings');
+  await page.goto('/settings/security');
   const current = page.getByLabel('Current password');
   const next = page.getByLabel('New password', { exact: true });
   const repeat = page.getByLabel('Repeat new password');
@@ -181,7 +184,8 @@ test('change the password, then log in with the new one (the old token stops wor
 
   // Log out, the old password no longer works, the new one does
   await openMenuIfNeeded(page);
-  await page.getByRole('button', { name: 'Log out', exact: true }).click();
+  await page.getByTestId('account').click();
+  await page.getByRole('menuitem', { name: 'Log out' }).click();
   await expect(page).toHaveURL(/\/login$/);
   await page.getByLabel('Email').fill(email);
   await page.getByLabel('Password', { exact: true }).fill(PASSWORD);
@@ -199,7 +203,7 @@ test('log out of all other devices keeps this one signed in', async ({ page }, t
   const otherDevice = await otherDeviceToken(page, email);
   expect(await statusOf(page, otherDevice)).toBe(200);
 
-  await page.goto('/settings');
+  await page.goto('/settings/security');
   await page.getByRole('button', { name: 'Log out of all other devices' }).click();
   await expect(page.getByText('Logged out of all other devices.')).toBeVisible();
   expect(await statusOf(page, otherDevice)).toBe(401);
@@ -218,7 +222,7 @@ test('the week can start on Sunday, and the calendar in Reports follows', async 
   await page.goto('/reports?tab=calendar');
   await expect(weekdays.first()).toHaveText('Mon');
 
-  await page.goto('/settings');
+  await page.goto('/settings/preferences');
   await page.getByRole('button', { name: 'Sunday' }).click();
   await expect(page.getByText('Preference saved')).toBeVisible();
   await expect.poll(async () => (await myPreferences(page)).weekStartsOn).toBe('sunday');
@@ -228,7 +232,7 @@ test('the week can start on Sunday, and the calendar in Reports follows', async 
   await expect(weekdays.last()).toHaveText('Sat');
 
   // Back to Monday
-  await page.goto('/settings');
+  await page.goto('/settings/preferences');
   await page.getByRole('button', { name: 'Monday' }).click();
   await expect.poll(async () => (await myPreferences(page)).weekStartsOn).toBe('monday');
 });
@@ -249,7 +253,7 @@ test('the language chosen in the menu is saved on the account and comes back on 
 
 test('download my data: a JSON file with the profile and the data, never the password hash', async ({ page }, testInfo) => {
   const email = await register(page, testInfo, 'export');
-  await page.goto('/settings');
+  await page.goto('/settings/data');
 
   const downloadPromise = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Download my data' }).click();
@@ -269,7 +273,7 @@ test('download my data: a JSON file with the profile and the data, never the pas
 
 test('delete the account: the button needs DELETE and the password, then everything is gone', async ({ page }, testInfo) => {
   const email = await register(page, testInfo, 'delete');
-  await page.goto('/settings');
+  await page.goto('/settings/danger');
 
   const confirmWord = page.getByLabel('Type DELETE to confirm');
   const password = page.getByLabel('Your password');

@@ -1,0 +1,111 @@
+.card {
+  position: relative;
+}
+
+/* A folded card next to an open one keeps its own height */
+.collapsed {
+  align-self: start;
+}
+
+/* Room for the chevron in the corner */
+.header {
+  padding-right: var(--space-6);
+}
+
+.header > * {
+  transition: margin-bottom var(--duration-base) var(--ease-out);
+}
+
+.collapsed .header > * {
+  margin-bottom: 0;
+}
+
+.toggle {
+  position: absolute;
+  top: var(--space-5);
+  right: var(--space-4);
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out),
+    transform var(--duration-base) var(--ease-out);
+}
+
+.toggle:hover {
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+}
+
+.toggle:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+.collapsed .toggle {
+  transform: rotate(-90deg);
+}
+
+/* A grid row can move between 1fr and 0fr, which "height: auto" cannot */
+.body {
+  display: grid;
+  flex: 1; /* fills the card next to a taller one, like the content of a plain Card */
+  /* minmax(0, ...): the column has the width of the card, so a chart that measures its parent gets a real number */
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 1fr;
+  min-width: 0;
+  transition: grid-template-rows var(--duration-base) var(--ease-out);
+}
+
+.collapsed .body {
+  grid-template-rows: 0fr;
+}
+
+/* Open: nothing is cut off (a chart tooltip, a focus ring), except during the movement itself */
+.inner {
+  /* A flex column like a plain Card: a chart with flex: 1 takes the height that is left */
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  animation: clip-while-moving var(--duration-base);
+}
+
+.collapsed .inner {
+  min-height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  transition: visibility 0s linear var(--duration-base);
+}
+
+@keyframes clip-while-moving {
+  from,
+  to {
+    overflow: hidden;
+  }
+}
+
+/* Paper shows everything */
+@media print {
+  .toggle {
+    display: none;
+  }
+
+  .collapsed .body {
+    grid-template-rows: 1fr;
+  }
+
+  .collapsed .inner {
+    overflow: visible;
+    visibility: visible;
+  }
+
+  .collapsed .header > * {
+    margin-bottom: var(--space-4);
+  }
+}

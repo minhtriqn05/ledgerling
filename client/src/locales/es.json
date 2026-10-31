@@ -35,7 +35,9 @@
     "totalsFor": "Totales de {{period}}",
     "tryAgain": "Reintentar",
     "type": "Tipo",
-    "viewAll": "Ver todo"
+    "viewAll": "Ver todo",
+    "back": "Volver",
+    "skipToContent": "Saltar al contenido"
   },
   "nav": {
     "admin": "Administración",
@@ -51,11 +53,15 @@
     "recurring": "Recurrentes",
     "reports": "Informes",
     "settings": "Ajustes",
-    "transactions": "Movimientos"
+    "transactions": "Movimientos",
+    "toWelcome": "Ir a la página de inicio",
+    "collapseSidebar": "Contraer la barra lateral",
+    "expandSidebar": "Expandir la barra lateral"
   },
   "breadcrumb": {
     "label": "Ruta de navegación",
-    "transactionDetails": "Detalles de la transacción"
+    "transactionDetails": "Detalles de la transacción",
+    "home": "Inicio"
   },
   "language": {
     "label": "Idioma"
@@ -133,7 +139,9 @@
     "note": "Los atajos se ignoran mientras escribes en un campo.",
     "quickAdd": "Añadir un movimiento rápidamente",
     "search": "Buscar en tus movimientos",
-    "title": "Atajos de teclado"
+    "title": "Atajos de teclado",
+    "sidebar": "Contraer o expandir la barra lateral",
+    "palette": "Abrir la paleta de comandos"
   },
   "errorPage": {
     "reload": "Recargar",
@@ -664,6 +672,41 @@
       "button": "Instalar la app",
       "manual": "Tu navegador no tiene botón de instalación. En iPhone o iPad: toca Compartir y luego Añadir a pantalla de inicio. En Android: abre el menú del navegador y elige Añadir a la pantalla de inicio.",
       "installed": "Ledgerling está instalada en este dispositivo."
+    },
+    "menuLabel": "Secciones de ajustes",
+    "sections": {
+      "profile": {
+        "label": "Perfil",
+        "description": "Tu avatar y tu nombre"
+      },
+      "security": {
+        "label": "Seguridad",
+        "description": "Contraseña y dispositivos conectados"
+      },
+      "appearance": {
+        "label": "Apariencia",
+        "description": "Claro, oscuro o como tu dispositivo"
+      },
+      "preferences": {
+        "label": "Preferencias",
+        "description": "El primer día de la semana"
+      },
+      "notifications": {
+        "label": "Notificaciones",
+        "description": "De qué quieres enterarte"
+      },
+      "app": {
+        "label": "Aplicación",
+        "description": "Instalar Ledgerling en este dispositivo"
+      },
+      "data": {
+        "label": "Datos",
+        "description": "Descargar todo lo que tienes aquí"
+      },
+      "danger": {
+        "label": "Zona de peligro",
+        "description": "Eliminar tu cuenta para siempre"
+      }
     }
   },
   "avatar": {
@@ -772,7 +815,9 @@
       "enable": "Activar",
       "disableFor": "Desactivar a {{name}}",
       "enableFor": "Activar a {{name}}",
-      "noAction": "Esta cuenta no se puede modificar"
+      "noAction": "Esta cuenta no se puede modificar",
+      "pageText": "Busca una cuenta y desactívala o actívala.",
+      "manage": "Gestionar usuarios"
     },
     "dialog": {
       "disableText": "{{name}} se desconectará en todos los dispositivos y no podrá iniciar sesión hasta que vuelvas a activar la cuenta. Sus datos se conservan.",
@@ -856,7 +901,8 @@
     },
     "footerNote": "UIT · CSBU109.R11.KHBC",
     "github": "Ver en GitHub",
-    "opensInNewTab": "(se abre en una pestaña nueva)"
+    "opensInNewTab": "(se abre en una pestaña nueva)",
+    "openApp": "Abrir la aplicación"
   },
   "onboarding": {
     "title": "Empieza con Ledgerling",
@@ -960,5 +1006,126 @@
     "banner": "Estás sin conexión: se muestran los datos guardados",
     "note": "Añadir, editar y eliminar están desactivados hasta que vuelvas a tener conexión.",
     "locked": "No disponible sin conexión"
+  },
+  "card": {
+    "collapse": "Contraer {{title}}",
+    "expand": "Expandir {{title}}"
+  },
+  "unsaved": {
+    "title": "¿Salir sin guardar?",
+    "text": "Tienes cambios sin guardar. Si sales ahora, se perderán.",
+    "stay": "Quedarme",
+    "leave": "Salir"
+  },
+  "userMenu": {
+    "label": "Cuenta",
+    "profile": "Perfil"
+  },
+  "tour": {
+    "open": "Hacer el recorrido",
+    "skip": "Omitir",
+    "next": "Siguiente",
+    "done": "Listo",
+    "counter": "Paso {{step}} de {{total}}",
+    "steps": {
+      "quickAdd": {
+        "title": "Añadido rápido",
+        "text": "Añade una transacción desde cualquier página con este botón o la tecla N. Prueba «café 35k #trabajo»."
+      },
+      "dashboard": {
+        "title": "Panel",
+        "text": "Tu mes de un vistazo: ingresos, gastos, saldo y a dónde fue el dinero."
+      },
+      "budgets": {
+        "title": "Presupuestos",
+        "text": "Fija un límite por categoría. Recibes un aviso al 80 % y al 100 %."
+      },
+      "reports": {
+        "title": "Informes",
+        "text": "Consulta un mes, un año entero o un calendario de tus gastos."
+      },
+      "settings": {
+        "title": "Ajustes",
+        "text": "Tu perfil, seguridad, tema, notificaciones y datos, cada uno en su sección."
+      },
+      "account": {
+        "title": "Tu cuenta",
+        "text": "Abre este menú para cambiar el tema, ver los atajos, cerrar sesión o repetir este recorrido."
+      }
+    }
+  },
+  "commandPalette": {
+    "open": "Buscar…",
+    "title": "Ir a",
+    "placeholder": "Escribe una página, un comando o una nota",
+    "searchLanguage": "Escribe un idioma",
+    "results": "Resultados",
+    "toggleTheme": "Cambiar el tema",
+    "changeLanguage": "Cambiar el idioma",
+    "searching": "Buscando en tus transacciones…",
+    "searchFailed": "Ahora mismo no se puede buscar en tus transacciones.",
+    "noResults": "No se encontró nada.",
+    "groups": {
+      "pages": "Páginas",
+      "actions": "Comandos",
+      "transactions": "Transacciones",
+      "languages": "Idiomas"
+    }
+  },
+  "session": {
+    "title": "La sesión ha caducado",
+    "text": "Por tu seguridad se cerró tu sesión. Vuelve a iniciarla para continuar donde lo dejaste.",
+    "logInAgain": "Iniciar sesión de nuevo"
+  },
+  "legal": {
+    "linksLabel": "Sobre este sitio",
+    "about": {
+      "title": "Acerca de",
+      "lead": "Ledgerling es un registro de gastos personales sencillo y tranquilo.",
+      "what": {
+        "title": "Qué hace",
+        "text": "Anotas ingresos y gastos, fijas presupuestos por categoría, ahorras para tus metas y lees informes de un mes o de un año. Está en ocho idiomas y también funciona en el móvil."
+      },
+      "who": {
+        "title": "Quién lo hizo",
+        "text": "Es el proyecto final de un estudiante para la asignatura Desarrollo de aplicaciones web y bases de datos, clase CSBU109.R11.KHBC, en la UIT."
+      },
+      "built": {
+        "title": "Cómo está hecho",
+        "text": "React en el cliente, Node.js con Express para la API y MongoDB para los datos. El código fuente está en GitHub."
+      }
+    },
+    "privacy": {
+      "title": "Privacidad",
+      "lead": "Qué guarda Ledgerling sobre ti, en palabras sencillas.",
+      "collect": {
+        "title": "Qué se guarda",
+        "text": "Tu nombre, tu correo, tu avatar, una versión cifrada de tu contraseña (bcrypt, nunca la contraseña en sí) y todo lo que introduces: transacciones, categorías, presupuestos, reglas y metas. No hay anuncios ni herramientas de analítica."
+      },
+      "where": {
+        "title": "Dónde está",
+        "text": "Los datos están en una base de datos de MongoDB Atlas; el sitio funciona en Vercel y Render. La fuente viene de Google Fonts. Tu navegador guarda tu token de sesión y tus elecciones, como el tema y el idioma."
+      },
+      "control": {
+        "title": "Qué puedes hacer",
+        "text": "En Ajustes puedes descargar todos tus datos en un archivo y eliminar tu cuenta, lo que borra todo lo que le pertenece."
+      }
+    },
+    "terms": {
+      "title": "Términos",
+      "lead": "Ledgerling es un proyecto de clase, así que estos términos son breves.",
+      "use": {
+        "title": "Uso",
+        "text": "Usa Ledgerling para tus propias cuentas. Guarda tu contraseña para ti y no intentes acceder a los datos de otras personas ni sobrecargar el servicio."
+      },
+      "data": {
+        "title": "Tus datos",
+        "text": "Lo que introduces sigue siendo tuyo. Un administrador puede desactivar una cuenta que incumpla estos términos. Guarda una copia de lo importante: el servicio puede detenerse o reiniciarse al acabar la asignatura."
+      },
+      "warranty": {
+        "title": "Sin garantía",
+        "text": "El servicio es gratuito y no ofrece ninguna garantía. No da consejos financieros, y sus cifras son tan buenas como lo que introduces."
+      }
+    }
   }
 }

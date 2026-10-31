@@ -5,10 +5,10 @@ import { useCurrentBreadcrumbDetail } from '../../context/BreadcrumbContext.jsx'
 import Icon from '../Icon.jsx';
 import styles from './Breadcrumbs.module.css';
 
-// "Dashboard / Reports / Monthly": where the visitor is, and a link to every level above. The trail is made from the
-// address and the route configuration (config/breadcrumbs.js), so no page writes its own.
+// "Home / Reports / Monthly": where the visitor is, and a link to every level above. Home is an icon that goes to the
+// landing page. The trail is made from the address and the route configuration (config/breadcrumbs.js), so no page writes its own.
 // A screen reader gets a navigation landmark named "Breadcrumb", and the current level is marked aria-current="page".
-// On a phone only the level above is shown, as "‹ Reports" (the same links, the others are hidden with CSS).
+// On a phone the Home icon and the level above are shown, as "Home ‹ Reports" (the same links, the others are hidden with CSS).
 export default function Breadcrumbs() {
   // A component test may render a part of a page without a router: then there is no address to read
   if (!useInRouterContext()) return null;
@@ -35,6 +35,15 @@ function Trail() {
                 <span className={styles.current} aria-current="page">
                   {label}
                 </span>
+              ) : item.home ? (
+                <>
+                  <Link to={item.to} className={`${styles.link} ${styles.home}`} aria-label={label} title={label}>
+                    <Icon name="home" size={16} />
+                  </Link>
+                  <span className={styles.separator} aria-hidden="true">
+                    <Icon name="chevronRight" size={14} />
+                  </span>
+                </>
               ) : (
                 <>
                   <span className={styles.backIcon} aria-hidden="true">

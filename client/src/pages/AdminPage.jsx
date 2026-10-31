@@ -1,21 +1,23 @@
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getAdminStats } from '../api/admin.js';
 import { useLoad } from '../hooks/useLoad.js';
 import { formatNumber } from '../utils/format.js';
 import { toChartData } from '../utils/admin.js';
+import Button from '../components/Button/Button.jsx';
 import PageHeader from '../components/PageHeader/PageHeader.jsx';
 import Card, { CardHeader } from '../components/Card/Card.jsx';
 import ErrorState from '../components/ErrorState/ErrorState.jsx';
 import LoadingState from '../components/LoadingState/LoadingState.jsx';
 import StatCard from './reports/StatCard.jsx';
 import CountLineChart from './admin/AdminCharts.jsx';
-import UsersTable from './admin/UsersTable.jsx';
 import styles from './AdminPage.module.css';
 
 // The Admin page (only an admin gets here, see AdminRoute): three number cards, two line charts of the last 30 days
-// and the table of accounts. Plan: docs/plans/admin.md.
+// and the way to the table of accounts (AdminUsersPage). Plan: docs/plans/admin.md.
 export default function AdminPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { data: stats, loading, error, reload } = useLoad(getAdminStats, []);
 
   function renderStats() {
@@ -58,7 +60,13 @@ export default function AdminPage() {
     <div className={styles.page}>
       <PageHeader title={t('nav.admin')} subtitle={t('admin.subtitle')} />
       {renderStats()}
-      <UsersTable />
+      <Card>
+        <CardHeader icon="user" tone="periwinkle" title={t('admin.users.title')} subtitle={t('admin.users.pageText')}>
+          <Button variant="secondary" onClick={() => navigate('/admin/users')}>
+            {t('admin.users.manage')}
+          </Button>
+        </CardHeader>
+      </Card>
     </div>
   );
 }

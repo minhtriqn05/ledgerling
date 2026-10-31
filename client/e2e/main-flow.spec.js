@@ -50,7 +50,8 @@ test('register → add a transaction → see it everywhere → log out', async (
 
   // 6. Log out: a visitor on "/" lands on the landing page, and any other protected page sends us to the login page
   await openMenuIfNeeded(page);
-  await page.getByRole('button', { name: 'Log out' }).click();
+  await page.getByTestId('account').click();
+  await page.getByRole('menuitem', { name: 'Log out' }).click();
   await expect(page).toHaveURL(/\/welcome$/);
 
   await page.goto('/transactions');

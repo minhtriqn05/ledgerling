@@ -14,6 +14,13 @@ import styles from './Settings.module.css';
 
 // Delete the account and all its data. The button stays off until the word DELETE is typed (exactly, in capitals)
 // and a password is entered; the server checks the password. When it is done the person is logged out.
+//
+// A browser sees "a text field, then a password field" as a login form and fills in the saved email and password.
+// new-password says this is not a login, so nothing saved is filled in; the form and the word field also ask for
+// no autofill, and their own names keep the browser from matching them with a saved email or username.
+// The data-* attributes do the same for the password manager extensions (1Password, LastPass, Bitwarden).
+const NO_PASSWORD_MANAGER = { 'data-1p-ignore': 'true', 'data-lpignore': 'true', 'data-bwignore': 'true', 'data-form-type': 'other' };
+
 export default function DangerSection() {
   const { t } = useTranslation();
   const { logout } = useAuth();
@@ -47,21 +54,27 @@ export default function DangerSection() {
     <Card className={styles.danger}>
       <CardHeader icon="alert" tone="coral" title={t('settings.danger.title')} />
       <p className={styles.dangerText}>{t('settings.danger.text')}</p>
-      <form className={styles.form} onSubmit={handleSubmit} noValidate>
+      <form className={styles.form} onSubmit={handleSubmit} autoComplete="off" noValidate>
         <TextField
           label={t('settings.danger.typeToConfirm', { word: DELETE_WORD })}
+          name="delete-confirmation"
           autoComplete="off"
+          autoCapitalize="characters"
+          autoCorrect="off"
           spellCheck={false}
           value={word}
           onChange={(event) => setWord(event.target.value)}
+          {...NO_PASSWORD_MANAGER}
         />
         <TextField
           label={t('settings.danger.password')}
           icon="lock"
           type="password"
-          autoComplete="current-password"
+          name="delete-account-password"
+          autoComplete="new-password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
+          {...NO_PASSWORD_MANAGER}
         />
 
         {error && <Alert>{error}</Alert>}

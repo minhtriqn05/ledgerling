@@ -35,7 +35,9 @@
     "totalsFor": "Summen für {{period}}",
     "tryAgain": "Erneut versuchen",
     "type": "Art",
-    "viewAll": "Alle anzeigen"
+    "viewAll": "Alle anzeigen",
+    "back": "Zurück",
+    "skipToContent": "Zum Inhalt springen"
   },
   "nav": {
     "admin": "Admin",
@@ -51,11 +53,15 @@
     "recurring": "Daueraufträge",
     "reports": "Berichte",
     "settings": "Einstellungen",
-    "transactions": "Buchungen"
+    "transactions": "Buchungen",
+    "toWelcome": "Zur Startseite",
+    "collapseSidebar": "Seitenleiste einklappen",
+    "expandSidebar": "Seitenleiste ausklappen"
   },
   "breadcrumb": {
     "label": "Brotkrümelnavigation",
-    "transactionDetails": "Transaktionsdetails"
+    "transactionDetails": "Transaktionsdetails",
+    "home": "Startseite"
   },
   "language": {
     "label": "Sprache"
@@ -133,7 +139,9 @@
     "note": "Während der Eingabe in ein Feld sind die Tastenkürzel inaktiv.",
     "quickAdd": "Buchung schnell hinzufügen",
     "search": "Buchungen durchsuchen",
-    "title": "Tastenkürzel"
+    "title": "Tastenkürzel",
+    "sidebar": "Seitenleiste ein- oder ausklappen",
+    "palette": "Befehlspalette öffnen"
   },
   "errorPage": {
     "reload": "Neu laden",
@@ -664,6 +672,41 @@
       "button": "App installieren",
       "manual": "Dein Browser hat keine Installationsschaltfläche. Auf iPhone oder iPad: Tippe auf Teilen, dann auf Zum Home-Bildschirm. Auf Android: Öffne das Browsermenü und wähle Zum Startbildschirm hinzufügen.",
       "installed": "Ledgerling ist auf diesem Gerät installiert."
+    },
+    "menuLabel": "Bereiche der Einstellungen",
+    "sections": {
+      "profile": {
+        "label": "Profil",
+        "description": "Dein Avatar und dein Name"
+      },
+      "security": {
+        "label": "Sicherheit",
+        "description": "Passwort und angemeldete Geräte"
+      },
+      "appearance": {
+        "label": "Darstellung",
+        "description": "Hell, dunkel oder wie dein Gerät"
+      },
+      "preferences": {
+        "label": "Vorlieben",
+        "description": "Der erste Tag der Woche"
+      },
+      "notifications": {
+        "label": "Benachrichtigungen",
+        "description": "Worüber du informiert werden willst"
+      },
+      "app": {
+        "label": "App",
+        "description": "Ledgerling auf diesem Gerät installieren"
+      },
+      "data": {
+        "label": "Daten",
+        "description": "Alles herunterladen, was du hier hast"
+      },
+      "danger": {
+        "label": "Gefahrenbereich",
+        "description": "Dein Konto endgültig löschen"
+      }
     }
   },
   "avatar": {
@@ -772,7 +815,9 @@
       "enable": "Entsperren",
       "disableFor": "{{name}} sperren",
       "enableFor": "{{name}} entsperren",
-      "noAction": "Dieses Konto kann nicht geändert werden"
+      "noAction": "Dieses Konto kann nicht geändert werden",
+      "pageText": "Finde ein Konto und deaktiviere oder aktiviere es.",
+      "manage": "Benutzer verwalten"
     },
     "dialog": {
       "disableText": "{{name}} wird auf allen Geräten abgemeldet und kann sich nicht mehr anmelden, bis du das Konto wieder entsperrst. Die Daten bleiben erhalten.",
@@ -856,7 +901,8 @@
     },
     "footerNote": "UIT · CSBU109.R11.KHBC",
     "github": "Auf GitHub ansehen",
-    "opensInNewTab": "(öffnet in einem neuen Tab)"
+    "opensInNewTab": "(öffnet in einem neuen Tab)",
+    "openApp": "App öffnen"
   },
   "onboarding": {
     "title": "Erste Schritte mit Ledgerling",
@@ -960,5 +1006,126 @@
     "banner": "Du bist offline – gespeicherte Daten werden angezeigt",
     "note": "Hinzufügen, Bearbeiten und Löschen sind deaktiviert, bis du wieder online bist.",
     "locked": "Offline nicht verfügbar"
+  },
+  "card": {
+    "collapse": "{{title}} einklappen",
+    "expand": "{{title}} ausklappen"
+  },
+  "unsaved": {
+    "title": "Ohne Speichern verlassen?",
+    "text": "Du hast Änderungen, die noch nicht gespeichert sind. Wenn du jetzt gehst, gehen sie verloren.",
+    "stay": "Bleiben",
+    "leave": "Verlassen"
+  },
+  "userMenu": {
+    "label": "Konto",
+    "profile": "Profil"
+  },
+  "tour": {
+    "open": "Rundgang starten",
+    "skip": "Überspringen",
+    "next": "Weiter",
+    "done": "Fertig",
+    "counter": "Schritt {{step}} von {{total}}",
+    "steps": {
+      "quickAdd": {
+        "title": "Schnell hinzufügen",
+        "text": "Füge von jeder Seite eine Buchung hinzu, mit dieser Schaltfläche oder der Taste N. Probiere „Kaffee 35k #arbeit“."
+      },
+      "dashboard": {
+        "title": "Übersicht",
+        "text": "Dein Monat auf einen Blick: Einnahmen, Ausgaben, Saldo und wohin das Geld ging."
+      },
+      "budgets": {
+        "title": "Budgets",
+        "text": "Lege pro Kategorie ein Limit fest. Bei 80 % und 100 % bekommst du eine Warnung."
+      },
+      "reports": {
+        "title": "Berichte",
+        "text": "Sieh dir einen Monat, ein ganzes Jahr oder den Kalender deiner Ausgaben an."
+      },
+      "settings": {
+        "title": "Einstellungen",
+        "text": "Profil, Sicherheit, Design, Benachrichtigungen und Daten, jeweils in einem eigenen Bereich."
+      },
+      "account": {
+        "title": "Dein Konto",
+        "text": "Öffne dieses Menü, um das Design zu ändern, Tastenkürzel zu sehen, dich abzumelden oder den Rundgang zu wiederholen."
+      }
+    }
+  },
+  "commandPalette": {
+    "open": "Suchen…",
+    "title": "Springen zu",
+    "placeholder": "Seite, Befehl oder Buchungsnotiz eingeben",
+    "searchLanguage": "Sprache eingeben",
+    "results": "Ergebnisse",
+    "toggleTheme": "Design umschalten",
+    "changeLanguage": "Sprache ändern",
+    "searching": "Deine Buchungen werden durchsucht…",
+    "searchFailed": "Deine Buchungen können gerade nicht durchsucht werden.",
+    "noResults": "Nichts gefunden.",
+    "groups": {
+      "pages": "Seiten",
+      "actions": "Befehle",
+      "transactions": "Buchungen",
+      "languages": "Sprachen"
+    }
+  },
+  "session": {
+    "title": "Sitzung abgelaufen",
+    "text": "Zu deiner Sicherheit wurdest du abgemeldet. Melde dich erneut an, um dort weiterzumachen, wo du warst.",
+    "logInAgain": "Erneut anmelden"
+  },
+  "legal": {
+    "linksLabel": "Über diese Website",
+    "about": {
+      "title": "Über uns",
+      "lead": "Ledgerling ist ein ruhiger, einfacher Ausgabentracker für den Alltag.",
+      "what": {
+        "title": "Was es kann",
+        "text": "Du erfasst Einnahmen und Ausgaben, setzt Budgets pro Kategorie, sparst auf Ziele hin und liest Berichte für einen Monat oder ein Jahr. Es gibt acht Sprachen, und es funktioniert auch auf dem Handy."
+      },
+      "who": {
+        "title": "Wer es gemacht hat",
+        "text": "Es ist die Abschlussarbeit eines Studierenden im Kurs Entwicklung von Webanwendungen und Datenbanken, Klasse CSBU109.R11.KHBC, an der UIT."
+      },
+      "built": {
+        "title": "Wie es gebaut ist",
+        "text": "React im Client, Node.js mit Express für die API und MongoDB für die Daten. Der Quellcode liegt auf GitHub."
+      }
+    },
+    "privacy": {
+      "title": "Datenschutz",
+      "lead": "Was Ledgerling über dich speichert, in einfachen Worten.",
+      "collect": {
+        "title": "Was gespeichert wird",
+        "text": "Dein Name, deine E-Mail, dein Avatar, eine verschlüsselte Form deines Passworts (bcrypt, nie das Passwort selbst) und alles, was du eingibst: Buchungen, Kategorien, Budgets, Regeln und Ziele. Es gibt keine Werbung und keine Analysewerkzeuge."
+      },
+      "where": {
+        "title": "Wo es liegt",
+        "text": "Die Daten liegen in einer MongoDB-Atlas-Datenbank; die Website läuft auf Vercel und Render. Die Schrift kommt von Google Fonts. Dein Browser speichert dein Anmelde-Token und deine Auswahl wie Design und Sprache."
+      },
+      "control": {
+        "title": "Was du tun kannst",
+        "text": "In den Einstellungen kannst du alle Daten als eine Datei herunterladen und dein Konto löschen; dabei wird alles entfernt, was dazu gehört."
+      }
+    },
+    "terms": {
+      "title": "Nutzungsbedingungen",
+      "lead": "Ledgerling ist ein Kursprojekt, deshalb sind diese Bedingungen kurz.",
+      "use": {
+        "title": "Nutzung",
+        "text": "Nutze Ledgerling für deine eigenen Finanzen. Behalte dein Passwort für dich und versuche nicht, auf Daten anderer zuzugreifen oder den Dienst zu überlasten."
+      },
+      "data": {
+        "title": "Deine Daten",
+        "text": "Was du eingibst, bleibt deins. Ein Admin kann ein Konto deaktivieren, das gegen diese Bedingungen verstößt. Bewahre eine Kopie von Wichtigem auf: Der Dienst kann am Kursende eingestellt oder zurückgesetzt werden."
+      },
+      "warranty": {
+        "title": "Keine Garantie",
+        "text": "Der Dienst ist kostenlos und ohne jede Garantie. Er gibt keine Finanzberatung, und die Zahlen sind nur so gut wie deine Eingaben."
+      }
+    }
   }
 }

@@ -2,6 +2,7 @@
   display: grid;
   grid-template-columns: calc(var(--sidebar-width) + var(--frame-gap)) minmax(0, 1fr);
   min-height: 100vh;
+  transition: grid-template-columns var(--duration-base) var(--ease-out);
 }
 
 /* ---------- Sidebar ---------- */
@@ -9,9 +10,10 @@
 .sidebar {
   position: sticky;
   top: var(--frame-gap);
+  z-index: 5; /* the tooltips of the folded sidebar go over the page */
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-4);
   height: calc(100vh - 2 * var(--frame-gap));
   margin: var(--frame-gap) 0 var(--frame-gap) var(--frame-gap);
   padding: var(--space-5) var(--space-3);
@@ -54,7 +56,7 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-4);
   min-height: 0;
 }
 
@@ -65,6 +67,18 @@
   gap: 2px;
   padding: 0 var(--space-2);
   color: var(--color-text);
+}
+
+/* The logo is the way back to the landing page */
+.logoLink {
+  display: inline-flex;
+  border-radius: var(--radius-md);
+  color: inherit;
+}
+
+.logoLink:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
 }
 
 .nav {
@@ -97,12 +111,16 @@
   transform: translateY(-50%);
 }
 
+/* One line, cut off by its own box: while the sidebar moves, the words do not jump to a second line. */
 .navLabel {
+  flex: 1;
   min-width: 0;
-  overflow-wrap: anywhere;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* Used by the three links and by the Log out button, so they look the same. */
+/* Used by the links and by the search button, so they look the same. */
 .navItem {
   position: relative;
   display: flex;
@@ -121,6 +139,10 @@
   cursor: pointer;
   transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out),
     transform var(--duration-fast) var(--ease-out);
+}
+
+.navItem > svg {
+  flex-shrink: 0;
 }
 
 .navItem:active {
@@ -144,7 +166,23 @@
   font-weight: var(--font-weight-semibold);
 }
 
-/* The language picker and Log out, at the bottom of the sidebar. */
+/* Opens the command palette; it looks like a quiet search box */
+.searchButton {
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-regular);
+}
+
+.searchKey {
+  flex-shrink: 0;
+  padding: 0 var(--space-1);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: var(--font-size-xs);
+}
+
+/* The language picker, the fold button and the account, at the bottom of the sidebar. */
 .panelFooter {
   display: flex;
   flex-direction: column;
@@ -152,42 +190,166 @@
   margin-top: auto;
 }
 
-/* Who is signed in: the avatar, the name and the email. The name changes as soon as it is saved in Settings. */
-.account {
+.footerRow {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  min-width: 0;
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-md);
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.collapseButton {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+}
+
+.collapseButton:hover {
   background: var(--color-surface-muted);
+  color: var(--color-text);
 }
 
-.accountText {
-  display: flex;
+.collapseButton:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+/* ---------- The folded sidebar: only icons ---------- */
+.collapsed {
+  grid-template-columns: calc(var(--sidebar-width-collapsed) + var(--frame-gap)) minmax(0, 1fr);
+}
+
+.collapsed .bar {
   flex-direction: column;
-  min-width: 0;
+  gap: var(--space-3);
 }
 
-.accountName,
-.accountEmail {
+.collapsed .brand {
+  align-items: center;
+  padding: 0;
+}
+
+/* Only the dot stays; the words are in its tooltip */
+.collapsed [data-testid='live-status'] {
+  gap: 0;
+  font-size: 0;
+}
+
+.collapsed .navItem {
+  justify-content: center;
+  gap: 0;
+  padding-inline: 0;
+}
+
+/* Out of sight, but a screen reader still hears the name of the link */
+.collapsed .navLabel {
+  flex: 0 0 0;
+  width: 0;
+}
+
+.collapsed .searchKey {
+  display: none;
+}
+
+.collapsed .footerRow {
+  flex-direction: column;
+}
+
+/* The language picker is only its short code here */
+.collapsed .language,
+.collapsed .language > *,
+.collapsed .language [role='combobox'] {
+  width: 100%;
+}
+
+.collapsed .language [role='combobox'] {
+  justify-content: center;
+  padding: 0;
+  text-align: center;
+}
+
+.collapsed .language [role='combobox'] > span {
+  flex: none;
+}
+
+.collapsed .language [role='combobox'] svg {
+  display: none;
+}
+
+/* The account is only its face */
+.collapsed [data-testid='account'] {
+  justify-content: center;
+  padding: var(--space-1);
+}
+
+/* Out of sight, but the name and the email stay the name of the button for a screen reader */
+.collapsed [data-account-text] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
   overflow: hidden;
-  text-overflow: ellipsis;
+  clip-path: inset(50%);
   white-space: nowrap;
 }
 
-.accountName {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
+.collapsed [data-account-chevron] {
+  display: none;
 }
 
-.accountEmail {
+/* The name of an icon, next to it, on hover and on keyboard focus */
+.collapsed [data-tooltip]:hover::after,
+.collapsed [data-tooltip]:focus-visible::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: 50%;
+  left: calc(100% + var(--space-3));
+  z-index: 10;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--color-text);
+  color: var(--color-surface);
   font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translateY(-50%);
 }
 
-.language {
-  width: 100%;
+/* A low window (a small laptop): everything a little tighter, so the account card stays on screen, also when folded */
+@media (min-width: 768px) and (max-height: 820px) {
+  .sidebar {
+    gap: var(--space-2);
+    padding-block: var(--space-3);
+  }
+
+  .panel {
+    gap: var(--space-2);
+  }
+
+  .nav {
+    gap: 2px;
+  }
+
+  .navItem {
+    min-height: 36px;
+    padding-block: var(--space-1);
+  }
+}
+
+/* Lower still: the sidebar scrolls by itself */
+@media (min-width: 768px) and (max-height: 700px) {
+  .sidebar {
+    overflow-y: auto;
+  }
 }
 
 /* ---------- Main area ---------- */
@@ -313,6 +475,11 @@
     margin-top: 0;
     padding-top: var(--space-2);
     border-top: 1px solid var(--color-border);
+  }
+
+  .searchKey,
+  .collapseButton {
+    display: none;
   }
 
   .main {

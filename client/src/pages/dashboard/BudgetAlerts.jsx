@@ -5,7 +5,7 @@ import { useLoad } from '../../hooks/useLoad.js';
 import { useLiveRefresh } from '../../hooks/useLiveRefresh.js';
 import { formatPercent, formatVnd } from '../../utils/format.js';
 import { formatMonth } from '../../utils/vnDate.js';
-import Card, { CardHeader } from '../../components/Card/Card.jsx';
+import CollapsibleCard from '../../components/CollapsibleCard/CollapsibleCard.jsx';
 import Button from '../../components/Button/Button.jsx';
 import LoadingState from '../../components/LoadingState/LoadingState.jsx';
 import Icon from '../../components/Icon.jsx';
@@ -75,13 +75,19 @@ export default function BudgetAlerts({ month }) {
   }
 
   return (
-    <Card>
-      <CardHeader icon="alert" tone="coral" title={t('dashboard.budgetAlerts')} subtitle={formatMonth(month)}>
+    <CollapsibleCard
+      id="dashboard.budgetAlerts"
+      icon="alert"
+      tone="coral"
+      title={t('dashboard.budgetAlerts')}
+      subtitle={formatMonth(month)}
+      actions={
         <Button variant="secondary" onClick={() => navigate('/budgets')}>
           {t('dashboard.manageBudgets')}
         </Button>
-      </CardHeader>
+      }
+    >
       {renderBody()}
-    </Card>
+    </CollapsibleCard>
   );
 }
