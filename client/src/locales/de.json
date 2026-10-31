@@ -38,6 +38,7 @@
     "viewAll": "Alle anzeigen"
   },
   "nav": {
+    "admin": "Admin",
     "budgets": "Budgets",
     "categories": "Kategorien",
     "closeMenu": "Menü schließen",
@@ -653,11 +654,72 @@
       "deleted": "Dein Konto wurde gelöscht."
     }
   },
+  "admin": {
+    "subtitle": "Statistiken und Konten der Website. Nur Admins sehen diese Seite.",
+    "stats": {
+      "activeUsers": "Aktiv in den letzten 7 Tagen",
+      "label": "Gesamtzahlen der Website",
+      "totalTransactions": "Transaktionen",
+      "totalUsers": "Nutzer"
+    },
+    "charts": {
+      "last30": "Letzte 30 Tage",
+      "newUsers": "Neue Nutzer",
+      "newUsersLabel": "Liniendiagramm: neue Nutzer pro Tag in den letzten 30 Tagen",
+      "transactions": "Transaktionen",
+      "transactionsLabel": "Liniendiagramm: Transaktionen pro Tag in den letzten 30 Tagen"
+    },
+    "users": {
+      "title": "Nutzer",
+      "search": "Nach Name oder E-Mail suchen",
+      "loading": "Nutzer werden geladen…",
+      "count_one": "{{count}} Nutzer",
+      "count_other": "{{count}} Nutzer",
+      "emptyTitle": "Keine Nutzer gefunden",
+      "emptyText": "Kein Name und keine E-Mail passt zu „{{q}}“.",
+      "columns": {
+        "name": "Name",
+        "email": "E-Mail",
+        "role": "Rolle",
+        "status": "Status",
+        "joined": "Beigetreten",
+        "transactions": "Transaktionen",
+        "actions": "Aktionen"
+      },
+      "roles": {
+        "user": "Nutzer",
+        "admin": "Admin"
+      },
+      "statuses": {
+        "active": "Aktiv",
+        "disabled": "Gesperrt"
+      },
+      "you": "Du",
+      "disable": "Sperren",
+      "enable": "Entsperren",
+      "disableFor": "{{name}} sperren",
+      "enableFor": "{{name}} entsperren",
+      "noAction": "Dieses Konto kann nicht geändert werden"
+    },
+    "dialog": {
+      "disableText": "{{name}} wird auf allen Geräten abgemeldet und kann sich nicht mehr anmelden, bis du das Konto wieder entsperrst. Die Daten bleiben erhalten.",
+      "disableTitle": "Dieses Konto sperren?",
+      "disabled": "{{name}} wurde gesperrt",
+      "disabling": "Wird gesperrt…",
+      "enableText": "{{name}} kann sich wieder anmelden.",
+      "enableTitle": "Dieses Konto entsperren?",
+      "enabled": "{{name}} wurde entsperrt",
+      "enabling": "Wird entsperrt…"
+    }
+  },
   "errors": {
+    "ACCOUNT_DISABLED": "Dieses Konto wurde gesperrt",
     "AMOUNT_INVALID": "Der Betrag muss größer als 0 sein",
     "BUDGET_EXISTS": "Für diese Kategorie und diesen Monat gibt es bereits ein Budget",
     "BUDGET_EXPENSE_ONLY": "Budgets gibt es nur für Ausgabenkategorien",
     "BUDGET_NOT_FOUND": "Budget nicht gefunden",
+    "CANNOT_DISABLE_ADMIN": "Du kannst keinen anderen Admin sperren",
+    "CANNOT_DISABLE_SELF": "Du kannst dein eigenes Konto nicht sperren",
     "CATEGORY_EXISTS": "Diese Kategorie existiert bereits",
     "CATEGORY_HAS_RULES": "Diese Kategorie hat noch Daueraufträge",
     "CATEGORY_IN_USE": "Diese Kategorie hat noch Buchungen",
@@ -675,6 +737,7 @@
     "EMAIL_INVALID": "Ungültige E-Mail-Adresse",
     "EMAIL_TAKEN": "Diese E-Mail-Adresse ist bereits registriert",
     "END_BEFORE_START": "Das Enddatum muss nach dem Startdatum liegen",
+    "FORBIDDEN": "Dafür fehlt dir die Berechtigung",
     "GOAL_NOT_FOUND": "Sparziel nicht gefunden",
     "ICON_INVALID": "Bitte wähle ein Symbol aus der Liste",
     "IMPORT_CATEGORY_NOT_FOUND": "Kategorie „{{name}}“ ({{type}}) nicht gefunden",
@@ -696,6 +759,7 @@
     "PASSWORD_UNCHANGED": "Das neue Passwort muss sich vom aktuellen unterscheiden",
     "ROUTE_NOT_FOUND": "Nicht gefunden",
     "RULE_NOT_FOUND": "Dauerauftrag nicht gefunden",
+    "STATUS_INVALID": "Der Status muss aktiv oder gesperrt sein",
     "TAG_INVALID": "Jedes Schlagwort hat 1–20 Buchstaben, Ziffern oder Bindestriche",
     "TARGET_INVALID": "Der Zielbetrag muss eine ganze Zahl größer als 0 sein",
     "TEMPLATE_NOT_FOUND": "Vorlage nicht gefunden",
@@ -707,6 +771,7 @@
     "TYPE_LOCKED": "Die Art kann nicht geändert werden",
     "UNAUTHORIZED": "Bitte melde dich an, um fortzufahren.",
     "UNKNOWN": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+    "USER_NOT_FOUND": "Nutzer nicht gefunden",
     "VALIDATION_ERROR": "Bitte prüfe deine Eingaben.",
     "WITHDRAW_TOO_MUCH": "Du kannst nicht mehr auszahlen, als gespart ist",
     "WRONG_PASSWORD": "Das Passwort ist falsch"

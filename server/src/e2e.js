@@ -2,6 +2,7 @@
 // It uses an empty MongoDB in memory instead of Atlas and never reads .env,
 // so end-to-end tests can never touch the real database.
 import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 import { MongoMemoryServer } from "mongodb-memory-server";
 
 const PORT = 4100;
@@ -13,6 +14,17 @@ process.env.CLIENT_URL = "http://localhost:5174";
 
 const mongod = await MongoMemoryServer.create();
 await mongoose.connect(mongod.getUri());
+
+// The one admin of the test database, for e2e/admin.spec.js. It exists only here: no route can create an admin.
+const { default: User } = await import("./models/User.js");
+const { createDefaultCategories } = await import("./services/categoryService.js");
+const admin = await User.create({
+  name: "E2E Admin",
+  email: "admin@e2e.test",
+  passwordHash: await bcrypt.hash("secret123", 10),
+  role: "admin",
+});
+await createDefaultCategories(admin._id);
 
 // app.js reads CLIENT_URL when it is loaded, so it is imported after the variables above are set
 const { default: app } = await import("./app.js");

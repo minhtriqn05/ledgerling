@@ -1,0 +1,35 @@
+/* A fixed height: ResponsiveContainer measures its parent, and a percent height of an auto-height parent is 0 */
+.chart {
+  height: 260px;
+}
+
+.tooltip {
+  min-width: 140px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  font-size: var(--font-size-xs);
+}
+
+.tooltipLabel {
+  margin: 0 0 var(--space-1);
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-medium);
+}
+
+.tooltipRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.tooltipRow strong {
+  margin-left: auto;
+  padding-left: var(--space-3);
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}

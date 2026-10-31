@@ -38,6 +38,7 @@
     "viewAll": "Ver todo"
   },
   "nav": {
+    "admin": "Administración",
     "budgets": "Presupuestos",
     "categories": "Categorías",
     "closeMenu": "Cerrar menú",
@@ -653,11 +654,72 @@
       "deleted": "Tu cuenta se ha eliminado."
     }
   },
+  "admin": {
+    "subtitle": "Estadísticas del sitio y cuentas. Solo los administradores ven esta página.",
+    "stats": {
+      "activeUsers": "Activos en los últimos 7 días",
+      "label": "Totales del sitio",
+      "totalTransactions": "Transacciones",
+      "totalUsers": "Usuarios"
+    },
+    "charts": {
+      "last30": "Últimos 30 días",
+      "newUsers": "Usuarios nuevos",
+      "newUsersLabel": "Gráfico de líneas: usuarios nuevos por día en los últimos 30 días",
+      "transactions": "Transacciones",
+      "transactionsLabel": "Gráfico de líneas: transacciones por día en los últimos 30 días"
+    },
+    "users": {
+      "title": "Usuarios",
+      "search": "Buscar por nombre o correo",
+      "loading": "Cargando usuarios…",
+      "count_one": "{{count}} usuario",
+      "count_other": "{{count}} usuarios",
+      "emptyTitle": "No se encontraron usuarios",
+      "emptyText": "Ningún nombre ni correo coincide con «{{q}}».",
+      "columns": {
+        "name": "Nombre",
+        "email": "Correo",
+        "role": "Rol",
+        "status": "Estado",
+        "joined": "Registro",
+        "transactions": "Transacciones",
+        "actions": "Acciones"
+      },
+      "roles": {
+        "user": "Usuario",
+        "admin": "Administrador"
+      },
+      "statuses": {
+        "active": "Activo",
+        "disabled": "Desactivado"
+      },
+      "you": "Tú",
+      "disable": "Desactivar",
+      "enable": "Activar",
+      "disableFor": "Desactivar a {{name}}",
+      "enableFor": "Activar a {{name}}",
+      "noAction": "Esta cuenta no se puede modificar"
+    },
+    "dialog": {
+      "disableText": "{{name}} se desconectará en todos los dispositivos y no podrá iniciar sesión hasta que vuelvas a activar la cuenta. Sus datos se conservan.",
+      "disableTitle": "¿Desactivar esta cuenta?",
+      "disabled": "{{name}} fue desactivado",
+      "disabling": "Desactivando…",
+      "enableText": "{{name}} podrá iniciar sesión de nuevo.",
+      "enableTitle": "¿Activar esta cuenta?",
+      "enabled": "{{name}} fue activado",
+      "enabling": "Activando…"
+    }
+  },
   "errors": {
+    "ACCOUNT_DISABLED": "Esta cuenta ha sido desactivada",
     "AMOUNT_INVALID": "El importe debe ser mayor que 0",
     "BUDGET_EXISTS": "Ya existe un presupuesto para esta categoría y este mes",
     "BUDGET_EXPENSE_ONLY": "Los presupuestos son solo para categorías de gastos",
     "BUDGET_NOT_FOUND": "Presupuesto no encontrado",
+    "CANNOT_DISABLE_ADMIN": "No puedes desactivar a otro administrador",
+    "CANNOT_DISABLE_SELF": "No puedes desactivar tu propia cuenta",
     "CATEGORY_EXISTS": "La categoría ya existe",
     "CATEGORY_HAS_RULES": "La categoría todavía tiene reglas recurrentes",
     "CATEGORY_IN_USE": "La categoría todavía tiene movimientos",
@@ -675,6 +737,7 @@
     "EMAIL_INVALID": "El correo electrónico no es válido",
     "EMAIL_TAKEN": "Este correo electrónico ya está registrado",
     "END_BEFORE_START": "La fecha de fin debe ser posterior a la de inicio",
+    "FORBIDDEN": "No tienes permiso para hacer esto",
     "GOAL_NOT_FOUND": "Meta no encontrada",
     "ICON_INVALID": "Elige un icono de la lista",
     "IMPORT_CATEGORY_NOT_FOUND": "Categoría «{{name}}» ({{type}}) no encontrada",
@@ -696,6 +759,7 @@
     "PASSWORD_UNCHANGED": "La contraseña nueva debe ser distinta de la actual",
     "ROUTE_NOT_FOUND": "No encontrado",
     "RULE_NOT_FOUND": "Regla recurrente no encontrada",
+    "STATUS_INVALID": "El estado debe ser activo o desactivado",
     "TAG_INVALID": "Cada etiqueta debe tener de 1 a 20 letras, números o guiones",
     "TARGET_INVALID": "El importe objetivo debe ser un número entero mayor que 0",
     "TEMPLATE_NOT_FOUND": "Plantilla no encontrada",
@@ -707,6 +771,7 @@
     "TYPE_LOCKED": "El tipo no se puede cambiar",
     "UNAUTHORIZED": "Inicia sesión para continuar.",
     "UNKNOWN": "Algo ha ido mal. Inténtalo de nuevo.",
+    "USER_NOT_FOUND": "Usuario no encontrado",
     "VALIDATION_ERROR": "Revisa los valores introducidos.",
     "WITHDRAW_TOO_MUCH": "No puedes retirar más que el importe ahorrado",
     "WRONG_PASSWORD": "La contraseña no es correcta"

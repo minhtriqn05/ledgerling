@@ -1,0 +1,171 @@
+.search {
+  max-width: 420px;
+  margin-bottom: var(--space-4);
+}
+
+.tableWrap {
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+/* The rows of the page before are still shown while the next ones load */
+.busy {
+  opacity: 0.55;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.table th {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.table td {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table tbody tr:hover {
+  background: var(--color-surface-muted);
+}
+
+.table th.number,
+.table td.number {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.name {
+  font-weight: var(--font-weight-semibold);
+  overflow-wrap: anywhere;
+}
+
+.email {
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+/* "You" next to my own name */
+.you {
+  margin-left: var(--space-2);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-muted);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+}
+
+.admin {
+  background: var(--color-primary-soft);
+  color: var(--color-primary-text);
+}
+
+.plain {
+  background: var(--color-surface-muted);
+  color: var(--color-text-secondary);
+}
+
+.active {
+  background: var(--color-income-soft);
+  color: var(--color-income-text);
+}
+
+.disabled {
+  background: var(--color-expense-soft);
+  color: var(--color-expense-text);
+}
+
+.action {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.table .rowButton {
+  height: 32px;
+  padding: 0 var(--space-4);
+  font-size: var(--font-size-sm);
+}
+
+.none {
+  color: var(--color-text-muted);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- Phone: every account becomes a small card, the column names move next to the values ---------- */
+@media (max-width: 760px) {
+  .table,
+  .table tbody,
+  .table tr,
+  .table td {
+    display: block;
+  }
+
+  .table thead {
+    display: none;
+  }
+
+  .table tr {
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .table tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .table td,
+  .table tbody tr:last-child td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-1) 0;
+    border-bottom: none;
+    text-align: right;
+  }
+
+  .table td[data-label]::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    text-align: left;
+  }
+
+  .table td.action {
+    justify-content: flex-end;
+    padding-top: var(--space-2);
+  }
+}

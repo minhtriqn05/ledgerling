@@ -38,6 +38,7 @@
     "viewAll": "Tout voir"
   },
   "nav": {
+    "admin": "Administration",
     "budgets": "Budgets",
     "categories": "Catégories",
     "closeMenu": "Fermer le menu",
@@ -653,11 +654,72 @@
       "deleted": "Votre compte a été supprimé."
     }
   },
+  "admin": {
+    "subtitle": "Statistiques du site et comptes. Seuls les administrateurs voient cette page.",
+    "stats": {
+      "activeUsers": "Actifs ces 7 derniers jours",
+      "label": "Totaux du site",
+      "totalTransactions": "Transactions",
+      "totalUsers": "Utilisateurs"
+    },
+    "charts": {
+      "last30": "30 derniers jours",
+      "newUsers": "Nouveaux utilisateurs",
+      "newUsersLabel": "Courbe : nouveaux utilisateurs par jour sur les 30 derniers jours",
+      "transactions": "Transactions",
+      "transactionsLabel": "Courbe : transactions par jour sur les 30 derniers jours"
+    },
+    "users": {
+      "title": "Utilisateurs",
+      "search": "Rechercher par nom ou e-mail",
+      "loading": "Chargement des utilisateurs…",
+      "count_one": "{{count}} utilisateur",
+      "count_other": "{{count}} utilisateurs",
+      "emptyTitle": "Aucun utilisateur trouvé",
+      "emptyText": "Aucun nom ni e-mail ne correspond à « {{q}} ».",
+      "columns": {
+        "name": "Nom",
+        "email": "E-mail",
+        "role": "Rôle",
+        "status": "Statut",
+        "joined": "Inscription",
+        "transactions": "Transactions",
+        "actions": "Actions"
+      },
+      "roles": {
+        "user": "Utilisateur",
+        "admin": "Administrateur"
+      },
+      "statuses": {
+        "active": "Actif",
+        "disabled": "Désactivé"
+      },
+      "you": "Vous",
+      "disable": "Désactiver",
+      "enable": "Activer",
+      "disableFor": "Désactiver {{name}}",
+      "enableFor": "Activer {{name}}",
+      "noAction": "Ce compte ne peut pas être modifié"
+    },
+    "dialog": {
+      "disableText": "{{name}} sera déconnecté sur tous les appareils et ne pourra plus se connecter tant que vous n’aurez pas réactivé le compte. Ses données sont conservées.",
+      "disableTitle": "Désactiver ce compte ?",
+      "disabled": "{{name}} a été désactivé",
+      "disabling": "Désactivation…",
+      "enableText": "{{name}} pourra de nouveau se connecter.",
+      "enableTitle": "Activer ce compte ?",
+      "enabled": "{{name}} a été activé",
+      "enabling": "Activation…"
+    }
+  },
   "errors": {
+    "ACCOUNT_DISABLED": "Ce compte a été désactivé",
     "AMOUNT_INVALID": "Le montant doit être supérieur à 0",
     "BUDGET_EXISTS": "Un budget existe déjà pour cette catégorie et ce mois",
     "BUDGET_EXPENSE_ONLY": "Les budgets concernent uniquement les catégories de dépenses",
     "BUDGET_NOT_FOUND": "Budget introuvable",
+    "CANNOT_DISABLE_ADMIN": "Vous ne pouvez pas désactiver un autre administrateur",
+    "CANNOT_DISABLE_SELF": "Vous ne pouvez pas désactiver votre propre compte",
     "CATEGORY_EXISTS": "Cette catégorie existe déjà",
     "CATEGORY_HAS_RULES": "Cette catégorie a encore des règles récurrentes",
     "CATEGORY_IN_USE": "Cette catégorie a encore des transactions",
@@ -675,6 +737,7 @@
     "EMAIL_INVALID": "E-mail non valide",
     "EMAIL_TAKEN": "Cet e-mail est déjà enregistré",
     "END_BEFORE_START": "La date de fin doit être postérieure à la date de début",
+    "FORBIDDEN": "Vous n’avez pas la permission de faire cela",
     "GOAL_NOT_FOUND": "Objectif introuvable",
     "ICON_INVALID": "Veuillez choisir une icône dans la liste",
     "IMPORT_CATEGORY_NOT_FOUND": "Catégorie « {{name}} » ({{type}}) introuvable",
@@ -696,6 +759,7 @@
     "PASSWORD_UNCHANGED": "Le nouveau mot de passe doit être différent de l'actuel",
     "ROUTE_NOT_FOUND": "Introuvable",
     "RULE_NOT_FOUND": "Règle récurrente introuvable",
+    "STATUS_INVALID": "Le statut doit être actif ou désactivé",
     "TAG_INVALID": "Chaque étiquette contient de 1 à 20 lettres, chiffres ou tirets",
     "TARGET_INVALID": "Le montant cible doit être un nombre entier supérieur à 0",
     "TEMPLATE_NOT_FOUND": "Modèle introuvable",
@@ -707,6 +771,7 @@
     "TYPE_LOCKED": "Le type ne peut pas être modifié",
     "UNAUTHORIZED": "Veuillez vous connecter pour continuer.",
     "UNKNOWN": "Une erreur s'est produite. Veuillez réessayer.",
+    "USER_NOT_FOUND": "Utilisateur introuvable",
     "VALIDATION_ERROR": "Veuillez vérifier les valeurs saisies.",
     "WITHDRAW_TOO_MUCH": "Vous ne pouvez pas retirer plus que le montant épargné",
     "WRONG_PASSWORD": "Le mot de passe est incorrect"

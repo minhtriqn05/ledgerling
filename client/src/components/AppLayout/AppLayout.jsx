@@ -124,7 +124,7 @@ function Layout() {
         <div id="main-menu" className={`${styles.panel} ${menuOpen ? styles.panelOpen : ''}`}>
           <nav className={styles.nav} ref={navRef} aria-label={t('nav.main')}>
             {indicator && <span className={styles.indicator} style={{ top: indicator.top, height: indicator.height }} aria-hidden="true" />}
-            {navItems.map((item) => (
+            {navItems.filter((item) => !item.adminOnly || user?.role === 'admin').map((item) => (
               <NavLink
                 key={item.path}
                 to={item.path}

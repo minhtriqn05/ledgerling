@@ -12,6 +12,8 @@ import GoalsPage from './pages/GoalsPage.jsx';
 import ReportsPage from './pages/ReportsPage.jsx';
 import NotificationsPage from './pages/NotificationsPage.jsx';
 import SettingsPage from './pages/SettingsPage.jsx';
+import AdminPage from './pages/AdminPage.jsx';
+import AdminRoute from './components/AdminRoute/AdminRoute.jsx';
 import PreferencesSync from './components/PreferencesSync/PreferencesSync.jsx';
 import LoginPage from'./pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
@@ -44,6 +46,10 @@ export default function App() {
             <Route path="/reports" element={<ReportsPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/settings" element={<SettingsPage />} />
+            {/* Only for an admin; anybody else is sent to the Dashboard */}
+            <Route element={<AdminRoute />}>
+              <Route path="/admin" element={<AdminPage />} />
+            </Route>
           </Route>
         </Route>
 

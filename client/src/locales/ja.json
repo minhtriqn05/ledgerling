@@ -38,6 +38,7 @@
     "viewAll": "すべて表示"
   },
   "nav": {
+    "admin": "管理",
     "budgets": "予算",
     "categories": "カテゴリ",
     "closeMenu": "メニューを閉じる",
@@ -653,11 +654,72 @@
       "deleted": "アカウントを削除しました。"
     }
   },
+  "admin": {
+    "subtitle": "サイトの統計とアカウント。管理者だけがこのページを見られます。",
+    "stats": {
+      "activeUsers": "直近 7 日間のアクティブ",
+      "label": "サイト全体の数",
+      "totalTransactions": "取引",
+      "totalUsers": "ユーザー"
+    },
+    "charts": {
+      "last30": "直近 30 日間",
+      "newUsers": "新規ユーザー",
+      "newUsersLabel": "折れ線グラフ：直近 30 日間の 1 日ごとの新規ユーザー",
+      "transactions": "取引",
+      "transactionsLabel": "折れ線グラフ：直近 30 日間の 1 日ごとの取引数"
+    },
+    "users": {
+      "title": "ユーザー",
+      "search": "名前またはメールで検索",
+      "loading": "ユーザーを読み込み中…",
+      "count_one": "{{count}} 人のユーザー",
+      "count_other": "{{count}} 人のユーザー",
+      "emptyTitle": "ユーザーが見つかりません",
+      "emptyText": "「{{q}}」に一致する名前やメールはありません。",
+      "columns": {
+        "name": "名前",
+        "email": "メール",
+        "role": "役割",
+        "status": "状態",
+        "joined": "登録日",
+        "transactions": "取引",
+        "actions": "操作"
+      },
+      "roles": {
+        "user": "ユーザー",
+        "admin": "管理者"
+      },
+      "statuses": {
+        "active": "有効",
+        "disabled": "停止中"
+      },
+      "you": "あなた",
+      "disable": "停止",
+      "enable": "有効にする",
+      "disableFor": "{{name}} を停止",
+      "enableFor": "{{name}} を有効にする",
+      "noAction": "このアカウントは変更できません"
+    },
+    "dialog": {
+      "disableText": "{{name}} はすべての端末でログアウトされ、アカウントを再び有効にするまでログインできません。データは残ります。",
+      "disableTitle": "このアカウントを停止しますか？",
+      "disabled": "{{name}} を停止しました",
+      "disabling": "停止中…",
+      "enableText": "{{name}} は再びログインできるようになります。",
+      "enableTitle": "このアカウントを有効にしますか？",
+      "enabled": "{{name}} を有効にしました",
+      "enabling": "有効化中…"
+    }
+  },
   "errors": {
+    "ACCOUNT_DISABLED": "このアカウントは停止されています",
     "AMOUNT_INVALID": "金額は 0 より大きくしてください",
     "BUDGET_EXISTS": "このカテゴリと月の予算はすでにあります",
     "BUDGET_EXPENSE_ONLY": "予算は支出カテゴリにのみ設定できます",
     "BUDGET_NOT_FOUND": "予算が見つかりません",
+    "CANNOT_DISABLE_ADMIN": "他の管理者は停止できません",
+    "CANNOT_DISABLE_SELF": "自分のアカウントは停止できません",
     "CATEGORY_EXISTS": "このカテゴリはすでにあります",
     "CATEGORY_HAS_RULES": "このカテゴリには定期ルールが残っています",
     "CATEGORY_IN_USE": "このカテゴリには取引が残っています",
@@ -675,6 +737,7 @@
     "EMAIL_INVALID": "メールアドレスが無効です",
     "EMAIL_TAKEN": "このメールアドレスはすでに登録されています",
     "END_BEFORE_START": "終了日は開始日より後にしてください",
+    "FORBIDDEN": "この操作を行う権限がありません",
     "GOAL_NOT_FOUND": "目標が見つかりません",
     "ICON_INVALID": "一覧からアイコンを選択してください",
     "IMPORT_CATEGORY_NOT_FOUND": "カテゴリ「{{name}}」（{{type}}）が見つかりません",
@@ -696,6 +759,7 @@
     "PASSWORD_UNCHANGED": "新しいパスワードは現在のものと異なる必要があります",
     "ROUTE_NOT_FOUND": "見つかりません",
     "RULE_NOT_FOUND": "定期ルールが見つかりません",
+    "STATUS_INVALID": "状態は有効か停止中のどちらかにしてください",
     "TAG_INVALID": "タグは 1〜20 文字の英字、数字、ハイフンで入力してください",
     "TARGET_INVALID": "目標金額は 0 より大きい整数にしてください",
     "TEMPLATE_NOT_FOUND": "テンプレートが見つかりません",
@@ -707,6 +771,7 @@
     "TYPE_LOCKED": "種類は変更できません",
     "UNAUTHORIZED": "続けるにはログインしてください。",
     "UNKNOWN": "問題が発生しました。もう一度お試しください。",
+    "USER_NOT_FOUND": "ユーザーが見つかりません",
     "VALIDATION_ERROR": "入力内容を確認してください。",
     "WITHDRAW_TOO_MUCH": "貯蓄額を超えて出金することはできません",
     "WRONG_PASSWORD": "パスワードが正しくありません"

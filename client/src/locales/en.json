@@ -38,6 +38,7 @@
     "viewAll": "View all"
   },
   "nav": {
+    "admin": "Admin",
     "budgets": "Budgets",
     "categories": "Categories",
     "closeMenu": "Close menu",
@@ -653,11 +654,72 @@
       "deleted": "Your account was deleted."
     }
   },
+  "admin": {
+    "subtitle": "Site statistics and accounts. Only admins can see this page.",
+    "stats": {
+      "activeUsers": "Active in the last 7 days",
+      "label": "Site totals",
+      "totalTransactions": "Transactions",
+      "totalUsers": "Users"
+    },
+    "charts": {
+      "last30": "Last 30 days",
+      "newUsers": "New users",
+      "newUsersLabel": "Line chart: new users per day over the last 30 days",
+      "transactions": "Transactions",
+      "transactionsLabel": "Line chart: transactions per day over the last 30 days"
+    },
+    "users": {
+      "title": "Users",
+      "search": "Search by name or email",
+      "loading": "Loading users…",
+      "count_one": "{{count}} user",
+      "count_other": "{{count}} users",
+      "emptyTitle": "No users found",
+      "emptyText": "No name or email matches “{{q}}”.",
+      "columns": {
+        "name": "Name",
+        "email": "Email",
+        "role": "Role",
+        "status": "Status",
+        "joined": "Joined",
+        "transactions": "Transactions",
+        "actions": "Actions"
+      },
+      "roles": {
+        "user": "User",
+        "admin": "Admin"
+      },
+      "statuses": {
+        "active": "Active",
+        "disabled": "Disabled"
+      },
+      "you": "You",
+      "disable": "Disable",
+      "enable": "Enable",
+      "disableFor": "Disable {{name}}",
+      "enableFor": "Enable {{name}}",
+      "noAction": "This account cannot be changed"
+    },
+    "dialog": {
+      "disableText": "{{name}} will be logged out on every device and cannot log in until you enable the account again. Their data is kept.",
+      "disableTitle": "Disable this account?",
+      "disabled": "{{name}} was disabled",
+      "disabling": "Disabling…",
+      "enableText": "{{name}} will be able to log in again.",
+      "enableTitle": "Enable this account?",
+      "enabled": "{{name}} was enabled",
+      "enabling": "Enabling…"
+    }
+  },
   "errors": {
+    "ACCOUNT_DISABLED": "This account has been disabled",
     "AMOUNT_INVALID": "Amount must be greater than 0",
     "BUDGET_EXISTS": "Budget already exists for this category and month",
     "BUDGET_EXPENSE_ONLY": "Budgets are only for expense categories",
     "BUDGET_NOT_FOUND": "Budget not found",
+    "CANNOT_DISABLE_ADMIN": "You cannot disable another admin",
+    "CANNOT_DISABLE_SELF": "You cannot disable your own account",
     "CATEGORY_EXISTS": "Category already exists",
     "CATEGORY_HAS_RULES": "Category still has recurring rules",
     "CATEGORY_IN_USE": "Category still has transactions",
@@ -675,6 +737,7 @@
     "EMAIL_INVALID": "Email is invalid",
     "EMAIL_TAKEN": "Email is already registered",
     "END_BEFORE_START": "End date must be after the start date",
+    "FORBIDDEN": "You do not have permission to do this",
     "GOAL_NOT_FOUND": "Goal not found",
     "ICON_INVALID": "Please choose an icon from the list",
     "IMPORT_CATEGORY_NOT_FOUND": "Category \"{{name}}\" ({{type}}) not found",
@@ -696,6 +759,7 @@
     "PASSWORD_UNCHANGED": "New password must be different from the current one",
     "ROUTE_NOT_FOUND": "Not found",
     "RULE_NOT_FOUND": "Recurring rule not found",
+    "STATUS_INVALID": "Status must be active or disabled",
     "TAG_INVALID": "Each tag must be 1-20 letters, digits or hyphens",
     "TARGET_INVALID": "Target amount must be a whole number greater than 0",
     "TEMPLATE_NOT_FOUND": "Template not found",
@@ -707,6 +771,7 @@
     "TYPE_LOCKED": "Type cannot be changed",
     "UNAUTHORIZED": "Please log in to continue.",
     "UNKNOWN": "Something went wrong. Please try again.",
+    "USER_NOT_FOUND": "User not found",
     "VALIDATION_ERROR": "Please check the values you entered.",
     "WITHDRAW_TOO_MUCH": "You cannot withdraw more than the saved amount",
     "WRONG_PASSWORD": "The password is incorrect"

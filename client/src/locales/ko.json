@@ -38,6 +38,7 @@
     "viewAll": "모두 보기"
   },
   "nav": {
+    "admin": "관리",
     "budgets": "예산",
     "categories": "카테고리",
     "closeMenu": "메뉴 닫기",
@@ -653,11 +654,72 @@
       "deleted": "계정이 삭제되었습니다."
     }
   },
+  "admin": {
+    "subtitle": "사이트 통계와 계정입니다. 관리자만 이 페이지를 볼 수 있습니다.",
+    "stats": {
+      "activeUsers": "최근 7일간 활동",
+      "label": "사이트 전체 현황",
+      "totalTransactions": "거래",
+      "totalUsers": "사용자"
+    },
+    "charts": {
+      "last30": "최근 30일",
+      "newUsers": "신규 사용자",
+      "newUsersLabel": "꺾은선 그래프: 최근 30일간 하루별 신규 사용자",
+      "transactions": "거래",
+      "transactionsLabel": "꺾은선 그래프: 최근 30일간 하루별 거래 수"
+    },
+    "users": {
+      "title": "사용자",
+      "search": "이름 또는 이메일로 검색",
+      "loading": "사용자를 불러오는 중…",
+      "count_one": "사용자 {{count}}명",
+      "count_other": "사용자 {{count}}명",
+      "emptyTitle": "사용자를 찾을 수 없습니다",
+      "emptyText": "“{{q}}”와(과) 일치하는 이름이나 이메일이 없습니다.",
+      "columns": {
+        "name": "이름",
+        "email": "이메일",
+        "role": "역할",
+        "status": "상태",
+        "joined": "가입일",
+        "transactions": "거래",
+        "actions": "작업"
+      },
+      "roles": {
+        "user": "사용자",
+        "admin": "관리자"
+      },
+      "statuses": {
+        "active": "활성",
+        "disabled": "비활성화됨"
+      },
+      "you": "나",
+      "disable": "비활성화",
+      "enable": "활성화",
+      "disableFor": "{{name}} 비활성화",
+      "enableFor": "{{name}} 활성화",
+      "noAction": "이 계정은 변경할 수 없습니다"
+    },
+    "dialog": {
+      "disableText": "{{name}} 님은 모든 기기에서 로그아웃되며, 계정을 다시 활성화하기 전에는 로그인할 수 없습니다. 데이터는 그대로 유지됩니다.",
+      "disableTitle": "이 계정을 비활성화할까요?",
+      "disabled": "{{name}} 님을 비활성화했습니다",
+      "disabling": "비활성화하는 중…",
+      "enableText": "{{name}} 님이 다시 로그인할 수 있게 됩니다.",
+      "enableTitle": "이 계정을 활성화할까요?",
+      "enabled": "{{name}} 님을 활성화했습니다",
+      "enabling": "활성화하는 중…"
+    }
+  },
   "errors": {
+    "ACCOUNT_DISABLED": "이 계정은 비활성화되었습니다",
     "AMOUNT_INVALID": "금액은 0보다 커야 합니다",
     "BUDGET_EXISTS": "이 카테고리와 달의 예산이 이미 있습니다",
     "BUDGET_EXPENSE_ONLY": "예산은 지출 카테고리에만 설정할 수 있습니다",
     "BUDGET_NOT_FOUND": "예산을 찾을 수 없습니다",
+    "CANNOT_DISABLE_ADMIN": "다른 관리자는 비활성화할 수 없습니다",
+    "CANNOT_DISABLE_SELF": "자신의 계정은 비활성화할 수 없습니다",
     "CATEGORY_EXISTS": "이미 있는 카테고리입니다",
     "CATEGORY_HAS_RULES": "이 카테고리에 정기 거래 규칙이 남아 있습니다",
     "CATEGORY_IN_USE": "이 카테고리에 거래가 남아 있습니다",
@@ -675,6 +737,7 @@
     "EMAIL_INVALID": "이메일이 올바르지 않습니다",
     "EMAIL_TAKEN": "이미 가입된 이메일입니다",
     "END_BEFORE_START": "종료일은 시작일 이후여야 합니다",
+    "FORBIDDEN": "이 작업을 할 권한이 없습니다",
     "GOAL_NOT_FOUND": "목표를 찾을 수 없습니다",
     "ICON_INVALID": "목록에서 아이콘을 선택하세요",
     "IMPORT_CATEGORY_NOT_FOUND": "카테고리 \"{{name}}\" ({{type}})을(를) 찾을 수 없습니다",
@@ -696,6 +759,7 @@
     "PASSWORD_UNCHANGED": "새 비밀번호는 현재 비밀번호와 달라야 합니다",
     "ROUTE_NOT_FOUND": "찾을 수 없습니다",
     "RULE_NOT_FOUND": "정기 거래 규칙을 찾을 수 없습니다",
+    "STATUS_INVALID": "상태는 활성 또는 비활성화여야 합니다",
     "TAG_INVALID": "태그는 영문자, 숫자, 하이픈 1~20자여야 합니다",
     "TARGET_INVALID": "목표 금액은 0보다 큰 정수여야 합니다",
     "TEMPLATE_NOT_FOUND": "템플릿을 찾을 수 없습니다",
@@ -707,6 +771,7 @@
     "TYPE_LOCKED": "유형은 바꿀 수 없습니다",
     "UNAUTHORIZED": "계속하려면 로그인하세요.",
     "UNKNOWN": "문제가 발생했습니다. 다시 시도하세요.",
+    "USER_NOT_FOUND": "사용자를 찾을 수 없습니다",
     "VALIDATION_ERROR": "입력한 내용을 확인하세요.",
     "WITHDRAW_TOO_MUCH": "저축액보다 많이 출금할 수 없습니다",
     "WRONG_PASSWORD": "비밀번호가 올바르지 않습니다"
