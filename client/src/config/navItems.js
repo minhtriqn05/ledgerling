@@ -9,4 +9,5 @@ export const navItems = [
   { labelKey: 'nav.goals', path: '/goals', icon: 'target' },
   { labelKey: 'nav.reports', path: '/reports', icon: 'reports' },
   { labelKey: 'nav.notifications', path: '/notifications', icon: 'bell' },
+  { labelKey: 'nav.settings', path: '/settings', icon: 'settings' },
 ];

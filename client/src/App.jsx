@@ -11,6 +11,8 @@ import RecurringPage from './pages/RecurringPage.jsx';
 import GoalsPage from './pages/GoalsPage.jsx';
 import ReportsPage from './pages/ReportsPage.jsx';
 import NotificationsPage from './pages/NotificationsPage.jsx';
+import SettingsPage from './pages/SettingsPage.jsx';
+import PreferencesSync from './components/PreferencesSync/PreferencesSync.jsx';
 import LoginPage from'./pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import StyleGuidePage from './pages/StyleGuidePage.jsx';
@@ -21,32 +23,36 @@ export default function App() {
   useTranslation();
 
   return (
-    <Routes>
-      {/* Pages without the sidebar */}
-      <Route element={<AuthLayout />}>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-      </Route>
-
-      {/* Pages with the sidebar / top bar. They need a signed-in user. */}
-      <Route element={<ProtectedRoute />}>
-        <Route element={<AppLayout />}>
-          <Route path="/" element={<DashboardPage />} />
-          <Route path="/transactions" element={<TransactionsPage />} />
-          <Route path="/categories" element={<CategoriesPage />} />
-          <Route path="/budgets" element={<BudgetsPage />} />
-          <Route path="/recurring" element={<RecurringPage />} />
-          <Route path="/goals" element={<GoalsPage />} />
-          <Route path="/reports" element={<ReportsPage />} />
-          <Route path="/notifications" element={<NotificationsPage />} />
+    <>
+      <PreferencesSync />
+      <Routes>
+        {/* Pages without the sidebar */}
+        <Route element={<AuthLayout />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
         </Route>
-      </Route>
 
-      {/* Temporary page to review the design tokens. Only available in dev mode. */}
-      {import.meta.env.DEV && <Route path="/style-guide" element={<StyleGuidePage />} />}
+        {/* Pages with the sidebar / top bar. They need a signed-in user. */}
+        <Route element={<ProtectedRoute />}>
+          <Route element={<AppLayout />}>
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/transactions" element={<TransactionsPage />} />
+            <Route path="/categories" element={<CategoriesPage />} />
+            <Route path="/budgets" element={<BudgetsPage />} />
+            <Route path="/recurring" element={<RecurringPage />} />
+            <Route path="/goals" element={<GoalsPage />} />
+            <Route path="/reports" element={<ReportsPage />} />
+            <Route path="/notifications" element={<NotificationsPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+          </Route>
+        </Route>
 
-      {/* Any other address */}
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
+        {/* Temporary page to review the design tokens. Only available in dev mode. */}
+        {import.meta.env.DEV && <Route path="/style-guide" element={<StyleGuidePage />} />}
+
+        {/* Any other address */}
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </>
   );
 }

@@ -22,11 +22,11 @@ function Where() {
   return <p data-testid="where">{pathname + search}</p>;
 }
 
-function renderTab() {
+function renderTab(props = {}) {
   return render(
     <MemoryRouter initialEntries={['/reports']}>
       <Routes>
-        <Route path="/reports" element={<CalendarTab month="2026-10" />} />
+        <Route path="/reports" element={<CalendarTab month="2026-10" {...props} />} />
         <Route path="/transactions" element={<Where />} />
       </Routes>
     </MemoryRouter>
@@ -58,6 +58,20 @@ describe('CalendarTab', () => {
     names.slice(1).forEach((name, i) => {
       expect(names[i].compareDocumentPosition(name) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     });
+  });
+
+  it('starts the week on Sunday when the preference says so', async () => {
+    getMonthlyReport.mockResolvedValue(makeReport());
+    renderTab({ weekStartsOn: 'sunday' });
+    await screen.findByRole('button', { name: /10 October 2026/ });
+
+    const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => screen.getByText(d));
+    names.slice(1).forEach((name, i) => {
+      expect(names[i].compareDocumentPosition(name) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    });
+    // 1 October 2026 is a Thursday: 4 empty cells come before it, so it is in the 5th column
+    const cells = [...document.querySelectorAll('[role="group"] > *')].slice(7);
+    expect(cells[4]).toHaveAccessibleName('1 October 2026: no spending');
   });
 
   it('shades a day more the more was spent on it', async () => {

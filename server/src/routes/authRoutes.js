@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { register, login, me } from "../controllers/authController.js";
+import { register, login, me, logoutAll } from "../controllers/authController.js";
 import { validateRegister, validateLogin } from "../middlewares/validateAuth.js";
 import { requireAuth } from "../middlewares/requireAuth.js";
 
@@ -137,5 +137,26 @@ router.post("/login", validateLogin, login);
  *               message: Not authorized, invalid token
  */
 router.get("/me", requireAuth, me);
+
+/**
+ * @openapi
+ * /auth/logout-all:
+ *   post:
+ *     summary: Log out of all devices
+ *     description: Raises the token version, so every token made before (on every device, this one included) stops working. The answer holds a new token for the device that asked, which stays signed in. The app uses it for "Log out of all other devices".
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Every other device is logged out. Use the new token from now on.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthResponse'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
+router.post("/logout-all", requireAuth, logoutAll);
 
 export default router;

@@ -49,6 +49,7 @@
     "openMenu": "Menü öffnen",
     "recurring": "Daueraufträge",
     "reports": "Berichte",
+    "settings": "Einstellungen",
     "transactions": "Buchungen"
   },
   "language": {
@@ -544,6 +545,7 @@
       "weekly": "Wochenübersicht",
       "weeklyHint": "Deine Ausgaben der letzten 7 Tage, einmal pro Woche"
     },
+    "settingsLink": "Benachrichtigungseinstellungen",
     "settingsSaved": "Einstellungen gespeichert",
     "settingsText": "Wähle, welche Benachrichtigungen du erhältst. Eine ausgeschaltete Art wird gar nicht erst erstellt.",
     "settingsTitle": "Benachrichtigungseinstellungen",
@@ -584,6 +586,73 @@
     "unreadCount_other": "{{count}} ungelesen",
     "viewAll": "Alle Benachrichtigungen anzeigen"
   },
+  "settings": {
+    "subtitle": "Dein Profil, die Sicherheit deines Kontos und wie Ledgerling aussieht und sich verhält.",
+    "profile": {
+      "title": "Profil",
+      "text": "Dein Name erscheint im Menü.",
+      "emailHint": "Deine E-Mail-Adresse dient zum Anmelden und kann hier nicht geändert werden.",
+      "saved": "Name aktualisiert"
+    },
+    "password": {
+      "title": "Passwort",
+      "text": "Wenn du es änderst, wirst du auf allen anderen Geräten abgemeldet.",
+      "current": "Aktuelles Passwort",
+      "new": "Neues Passwort",
+      "confirm": "Neues Passwort wiederholen",
+      "strength": "Passwortstärke",
+      "weak": "Schwach",
+      "medium": "Mittel",
+      "strong": "Stark",
+      "hint": "Verwende mindestens 8 Zeichen. Mit Buchstaben, Zahlen und Symbolen wird es stärker.",
+      "enterCurrent": "Bitte gib dein aktuelles Passwort ein.",
+      "tooShort": "Das neue Passwort muss mindestens 8 Zeichen lang sein.",
+      "mismatch": "Die beiden neuen Passwörter stimmen nicht überein.",
+      "submit": "Passwort ändern",
+      "changing": "Wird geändert…",
+      "changed": "Passwort geändert. Andere Geräte wurden abgemeldet."
+    },
+    "sessions": {
+      "title": "Sitzungen",
+      "text": "Irgendwo angemeldet, was du nicht kennst? Melde alle anderen Geräte ab. Dieses Gerät bleibt angemeldet.",
+      "logoutOthers": "Von allen anderen Geräten abmelden",
+      "working": "Wird abgemeldet…",
+      "done": "Alle anderen Geräte wurden abgemeldet."
+    },
+    "appearance": {
+      "title": "Darstellung",
+      "text": "Wähle ein Design. System folgt deinem Gerät.",
+      "theme": "Design",
+      "light": "Hell",
+      "dark": "Dunkel",
+      "system": "System"
+    },
+    "preferences": {
+      "title": "Voreinstellungen",
+      "text": "Wie Kalender angeordnet werden.",
+      "weekStartsOn": "Woche beginnt am",
+      "monday": "Montag",
+      "sunday": "Sonntag",
+      "weekHint": "Der Kalender in den Berichten beginnt seine Wochen an diesem Tag.",
+      "saved": "Einstellung gespeichert"
+    },
+    "data": {
+      "title": "Deine Daten",
+      "text": "Lade alles, was du in Ledgerling hast, als eine JSON-Datei herunter: Profil, Kategorien, Transaktionen, Budgets, Daueraufträge, Ziele und Vorlagen. Dein Passwort ist nie enthalten.",
+      "download": "Meine Daten herunterladen",
+      "working": "Wird vorbereitet…",
+      "done": "Deine Daten wurden heruntergeladen."
+    },
+    "danger": {
+      "title": "Gefahrenbereich",
+      "text": "Wenn du dein Konto löschst, werden dein Profil und alle deine Daten endgültig entfernt. Das kann nicht rückgängig gemacht werden.",
+      "typeToConfirm": "Gib zur Bestätigung {{word}} ein",
+      "password": "Dein Passwort",
+      "submit": "Mein Konto löschen",
+      "deleting": "Wird gelöscht…",
+      "deleted": "Dein Konto wurde gelöscht."
+    }
+  },
   "errors": {
     "AMOUNT_INVALID": "Der Betrag muss größer als 0 sein",
     "BUDGET_EXISTS": "Für diese Kategorie und diesen Monat gibt es bereits ein Budget",
@@ -598,6 +667,7 @@
     "CONFLICT": "Das steht im Konflikt mit vorhandenen Daten",
     "CONTRIBUTION_NOT_FOUND": "Eintrag nicht gefunden",
     "CURRENCY_INVALID": "Die Währung muss ein dreistelliger ISO-Code sein",
+    "CURRENT_PASSWORD_REQUIRED": "Das aktuelle Passwort ist erforderlich",
     "DATE_INVALID": "Ungültiges Datum, verwende JJJJ-MM-TT HH:mm oder ISO 8601",
     "DEADLINE_IN_PAST": "Die Frist muss nach dem heutigen Tag liegen",
     "DEPOSIT_IN_USE": "Wird diese Einzahlung gelöscht, wäre der gesparte Betrag negativ",
@@ -616,12 +686,14 @@
     "NAME_REQUIRED": "Der Name fehlt",
     "NAME_TOO_LONG": "Dieser Name ist zu lang",
     "NETWORK": "Der Server ist nicht erreichbar. Bitte versuche es erneut.",
+    "NEW_PASSWORD_TOO_SHORT": "Das neue Passwort muss mindestens 8 Zeichen lang sein",
     "NOTE_TOO_LONG": "Die Notiz darf höchstens 200 Zeichen haben",
-    "NOT_FOUND": "Nicht gefunden",
     "NOTIFICATION_NOT_FOUND": "Benachrichtigung nicht gefunden",
+    "NOT_FOUND": "Nicht gefunden",
     "PASSWORD_REQUIRED": "Das Passwort fehlt",
     "PASSWORD_TOO_LONG": "Das Passwort darf höchstens 72 Zeichen haben",
     "PASSWORD_TOO_SHORT": "Das Passwort muss mindestens 6 Zeichen haben",
+    "PASSWORD_UNCHANGED": "Das neue Passwort muss sich vom aktuellen unterscheiden",
     "ROUTE_NOT_FOUND": "Nicht gefunden",
     "RULE_NOT_FOUND": "Dauerauftrag nicht gefunden",
     "TAG_INVALID": "Jedes Schlagwort hat 1–20 Buchstaben, Ziffern oder Bindestriche",
@@ -636,6 +708,7 @@
     "UNAUTHORIZED": "Bitte melde dich an, um fortzufahren.",
     "UNKNOWN": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
     "VALIDATION_ERROR": "Bitte prüfe deine Eingaben.",
-    "WITHDRAW_TOO_MUCH": "Du kannst nicht mehr auszahlen, als gespart ist"
+    "WITHDRAW_TOO_MUCH": "Du kannst nicht mehr auszahlen, als gespart ist",
+    "WRONG_PASSWORD": "Das Passwort ist falsch"
   }
 }

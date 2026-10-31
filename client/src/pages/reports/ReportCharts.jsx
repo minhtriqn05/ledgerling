@@ -11,6 +11,7 @@ import {
 } from 'recharts';
 import { useReducedMotion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '../../context/ThemeContext.jsx';
 import { cssVar } from '../../utils/cssVar.js';
 import { formatCompact } from '../../utils/format.js';
 import { formatLongDay } from '../../utils/reports.js';
@@ -27,6 +28,7 @@ const axisTick = () => ({ fill: cssVar('--chart-axis'), fontSize: cssVar('--font
 // Expense of every day of one month as a smooth line.
 // dailyExpense: [{ date: 'YYYY-MM-DD', total }], one entry per day (the monthly report sends them all).
 export function DailyExpenseChart({ dailyExpense, month }) {
+  useTheme(); // the colors below are read from the CSS variables, so draw again when the theme changes
   const { t } = useTranslation();
   const animate = !useReducedMotion();
   const data = dailyExpense.map((d) => ({
@@ -81,6 +83,7 @@ export function DailyExpenseChart({ dailyExpense, month }) {
 // Income and expense of the 12 months of a year as pairs of capsule bars.
 // months: [{ month: 'YYYY-MM', income, expense }]
 export function YearlyChart({ months, year }) {
+  useTheme(); // the colors below are read from the CSS variables, so draw again when the theme changes
   const { t } = useTranslation();
   const animate = !useReducedMotion();
   const data = months.map((m) => ({ ...m, label: formatMonthShort(m.month), fullLabel: formatMonth(m.month) }));

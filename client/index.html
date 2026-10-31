@@ -8,6 +8,30 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="theme-color" content="#2874b5" />
+    <!--
+      Applies the saved color theme before the page is drawn, so a dark theme never flashes white on load.
+      Same steps as utils/theme.js and the same localStorage key. The background below is only a stand-in for the
+      moment before tokens.css is loaded (it is --color-bg of the dark theme); after that the tokens take over.
+    -->
+    <script>
+      (function () {
+        try {
+          var choice = localStorage.getItem('ledgerling.theme');
+          var dark =
+            choice === 'dark' ||
+            (choice !== 'light' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        } catch (error) {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      })();
+    </script>
+    <style>
+      html[data-theme='dark'] {
+        background: #0f1923;
+        color-scheme: dark;
+      }
+    </style>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

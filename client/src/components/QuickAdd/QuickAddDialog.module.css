@@ -72,7 +72,7 @@
 
 .templateRemove:hover:not(:disabled) {
   background: var(--color-danger-soft);
-  color: var(--color-danger);
+  color: var(--color-danger-text);
 }
 
 .templateUse:focus-visible,

@@ -99,6 +99,15 @@
   background: color-mix(in srgb, var(--color-expense) 70%, var(--color-surface));
 }
 
+/* In the dark theme the text is light, so the two darkest steps are kept a little paler (text 4.5:1 or more) */
+[data-theme='dark'] .level3 {
+  background: color-mix(in srgb, var(--color-expense) 44%, var(--color-surface));
+}
+
+[data-theme='dark'] .level4 {
+  background: color-mix(in srgb, var(--color-expense) 56%, var(--color-surface));
+}
+
 .legend {
   display: flex;
   align-items: center;

@@ -14,12 +14,12 @@ import LoadingState from '../components/LoadingState/LoadingState.jsx';
 import ErrorState from '../components/ErrorState/ErrorState.jsx';
 import NotificationItem from '../components/Notifications/NotificationItem.jsx';
 import Pager from './transactions/Pager.jsx';
-import NotificationSettings from './notifications/NotificationSettings.jsx';
 import styles from './NotificationsPage.module.css';
 
 const PAGE_SIZE = 10;
 
-// All notifications, 10 per page, with a filter for the unread ones, then the Notification settings.
+// All notifications, 10 per page, with a filter for the unread ones. The switches for each kind of notification are
+// in Settings (the button in the header opens them).
 export default function NotificationsPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -133,6 +133,9 @@ export default function NotificationsPage() {
         title={t('nav.notifications')}
         subtitle={!loading && !loadError ? t('notifications.unreadCount', { count: unread }) : undefined}
       >
+        <Button variant="secondary" icon="settings" onClick={() => navigate('/settings#notifications')}>
+          {t('notifications.settingsLink')}
+        </Button>
         <Button variant="secondary" icon="check" onClick={handleMarkAll} disabled={unread === 0}>
           {t('notifications.markAllRead')}
         </Button>
@@ -150,8 +153,6 @@ export default function NotificationsPage() {
         />
         {renderContent()}
       </div>
-
-      <NotificationSettings />
     </div>
   );
 }

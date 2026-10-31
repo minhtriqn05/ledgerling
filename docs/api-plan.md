@@ -26,7 +26,7 @@ Swagger UI: `/api-docs` (outside `/api`).
 | 200 | OK (read, update, delete) |
 | 201 | Created |
 | 400 | Invalid input (validation failed, unknown field value, bad format, body that is not valid JSON → `"Invalid JSON body"`) |
-| 401 | Missing/invalid/expired token, wrong email or password |
+| 401 | Missing/invalid/expired token (also a token made before the password changed or "log out of all devices", or of a deleted account), wrong email or password at login |
 | 404 | Not found, belongs to another user, malformed `:id` in the URL, or unknown route (`"Route not found"`) |
 | 409 | Duplicate (email, category name, budget of the same category and month, two transactions of one recurring rule on the same date) or conflict (category still has transactions or recurring rules) |
 | 500 | Server error |
@@ -40,7 +40,7 @@ When the place that throws an error names no specific code, the status gives a d
 
 | Status | Codes |
 |--------|-------|
-| 400 | `VALIDATION_ERROR`, `INVALID_JSON`, `NAME_REQUIRED`, `NAME_TOO_LONG`, `EMAIL_INVALID`, `PASSWORD_REQUIRED`, `PASSWORD_TOO_SHORT`, `PASSWORD_TOO_LONG`, `TYPE_INVALID`, `TYPE_LOCKED`, `COLOR_INVALID`, `ICON_INVALID`, `CATEGORY_REQUIRED`, `AMOUNT_INVALID`, `CURRENCY_INVALID`, `NOTE_TOO_LONG`, `DATE_INVALID`, `TAG_INVALID`, `TOO_MANY_TAGS`, `MONTH_INVALID`, `BUDGET_EXPENSE_ONLY`, `END_BEFORE_START`, `TARGET_INVALID`, `DEADLINE_IN_PAST`, `WITHDRAW_TOO_MUCH`, `DEPOSIT_IN_USE`, `IMPORT_TOO_MANY_ROWS` |
+| 400 | `VALIDATION_ERROR`, `INVALID_JSON`, `NAME_REQUIRED`, `NAME_TOO_LONG`, `EMAIL_INVALID`, `PASSWORD_REQUIRED`, `PASSWORD_TOO_SHORT`, `PASSWORD_TOO_LONG`, `CURRENT_PASSWORD_REQUIRED`, `NEW_PASSWORD_TOO_SHORT`, `PASSWORD_UNCHANGED`, `WRONG_PASSWORD`, `TYPE_INVALID`, `TYPE_LOCKED`, `COLOR_INVALID`, `ICON_INVALID`, `CATEGORY_REQUIRED`, `AMOUNT_INVALID`, `CURRENCY_INVALID`, `NOTE_TOO_LONG`, `DATE_INVALID`, `TAG_INVALID`, `TOO_MANY_TAGS`, `MONTH_INVALID`, `BUDGET_EXPENSE_ONLY`, `END_BEFORE_START`, `TARGET_INVALID`, `DEADLINE_IN_PAST`, `WITHDRAW_TOO_MUCH`, `DEPOSIT_IN_USE`, `IMPORT_TOO_MANY_ROWS` |
 | 401 | `TOKEN_MISSING`, `TOKEN_INVALID`, `INVALID_CREDENTIALS` |
 | 404 | `ROUTE_NOT_FOUND`, `CATEGORY_NOT_FOUND`, `TRANSACTION_NOT_FOUND`, `BUDGET_NOT_FOUND`, `RULE_NOT_FOUND`, `GOAL_NOT_FOUND`, `CONTRIBUTION_NOT_FOUND`, `TEMPLATE_NOT_FOUND`, `NOTIFICATION_NOT_FOUND` |
 | 409 | `EMAIL_TAKEN`, `CATEGORY_EXISTS`, `CATEGORY_IN_USE`, `CATEGORY_HAS_RULES`, `BUDGET_EXISTS`, `DUPLICATE_VALUE` |
@@ -55,7 +55,8 @@ The tables below list the `message` of each endpoint; the matching code is in th
 |-------|------|
 | `name` (user) | string, trimmed, 1–50 chars |
 | `email` | valid email, stored lowercase, unique |
-| `password` | string, 6–72 chars (72 = bcrypt limit) |
+| `password` (register) | string, 6–72 chars (72 = bcrypt limit) |
+| `newPassword` (change password) | string, 8–72 chars, different from `currentPassword` |
 | `name` (category) | string, trimmed, 1–30 chars, unique per user + type (case-insensitive) |
 | `type` | `"income"` or `"expense"` |
 | `color` | hex `#RRGGBB` |
@@ -131,7 +132,12 @@ The tables below list the `message` of each endpoint; the matching code is in th
 | 48 | PATCH | `/api/notifications/read-all` | Yes | Mark all my notifications as read |
 | 49 | PATCH | `/api/notifications/:id/read` | Yes | Mark one notification as read |
 | 50 | DELETE | `/api/notifications/:id` | Yes | Delete a notification |
-| 51 | PATCH | `/api/users/me/preferences` | Yes | Turn the kinds of notifications on or off |
+| 51 | PATCH | `/api/users/me/preferences` | Yes | Change theme, first day of the week, language and the notification switches |
+| 52 | PATCH | `/api/users/me` | Yes | Change my name |
+| 53 | PATCH | `/api/users/me/password` | Yes | Change my password (logs out the other devices, returns a new token) |
+| 54 | POST | `/api/auth/logout-all` | Yes | Log out of all devices (returns a new token for this one) |
+| 55 | GET | `/api/users/me/export` | Yes | Download all my data as JSON |
+| 56 | DELETE | `/api/users/me` | Yes | Delete my account and all my data (password needed) |
 
 Every protected route (Auth = Yes) can also return **401** (`"Not authorized, token missing"` /
 `"Not authorized, invalid token"`) and every route can return **500** (`"Internal server error"`).
@@ -217,7 +223,11 @@ Auth: yes. No body.
     "_id": "6720a1b2c3d4e5f601234567",
     "name": "Minh Tri",
     "email": "tri@example.com",
-    "preferences": { "notifications": { "budget": true, "goals": true, "recurring": true, "weekly": true } },
+    "preferences": {
+      "theme": "system",
+      "weekStartsOn": "monday",
+      "notifications": { "budget": true, "goals": true, "recurring": true, "weekly": true }
+    },
     "createdAt": "2026-10-27T03:00:00.000Z",
     "updatedAt": "2026-10-27T03:00:00.000Z"
   }
@@ -226,7 +236,16 @@ Auth: yes. No body.
 
 **Errors**: 401 also if the user in the token no longer exists.
 
-Logout: no endpoint. The client deletes the token from localStorage.
+`preferences.language` is only there after the user picked a language. The token version (`tokenVersion`) never leaves the server.
+
+Logout of this device: no endpoint, the client deletes the token from localStorage. To end the session on every device, use
+`POST /auth/logout-all` (endpoint 54).
+
+### How a token stops working
+The token holds `sub` (user id) and `tv` (token version). On every protected request `requireAuth` checks the signature,
+reads the user and compares `tv` with `User.tokenVersion`. A different version, or a user that no longer exists, is a
+**401** `TOKEN_INVALID`. Changing the password and `logout-all` raise the version by 1, so every older token is refused at once.
+A token made before this field existed has no `tv` and counts as version 0.
 
 ---
 
@@ -1207,19 +1226,85 @@ Auth: yes. **200** – `{ "success": true, "data": { "_id": "..." } }`. **Errors
 ## Users
 
 ### 51. PATCH /api/users/me/preferences
-Auth: yes. Changes only the switches that are sent; the others keep their value. An account made before this field existed counts as all on.
+Auth: yes. Changes only the fields that are sent; the others keep their value. At least one field. An account made before
+these fields existed counts as theme `system`, week on `monday`, no language and all notification switches on.
 
-**Body**
+**Body** (any of them)
 ```json
-{ "notifications": { "budget": false } }
+{ "theme": "dark", "weekStartsOn": "sunday", "language": "vi", "notifications": { "budget": false } }
 ```
-Switches: `budget`, `goals`, `recurring`, `weekly` (booleans). At least one.
+- `theme`: `light`, `dark` or `system` (follows the device). The app applies it at once and keeps a copy in localStorage.
+- `weekStartsOn`: `monday` or `sunday`. The calendar in Reports starts its weeks on that day.
+- `language`: one of `en`, `vi`, `fr`, `de`, `es`, `zh-CN`, `ja`, `ko`. Signing in on another device opens the app in it.
+- `notifications`: switches `budget`, `goals`, `recurring`, `weekly` (booleans), at least one.
 
 **200** – `data` is the user (same as `GET /api/auth/me`), for example
-`"preferences": { "notifications": { "budget": false, "goals": true, "recurring": true, "weekly": true } }`.
+`"preferences": { "theme": "dark", "weekStartsOn": "sunday", "language": "vi", "notifications": { "budget": false, "goals": true, "recurring": true, "weekly": true } }`.
 
 **Errors**
 
 | Code | message |
 |------|---------|
-| 400 | `"Nothing to update"`, `"Only notifications can be changed"`, `"Notifications must be an object"`, `"Notifications can only have budget, goals, recurring, weekly"`, `"Notification setting \"budget\" must be true or false"` |
+| 400 | `"Nothing to update"`, `"Only notifications, theme, weekStartsOn, language can be changed"`, `"Theme must be one of light, dark, system"`, `"weekStartsOn must be one of monday, sunday"`, `"Language must be one of en, vi, fr, de, es, zh-CN, ja, ko"`, `"Notifications must be an object"`, `"Notifications can only have budget, goals, recurring, weekly"`, `"Notification setting \"budget\" must be true or false"` |
+
+### 52. PATCH /api/users/me
+Auth: yes. Changes the name. Any other field in the body (email, role...) is ignored.
+
+**Body** `{ "name": "Minh Tri" }`
+
+**200** – `data` is the user. **Errors**: 400 `"Name is required"` (`NAME_REQUIRED`), `"Name must be at most 50 characters"` (`NAME_TOO_LONG`).
+
+### 53. PATCH /api/users/me/password
+Auth: yes. Checks the current password, saves the new one (bcrypt) and raises the token version, so **every other device is
+logged out**. The answer holds a new token for the device that asked; the client must store it.
+
+**Body** `{ "currentPassword": "secret123", "newPassword": "a-better-secret" }`
+
+**200** – `data` is `{ "token": "...", "user": { ... } }` (like login).
+
+**Errors**
+
+| Code | message |
+|------|---------|
+| 400 | `"Current password is required"` (`CURRENT_PASSWORD_REQUIRED`), `"New password must be at least 8 characters"` (`NEW_PASSWORD_TOO_SHORT`), `"Password must be at most 72 characters"` (`PASSWORD_TOO_LONG`), `"New password must be different from the current one"` (`PASSWORD_UNCHANGED`), `"Current password is incorrect"` (`WRONG_PASSWORD`) |
+
+A wrong current password is a **400**, not a 401: the client logs the user out when it sees a 401.
+
+### 54. POST /api/auth/logout-all
+Auth: yes. No body. Raises the token version: every token made before, on every device, stops working. The device that
+asked gets a new token and stays signed in (the app uses this for "Log out of all other devices").
+
+**200** – `data` is `{ "token": "...", "user": { ... } }`.
+
+### 55. GET /api/users/me/export
+Auth: yes. No body. Everything the user owns, in one document. The app saves `data` as `ledgerling-data-YYYY-MM-DD.json`.
+It never contains the password hash, the token version or any `userId`. Transactions, budgets, recurring rules and templates
+show their category as `category: { _id, name, type }`.
+
+**200**
+```json
+{
+  "success": true,
+  "data": {
+    "exportedAt": "2026-10-31T03:00:00.000Z",
+    "profile": { "_id": "...", "name": "Minh Tri", "email": "tri@example.com", "preferences": {} },
+    "categories": [],
+    "transactions": [],
+    "budgets": [],
+    "recurringRules": [],
+    "goals": [],
+    "templates": []
+  }
+}
+```
+The route is declared before any route with a parameter, so `export` is never read as an id.
+
+### 56. DELETE /api/users/me
+Auth: yes. Deletes the user and every category, transaction, budget, recurring rule, goal, template and notification that
+belongs to the user. It cannot be undone.
+
+**Body** `{ "password": "secret123" }`
+
+**200** – `{ "success": true, "data": { "deleted": true } }`. The token is useless afterwards (the user is gone).
+
+**Errors**: 400 `"Password is required"` (`PASSWORD_REQUIRED`), `"Password is incorrect"` (`WRONG_PASSWORD`).

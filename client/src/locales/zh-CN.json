@@ -49,6 +49,7 @@
     "openMenu": "打开菜单",
     "recurring": "定期",
     "reports": "报表",
+    "settings": "设置",
     "transactions": "交易"
   },
   "language": {
@@ -544,6 +545,7 @@
       "weekly": "每周总结",
       "weeklyHint": "过去 7 天的支出，每周一次"
     },
+    "settingsLink": "通知设置",
     "settingsSaved": "设置已保存",
     "settingsText": "选择你要接收的通知。关闭的类型根本不会生成。",
     "settingsTitle": "通知设置",
@@ -584,6 +586,73 @@
     "unreadCount_other": "{{count}} 条未读",
     "viewAll": "查看全部通知"
   },
+  "settings": {
+    "subtitle": "你的个人资料、账户安全，以及 Ledgerling 的外观和行为。",
+    "profile": {
+      "title": "个人资料",
+      "text": "你的名字会显示在菜单中。",
+      "emailHint": "邮箱用于登录，因此无法在这里修改。",
+      "saved": "名字已更新"
+    },
+    "password": {
+      "title": "密码",
+      "text": "修改密码后，其他所有设备都会退出登录。",
+      "current": "当前密码",
+      "new": "新密码",
+      "confirm": "再次输入新密码",
+      "strength": "密码强度",
+      "weak": "弱",
+      "medium": "中",
+      "strong": "强",
+      "hint": "至少使用 8 个字符。混合字母、数字和符号会更安全。",
+      "enterCurrent": "请输入当前密码。",
+      "tooShort": "新密码至少需要 8 个字符。",
+      "mismatch": "两次输入的新密码不一致。",
+      "submit": "修改密码",
+      "changing": "正在修改…",
+      "changed": "密码已修改，其他设备已退出登录。"
+    },
+    "sessions": {
+      "title": "登录会话",
+      "text": "在不认识的设备上登录了？可以让其他所有设备退出登录，当前设备保持登录。",
+      "logoutOthers": "退出其他所有设备",
+      "working": "正在退出…",
+      "done": "其他所有设备已退出登录。"
+    },
+    "appearance": {
+      "title": "外观",
+      "text": "选择主题。“跟随系统”会与设备保持一致。",
+      "theme": "主题",
+      "light": "浅色",
+      "dark": "深色",
+      "system": "跟随系统"
+    },
+    "preferences": {
+      "title": "偏好设置",
+      "text": "日历的排列方式。",
+      "weekStartsOn": "每周从",
+      "monday": "周一",
+      "sunday": "周日",
+      "weekHint": "“报告”中的日历每周从这一天开始。",
+      "saved": "偏好已保存"
+    },
+    "data": {
+      "title": "你的数据",
+      "text": "将你在 Ledgerling 中的全部数据下载为一个 JSON 文件：个人资料、分类、交易、预算、定期规则、目标和模板。文件中绝不包含密码。",
+      "download": "下载我的数据",
+      "working": "正在准备…",
+      "done": "你的数据已下载。"
+    },
+    "danger": {
+      "title": "危险区域",
+      "text": "删除账户会永久删除你的个人资料和所有数据，且无法撤销。",
+      "typeToConfirm": "输入 {{word}} 以确认",
+      "password": "你的密码",
+      "submit": "删除我的账户",
+      "deleting": "正在删除…",
+      "deleted": "你的账户已删除。"
+    }
+  },
   "errors": {
     "AMOUNT_INVALID": "金额必须大于 0",
     "BUDGET_EXISTS": "该分类本月已有预算",
@@ -598,6 +667,7 @@
     "CONFLICT": "这与您现有的数据冲突",
     "CONTRIBUTION_NOT_FOUND": "找不到该记录",
     "CURRENCY_INVALID": "货币必须是 3 个字母的 ISO 代码",
+    "CURRENT_PASSWORD_REQUIRED": "请输入当前密码",
     "DATE_INVALID": "日期无效，请使用 YYYY-MM-DD HH:mm 或 ISO 8601",
     "DEADLINE_IN_PAST": "截止日期必须晚于今天",
     "DEPOSIT_IN_USE": "删除这笔存入会使已存金额变为负数",
@@ -616,12 +686,14 @@
     "NAME_REQUIRED": "请填写名称",
     "NAME_TOO_LONG": "名称太长",
     "NETWORK": "无法连接服务器。请重试。",
+    "NEW_PASSWORD_TOO_SHORT": "新密码至少需要 8 个字符",
     "NOTE_TOO_LONG": "备注最多 200 个字符",
-    "NOT_FOUND": "未找到",
     "NOTIFICATION_NOT_FOUND": "找不到通知",
+    "NOT_FOUND": "未找到",
     "PASSWORD_REQUIRED": "请填写密码",
     "PASSWORD_TOO_LONG": "密码最多 72 个字符",
     "PASSWORD_TOO_SHORT": "密码至少需要 6 个字符",
+    "PASSWORD_UNCHANGED": "新密码不能与当前密码相同",
     "ROUTE_NOT_FOUND": "未找到",
     "RULE_NOT_FOUND": "找不到定期规则",
     "TAG_INVALID": "每个标签由 1-20 个字母、数字或连字符组成",
@@ -636,6 +708,7 @@
     "UNAUTHORIZED": "请登录后继续。",
     "UNKNOWN": "出错了。请重试。",
     "VALIDATION_ERROR": "请检查您输入的内容。",
-    "WITHDRAW_TOO_MUCH": "取出金额不能超过已存金额"
+    "WITHDRAW_TOO_MUCH": "取出金额不能超过已存金额",
+    "WRONG_PASSWORD": "密码不正确"
   }
 }

@@ -6,9 +6,10 @@ import { httpError } from "../utils/httpError.js";
 
 const SALT_ROUNDS = 10;
 
-// The token only says who the user is (sub = subject). It is signed, not encrypted: never put secrets in it.
-function signToken(userId) {
-  return jwt.sign({ sub: String(userId) }, process.env.JWT_SECRET, {
+// The token says who the user is (sub = subject) and which token version it belongs to (tv).
+// It is signed, not encrypted: never put secrets in it.
+export function signToken(user) {
+  return jwt.sign({ sub: String(user._id), tv: user.tokenVersion ?? 0 }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN || "7d",
   });
 }
@@ -23,7 +24,7 @@ export async function register({ name, email, password }) {
   // Every new account starts with a ready-made set of categories
   await createDefaultCategories(user._id);
 
-  return { token: signToken(user._id), user };
+  return { token: signToken(user), user };
 }
 
 export async function getCurrentUser(userId) {
@@ -39,5 +40,13 @@ export async function login({ email, password }) {
   const ok = user && (await bcrypt.compare(password, user.passwordHash));
   if (!ok) throw httpError(401, "Invalid email or password", "INVALID_CREDENTIALS");
 
-  return { token: signToken(user._id), user };
+  return { token: signToken(user), user };
+}
+
+// Raises the token version: every token made before (on every device) stops working.
+// The device that asked gets a new token, so it stays signed in.
+export async function logoutAll(userId) {
+  const user = await User.findByIdAndUpdate(userId, { $inc: { tokenVersion: 1 } }, { returnDocument: "after" });
+  if (!user) throw httpError(401, "Not authorized, invalid token", "TOKEN_INVALID");
+  return { token: signToken(user), user };
 }

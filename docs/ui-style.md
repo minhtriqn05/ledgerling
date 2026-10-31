@@ -27,7 +27,7 @@ Principles:
    Amounts always carry `+` / `−`, so color is never the only signal.
 5. **Soft shapes:** 20px cards, pill buttons and chips, capsule chart bars, smooth curves, line icons.
 6. **Readable:** every text color passes WCAG AA (4.5:1) on its background.
-7. Light mode only for the MVP. Dark mode is a possible bonus feature later.
+7. Light is the default look; a dark theme is chosen in Settings (section 3b).
 
 ## 2. References
 
@@ -133,6 +133,37 @@ Emoji saved by the earlier picker are shown as the matching line icon; nothing i
 `--chart-bar` `#8fc2ec` (pastel capsules), `--chart-bar-track` `#eef4fa`, `--chart-highlight`
 `#2874b5`, `--chart-grid` `#e3eaf1`, `--chart-axis` `#617082`. `--pattern-track` (pale diagonal stripes)
 is the free part of budget and goal progress bars.
+
+## 3b. Dark theme
+
+The person picks **Light**, **Dark** or **System** (follows the device) in Settings > Appearance. The result is one
+attribute on `<html>`: `data-theme="light"` or `data-theme="dark"`. The dark values live in `tokens.css` under
+`[data-theme='dark']`; only what must change is listed there, the brand blue, the hero gradient, the category/chart hues
+(`--chart-1` ... `--chart-8`, they are saved in the database) and every size stay as in `:root`. Components never know
+which theme is on: they only use tokens.
+
+- **Before React loads**, a small script in `client/index.html` reads `localStorage['ledgerling.theme']` (and
+  `prefers-color-scheme` for System) and sets `data-theme`, so a dark page never flashes white. A matching
+  `html[data-theme='dark']` background in the same file covers the moment before `tokens.css` arrives.
+- The choice is kept in localStorage and saved on the account (`preferences.theme`), so it follows the person to another
+  device: when someone signs in, the account's theme is applied (`PreferencesSync`).
+- Charts (Recharts) read their colors with `cssVar()` while they render, so each chart component calls `useTheme()` and
+  draws again when the theme changes.
+
+| Token | Light | Dark | Note |
+|---|---|---|---|
+| `--color-bg` / `--color-surface` / `--color-surface-muted` | `#edf3f8` / `#fff` / `#f1f5f9` | `#0f1923` / `#172431` / `#1e2d3c` | Deep navy canvas, slightly lighter panels |
+| `--color-text` / `-secondary` / `-muted` | `#172534` / `#4a5868` / `#5b6a7c` | `#e6edf4` / `#b3c0ce` / `#93a3b5` | 13.3 / 8.5 / 6.1 : 1 on the surface |
+| `--color-border` / `--color-border-strong` | `#e3eaf1` / `#c9d5e0` | `#26384a` / `#4b6279` | Input borders keep 3:1 |
+| `--color-primary-text` / `-soft` | `#1f639f` / `#e4f0fb` | `#7fbdf0` / `#1d3a56` | Buttons keep `--color-primary` (white text 4.9:1) |
+| `--color-income-text` / `-soft` | `#1e7a52` / `#e2f5eb` | `#5fd6ab` / `#163a2f` | `--color-income` fill `#3fc79a` |
+| `--color-expense-text` / `-soft` | `#bd3f36` / `#fdecea` | `#ff9d93` / `#3d2124` | `--color-expense` fill `#f2857a` |
+| `--color-danger-text` (new) | `#bd3f36` | `#ff8a80` | Red written as text or an icon; the red button keeps `--color-danger` (white text 5.4:1) |
+| `--chart-bar` / `--chart-bar-track` / `--chart-grid` / `--chart-axis` | `#8fc2ec` / `#eef4fa` / `#e3eaf1` / `#617082` | `#4a86bb` / `#1e3042` / `#2a3d50` / `#93a3b5` | Axis text 5.9:1 |
+| `--gradient-soft` / `--gradient-banner` | pastel sky to mint | deep blue to deep teal | Banner and empty-state washes |
+
+Tints made with `color-mix(... var(--color-surface))` (icon tiles, alerts, category chips) follow the theme by themselves.
+The two darkest steps of the Reports calendar are kept a little paler in the dark theme so the day numbers keep 4.5:1.
 
 ## 4. Typography
 

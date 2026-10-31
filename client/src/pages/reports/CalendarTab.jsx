@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getMonthlyReport } from '../../api/reports.js';
+import { useWeekStart } from '../../context/AuthContext.jsx';
 import { useLoad } from '../../hooks/useLoad.js';
 import { formatCompact, formatVnd } from '../../utils/format.js';
 import { buildCalendar, dayTransactionsPath, formatLongDay, weekdayLabels } from '../../utils/reports.js';
@@ -13,15 +14,18 @@ import styles from './CalendarTab.module.css';
 // The Calendar tab: a month grid made with CSS grid. A day is darker the more was spent on it
 // (4 steps, relative to the busiest day). A click on a day opens the Transactions page filtered to that day.
 // The numbers come from the same request as the Monthly tab (GET /api/reports/monthly).
-export default function CalendarTab({ month }) {
+// The week starts on the day chosen in Settings (weekStartsOn: 'monday' | 'sunday'); a prop overrides it.
+export default function CalendarTab({ month, weekStartsOn }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const preferredWeekStart = useWeekStart();
+  const weekStart = weekStartsOn ?? preferredWeekStart;
   const { data: report, loading, error, reload } = useLoad(() => getMonthlyReport(month), [month]);
 
   if (loading) return <LoadingState skeleton="cards">{t('reports.loadingCalendar')}</LoadingState>;
   if (error) return <ErrorState message={error} onRetry={reload} />;
 
-  const { cells } = buildCalendar(month, report.dailyExpense);
+  const { cells } = buildCalendar(month, report.dailyExpense, weekStart);
 
   return (
     <Card>
@@ -32,7 +36,7 @@ export default function CalendarTab({ month }) {
       </CardHeader>
 
       <div className={styles.grid} role="group" aria-label={t('reports.calendarOf', { month: formatMonth(month) })}>
-        {weekdayLabels().map((weekday) => (
+        {weekdayLabels(weekStart).map((weekday) => (
           <span key={weekday} className={styles.weekday} aria-hidden="true">
             {weekday}
           </span>
