@@ -45,6 +45,7 @@
     "goals": "Objectifs",
     "logout": "Se déconnecter",
     "main": "Navigation principale",
+    "notifications": "Notifications",
     "openMenu": "Ouvrir le menu",
     "recurring": "Récurrences",
     "reports": "Rapports",
@@ -517,6 +518,72 @@
     "title": "Analyses",
     "warning": "Attention"
   },
+  "notifications": {
+    "allRead": "Toutes les notifications sont marquées comme lues",
+    "bellUnread": "Notifications, {{count}} non lues",
+    "count_one": "{{count}} notification",
+    "count_other": "{{count}} notifications",
+    "delete": "Supprimer la notification : {{title}}",
+    "deleted": "Notification supprimée",
+    "emptyText": "Les alertes de budget, les objectifs atteints, les transactions récurrentes et votre résumé hebdomadaire apparaissent ici.",
+    "emptyTitle": "Vous êtes à jour",
+    "emptyUnreadText": "Tout a été lu.",
+    "emptyUnreadTitle": "Aucune notification non lue",
+    "filterAll": "Toutes",
+    "filterLabel": "Afficher",
+    "filterUnread": "Non lues",
+    "loading": "Chargement des notifications…",
+    "markAllRead": "Tout marquer comme lu",
+    "settings": {
+      "budget": "Budgets",
+      "budgetHint": "Une alerte à 80 % d'un budget et une autre à 100 %",
+      "goals": "Objectifs d'épargne",
+      "goalsHint": "Quand vous atteignez un objectif",
+      "recurring": "Transactions récurrentes",
+      "recurringHint": "Quand des transactions récurrentes sont ajoutées",
+      "weekly": "Résumé hebdomadaire",
+      "weeklyHint": "Ce que vous avez dépensé ces 7 derniers jours, une fois par semaine"
+    },
+    "settingsSaved": "Réglages enregistrés",
+    "settingsText": "Choisissez les notifications que vous recevez. Un type désactivé n'est pas créé du tout.",
+    "settingsTitle": "Réglages des notifications",
+    "time": {
+      "days": "il y a {{count}} j",
+      "hours": "il y a {{count}} h",
+      "minutes": "il y a {{count}} min",
+      "now": "À l'instant"
+    },
+    "title": "Notifications",
+    "types": {
+      "budget_over": {
+        "message": "{{category}} a dépassé son budget de {{month}} : {{spent}} dépensés sur {{amount}}.",
+        "title": "Budget dépassé : {{category}}"
+      },
+      "budget_warning": {
+        "message": "{{category}} a utilisé {{percent}} de son budget de {{month}} ({{spent}} sur {{amount}}).",
+        "title": "Alerte budget : {{category}}"
+      },
+      "goal_completed": {
+        "message": "Vous avez économisé {{target}} pour « {{goal}} ». Bravo !",
+        "title": "Objectif atteint : {{goal}}"
+      },
+      "recurring_created": {
+        "message_one": "{{count}} transaction récurrente a été ajoutée.",
+        "message_other": "{{count}} transactions récurrentes ont été ajoutées.",
+        "title": "Transactions récurrentes ajoutées"
+      },
+      "weekly_summary": {
+        "message_one": "Vous avez dépensé {{total}} en {{count}} transaction ces 7 derniers jours. Catégorie principale : {{category}}.",
+        "message_other": "Vous avez dépensé {{total}} en {{count}} transactions ces 7 derniers jours. Catégorie principale : {{category}}.",
+        "messageEmpty": "Vous n'avez rien dépensé ces 7 derniers jours.",
+        "title": "Votre semaine en chiffres"
+      }
+    },
+    "unread": "Non lue",
+    "unreadCount_one": "{{count}} non lue",
+    "unreadCount_other": "{{count}} non lues",
+    "viewAll": "Voir toutes les notifications"
+  },
   "errors": {
     "AMOUNT_INVALID": "Le montant doit être supérieur à 0",
     "BUDGET_EXISTS": "Un budget existe déjà pour cette catégorie et ce mois",
@@ -551,6 +618,7 @@
     "NETWORK": "Impossible de joindre le serveur. Veuillez réessayer.",
     "NOTE_TOO_LONG": "La note ne doit pas dépasser 200 caractères",
     "NOT_FOUND": "Introuvable",
+    "NOTIFICATION_NOT_FOUND": "Notification introuvable",
     "PASSWORD_REQUIRED": "Le mot de passe est obligatoire",
     "PASSWORD_TOO_LONG": "Le mot de passe ne doit pas dépasser 72 caractères",
     "PASSWORD_TOO_SHORT": "Le mot de passe doit contenir au moins 6 caractères",

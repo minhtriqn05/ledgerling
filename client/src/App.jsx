@@ -10,6 +10,7 @@ import BudgetsPage from './pages/BudgetsPage.jsx';
 import RecurringPage from './pages/RecurringPage.jsx';
 import GoalsPage from './pages/GoalsPage.jsx';
 import ReportsPage from './pages/ReportsPage.jsx';
+import NotificationsPage from './pages/NotificationsPage.jsx';
 import LoginPage from'./pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import StyleGuidePage from './pages/StyleGuidePage.jsx';
@@ -37,6 +38,7 @@ export default function App() {
           <Route path="/recurring" element={<RecurringPage />} />
           <Route path="/goals" element={<GoalsPage />} />
           <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
         </Route>
       </Route>
 

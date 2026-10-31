@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { AnimatePresence } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import { getCategories } from '../api/categories.js';
@@ -24,9 +25,18 @@ function sortByCategory(list) {
   return [...list].sort((a, b) => a.category.name.localeCompare(b.category.name, 'en'));
 }
 
+// A notification links here with ?month=2026-10; anything that is not a month is ignored
+const MONTH_PARAM = /^\d{4}-(0[1-9]|1[0-2])$/;
+
 export default function BudgetsPage() {
   const { t } = useTranslation();
-  const [month, setMonth] = useState(currentMonth);
+  const [searchParams] = useSearchParams();
+  const monthParam = searchParams.get('month');
+  const [month, setMonth] = useState(() => (MONTH_PARAM.test(monthParam ?? '') ? monthParam : currentMonth()));
+  // Another notification link while this page is already open
+  useEffect(() => {
+    if (MONTH_PARAM.test(monthParam ?? '')) setMonth(monthParam);
+  }, [monthParam]);
   const [categories, setCategories] = useState([]);
   const [budgets, setBudgets] = useState([]);
   const [loading, setLoading] = useState(true);

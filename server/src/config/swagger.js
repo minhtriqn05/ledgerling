@@ -49,6 +49,12 @@ const options = {
         description:
           "Saved category + amount + note combos of the signed-in user. The quick add dialog shows them as chips; a click creates a normal transaction dated today.",
       },
+      {
+        name: "Notifications",
+        description:
+          "In-app notifications of the signed-in user: budget at 80% and 100%, a goal reached, recurring transactions added and a weekly summary. Each event notifies once (dedupeKey), and a type the user turned off in Users > preferences is never created.",
+      },
+      { name: "Users", description: "The signed-in user's own settings" },
     ],
     components: {
       securitySchemes: {
@@ -91,8 +97,45 @@ const options = {
             _id: { type: "string", example: "6720a1b2c3d4e5f601234567" },
             name: { type: "string", example: "Minh Tri" },
             email: { type: "string", example: "tri@example.com" },
+            preferences: {
+              type: "object",
+              properties: {
+                notifications: {
+                  type: "object",
+                  description: "false = that kind of notification is never created. All true by default.",
+                  properties: {
+                    budget: { type: "boolean", example: true },
+                    goals: { type: "boolean", example: true },
+                    recurring: { type: "boolean", example: true },
+                    weekly: { type: "boolean", example: true },
+                  },
+                },
+              },
+            },
             createdAt: { type: "string", format: "date-time", example: "2026-10-27T03:00:00.000Z" },
             updatedAt: { type: "string", format: "date-time", example: "2026-10-27T03:00:00.000Z" },
+          },
+        },
+        Notification: {
+          type: "object",
+          properties: {
+            _id: { type: "string", example: "6720f1b2c3d4e5f601234701" },
+            type: {
+              type: "string",
+              enum: ["budget_warning", "budget_over", "goal_completed", "recurring_created", "weekly_summary"],
+              example: "budget_warning",
+            },
+            title: { type: "string", description: "English text; the app builds its own text from type + params", example: "Budget warning: Food" },
+            message: { type: "string", example: "Food has used 85% of its 2026-10 budget (850,000 VND of 1,000,000 VND)." },
+            link: { type: "string", description: "A path inside the app", example: "/budgets?month=2026-10" },
+            params: {
+              type: "object",
+              description: "The numbers and names the text was built from. budget_*: categoryName, month, percent, spent, amount. goal_completed: goalName, targetAmount. recurring_created: count. weekly_summary: total, count, topCategory, from, to.",
+              example: { categoryName: "Food", month: "2026-10", percent: 85, spent: 850000, amount: 1000000 },
+            },
+            read: { type: "boolean", example: false },
+            createdAt: { type: "string", format: "date-time", example: "2026-10-31T03:00:00.000Z" },
+            updatedAt: { type: "string", format: "date-time", example: "2026-10-31T03:00:00.000Z" },
           },
         },
         Category: {

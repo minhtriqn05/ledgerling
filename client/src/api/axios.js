@@ -5,6 +5,13 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
 });
 
+// Sent on `window` after a request that changed data succeeded (a transaction was added, a goal was funded...).
+// The server may have created a notification because of it, so the bell listens and asks for the unread count again.
+export const DATA_CHANGED_EVENT = 'ledgerling:data-changed';
+
+// These never cause a notification (and the notification calls update the count themselves)
+const QUIET_PREFIXES = ['/auth/', '/notifications', '/users/'];
+
 // Attach the JWT (if any) to every request.
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
@@ -18,7 +25,13 @@ api.interceptors.request.use((config) => {
 // Requests to /auth/* are skipped: a wrong password (login) or a stale token at start-up (me)
 // is handled by AuthContext and the login page, which show their own message.
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    const { method, url = '' } = response.config;
+    if (method !== 'get' && !QUIET_PREFIXES.some((prefix) => url.startsWith(prefix))) {
+      window.dispatchEvent(new Event(DATA_CHANGED_EVENT));
+    }
+    return response;
+  },
   (error) => {
     const isAuthRequest = error.config?.url?.startsWith('/auth/');
     if (error.response?.status === 401 && !isAuthRequest) {

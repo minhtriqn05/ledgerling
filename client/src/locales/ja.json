@@ -45,6 +45,7 @@
     "goals": "目標",
     "logout": "ログアウト",
     "main": "メインナビゲーション",
+    "notifications": "通知",
     "openMenu": "メニューを開く",
     "recurring": "定期",
     "reports": "レポート",
@@ -517,6 +518,72 @@
     "title": "分析",
     "warning": "警告"
   },
+  "notifications": {
+    "allRead": "すべての通知を既読にしました",
+    "bellUnread": "通知、未読 {{count}} 件",
+    "count_one": "通知 {{count}} 件",
+    "count_other": "通知 {{count}} 件",
+    "delete": "通知を削除：{{title}}",
+    "deleted": "通知を削除しました",
+    "emptyText": "予算の警告、達成した目標、定期取引、週のまとめがここに表示されます。",
+    "emptyTitle": "すべて確認済みです",
+    "emptyUnreadText": "すべて既読です。",
+    "emptyUnreadTitle": "未読の通知はありません",
+    "filterAll": "すべて",
+    "filterLabel": "表示",
+    "filterUnread": "未読",
+    "loading": "通知を読み込み中…",
+    "markAllRead": "すべて既読にする",
+    "settings": {
+      "budget": "予算",
+      "budgetHint": "予算の 80% で警告、100% でアラート",
+      "goals": "貯蓄目標",
+      "goalsHint": "目標を達成したとき",
+      "recurring": "定期取引",
+      "recurringHint": "定期取引が追加されたとき",
+      "weekly": "週のまとめ",
+      "weeklyHint": "過去 7 日間の支出を週に 1 回"
+    },
+    "settingsSaved": "設定を保存しました",
+    "settingsText": "受け取る通知を選びます。オフにした種類は作成されません。",
+    "settingsTitle": "通知の設定",
+    "time": {
+      "days": "{{count}} 日前",
+      "hours": "{{count}} 時間前",
+      "minutes": "{{count}} 分前",
+      "now": "たった今"
+    },
+    "title": "通知",
+    "types": {
+      "budget_over": {
+        "message": "{{category}} は {{month}} の予算を超えました：{{amount}} のうち {{spent}} を使用。",
+        "title": "予算超過：{{category}}"
+      },
+      "budget_warning": {
+        "message": "{{category}} は {{month}} の予算の {{percent}} を使いました（{{amount}} のうち {{spent}}）。",
+        "title": "予算の警告：{{category}}"
+      },
+      "goal_completed": {
+        "message": "「{{goal}}」のために {{target}} を貯めました。お疲れさまです！",
+        "title": "目標を達成：{{goal}}"
+      },
+      "recurring_created": {
+        "message_one": "定期取引を {{count}} 件追加しました。",
+        "message_other": "定期取引を {{count}} 件追加しました。",
+        "title": "定期取引を追加しました"
+      },
+      "weekly_summary": {
+        "message_one": "過去 7 日間に {{count}} 件の取引で {{total}} を使いました。最も多いカテゴリ：{{category}}。",
+        "message_other": "過去 7 日間に {{count}} 件の取引で {{total}} を使いました。最も多いカテゴリ：{{category}}。",
+        "messageEmpty": "過去 7 日間の支出はありません。",
+        "title": "数字で見る今週"
+      }
+    },
+    "unread": "未読",
+    "unreadCount_one": "未読 {{count}} 件",
+    "unreadCount_other": "未読 {{count}} 件",
+    "viewAll": "すべての通知を見る"
+  },
   "errors": {
     "AMOUNT_INVALID": "金額は 0 より大きくしてください",
     "BUDGET_EXISTS": "このカテゴリと月の予算はすでにあります",
@@ -551,6 +618,7 @@
     "NETWORK": "サーバーに接続できません。もう一度お試しください。",
     "NOTE_TOO_LONG": "メモは 200 文字以内で入力してください",
     "NOT_FOUND": "見つかりません",
+    "NOTIFICATION_NOT_FOUND": "通知が見つかりません",
     "PASSWORD_REQUIRED": "パスワードは必須です",
     "PASSWORD_TOO_LONG": "パスワードは 72 文字以内で入力してください",
     "PASSWORD_TOO_SHORT": "パスワードは 6 文字以上で入力してください",

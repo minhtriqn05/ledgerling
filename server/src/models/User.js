@@ -7,6 +7,15 @@ const userSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     // Only the bcrypt hash is stored, never the password
     passwordHash: { type: String, required: true },
+    preferences: {
+      // One switch per kind of notification; an account made before this field existed counts as "all on"
+      notifications: {
+        budget: { type: Boolean, default: true },
+        goals: { type: Boolean, default: true },
+        recurring: { type: Boolean, default: true },
+        weekly: { type: Boolean, default: true },
+      },
+    },
   },
   // Adds createdAt and updatedAt
   { timestamps: true }

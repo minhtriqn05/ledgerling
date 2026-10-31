@@ -45,6 +45,7 @@
     "goals": "Metas",
     "logout": "Cerrar sesión",
     "main": "Navegación principal",
+    "notifications": "Notificaciones",
     "openMenu": "Abrir menú",
     "recurring": "Recurrentes",
     "reports": "Informes",
@@ -517,6 +518,72 @@
     "title": "Análisis",
     "warning": "Aviso"
   },
+  "notifications": {
+    "allRead": "Todas las notificaciones marcadas como leídas",
+    "bellUnread": "Notificaciones, {{count}} sin leer",
+    "count_one": "{{count}} notificación",
+    "count_other": "{{count}} notificaciones",
+    "delete": "Eliminar notificación: {{title}}",
+    "deleted": "Notificación eliminada",
+    "emptyText": "Aquí aparecen los avisos de presupuesto, las metas alcanzadas, los movimientos recurrentes y tu resumen semanal.",
+    "emptyTitle": "Estás al día",
+    "emptyUnreadText": "Todo está leído.",
+    "emptyUnreadTitle": "No hay notificaciones sin leer",
+    "filterAll": "Todas",
+    "filterLabel": "Mostrar",
+    "filterUnread": "Sin leer",
+    "loading": "Cargando notificaciones…",
+    "markAllRead": "Marcar todas como leídas",
+    "settings": {
+      "budget": "Presupuestos",
+      "budgetHint": "Un aviso al llegar al 80 % de un presupuesto y una alerta al 100 %",
+      "goals": "Metas de ahorro",
+      "goalsHint": "Cuando alcanzas una meta",
+      "recurring": "Movimientos recurrentes",
+      "recurringHint": "Cuando se añaden movimientos recurrentes",
+      "weekly": "Resumen semanal",
+      "weeklyHint": "Lo que gastaste en los últimos 7 días, una vez por semana"
+    },
+    "settingsSaved": "Ajustes guardados",
+    "settingsText": "Elige qué notificaciones recibes. Un tipo desactivado no se crea en absoluto.",
+    "settingsTitle": "Ajustes de notificaciones",
+    "time": {
+      "days": "hace {{count}} d",
+      "hours": "hace {{count}} h",
+      "minutes": "hace {{count}} min",
+      "now": "Ahora mismo"
+    },
+    "title": "Notificaciones",
+    "types": {
+      "budget_over": {
+        "message": "{{category}} superó su presupuesto de {{month}}: {{spent}} gastados de {{amount}}.",
+        "title": "Presupuesto superado: {{category}}"
+      },
+      "budget_warning": {
+        "message": "{{category}} ha usado el {{percent}} de su presupuesto de {{month}} ({{spent}} de {{amount}}).",
+        "title": "Aviso de presupuesto: {{category}}"
+      },
+      "goal_completed": {
+        "message": "Has ahorrado {{target}} para «{{goal}}». ¡Bien hecho!",
+        "title": "Meta alcanzada: {{goal}}"
+      },
+      "recurring_created": {
+        "message_one": "Se añadió {{count}} movimiento recurrente.",
+        "message_other": "Se añadieron {{count}} movimientos recurrentes.",
+        "title": "Movimientos recurrentes añadidos"
+      },
+      "weekly_summary": {
+        "message_one": "Gastaste {{total}} en {{count}} movimiento en los últimos 7 días. Categoría principal: {{category}}.",
+        "message_other": "Gastaste {{total}} en {{count}} movimientos en los últimos 7 días. Categoría principal: {{category}}.",
+        "messageEmpty": "No gastaste nada en los últimos 7 días.",
+        "title": "Tu semana en cifras"
+      }
+    },
+    "unread": "Sin leer",
+    "unreadCount_one": "{{count}} sin leer",
+    "unreadCount_other": "{{count}} sin leer",
+    "viewAll": "Ver todas las notificaciones"
+  },
   "errors": {
     "AMOUNT_INVALID": "El importe debe ser mayor que 0",
     "BUDGET_EXISTS": "Ya existe un presupuesto para esta categoría y este mes",
@@ -551,6 +618,7 @@
     "NETWORK": "No se puede conectar con el servidor. Inténtalo de nuevo.",
     "NOTE_TOO_LONG": "La nota debe tener como máximo 200 caracteres",
     "NOT_FOUND": "No encontrado",
+    "NOTIFICATION_NOT_FOUND": "Notificación no encontrada",
     "PASSWORD_REQUIRED": "La contraseña es obligatoria",
     "PASSWORD_TOO_LONG": "La contraseña debe tener como máximo 72 caracteres",
     "PASSWORD_TOO_SHORT": "La contraseña debe tener al menos 6 caracteres",

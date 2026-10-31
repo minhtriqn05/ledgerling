@@ -45,6 +45,7 @@
     "goals": "Mục tiêu",
     "logout": "Đăng xuất",
     "main": "Điều hướng chính",
+    "notifications": "Thông báo",
     "openMenu": "Mở menu",
     "recurring": "Định kỳ",
     "reports": "Báo cáo",
@@ -517,6 +518,72 @@
     "title": "Nhận định",
     "warning": "Cảnh báo"
   },
+  "notifications": {
+    "allRead": "Đã đánh dấu tất cả thông báo là đã đọc",
+    "bellUnread": "Thông báo, {{count}} chưa đọc",
+    "count_one": "{{count}} thông báo",
+    "count_other": "{{count}} thông báo",
+    "delete": "Xóa thông báo: {{title}}",
+    "deleted": "Đã xóa thông báo",
+    "emptyText": "Cảnh báo ngân sách, mục tiêu đã đạt, giao dịch định kỳ và tóm tắt tuần sẽ hiện ở đây.",
+    "emptyTitle": "Bạn đã xem hết rồi",
+    "emptyUnreadText": "Tất cả đã được đọc.",
+    "emptyUnreadTitle": "Không có thông báo chưa đọc",
+    "filterAll": "Tất cả",
+    "filterLabel": "Hiển thị",
+    "filterUnread": "Chưa đọc",
+    "loading": "Đang tải thông báo…",
+    "markAllRead": "Đánh dấu tất cả là đã đọc",
+    "settings": {
+      "budget": "Ngân sách",
+      "budgetHint": "Cảnh báo khi dùng 80% ngân sách và khi vượt 100%",
+      "goals": "Mục tiêu tiết kiệm",
+      "goalsHint": "Khi bạn đạt được một mục tiêu",
+      "recurring": "Giao dịch định kỳ",
+      "recurringHint": "Khi giao dịch định kỳ được thêm vào",
+      "weekly": "Tóm tắt tuần",
+      "weeklyHint": "Số tiền đã chi trong 7 ngày qua, mỗi tuần một lần"
+    },
+    "settingsSaved": "Đã lưu cài đặt",
+    "settingsText": "Chọn loại thông báo bạn muốn nhận. Loại đã tắt sẽ hoàn toàn không được tạo.",
+    "settingsTitle": "Cài đặt thông báo",
+    "time": {
+      "days": "{{count}} ngày trước",
+      "hours": "{{count}} giờ trước",
+      "minutes": "{{count}} phút trước",
+      "now": "Vừa xong"
+    },
+    "title": "Thông báo",
+    "types": {
+      "budget_over": {
+        "message": "{{category}} đã vượt ngân sách {{month}}: đã chi {{spent}} trên {{amount}}.",
+        "title": "Vượt ngân sách: {{category}}"
+      },
+      "budget_warning": {
+        "message": "{{category}} đã dùng {{percent}} ngân sách {{month}} ({{spent}} trên {{amount}}).",
+        "title": "Cảnh báo ngân sách: {{category}}"
+      },
+      "goal_completed": {
+        "message": "Bạn đã tiết kiệm đủ {{target}} cho \"{{goal}}\". Làm tốt lắm!",
+        "title": "Đã đạt mục tiêu: {{goal}}"
+      },
+      "recurring_created": {
+        "message_one": "Đã thêm {{count}} giao dịch định kỳ.",
+        "message_other": "Đã thêm {{count}} giao dịch định kỳ.",
+        "title": "Đã thêm giao dịch định kỳ"
+      },
+      "weekly_summary": {
+        "message_one": "Bạn đã chi {{total}} cho {{count}} giao dịch trong 7 ngày qua. Danh mục chi nhiều nhất: {{category}}.",
+        "message_other": "Bạn đã chi {{total}} cho {{count}} giao dịch trong 7 ngày qua. Danh mục chi nhiều nhất: {{category}}.",
+        "messageEmpty": "Bạn chưa chi khoản nào trong 7 ngày qua.",
+        "title": "Tuần của bạn qua các con số"
+      }
+    },
+    "unread": "Chưa đọc",
+    "unreadCount_one": "{{count}} chưa đọc",
+    "unreadCount_other": "{{count}} chưa đọc",
+    "viewAll": "Xem tất cả thông báo"
+  },
   "errors": {
     "AMOUNT_INVALID": "Số tiền phải lớn hơn 0",
     "BUDGET_EXISTS": "Danh mục này đã có ngân sách trong tháng",
@@ -551,6 +618,7 @@
     "NETWORK": "Không kết nối được máy chủ. Vui lòng thử lại.",
     "NOTE_TOO_LONG": "Ghi chú tối đa 200 ký tự",
     "NOT_FOUND": "Không tìm thấy",
+    "NOTIFICATION_NOT_FOUND": "Không tìm thấy thông báo",
     "PASSWORD_REQUIRED": "Thiếu mật khẩu",
     "PASSWORD_TOO_LONG": "Mật khẩu tối đa 72 ký tự",
     "PASSWORD_TOO_SHORT": "Mật khẩu phải có ít nhất 6 ký tự",

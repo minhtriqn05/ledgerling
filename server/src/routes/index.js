@@ -10,6 +10,8 @@ import goalRoutes from "./goalRoutes.js";
 import reportRoutes from "./reportRoutes.js";
 import insightRoutes from "./insightRoutes.js";
 import templateRoutes from "./templateRoutes.js";
+import notificationRoutes from "./notificationRoutes.js";
+import userRoutes from "./userRoutes.js";
 
 const router = Router();
 
@@ -24,6 +26,8 @@ router.use("/goals", goalRoutes);
 router.use("/reports", reportRoutes);
 router.use("/insights", insightRoutes);
 router.use("/templates", templateRoutes);
+router.use("/notifications", notificationRoutes);
+router.use("/users", userRoutes);
 
 /**
  * @openapi

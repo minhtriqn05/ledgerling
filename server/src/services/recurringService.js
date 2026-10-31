@@ -4,6 +4,7 @@ import Transaction from "../models/Transaction.js";
 import { httpError } from "../utils/httpError.js";
 import { dayNoon, nextDayStart, todayInVietnam, vietnamDay } from "../utils/month.js";
 import { firstRunDayFrom, nextRunDay } from "../utils/recurrence.js";
+import { notifyRecurringCreated } from "./notificationService.js";
 
 // Shows the category's name and color instead of just its id
 const CATEGORY_FIELDS = "name color icon type";
@@ -24,11 +25,11 @@ async function findOwned(userId, id) {
   return rule;
 }
 
-// Creates the transaction of the rule's next run. If another request already created it,
-// the unique index on recurringRuleId + date refuses this one, which is exactly what we want.
+// Creates the transaction of the rule's next run and returns its id, or null when another request already created it:
+// the unique index on recurringRuleId + date refuses the second one, which is exactly what we want.
 async function createRunTransaction(rule) {
   try {
-    await Transaction.create({
+    const transaction = await Transaction.create({
       userId: rule.userId,
       categoryId: rule.categoryId._id,
       type: rule.categoryId.type, // copied from the category, like a normal transaction
@@ -37,21 +38,26 @@ async function createRunTransaction(rule) {
       date: rule.nextRunDate,
       recurringRuleId: rule._id,
     });
+    return transaction._id;
   } catch (err) {
     if (err.code !== DUPLICATE_KEY) throw err;
+    return null;
   }
 }
 
 // Runs one rule until it has nothing due. `before` is the start of tomorrow in Vietnam time.
+// Returns the ids of the transactions this call created.
 async function runRule(firstRule, before) {
   let rule = firstRule;
+  const created = [];
 
   for (let runs = 0; rule && runs < MAX_RUNS_PER_PASS; runs += 1) {
     const isDue = rule.nextRunDate < before;
     const isPastEnd = rule.endDate && rule.nextRunDate > rule.endDate;
-    if (!isDue || isPastEnd || !rule.categoryId) return;
+    if (!isDue || isPastEnd || !rule.categoryId) break;
 
-    await createRunTransaction(rule);
+    const id = await createRunTransaction(rule);
+    if (id) created.push(id);
 
     const next = nextRunDay(rule.frequency, vietnamDay(rule.startDate), vietnamDay(rule.nextRunDate));
     // Moves the rule only if nextRunDate is still the date we just used, so two requests can never skip a date.
@@ -65,6 +71,7 @@ async function runRule(firstRule, before) {
     // In that case read it again and keep going, so this request answers only when everything due has been created.
     rule = moved ?? (await RecurringRule.findOne({ _id: rule._id, active: true }).populate("categoryId", CATEGORY_FIELDS));
   }
+  return created;
 }
 
 // Creates every transaction that is due up to today (Vietnam time) for the user's active rules.
@@ -77,9 +84,12 @@ export async function processDueRules(userId) {
     CATEGORY_FIELDS
   );
 
+  const created = [];
   for (const rule of rules) {
-    await runRule(rule, before);
+    created.push(...(await runRule(rule, before)));
   }
+  // One notification for the whole pass, not one per transaction
+  await notifyRecurringCreated(userId, created);
 }
 
 export async function listRules(userId) {

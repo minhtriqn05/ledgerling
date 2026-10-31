@@ -72,6 +72,24 @@ export function shiftMonth(month, delta) {
   return shifted.toISOString().slice(0, 7);
 }
 
+// The ISO week of a day: "2026-10-31" -> "2026-W44". An ISO week starts on Monday and belongs to the year that
+// holds its Thursday, so "2026-01-01" is in "2026-W01" and "2027-01-01" is in "2026-W53".
+export function isoWeekKey(day) {
+  const [year, monthNumber, dayNumber] = day.split("-").map(Number);
+  const date = new Date(Date.UTC(year, monthNumber - 1, dayNumber));
+  const weekday = date.getUTCDay() || 7; // Monday = 1 ... Sunday = 7
+  date.setUTCDate(date.getUTCDate() + 4 - weekday); // the Thursday of this week
+  const firstDay = Date.UTC(date.getUTCFullYear(), 0, 1);
+  const week = Math.ceil(((date.getTime() - firstDay) / 86400000 + 1) / 7);
+  return `${date.getUTCFullYear()}-W${String(week).padStart(2, "0")}`;
+}
+
+// A day moved by some days: addDays("2026-10-31", -6) -> "2026-10-25"
+export function addDays(day, delta) {
+  const [year, monthNumber, dayNumber] = day.split("-").map(Number);
+  return new Date(Date.UTC(year, monthNumber - 1, dayNumber + delta)).toISOString().slice(0, 10);
+}
+
 // How many days a month has: "2026-02" -> 28. Day 0 of the next month is the last day of this one.
 export function daysInMonth(month) {
   const [year, monthNumber] = month.split("-").map(Number);
