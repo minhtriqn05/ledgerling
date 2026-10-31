@@ -7,7 +7,7 @@ import RecurringRule from "../models/RecurringRule.js";
 import Goal from "../models/Goal.js";
 import TransactionTemplate from "../models/TransactionTemplate.js";
 import Notification from "../models/Notification.js";
-import { DEMO_EMAIL, DEMO_NAME } from "../utils/demo.js";
+import { DEMO_AVATAR, DEMO_EMAIL, DEMO_NAME } from "../utils/demo.js";
 import { addDays, currentMonth, dayNoon, shiftMonth, todayInVietnam } from "../utils/month.js";
 import { processDueRules } from "./recurringService.js";
 import { ensureWeeklySummary, notifyBudgetThresholds } from "./notificationService.js";
@@ -149,6 +149,7 @@ async function resetUser(password) {
       $set: {
         name: DEMO_NAME,
         passwordHash,
+        avatar: DEMO_AVATAR,
         role: "user",
         status: "active",
         "preferences.theme": "system",

@@ -53,6 +53,10 @@
     "settings": "Cài đặt",
     "transactions": "Giao dịch"
   },
+  "breadcrumb": {
+    "label": "Đường dẫn trang",
+    "transactionDetails": "Chi tiết giao dịch"
+  },
   "language": {
     "label": "Ngôn ngữ"
   },
@@ -662,6 +666,67 @@
       "installed": "Ledgerling đã được cài trên thiết bị này."
     }
   },
+  "avatar": {
+    "title": "Ảnh đại diện",
+    "text": "Chọn một avatar có sẵn hoặc tải ảnh của bạn lên.",
+    "demoText": "Tài khoản demo dùng một avatar cố định.",
+    "upload": "Tải ảnh lên",
+    "remove": "Xóa",
+    "saved": "Đã cập nhật ảnh đại diện",
+    "removed": "Đã xóa ảnh đại diện",
+    "groupsLabel": "Nhóm avatar",
+    "cropTitle": "Chỉnh ảnh của bạn",
+    "cropHelp": "Kéo ảnh và dùng thanh trượt để phóng to. Vùng tròn là ảnh đại diện của bạn.",
+    "cropArea": "Khung cắt ảnh. Dùng phím mũi tên để di chuyển ảnh.",
+    "zoom": "Phóng to",
+    "usePhoto": "Dùng ảnh này",
+    "openProfile": "Hồ sơ của bạn",
+    "errors": {
+      "type": "Hãy chọn ảnh JPG, PNG hoặc WebP.",
+      "tooBig": "Ảnh quá lớn. Hãy chọn ảnh dưới 12 MB.",
+      "unreadable": "Không đọc được ảnh này. Hãy thử ảnh khác."
+    },
+    "groups": {
+      "animals": "Động vật",
+      "food": "Đồ ăn",
+      "nature": "Thiên nhiên",
+      "fun": "Vui nhộn"
+    },
+    "names": {
+      "cat": "Mèo",
+      "dog": "Chó",
+      "panda": "Gấu trúc",
+      "rabbit": "Thỏ",
+      "fox": "Cáo",
+      "penguin": "Chim cánh cụt",
+      "bear": "Gấu",
+      "tiger": "Hổ",
+      "cupcake": "Bánh cupcake",
+      "milk": "Sữa",
+      "strawberry": "Dâu tây",
+      "avocado": "Bơ",
+      "donut": "Bánh donut",
+      "pancake": "Bánh pancake",
+      "boba": "Trà sữa trân châu",
+      "onigiri": "Cơm nắm",
+      "cloud": "Đám mây",
+      "tree": "Cây",
+      "mushroom": "Nấm",
+      "sun": "Mặt trời",
+      "flower": "Hoa",
+      "moon": "Mặt trăng",
+      "cactus": "Xương rồng",
+      "rainbow": "Cầu vồng",
+      "robot": "Robot",
+      "astronaut": "Phi hành gia",
+      "dino": "Khủng long",
+      "ghost": "Ma nhỏ",
+      "rocket": "Tên lửa",
+      "alien": "Người ngoài hành tinh",
+      "blob": "Khối thạch",
+      "gamepad": "Tay cầm chơi game"
+    }
+  },
   "admin": {
     "subtitle": "Thống kê hệ thống và tài khoản. Chỉ quản trị viên mới xem được trang này.",
     "stats": {
@@ -789,7 +854,7 @@
         "text": "Trang tổng quan và báo cáo cho thấy tiền của bạn đi đâu mỗi tháng."
       }
     },
-    "footerNote": "Đồ án môn Phát triển Ứng dụng Web (MSIS207).",
+    "footerNote": "UIT · CSBU109.R11.KHBC",
     "github": "Xem trên GitHub",
     "opensInNewTab": "(mở trong tab mới)"
   },
@@ -847,6 +912,8 @@
     "IMPORT_CATEGORY_NOT_FOUND": "Không tìm thấy danh mục \"{{name}}\" ({{type}})",
     "IMPORT_TOO_MANY_ROWS": "Quá nhiều dòng để nhập trong một lần",
     "INTERNAL_ERROR": "Máy chủ gặp sự cố. Vui lòng thử lại.",
+    "INVALID_AVATAR": "Avatar này không tồn tại.",
+    "INVALID_AVATAR_IMAGE": "Ảnh phải là JPG, PNG hoặc WebP.",
     "INVALID_CREDENTIALS": "Email hoặc mật khẩu không đúng",
     "INVALID_INPUT": "Một số dữ liệu gửi đi không được chấp nhận.",
     "INVALID_JSON": "Không đọc được yêu cầu",
@@ -858,11 +925,11 @@
     "NOTE_TOO_LONG": "Ghi chú tối đa 200 ký tự",
     "NOTIFICATION_NOT_FOUND": "Không tìm thấy thông báo",
     "NOT_FOUND": "Không tìm thấy",
-    "PAYLOAD_TOO_LARGE": "Dữ liệu bạn gửi quá lớn.",
     "PASSWORD_REQUIRED": "Thiếu mật khẩu",
     "PASSWORD_TOO_LONG": "Mật khẩu tối đa 72 ký tự",
     "PASSWORD_TOO_SHORT": "Mật khẩu phải có ít nhất 6 ký tự",
     "PASSWORD_UNCHANGED": "Mật khẩu mới phải khác mật khẩu hiện tại",
+    "PAYLOAD_TOO_LARGE": "Dữ liệu bạn gửi quá lớn.",
     "RATE_LIMITED": "Quá nhiều yêu cầu. Vui lòng đợi vài phút rồi thử lại.",
     "ROUTE_NOT_FOUND": "Không tìm thấy",
     "RULE_NOT_FOUND": "Không tìm thấy quy tắc định kỳ",

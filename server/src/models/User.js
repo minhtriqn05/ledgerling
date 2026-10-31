@@ -2,6 +2,16 @@ import mongoose from "mongoose";
 import { LANGUAGE_CODES } from "../utils/languages.js";
 import { isDemoEmail } from "../utils/demo.js";
 
+// The picture of the user. "preset" = the id of a ready-made avatar (utils/avatars.js), "upload" = a data URL of the
+// user's own photo (a 256x256 WebP made by the app). No avatar at all = the app shows the first letter of the name.
+const avatarSchema = new mongoose.Schema(
+  {
+    type: { type: String, enum: ["preset", "upload"], required: true },
+    value: { type: String, required: true },
+  },
+  { _id: false }
+);
+
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true, maxlength: 50 },
@@ -9,6 +19,7 @@ const userSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     // Only the bcrypt hash is stored, never the password
     passwordHash: { type: String, required: true },
+    avatar: { type: avatarSchema },
     // Stored in the JWT (as "tv"). Raising it makes every token issued before invalid, which logs out every device.
     tokenVersion: { type: Number, default: 0 },
     // "admin" can open the Admin pages (/api/admin/*). Nobody can become one through the API: see scripts/make-admin.js.

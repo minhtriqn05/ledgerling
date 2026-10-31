@@ -3,6 +3,8 @@ import {
   updateProfile,
   changePassword,
   updatePreferences,
+  updateAvatar,
+  deleteAvatar,
   exportData,
   deleteAccount,
 } from "../controllers/userController.js";
@@ -10,6 +12,7 @@ import {
   validateProfile,
   validatePasswordChange,
   validatePreferences,
+  validateAvatar,
   validateDeleteAccount,
 } from "../middlewares/validateUser.js";
 import { requireAuth } from "../middlewares/requireAuth.js";
@@ -166,6 +169,77 @@ router.delete("/me", blockDemo, validateDeleteAccount, deleteAccount);
  *         $ref: '#/components/responses/DemoReadOnly'
  */
 router.patch("/me/password", blockDemo, validatePasswordChange, changePassword);
+
+/**
+ * @openapi
+ * /users/me/avatar:
+ *   patch:
+ *     summary: Choose my avatar (a ready-made one or my own photo)
+ *     description: 'Either { type: "preset", value: "<id>" } with one of the 32 ready-made avatar ids, or { type: "upload", value: "<data URL>" } with a JPEG, PNG or WebP photo (the app sends a 256x256 WebP of about 100 kB). The photo is checked by its first bytes, not only by its data URL, and may be at most 120 kB. This route accepts a JSON body of up to 200 kB (every other route 100 kB). It always changes the avatar of the signed-in user.'
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Avatar'
+ *     responses:
+ *       200:
+ *         description: The user with the new avatar
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   $ref: '#/components/schemas/User'
+ *       400:
+ *         description: 'Unknown preset id or a type that is not preset or upload (INVALID_AVATAR), or a photo that is not a JPEG, PNG or WebP image (INVALID_AVATAR_IMAGE)'
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Unknown avatar
+ *               code: INVALID_AVATAR
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/DemoReadOnly'
+ *       413:
+ *         $ref: '#/components/responses/PayloadTooLarge'
+ *   delete:
+ *     summary: Remove my avatar
+ *     description: The app shows the first letter of the name on a color again. Removing an avatar that is not there is not an error.
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: The user without an avatar
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   $ref: '#/components/schemas/User'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/DemoReadOnly'
+ */
+router.patch("/me/avatar", blockDemo, validateAvatar, updateAvatar);
+router.delete("/me/avatar", blockDemo, deleteAvatar);
 
 /**
  * @openapi

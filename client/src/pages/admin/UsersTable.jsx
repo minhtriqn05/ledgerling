@@ -7,6 +7,7 @@ import { useToast } from '../../context/ToastContext.jsx';
 import { useLoad } from '../../hooks/useLoad.js';
 import { canChangeStatus } from '../../utils/admin.js';
 import { formatDateDMY, formatNumber } from '../../utils/format.js';
+import Avatar from '../../components/Avatar/Avatar.jsx';
 import Button from '../../components/Button/Button.jsx';
 import Card, { CardHeader } from '../../components/Card/Card.jsx';
 import EmptyState from '../../components/EmptyState/EmptyState.jsx';
@@ -78,8 +79,11 @@ export default function UsersTable() {
               {data.users.map((user) => (
                 <tr key={user._id}>
                   <td data-label={t('admin.users.columns.name')} className={styles.name}>
-                    {user.name}
-                    {user._id === me._id && <span className={styles.you}>{t('admin.users.you')}</span>}
+                    <span className={styles.person}>
+                      <Avatar name={user.name} avatar={user.avatar} size="xs" />
+                      <span className={styles.personName}>{user.name}</span>
+                      {user._id === me._id && <span className={styles.you}>{t('admin.users.you')}</span>}
+                    </span>
                   </td>
                   <td data-label={t('admin.users.columns.email')} className={styles.email}>
                     {user.email}

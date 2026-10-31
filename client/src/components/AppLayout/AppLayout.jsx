@@ -4,6 +4,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import ApiStatus from '../ApiStatus/ApiStatus.jsx';
 import Avatar from '../Avatar/Avatar.jsx';
+import Breadcrumbs from '../Breadcrumbs/Breadcrumbs.jsx';
 import Icon from '../Icon.jsx';
 import LanguageSwitcher from '../LanguageSwitcher/LanguageSwitcher.jsx';
 import LiveStatus from '../LiveStatus/LiveStatus.jsx';
@@ -15,6 +16,7 @@ import QuickAddButton from '../QuickAdd/QuickAddButton.jsx';
 import QuickAddDialog from '../QuickAdd/QuickAddDialog.jsx';
 import ShortcutsDialog from '../QuickAdd/ShortcutsDialog.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
+import { BreadcrumbProvider } from '../../context/BreadcrumbContext.jsx';
 import { NotificationsProvider } from '../../context/NotificationsContext.jsx';
 import { SocketProvider } from '../../context/SocketContext.jsx';
 import { useHotkeys } from '../../hooks/useHotkeys.js';
@@ -31,7 +33,9 @@ export default function AppLayout() {
   return (
     <SocketProvider>
       <NotificationsProvider>
-        <Layout />
+        <BreadcrumbProvider>
+          <Layout />
+        </BreadcrumbProvider>
       </NotificationsProvider>
     </SocketProvider>
   );
@@ -121,6 +125,12 @@ function Layout() {
 
           <div className={styles.barActions}>
             <NotificationBell />
+            {/* The top bar of a phone: the face of the account, a shortcut to the profile */}
+            {user && (
+              <NavLink to="/settings" className={styles.barAvatar} aria-label={t('avatar.openProfile')} data-testid="bar-avatar">
+                <Avatar name={user.name} avatar={user.avatar} />
+              </NavLink>
+            )}
 
             {/* Only visible on narrow screens */}
             <button
@@ -157,7 +167,7 @@ function Layout() {
           <div className={styles.panelFooter}>
             {user && (
               <div className={styles.account} data-testid="account">
-                <Avatar name={user.name} />
+                <Avatar name={user.name} avatar={user.avatar} />
                 <span className={styles.accountText}>
                   <strong className={styles.accountName} data-testid="account-name">
                     {user.name}
@@ -178,6 +188,8 @@ function Layout() {
       <div className={styles.body}>
         <main className={styles.main}>
           <OfflineBanner />
+          {/* "Dashboard / Reports / Monthly", made from the address (config/breadcrumbs.js) */}
+          <Breadcrumbs />
           {/* A short fade and an 8px slide when another page opens. No exit animation: the new page is there at once. */}
           <motion.div
             key={location.pathname}

@@ -53,6 +53,10 @@
     "settings": "Einstellungen",
     "transactions": "Buchungen"
   },
+  "breadcrumb": {
+    "label": "Brotkrümelnavigation",
+    "transactionDetails": "Transaktionsdetails"
+  },
   "language": {
     "label": "Sprache"
   },
@@ -662,6 +666,67 @@
       "installed": "Ledgerling ist auf diesem Gerät installiert."
     }
   },
+  "avatar": {
+    "title": "Dein Avatar",
+    "text": "Wähle einen fertigen Avatar oder lade ein eigenes Foto hoch.",
+    "demoText": "Das Demokonto behält einen festen Avatar.",
+    "upload": "Foto hochladen",
+    "remove": "Entfernen",
+    "saved": "Avatar aktualisiert",
+    "removed": "Avatar entfernt",
+    "groupsLabel": "Avatar-Gruppen",
+    "cropTitle": "Foto anpassen",
+    "cropHelp": "Ziehe das Foto und zoome mit dem Schieberegler. Der runde Bereich ist dein Avatar.",
+    "cropArea": "Bildausschnitt. Mit den Pfeiltasten verschiebst du das Foto.",
+    "zoom": "Zoom",
+    "usePhoto": "Dieses Foto verwenden",
+    "openProfile": "Dein Profil",
+    "errors": {
+      "type": "Wähle ein JPG-, PNG- oder WebP-Bild.",
+      "tooBig": "Dieses Foto ist zu groß. Wähle eines unter 12 MB.",
+      "unreadable": "Dieses Bild konnte nicht gelesen werden. Probiere ein anderes."
+    },
+    "groups": {
+      "animals": "Tiere",
+      "food": "Essen",
+      "nature": "Natur",
+      "fun": "Spaß"
+    },
+    "names": {
+      "cat": "Katze",
+      "dog": "Hund",
+      "panda": "Panda",
+      "rabbit": "Hase",
+      "fox": "Fuchs",
+      "penguin": "Pinguin",
+      "bear": "Bär",
+      "tiger": "Tiger",
+      "cupcake": "Cupcake",
+      "milk": "Milch",
+      "strawberry": "Erdbeere",
+      "avocado": "Avocado",
+      "donut": "Donut",
+      "pancake": "Pfannkuchen",
+      "boba": "Bubble Tea",
+      "onigiri": "Reisball",
+      "cloud": "Wolke",
+      "tree": "Baum",
+      "mushroom": "Pilz",
+      "sun": "Sonne",
+      "flower": "Blume",
+      "moon": "Mond",
+      "cactus": "Kaktus",
+      "rainbow": "Regenbogen",
+      "robot": "Roboter",
+      "astronaut": "Astronaut",
+      "dino": "Dinosaurier",
+      "ghost": "Geist",
+      "rocket": "Rakete",
+      "alien": "Außerirdischer",
+      "blob": "Gelee-Blob",
+      "gamepad": "Spielcontroller"
+    }
+  },
   "admin": {
     "subtitle": "Statistiken und Konten der Website. Nur Admins sehen diese Seite.",
     "stats": {
@@ -789,7 +854,7 @@
         "text": "Dashboard und Berichte zeigen, wohin dein Geld jeden Monat fließt."
       }
     },
-    "footerNote": "Ein Kursprojekt für Webanwendungsentwicklung (MSIS207).",
+    "footerNote": "UIT · CSBU109.R11.KHBC",
     "github": "Auf GitHub ansehen",
     "opensInNewTab": "(öffnet in einem neuen Tab)"
   },
@@ -847,6 +912,8 @@
     "IMPORT_CATEGORY_NOT_FOUND": "Kategorie „{{name}}“ ({{type}}) nicht gefunden",
     "IMPORT_TOO_MANY_ROWS": "Zu viele Zeilen für einen Import",
     "INTERNAL_ERROR": "Auf dem Server ist ein Fehler aufgetreten. Bitte versuche es erneut.",
+    "INVALID_AVATAR": "Diesen Avatar gibt es nicht.",
+    "INVALID_AVATAR_IMAGE": "Das Foto muss ein JPG-, PNG- oder WebP-Bild sein.",
     "INVALID_CREDENTIALS": "E-Mail oder Passwort ist falsch",
     "INVALID_INPUT": "Ein Teil der gesendeten Daten konnte nicht akzeptiert werden.",
     "INVALID_JSON": "Die Anfrage konnte nicht gelesen werden",
@@ -858,11 +925,11 @@
     "NOTE_TOO_LONG": "Die Notiz darf höchstens 200 Zeichen haben",
     "NOTIFICATION_NOT_FOUND": "Benachrichtigung nicht gefunden",
     "NOT_FOUND": "Nicht gefunden",
-    "PAYLOAD_TOO_LARGE": "Die gesendeten Daten sind zu groß.",
     "PASSWORD_REQUIRED": "Das Passwort fehlt",
     "PASSWORD_TOO_LONG": "Das Passwort darf höchstens 72 Zeichen haben",
     "PASSWORD_TOO_SHORT": "Das Passwort muss mindestens 6 Zeichen haben",
     "PASSWORD_UNCHANGED": "Das neue Passwort muss sich vom aktuellen unterscheiden",
+    "PAYLOAD_TOO_LARGE": "Die gesendeten Daten sind zu groß.",
     "RATE_LIMITED": "Zu viele Anfragen. Bitte warte ein paar Minuten und versuche es erneut.",
     "ROUTE_NOT_FOUND": "Nicht gefunden",
     "RULE_NOT_FOUND": "Dauerauftrag nicht gefunden",

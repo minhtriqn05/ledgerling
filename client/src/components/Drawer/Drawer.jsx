@@ -9,7 +9,9 @@ const EXIT_MS = 220;
 
 // A panel that slides in from the right, over a dimmed page. Like Modal it is a native <dialog>, so the keyboard
 // focus stays inside and Escape closes it. Render it inside <AnimatePresence> to play the closing animation.
-export default function Drawer({ title, onClose, children }) {
+// `above` is shown at the top of the panel, over the title (the breadcrumb of the page: it is behind the dimmed area
+// otherwise, where it could not be clicked).
+export default function Drawer({ title, onClose, above = null, children }) {
   const { t } = useTranslation();
   const dialogRef = useRef(null);
   const titleId = useId();
@@ -64,6 +66,7 @@ export default function Drawer({ title, onClose, children }) {
         animate={{ x: isPresent ? 0 : '100%' }}
         transition={transition}
       >
+        {above}
         <div className={styles.header}>
           <h2 id={titleId} className={styles.title}>
             {title}

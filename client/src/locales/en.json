@@ -53,6 +53,10 @@
     "settings": "Settings",
     "transactions": "Transactions"
   },
+  "breadcrumb": {
+    "label": "Breadcrumb",
+    "transactionDetails": "Transaction details"
+  },
   "language": {
     "label": "Language"
   },
@@ -662,6 +666,67 @@
       "installed": "Ledgerling is installed on this device."
     }
   },
+  "avatar": {
+    "title": "Your avatar",
+    "text": "Pick one of the ready-made avatars or upload your own photo.",
+    "demoText": "The demo account keeps one fixed avatar.",
+    "upload": "Upload photo",
+    "remove": "Remove",
+    "saved": "Avatar updated",
+    "removed": "Avatar removed",
+    "groupsLabel": "Avatar groups",
+    "cropTitle": "Adjust your photo",
+    "cropHelp": "Drag the photo and use the slider to zoom. The round area is your avatar.",
+    "cropArea": "Photo crop area. Use the arrow keys to move the photo.",
+    "zoom": "Zoom",
+    "usePhoto": "Use this photo",
+    "openProfile": "Your profile",
+    "errors": {
+      "type": "Choose a JPG, PNG or WebP image.",
+      "tooBig": "This photo is too big. Choose one under 12 MB.",
+      "unreadable": "This image could not be read. Try another one."
+    },
+    "groups": {
+      "animals": "Animals",
+      "food": "Food",
+      "nature": "Nature",
+      "fun": "Fun"
+    },
+    "names": {
+      "cat": "Cat",
+      "dog": "Dog",
+      "panda": "Panda",
+      "rabbit": "Rabbit",
+      "fox": "Fox",
+      "penguin": "Penguin",
+      "bear": "Bear",
+      "tiger": "Tiger",
+      "cupcake": "Cupcake",
+      "milk": "Milk",
+      "strawberry": "Strawberry",
+      "avocado": "Avocado",
+      "donut": "Donut",
+      "pancake": "Pancakes",
+      "boba": "Bubble tea",
+      "onigiri": "Rice ball",
+      "cloud": "Cloud",
+      "tree": "Tree",
+      "mushroom": "Mushroom",
+      "sun": "Sun",
+      "flower": "Flower",
+      "moon": "Moon",
+      "cactus": "Cactus",
+      "rainbow": "Rainbow",
+      "robot": "Robot",
+      "astronaut": "Astronaut",
+      "dino": "Dinosaur",
+      "ghost": "Ghost",
+      "rocket": "Rocket",
+      "alien": "Alien",
+      "blob": "Jelly blob",
+      "gamepad": "Game controller"
+    }
+  },
   "admin": {
     "subtitle": "Site statistics and accounts. Only admins can see this page.",
     "stats": {
@@ -789,7 +854,7 @@
         "text": "The dashboard and reports show where your money goes every month."
       }
     },
-    "footerNote": "A course project for Web Application Development (MSIS207).",
+    "footerNote": "UIT · CSBU109.R11.KHBC",
     "github": "View on GitHub",
     "opensInNewTab": "(opens in a new tab)"
   },
@@ -847,6 +912,8 @@
     "IMPORT_CATEGORY_NOT_FOUND": "Category \"{{name}}\" ({{type}}) not found",
     "IMPORT_TOO_MANY_ROWS": "Too many rows to import at a time",
     "INTERNAL_ERROR": "Something went wrong on the server. Please try again.",
+    "INVALID_AVATAR": "That avatar does not exist.",
+    "INVALID_AVATAR_IMAGE": "The photo must be a JPG, PNG or WebP image.",
     "INVALID_CREDENTIALS": "Invalid email or password",
     "INVALID_INPUT": "Some of the data sent could not be accepted.",
     "INVALID_JSON": "The request could not be read",
@@ -858,11 +925,11 @@
     "NOTE_TOO_LONG": "Note must be at most 200 characters",
     "NOTIFICATION_NOT_FOUND": "Notification not found",
     "NOT_FOUND": "Not found",
-    "PAYLOAD_TOO_LARGE": "The data you sent is too large.",
     "PASSWORD_REQUIRED": "Password is required",
     "PASSWORD_TOO_LONG": "Password must be at most 72 characters",
     "PASSWORD_TOO_SHORT": "Password must be at least 6 characters",
     "PASSWORD_UNCHANGED": "New password must be different from the current one",
+    "PAYLOAD_TOO_LARGE": "The data you sent is too large.",
     "RATE_LIMITED": "Too many requests. Please wait a few minutes and try again.",
     "ROUTE_NOT_FOUND": "Not found",
     "RULE_NOT_FOUND": "Recurring rule not found",

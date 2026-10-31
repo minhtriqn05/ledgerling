@@ -8,6 +8,16 @@ export async function updateProfile(req, res) {
   res.status(200).json({ success: true, data });
 }
 
+export async function updateAvatar(req, res) {
+  const data = await userService.setAvatar(req.user.id, req.body);
+  res.status(200).json({ success: true, data });
+}
+
+export async function deleteAvatar(req, res) {
+  const data = await userService.removeAvatar(req.user.id);
+  res.status(200).json({ success: true, data });
+}
+
 export async function changePassword(req, res) {
   const data = await userService.changePassword(req.user.id, req.body);
   res.status(200).json({ success: true, data });

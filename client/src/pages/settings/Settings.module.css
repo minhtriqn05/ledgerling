@@ -5,37 +5,6 @@
   gap: var(--space-4);
 }
 
-/* Avatar + name + email at the top of the Profile card */
-.identity {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  min-width: 0;
-}
-
-.identityText {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.identityText strong {
-  overflow: hidden;
-  font-size: var(--font-size-lg);
-  letter-spacing: var(--letter-spacing-tight);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.identityText span {
-  overflow: hidden;
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .text {
   margin: 0;
   font-size: var(--font-size-sm);

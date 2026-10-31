@@ -53,6 +53,10 @@
     "settings": "Ajustes",
     "transactions": "Movimientos"
   },
+  "breadcrumb": {
+    "label": "Ruta de navegación",
+    "transactionDetails": "Detalles de la transacción"
+  },
   "language": {
     "label": "Idioma"
   },
@@ -662,6 +666,67 @@
       "installed": "Ledgerling está instalada en este dispositivo."
     }
   },
+  "avatar": {
+    "title": "Tu avatar",
+    "text": "Elige un avatar listo para usar o sube tu propia foto.",
+    "demoText": "La cuenta demo conserva un avatar fijo.",
+    "upload": "Subir foto",
+    "remove": "Quitar",
+    "saved": "Avatar actualizado",
+    "removed": "Avatar eliminado",
+    "groupsLabel": "Grupos de avatares",
+    "cropTitle": "Ajusta tu foto",
+    "cropHelp": "Arrastra la foto y usa el control deslizante para ampliar. El área redonda es tu avatar.",
+    "cropArea": "Área de recorte. Usa las flechas para mover la foto.",
+    "zoom": "Zoom",
+    "usePhoto": "Usar esta foto",
+    "openProfile": "Tu perfil",
+    "errors": {
+      "type": "Elige una imagen JPG, PNG o WebP.",
+      "tooBig": "Esta foto es demasiado grande. Elige una de menos de 12 MB.",
+      "unreadable": "No se pudo leer esta imagen. Prueba con otra."
+    },
+    "groups": {
+      "animals": "Animales",
+      "food": "Comida",
+      "nature": "Naturaleza",
+      "fun": "Diversión"
+    },
+    "names": {
+      "cat": "Gato",
+      "dog": "Perro",
+      "panda": "Panda",
+      "rabbit": "Conejo",
+      "fox": "Zorro",
+      "penguin": "Pingüino",
+      "bear": "Oso",
+      "tiger": "Tigre",
+      "cupcake": "Cupcake",
+      "milk": "Leche",
+      "strawberry": "Fresa",
+      "avocado": "Aguacate",
+      "donut": "Dona",
+      "pancake": "Panqueques",
+      "boba": "Té de burbujas",
+      "onigiri": "Bola de arroz",
+      "cloud": "Nube",
+      "tree": "Árbol",
+      "mushroom": "Seta",
+      "sun": "Sol",
+      "flower": "Flor",
+      "moon": "Luna",
+      "cactus": "Cactus",
+      "rainbow": "Arcoíris",
+      "robot": "Robot",
+      "astronaut": "Astronauta",
+      "dino": "Dinosaurio",
+      "ghost": "Fantasma",
+      "rocket": "Cohete",
+      "alien": "Alienígena",
+      "blob": "Gelatina",
+      "gamepad": "Mando de juego"
+    }
+  },
   "admin": {
     "subtitle": "Estadísticas del sitio y cuentas. Solo los administradores ven esta página.",
     "stats": {
@@ -789,7 +854,7 @@
         "text": "El panel y los informes muestran a dónde va tu dinero cada mes."
       }
     },
-    "footerNote": "Un proyecto del curso de Desarrollo de Aplicaciones Web (MSIS207).",
+    "footerNote": "UIT · CSBU109.R11.KHBC",
     "github": "Ver en GitHub",
     "opensInNewTab": "(se abre en una pestaña nueva)"
   },
@@ -847,6 +912,8 @@
     "IMPORT_CATEGORY_NOT_FOUND": "Categoría «{{name}}» ({{type}}) no encontrada",
     "IMPORT_TOO_MANY_ROWS": "Demasiadas filas para importar a la vez",
     "INTERNAL_ERROR": "Algo ha ido mal en el servidor. Inténtalo de nuevo.",
+    "INVALID_AVATAR": "Ese avatar no existe.",
+    "INVALID_AVATAR_IMAGE": "La foto debe ser una imagen JPG, PNG o WebP.",
     "INVALID_CREDENTIALS": "Correo electrónico o contraseña incorrectos",
     "INVALID_INPUT": "No se pudieron aceptar algunos de los datos enviados.",
     "INVALID_JSON": "No se ha podido leer la solicitud",
@@ -858,11 +925,11 @@
     "NOTE_TOO_LONG": "La nota debe tener como máximo 200 caracteres",
     "NOTIFICATION_NOT_FOUND": "Notificación no encontrada",
     "NOT_FOUND": "No encontrado",
-    "PAYLOAD_TOO_LARGE": "Los datos enviados son demasiado grandes.",
     "PASSWORD_REQUIRED": "La contraseña es obligatoria",
     "PASSWORD_TOO_LONG": "La contraseña debe tener como máximo 72 caracteres",
     "PASSWORD_TOO_SHORT": "La contraseña debe tener al menos 6 caracteres",
     "PASSWORD_UNCHANGED": "La contraseña nueva debe ser distinta de la actual",
+    "PAYLOAD_TOO_LARGE": "Los datos enviados son demasiado grandes.",
     "RATE_LIMITED": "Demasiadas solicitudes. Espera unos minutos e inténtalo de nuevo.",
     "ROUTE_NOT_FOUND": "No encontrado",
     "RULE_NOT_FOUND": "Regla recurrente no encontrada",

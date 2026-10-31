@@ -7,7 +7,7 @@ const options = {
       title: "Ledgerling API",
       version: "1.0.0",
       description: [
-        "REST API for the Ledgerling personal expense tracker.",
+        "REST API for the Ledgerling personal expense tracker. Course project: Phát triển ứng dụng web và cơ sở dữ liệu, class CSBU109.R11.KHBC, UIT.",
         "",
         "**How to try the routes that need a login (the lock icon):**",
         "1. Call `POST /auth/register` or `POST /auth/login` and copy the `token` from the response.",
@@ -18,7 +18,7 @@ const options = {
         "`message` is English text for people; `code` is a stable identifier such as `EMAIL_TAKEN`, `INVALID_CREDENTIALS`, `CATEGORY_IN_USE` or `VALIDATION_ERROR`, which a client can translate.",
         "Every route can also answer 500 (server error). A body that is not valid JSON gets 400 `Invalid JSON body`.",
         "",
-        "**Limits:** each IP address may send 300 requests to `/api` and 20 requests to `/auth/login` + `/auth/register` per 15 minutes (more gets 429 `RATE_LIMITED`; `/health` is free). A JSON body is limited to 100 kB (300 kB for `POST /transactions/import`); a bigger one gets 413 `PAYLOAD_TOO_LARGE`. A body key that starts with `$` or contains `.`, or a query key that starts with `$` or contains `[`, gets 400 `INVALID_INPUT`.",
+        "**Limits:** each IP address may send 300 requests to `/api` and 20 requests to `/auth/login` + `/auth/register` per 15 minutes (more gets 429 `RATE_LIMITED`; `/health` is free). A JSON body is limited to 100 kB (300 kB for `POST /transactions/import`, 200 kB for `PATCH /users/me/avatar`); a bigger one gets 413 `PAYLOAD_TOO_LARGE`. A body key that starts with `$` or contains `.`, or a query key that starts with `$` or contains `[`, gets 400 `INVALID_INPUT`.",
         "",
         "**Real-time:** a signed-in client can also open a Socket.IO connection on this server (`auth: { token }`). After every successful write it receives `data:changed { resource }`, and `notification:new { id, type }` for a new notification. An optional header `X-Socket-Id` on a write skips that socket. See `docs/api-plan.md`.",
       ].join("\n"),
@@ -136,6 +136,18 @@ const options = {
       },
       // Shapes shared by several endpoints; route comments point to them with $ref
       schemas: {
+        Avatar: {
+          type: "object",
+          required: ["type", "value"],
+          properties: {
+            type: { type: "string", enum: ["preset", "upload"], example: "preset" },
+            value: {
+              type: "string",
+              description: "preset: the id of a ready-made avatar, for example cat, panda, cupcake, cloud or robot (32 in four groups: animals, food, nature, fun). upload: a data URL of a JPEG, PNG or WebP photo, at most 120 kB.",
+              example: "panda",
+            },
+          },
+        },
         User: {
           type: "object",
           properties: {
@@ -144,6 +156,7 @@ const options = {
             email: { type: "string", example: "tri@example.com" },
             role: { type: "string", enum: ["user", "admin"], description: "Only an admin can open the Admin pages", example: "user" },
             status: { type: "string", enum: ["active", "disabled"], description: "A disabled account cannot log in", example: "active" },
+            avatar: { $ref: "#/components/schemas/Avatar", description: "Absent when the user has none: the app shows the first letter of the name" },
             isDemo: { type: "boolean", description: "true for the shared demo account (demo@example.com): the app hides the password, sessions and delete-account settings", example: false },
             preferences: {
               type: "object",
@@ -174,6 +187,7 @@ const options = {
             _id: { type: "string", example: "6720a1b2c3d4e5f601234567" },
             name: { type: "string", example: "Minh Tri" },
             email: { type: "string", example: "tri@example.com" },
+            avatar: { $ref: "#/components/schemas/Avatar" },
             role: { type: "string", enum: ["user", "admin"], example: "user" },
             status: { type: "string", enum: ["active", "disabled"], example: "active" },
             createdAt: { type: "string", format: "date-time", example: "2026-10-27T03:00:00.000Z" },

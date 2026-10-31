@@ -1,5 +1,6 @@
 import { httpError } from "../utils/httpError.js";
 import { LANGUAGE_CODES } from "../utils/languages.js";
+import { AVATAR_MIME_TYPES, MAX_AVATAR_BYTES, isPresetAvatarId } from "../utils/avatars.js";
 
 const NOTIFICATION_SWITCHES = ["budget", "goals", "recurring", "weekly"];
 const THEMES = ["light", "dark", "system"];
@@ -96,4 +97,35 @@ export function validateDeleteAccount(req, res, next) {
 
   req.body = { password };
   next();
+}
+
+// What a photo must start with, whatever its data URL says: the first bytes of a real WebP, PNG or JPEG file
+const IMAGE_SIGNATURES = {
+  "image/png": (bytes) => bytes.length > 8 && bytes.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])),
+  "image/jpeg": (bytes) => bytes.length > 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff,
+  "image/webp": (bytes) => bytes.length > 12 && bytes.toString("ascii", 0, 4) === "RIFF" && bytes.toString("ascii", 8, 12) === "WEBP",
+};
+const DATA_URL = new RegExp(`^data:(${AVATAR_MIME_TYPES.join("|")});base64,([A-Za-z0-9+/]+={0,2})$`);
+
+// PATCH /users/me/avatar: { type: "preset", value: "<id>" } or { type: "upload", value: "data:image/webp;base64,..." }
+export function validateAvatar(req, res, next) {
+  const body = req.body ?? {};
+
+  if (body.type === "preset") {
+    if (!isPresetAvatarId(body.value)) throw httpError(400, "Unknown avatar", "INVALID_AVATAR");
+    req.body = { type: "preset", value: body.value };
+    return next();
+  }
+
+  if (body.type === "upload") {
+    const match = DATA_URL.exec(text(body.value));
+    if (!match) throw httpError(400, "The photo must be a JPEG, PNG or WebP image", "INVALID_AVATAR_IMAGE");
+    const bytes = Buffer.from(match[2], "base64");
+    if (bytes.length > MAX_AVATAR_BYTES) throw httpError(413, "Request body is too large", "PAYLOAD_TOO_LARGE");
+    if (!IMAGE_SIGNATURES[match[1]](bytes)) throw httpError(400, "The photo must be a JPEG, PNG or WebP image", "INVALID_AVATAR_IMAGE");
+    req.body = { type: "upload", value: body.value };
+    return next();
+  }
+
+  throw httpError(400, "Avatar type must be preset or upload", "INVALID_AVATAR");
 }
