@@ -1,6 +1,7 @@
 import "dotenv/config";
 import app from "./app.js";
 import { connectDB } from "./config/db.js";
+import { attachSocket } from "./services/realtimeService.js";
 
 const PORT = process.env.PORT || 4000;
 
@@ -18,9 +19,11 @@ async function start() {
     process.exit(1);
   }
 
-  app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
+  // The real-time events share the port of the API
+  attachSocket(server);
 }
 
 start();

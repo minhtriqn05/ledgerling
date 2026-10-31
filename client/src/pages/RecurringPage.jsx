@@ -14,6 +14,7 @@ import ErrorState from '../components/ErrorState/ErrorState.jsx';
 import RuleRow from './recurring/RuleRow.jsx';
 import RuleFormDialog from './recurring/RuleFormDialog.jsx';
 import DeleteRuleDialog from './recurring/DeleteRuleDialog.jsx';
+import { useLiveRefresh } from '../hooks/useLiveRefresh.js';
 import styles from './RecurringPage.module.css';
 
 // The user's weekly and monthly rules. A rule creates real transactions by itself when they are due.
@@ -38,6 +39,7 @@ export default function RecurringPage() {
         if (cancelled) return;
         setCategories(categoryList);
         setRules(ruleList);
+        setLoadError('');
       })
       .catch((err) => {
         if (!cancelled) setLoadError(getErrorMessage(err));
@@ -49,6 +51,9 @@ export default function RecurringPage() {
       cancelled = true;
     };
   }, [reloadKey]);
+
+  // Another device changed something: the rows change in place, an open dialog stays open
+  useLiveRefresh(['recurring', 'categories'], () => setReloadKey((key) => key + 1));
 
   function reload() {
     setLoading(true);
@@ -96,7 +101,7 @@ export default function RecurringPage() {
           title={t('recurring.emptyTitle')}
           text={t('recurring.emptyText')}
         >
-          <Button icon="plus" onClick={() => setDialog({ form: null })}>
+          <Button needsNetwork icon="plus" onClick={() => setDialog({ form: null })}>
             {t('recurring.add')}
           </Button>
         </EmptyState>
@@ -128,7 +133,7 @@ export default function RecurringPage() {
         title={t('nav.recurring')}
         subtitle={ready ? t('recurring.count', { count: rules.length }) : undefined}
       >
-        <Button icon="plus" onClick={() => setDialog({ form: null })} disabled={!ready}>
+        <Button needsNetwork icon="plus" onClick={() => setDialog({ form: null })} disabled={!ready}>
           {t('recurring.add')}
         </Button>
       </PageHeader>

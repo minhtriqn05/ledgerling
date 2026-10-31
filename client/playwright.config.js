@@ -3,6 +3,7 @@ import { defineConfig, devices } from '@playwright/test';
 // End-to-end tests (npm run test:e2e). Playwright starts both servers itself:
 // - the API on port 4100 with an in-memory database (npm run start:e2e in /server), never Atlas
 // - Vite on port 5174, so it never clashes with a normal `npm run dev` on 5173
+// - the production build on port 5175 (vite preview, in its own folder): the service worker only exists there (e2e/offline.spec.js)
 const API_URL = 'http://localhost:4100/api';
 const APP_URL = 'http://localhost:5174';
 
@@ -38,6 +39,13 @@ export default defineConfig({
       reuseExistingServer: false,
       // Passed through the env option (not "VAR=value npm run dev") so it also works on Windows.
       // A variable that is already set wins over client/.env in Vite.
+      env: { VITE_API_URL: API_URL },
+    },
+    {
+      command: 'npm run build -- --outDir dist-e2e && npm run preview -- --outDir dist-e2e --port 5175 --strictPort',
+      url: 'http://localhost:5175',
+      timeout: 120000,
+      reuseExistingServer: false,
       env: { VITE_API_URL: API_URL },
     },
   ],

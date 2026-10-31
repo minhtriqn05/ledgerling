@@ -1,11 +1,15 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import api from '../api/axios.js';
+import { clearApiCache } from '../utils/apiCache.js';
 
 // Holds the signed-in user and the JWT for the whole app.
 // The token is also kept in localStorage (see CLAUDE.md) so the session survives a page refresh;
 // api/axios.js reads it from there to send the Authorization header.
 
 const AuthContext = createContext(null);
+
+// Who the saved offline data belongs to: when another account signs in, that data is deleted first
+const CACHE_OWNER_KEY = 'ledgerling.cacheOwner';
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem('token'));
@@ -23,9 +27,9 @@ export function AuthProvider({ children }) {
       .then((response) => {
         if (!cancelled) setUser(response.data.data);
       })
-      .catch(() => {
-        // Invalid, expired or unknown token: forget it
-        if (!cancelled) clearSession();
+      .catch((error) => {
+        // Invalid, expired or unknown token: forget it. No answer at all (offline, server asleep) says nothing about the token.
+        if (!cancelled && error.response?.status === 401) clearSession();
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -37,6 +41,8 @@ export function AuthProvider({ children }) {
   }, []);
 
   function saveSession({ token, user }) {
+    if (localStorage.getItem(CACHE_OWNER_KEY) !== user._id) clearApiCache();
+    localStorage.setItem(CACHE_OWNER_KEY, user._id);
     localStorage.setItem('token', token);
     setToken(token);
     setUser(user);
@@ -44,6 +50,8 @@ export function AuthProvider({ children }) {
 
   function clearSession() {
     localStorage.removeItem('token');
+    localStorage.removeItem(CACHE_OWNER_KEY);
+    clearApiCache();
     setToken(null);
     setUser(null);
   }

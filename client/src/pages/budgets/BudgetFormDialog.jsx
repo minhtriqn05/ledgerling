@@ -128,7 +128,7 @@ export default function BudgetFormDialog({ budget, month, availableCategories, o
           <Button variant="secondary" onClick={onClose} disabled={saving}>
             {t('common.cancel')}
           </Button>
-          <Button type="submit" disabled={saving || (!isEdit && availableCategories.length === 0)}>
+          <Button needsNetwork type="submit" disabled={saving || (!isEdit && availableCategories.length === 0)}>
             {saving ? t('common.saving') : isEdit ? t('common.saveChanges') : t('budgets.save')}
           </Button>
         </div>

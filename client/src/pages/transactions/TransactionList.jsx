@@ -153,8 +153,8 @@ export default function TransactionList({
                 </td>
                 <td className={styles.alignRight}>
                   <span className={styles.rowActions}>
-                    <IconButton icon="edit" label={t('common.editName', { name: item.note || item.category.name })} onClick={() => onEdit(item)} />
-                    <IconButton
+                    <IconButton needsNetwork icon="edit" label={t('common.editName', { name: item.note || item.category.name })} onClick={() => onEdit(item)} />
+                    <IconButton needsNetwork
                       icon="trash"
                       label={t('common.deleteName', { name: item.note || item.category.name })}
                       danger

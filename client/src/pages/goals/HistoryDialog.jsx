@@ -86,7 +86,7 @@ export default function HistoryDialog({ goal, onChanged, onClose }) {
                     </span>
                   </div>
                   <span className={`${styles.amount} ${isDeposit ? styles.income : styles.expense}`}>{amountText}</span>
-                  <IconButton
+                  <IconButton needsNetwork
                     icon="trash"
                     size={16}
                     danger

@@ -653,6 +653,13 @@
       "submit": "Xóa tài khoản của tôi",
       "deleting": "Đang xóa…",
       "deleted": "Tài khoản của bạn đã được xóa."
+    },
+    "install": {
+      "title": "Cài đặt ứng dụng",
+      "text": "Giữ Ledgerling trên màn hình chính hoặc máy tính. Ứng dụng mở trong cửa sổ riêng và có lối tắt để thêm giao dịch.",
+      "button": "Cài đặt ứng dụng",
+      "manual": "Trình duyệt của bạn không có nút cài đặt. Trên iPhone hoặc iPad: chạm Chia sẻ, rồi Thêm vào MH chính. Trên Android: mở menu trình duyệt, rồi chọn Thêm vào màn hình chính.",
+      "installed": "Ledgerling đã được cài trên thiết bị này."
     }
   },
   "admin": {
@@ -875,5 +882,16 @@
     "VALIDATION_ERROR": "Vui lòng kiểm tra lại thông tin đã nhập.",
     "WITHDRAW_TOO_MUCH": "Không thể rút nhiều hơn số tiền đã để dành",
     "WRONG_PASSWORD": "Mật khẩu không đúng"
+  },
+  "live": {
+    "live": "Trực tuyến",
+    "reconnecting": "Đang kết nối lại…",
+    "liveHint": "Thay đổi từ các thiết bị khác của bạn sẽ tự hiện ở đây.",
+    "reconnectingHint": "Đang thử kết nối tới máy chủ. Thay đổi từ các thiết bị khác sẽ hiện khi kết nối trở lại."
+  },
+  "offline": {
+    "banner": "Bạn đang ngoại tuyến – đang hiển thị dữ liệu đã lưu",
+    "note": "Thêm, sửa và xoá sẽ bị tắt cho đến khi bạn có mạng trở lại.",
+    "locked": "Không dùng được khi ngoại tuyến"
   }
 }

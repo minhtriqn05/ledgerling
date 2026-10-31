@@ -64,7 +64,7 @@ export default function ProfileSection() {
 
         {error && <Alert>{error}</Alert>}
         <div className={styles.actions}>
-          <Button type="submit" disabled={saving || trimmed === user.name}>
+          <Button needsNetwork type="submit" disabled={saving || trimmed === user.name}>
             {saving ? t('common.saving') : t('common.saveChanges')}
           </Button>
         </div>

@@ -1,4 +1,5 @@
 import * as userService from "../services/userService.js";
+import { disconnectUser } from "../services/realtimeService.js";
 
 // The user always comes from the token (req.user.id, set by requireAuth).
 
@@ -10,6 +11,8 @@ export async function updateProfile(req, res) {
 export async function changePassword(req, res) {
   const data = await userService.changePassword(req.user.id, req.body);
   res.status(200).json({ success: true, data });
+  // After the answer, so this device has its new token by the time its old socket closes
+  disconnectUser(req.user.id);
 }
 
 export async function updatePreferences(req, res) {
@@ -26,4 +29,5 @@ export async function exportData(req, res) {
 export async function deleteAccount(req, res) {
   await userService.deleteAccount(req.user.id, req.body);
   res.status(200).json({ success: true, data: { deleted: true } });
+  disconnectUser(req.user.id);
 }

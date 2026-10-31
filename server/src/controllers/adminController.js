@@ -1,4 +1,5 @@
 import * as adminService from "../services/adminService.js";
+import { disconnectUser } from "../services/realtimeService.js";
 
 export async function stats(req, res) {
   const data = await adminService.getStats();
@@ -13,4 +14,5 @@ export async function users(req, res) {
 export async function setStatus(req, res) {
   const data = await adminService.setUserStatus(req.user.id, req.params.id, req.body.status);
   res.status(200).json({ success: true, data });
+  if (req.body.status === "disabled") disconnectUser(req.params.id);
 }

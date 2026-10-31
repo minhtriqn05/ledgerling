@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { getNotifications, markAllRead, markRead } from '../../api/notifications.js';
 import { getErrorMessage } from '../../api/axios.js';
 import { useNotifications } from '../../context/NotificationsContext.jsx';
+import { useOfflineLock } from '../../hooks/useOnline.js';
 import Icon from '../Icon.jsx';
 import Popover from '../Popover/Popover.jsx';
 import NotificationItem from './NotificationItem.jsx';
@@ -17,6 +18,7 @@ const BADGE_MAX = 99;
 // as read and goes to its link.
 export default function NotificationBell() {
   const { t } = useTranslation();
+  const { locked, note } = useOfflineLock();
   const navigate = useNavigate();
   const { unread, setUnread, refreshUnread } = useNotifications();
   const [open, setOpen] = useState(false);
@@ -123,7 +125,7 @@ export default function NotificationBell() {
       <Popover open={open} anchorRef={buttonRef} onClose={() => setOpen(false)} className={styles.panel} role="dialog" aria-label={t('notifications.title')}>
         <div className={styles.header}>
           <h2 className={styles.heading}>{t('notifications.title')}</h2>
-          <button type="button" className={styles.markAll} disabled={unread === 0} onClick={handleMarkAll}>
+          <button type="button" className={styles.markAll} disabled={unread === 0 || locked} title={note} onClick={handleMarkAll}>
             {t('notifications.markAllRead')}
           </button>
         </div>

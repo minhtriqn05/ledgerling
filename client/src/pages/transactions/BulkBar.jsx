@@ -13,10 +13,10 @@ export default function BulkBar({ count, onChangeCategory, onDelete, onClear }) 
         {t('transactions.selected', { count })}
       </span>
       <div className={styles.actions}>
-        <Button variant="secondary" icon="categories" onClick={onChangeCategory}>
+        <Button needsNetwork variant="secondary" icon="categories" onClick={onChangeCategory}>
           {t('transactions.changeCategory')}
         </Button>
-        <Button variant="danger" icon="trash" onClick={onDelete}>
+        <Button needsNetwork variant="danger" icon="trash" onClick={onDelete}>
           {t('transactions.deleteSelected')}
         </Button>
         <Button variant="secondary" onClick={onClear}>

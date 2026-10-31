@@ -4,6 +4,7 @@ import helmet from "helmet";
 import compression from "compression";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./config/swagger.js";
+import { allowedOrigins } from "./config/origins.js";
 import routes from "./routes/index.js";
 import { notFound, errorHandler } from "./middlewares/errorHandler.js";
 import { apiLimiter, authLimiter } from "./middlewares/rateLimit.js";
@@ -30,18 +31,13 @@ export function createApp({ rateLimit = rateLimitWanted() } = {}) {
   // Query strings stay flat: ?a[b]=c is not turned into an object
   app.set("query parser", "simple");
 
-  const allowedOrigins = (process.env.CLIENT_URL || "")
-    .split(",")
-    .map((origin) => origin.trim())
-    .filter(Boolean);
-
   // Security headers on every route (also /api-docs). The API is read by the app on another address (Vercel),
   // so its answers must be allowed to be used by other origins.
   app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
   // Smaller JSON answers (and CSV exports)
   app.use(compression());
   // Content-Disposition is exposed so the browser app can read the file name of a CSV export
-  app.use(cors({ origin: allowedOrigins, exposedHeaders: ["Content-Disposition"] }));
+  app.use(cors({ origin: allowedOrigins(), exposedHeaders: ["Content-Disposition"] }));
 
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
       // Keep the pasted token after a page reload

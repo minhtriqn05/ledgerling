@@ -653,6 +653,13 @@
       "submit": "Eliminar mi cuenta",
       "deleting": "Eliminando…",
       "deleted": "Tu cuenta se ha eliminado."
+    },
+    "install": {
+      "title": "Instalar la app",
+      "text": "Ten Ledgerling en tu pantalla de inicio o escritorio. Se abre en su propia ventana y tiene un acceso directo para añadir una transacción.",
+      "button": "Instalar la app",
+      "manual": "Tu navegador no tiene botón de instalación. En iPhone o iPad: toca Compartir y luego Añadir a pantalla de inicio. En Android: abre el menú del navegador y elige Añadir a la pantalla de inicio.",
+      "installed": "Ledgerling está instalada en este dispositivo."
     }
   },
   "admin": {
@@ -875,5 +882,16 @@
     "VALIDATION_ERROR": "Revisa los valores introducidos.",
     "WITHDRAW_TOO_MUCH": "No puedes retirar más que el importe ahorrado",
     "WRONG_PASSWORD": "La contraseña no es correcta"
+  },
+  "live": {
+    "live": "En directo",
+    "reconnecting": "Reconectando…",
+    "liveHint": "Los cambios de tus otros dispositivos aparecen aquí solos.",
+    "reconnectingHint": "Intentando conectar con el servidor. Los cambios de tus otros dispositivos aparecerán cuando vuelva."
+  },
+  "offline": {
+    "banner": "Estás sin conexión: se muestran los datos guardados",
+    "note": "Añadir, editar y eliminar están desactivados hasta que vuelvas a tener conexión.",
+    "locked": "No disponible sin conexión"
   }
 }

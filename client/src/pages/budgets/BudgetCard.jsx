@@ -38,7 +38,7 @@ export default function BudgetCard({ budget, onEdit, onDelete }) {
           <Button variant="secondary" onClick={() => setConfirming(false)} disabled={deleting} autoFocus>
             {t('common.cancel')}
           </Button>
-          <Button variant="danger" onClick={handleDelete} disabled={deleting}>
+          <Button needsNetwork variant="danger" onClick={handleDelete} disabled={deleting}>
             {deleting ? t('common.deleting') : t('common.delete')}
           </Button>
         </div>
@@ -56,8 +56,8 @@ export default function BudgetCard({ budget, onEdit, onDelete }) {
           <span>{category.name}</span>
         </h2>
         <span className={styles.actions}>
-          <IconButton icon="edit" size={16} label={t('budgets.editName', { name: category.name })} onClick={() => onEdit(budget)} />
-          <IconButton
+          <IconButton needsNetwork icon="edit" size={16} label={t('budgets.editName', { name: category.name })} onClick={() => onEdit(budget)} />
+          <IconButton needsNetwork
             icon="trash"
             size={16}
             label={t('budgets.deleteName', { name: category.name })}

@@ -1,0 +1,21 @@
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-size-xs);
+  line-height: 1;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+/* The dot only repeats what the text already says, so color is never the only signal. */
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-text-muted);
+}
+
+.live .dot {
+  background: var(--color-income);
+}

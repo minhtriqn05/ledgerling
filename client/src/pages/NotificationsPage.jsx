@@ -14,6 +14,7 @@ import LoadingState from '../components/LoadingState/LoadingState.jsx';
 import ErrorState from '../components/ErrorState/ErrorState.jsx';
 import NotificationItem from '../components/Notifications/NotificationItem.jsx';
 import Pager from './transactions/Pager.jsx';
+import { useLiveRefresh } from '../hooks/useLiveRefresh.js';
 import styles from './NotificationsPage.module.css';
 
 const PAGE_SIZE = 10;
@@ -58,6 +59,9 @@ export default function NotificationsPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  // A new notification, or one read or deleted on another device
+  useLiveRefresh('notifications', () => load({ silent: true }));
 
   function changeFilter(value) {
     setFilter(value);
@@ -136,7 +140,7 @@ export default function NotificationsPage() {
         <Button variant="secondary" icon="settings" onClick={() => navigate('/settings#notifications')}>
           {t('notifications.settingsLink')}
         </Button>
-        <Button variant="secondary" icon="check" onClick={handleMarkAll} disabled={unread === 0}>
+        <Button needsNetwork variant="secondary" icon="check" onClick={handleMarkAll} disabled={unread === 0}>
           {t('notifications.markAllRead')}
         </Button>
       </PageHeader>

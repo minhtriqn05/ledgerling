@@ -155,7 +155,7 @@ export default function GoalFormDialog({ goal, onSaved, onClose }) {
           <Button variant="secondary" onClick={onClose} disabled={saving}>
             {t('common.cancel')}
           </Button>
-          <Button type="submit" disabled={saving}>
+          <Button needsNetwork type="submit" disabled={saving}>
             {saving ? t('common.saving') : isEdit ? t('common.saveChanges') : t('goals.save')}
           </Button>
         </div>

@@ -1,10 +1,12 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { DATA_CHANGED_EVENT } from '../api/axios.js';
 import { getUnreadCount } from '../api/notifications.js';
+import { useSocketEvent } from './SocketContext.jsx';
 
-// The number on the bell. It asks the API every minute while the tab is open, when the tab is shown again, and
-// after every request that changed data (a transaction was added, a goal was funded...), because the server may
-// have created a notification because of it.
+// The number on the bell. A new notification adds one at once (socket event notification:new) and a change on
+// another device asks for the true number. As a safety net for a lost connection it also asks the API every minute
+// while the tab is open, when the tab is shown again, and after every request that changed data (a transaction was
+// added, a goal was funded...), because the server may have created a notification because of it.
 
 const NotificationsContext = createContext(null);
 
@@ -29,6 +31,12 @@ export function NotificationsProvider({ children }) {
     version.current += 1;
     setUnreadState(update);
   }, []);
+
+  useSocketEvent('notification:new', () => setUnread((count) => count + 1));
+  useSocketEvent('data:changed', ({ resource }) => {
+    if (resource === 'notifications') refreshUnread();
+  });
+  useSocketEvent('reconnected', refreshUnread);
 
   useEffect(() => {
     refreshUnread();

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { getMonthlyReport } from '../../api/reports.js';
 import { useWeekStart } from '../../context/AuthContext.jsx';
 import { useLoad } from '../../hooks/useLoad.js';
+import { useLiveRefresh } from '../../hooks/useLiveRefresh.js';
 import { formatCompact, formatVnd } from '../../utils/format.js';
 import { buildCalendar, dayTransactionsPath, formatLongDay, weekdayLabels } from '../../utils/reports.js';
 import { formatMonth } from '../../utils/vnDate.js';
@@ -20,7 +21,8 @@ export default function CalendarTab({ month, weekStartsOn }) {
   const navigate = useNavigate();
   const preferredWeekStart = useWeekStart();
   const weekStart = weekStartsOn ?? preferredWeekStart;
-  const { data: report, loading, error, reload } = useLoad(() => getMonthlyReport(month), [month]);
+  const { data: report, loading, error, reload, refresh } = useLoad(() => getMonthlyReport(month), [month]);
+  useLiveRefresh(['transactions', 'categories'], refresh);
 
   if (loading) return <LoadingState skeleton="cards">{t('reports.loadingCalendar')}</LoadingState>;
   if (error) return <ErrorState message={error} onRetry={reload} />;

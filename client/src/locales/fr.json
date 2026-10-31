@@ -653,6 +653,13 @@
       "submit": "Supprimer mon compte",
       "deleting": "Suppression…",
       "deleted": "Votre compte a été supprimé."
+    },
+    "install": {
+      "title": "Installer l'application",
+      "text": "Gardez Ledgerling sur votre écran d'accueil ou votre bureau. L'application s'ouvre dans sa propre fenêtre et propose un raccourci pour ajouter une transaction.",
+      "button": "Installer l'application",
+      "manual": "Votre navigateur n'a pas de bouton d'installation. Sur iPhone ou iPad : touchez Partager, puis Sur l'écran d'accueil. Sur Android : ouvrez le menu du navigateur, puis choisissez Ajouter à l'écran d'accueil.",
+      "installed": "Ledgerling est installé sur cet appareil."
     }
   },
   "admin": {
@@ -875,5 +882,16 @@
     "VALIDATION_ERROR": "Veuillez vérifier les valeurs saisies.",
     "WITHDRAW_TOO_MUCH": "Vous ne pouvez pas retirer plus que le montant épargné",
     "WRONG_PASSWORD": "Le mot de passe est incorrect"
+  },
+  "live": {
+    "live": "En direct",
+    "reconnecting": "Reconnexion…",
+    "liveHint": "Les changements de vos autres appareils apparaissent ici tout seuls.",
+    "reconnectingHint": "Tentative de connexion au serveur. Les changements de vos autres appareils apparaîtront à son retour."
+  },
+  "offline": {
+    "banner": "Vous êtes hors ligne – données enregistrées affichées",
+    "note": "L'ajout, la modification et la suppression sont désactivés jusqu'au retour de la connexion.",
+    "locked": "Indisponible hors ligne"
   }
 }

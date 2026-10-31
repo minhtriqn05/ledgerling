@@ -101,6 +101,7 @@ export default function UsersTable() {
                   <td className={styles.action}>
                     {canChangeStatus(user, me._id) ? (
                       <Button
+                        needsNetwork
                         variant="secondary"
                         className={styles.rowButton}
                         aria-label={t(user.status === 'disabled' ? 'admin.users.enableFor' : 'admin.users.disableFor', { name: user.name })}

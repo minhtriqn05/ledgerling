@@ -79,7 +79,7 @@ export default function PasswordSection() {
 
         {error && <Alert>{error}</Alert>}
         <div className={styles.actions}>
-          <Button type="submit" disabled={saving}>
+          <Button needsNetwork type="submit" disabled={saving}>
             {saving ? t('settings.password.changing') : t('settings.password.submit')}
           </Button>
         </div>

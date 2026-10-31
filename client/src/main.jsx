@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { MotionConfig } from 'motion/react';
 import './i18n/index.js';
+import './utils/installPrompt.js';
 import App from './App.jsx';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary.jsx';
 import { AuthProvider } from './context/AuthContext.jsx';

@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getYearlyReport } from '../../api/reports.js';
 import { useLoad } from '../../hooks/useLoad.js';
+import { useLiveRefresh } from '../../hooks/useLiveRefresh.js';
 import { formatVnd } from '../../utils/format.js';
 import { formatMonthName, formatMonthShort } from '../../utils/vnDate.js';
 import Card, { CardHeader } from '../../components/Card/Card.jsx';
@@ -18,7 +19,8 @@ import styles from './YearlyTab.module.css';
 export default function YearlyTab({ year }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { data: report, loading, error, reload } = useLoad(() => getYearlyReport(year), [year]);
+  const { data: report, loading, error, reload, refresh } = useLoad(() => getYearlyReport(year), [year]);
+  useLiveRefresh(['transactions', 'categories'], refresh);
 
   if (loading) return <LoadingState skeleton="cards">{t('reports.loading')}</LoadingState>;
   if (error) return <ErrorState message={error} onRetry={reload} />;
@@ -32,7 +34,7 @@ export default function YearlyTab({ year }) {
         title={t('transactions.noneInMonth', { month: year })}
         text={t('reports.emptyText')}
       >
-        <Button icon="plus" onClick={() => navigate('/transactions')}>
+        <Button needsNetwork icon="plus" onClick={() => navigate('/transactions')}>
           {t('transactions.add')}
         </Button>
       </EmptyState>

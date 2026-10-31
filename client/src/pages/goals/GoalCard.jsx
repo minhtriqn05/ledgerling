@@ -28,8 +28,8 @@ export default function GoalCard({ goal, today, onAddMoney, onWithdraw, onHistor
         </h2>
         <span className={styles.actions}>
           <IconButton icon="history" size={16} label={t('goals.historyOf', { name: goal.name })} onClick={() => onHistory(goal)} />
-          <IconButton icon="edit" size={16} label={t('common.editName', { name: goal.name })} onClick={() => onEdit(goal)} />
-          <IconButton icon="trash" size={16} label={t('common.deleteName', { name: goal.name })} danger onClick={() => onDelete(goal)} />
+          <IconButton needsNetwork icon="edit" size={16} label={t('common.editName', { name: goal.name })} onClick={() => onEdit(goal)} />
+          <IconButton needsNetwork icon="trash" size={16} label={t('common.deleteName', { name: goal.name })} danger onClick={() => onDelete(goal)} />
         </span>
       </div>
 
@@ -72,11 +72,11 @@ export default function GoalCard({ goal, today, onAddMoney, onWithdraw, onHistor
       {perMonth !== null && <p className={styles.perMonth}>{t('goals.perMonth', { amount: formatVnd(perMonth) })}</p>}
 
       <div className={styles.buttons}>
-        <Button icon="plus" onClick={() => onAddMoney(goal)}>
+        <Button needsNetwork icon="plus" onClick={() => onAddMoney(goal)}>
           {t('goals.addMoney')}
         </Button>
         {/* Nothing saved, nothing to take out */}
-        <Button variant="secondary" onClick={() => onWithdraw(goal)} disabled={goal.savedAmount === 0}>
+        <Button needsNetwork variant="secondary" onClick={() => onWithdraw(goal)} disabled={goal.savedAmount === 0}>
           {t('goals.withdraw')}
         </Button>
       </div>

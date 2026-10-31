@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getBudgets } from '../../api/budgets.js';
 import { getGoals } from '../../api/goals.js';
+import { useLiveRefresh } from '../../hooks/useLiveRefresh.js';
 import { getStartedSteps } from '../../utils/onboarding.js';
 import Card, { CardHeader } from '../../components/Card/Card.jsx';
 import Icon from '../../components/Icon.jsx';
@@ -16,6 +17,8 @@ export default function GetStarted({ hasTransactions = false }) {
   const { t } = useTranslation();
   // null while loading
   const [counts, setCounts] = useState(null);
+  const [reloadKey, setReloadKey] = useState(0);
+  useLiveRefresh(['budgets', 'goals'], () => setReloadKey((key) => key + 1));
 
   useEffect(() => {
     let cancelled = false; // StrictMode runs effects twice in dev; ignore the first run's answer
@@ -29,7 +32,7 @@ export default function GetStarted({ hasTransactions = false }) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [reloadKey]);
 
   const steps = getStartedSteps({ hasTransactions, ...counts });
   const doneCount = steps.filter((step) => step.done).length;

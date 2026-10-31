@@ -36,7 +36,7 @@ export default function CategoryCard({ category, onEdit, onDelete }) {
           <Button variant="secondary" onClick={() => setConfirming(false)} disabled={deleting} autoFocus>
             {t('common.cancel')}
           </Button>
-          <Button variant="danger" onClick={handleDelete} disabled={deleting}>
+          <Button needsNetwork variant="danger" onClick={handleDelete} disabled={deleting}>
             {deleting ? t('common.deleting') : t('common.delete')}
           </Button>
         </div>
@@ -49,8 +49,8 @@ export default function CategoryCard({ category, onEdit, onDelete }) {
       <div className={styles.top}>
         <CategoryMark category={category} size="lg" />
         <span className={styles.actions}>
-          <IconButton icon="edit" size={16} label={t('common.editName', { name: category.name })} onClick={() => onEdit(category)} />
-          <IconButton
+          <IconButton needsNetwork icon="edit" size={16} label={t('common.editName', { name: category.name })} onClick={() => onEdit(category)} />
+          <IconButton needsNetwork
             icon="trash"
             size={16}
             label={t('common.deleteName', { name: category.name })}

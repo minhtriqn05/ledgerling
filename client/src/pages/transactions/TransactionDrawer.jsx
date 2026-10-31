@@ -52,10 +52,10 @@ export default function TransactionDrawer({ transaction, onEdit, onDelete, onClo
       </dl>
 
       <div className={styles.actions}>
-        <Button variant="secondary" icon="edit" block onClick={() => onEdit(transaction)} data-autofocus>
+        <Button needsNetwork variant="secondary" icon="edit" block onClick={() => onEdit(transaction)} data-autofocus>
           {t('common.edit')}
         </Button>
-        <Button variant="danger" icon="trash" block onClick={() => onDelete(transaction)}>
+        <Button needsNetwork variant="danger" icon="trash" block onClick={() => onDelete(transaction)}>
           {t('common.delete')}
         </Button>
       </div>

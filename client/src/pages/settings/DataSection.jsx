@@ -32,7 +32,7 @@ export default function DataSection() {
     <Card>
       <CardHeader icon="download" tone="sky" title={t('settings.data.title')} subtitle={t('settings.data.text')} />
       <div className={styles.actions}>
-        <Button variant="secondary" icon="download" onClick={handleClick} disabled={busy}>
+        <Button needsNetwork variant="secondary" icon="download" onClick={handleClick} disabled={busy}>
           {busy ? t('settings.data.working') : t('settings.data.download')}
         </Button>
       </div>
