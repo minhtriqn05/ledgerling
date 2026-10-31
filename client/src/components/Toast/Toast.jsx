@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import Icon from '../Icon.jsx';
 import IconButton from '../IconButton/IconButton.jsx';
 import styles from './Toast.module.css';
@@ -10,6 +11,7 @@ export const DEFAULT_DURATION = 3000; // ms before a toast hides itself
 // Errors use role="alert" (read out at once), success uses role="status" (read out politely).
 // onDismiss(id) must keep the same identity between renders, or the timer would restart.
 export default function Toast({ toast, onDismiss }) {
+  const { t } = useTranslation();
   const { id, type, message, duration = DEFAULT_DURATION, action } = toast;
 
   useEffect(() => {
@@ -33,7 +35,7 @@ export default function Toast({ toast, onDismiss }) {
           {action.label}
         </button>
       )}
-      <IconButton icon="x" size={16} label="Close message" onClick={() => onDismiss(id)} />
+      <IconButton icon="x" size={16} label={t('common.closeMessage')} onClick={() => onDismiss(id)} />
     </div>
   );
 }

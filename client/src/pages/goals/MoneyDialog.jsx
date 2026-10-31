@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { addContribution } from '../../api/goals.js';
 import { getErrorMessage } from '../../api/axios.js';
 import { useToast } from '../../context/ToastContext.jsx';
@@ -14,6 +15,7 @@ import styles from '../transactions/TransactionFormDialog.module.css';
 // The server gets a positive amount for a deposit and a negative one for a withdrawal.
 // onSaved(goal) receives the goal returned by the API, with its new saved amount.
 export default function MoneyDialog({ goal, mode, onSaved, onClose }) {
+  const { t } = useTranslation();
   const isWithdraw = mode === 'withdraw';
 
   const [amount, setAmount] = useState(''); // digits only
@@ -33,11 +35,11 @@ export default function MoneyDialog({ goal, mode, onSaved, onClose }) {
 
     // Basic checks first; the server validates again.
     const value = Number(amount);
-    if (!value) return setError('Please enter an amount greater than 0.');
+    if (!value) return setError(t('form.enterAmount'));
     if (isWithdraw && value > goal.savedAmount) {
-      return setError(`You can withdraw at most ${formatVnd(goal.savedAmount)}, the amount saved in this goal.`);
+      return setError(t('goals.withdrawMax', { amount: formatVnd(goal.savedAmount) }));
     }
-    if (!date) return setError('Please pick a date.');
+    if (!date) return setError(t('form.pickDate'));
 
     setError('');
     setSaving(true);
@@ -52,15 +54,15 @@ export default function MoneyDialog({ goal, mode, onSaved, onClose }) {
   }
 
   return (
-    <Modal title={isWithdraw ? 'Withdraw money' : 'Add money'} onClose={onClose} busy={saving}>
+    <Modal title={isWithdraw ? t('goals.withdrawMoney') : t('goals.addMoney')} onClose={onClose} busy={saving}>
       <form className={styles.form} onSubmit={handleSubmit} noValidate>
         <p className={styles.hint}>
-          <strong>{goal.name}</strong> · {formatVnd(goal.savedAmount)} saved of {formatVnd(goal.targetAmount)}
+          <strong>{goal.name}</strong> · {t('goals.savedOf', { saved: formatVnd(goal.savedAmount), target: formatVnd(goal.targetAmount) })}
         </p>
 
         <div className={styles.field}>
           <label className={styles.label} htmlFor="money-amount">
-            Amount
+            {t('common.amount')}
           </label>
           <div className={styles.amountBox}>
             <input
@@ -79,7 +81,7 @@ export default function MoneyDialog({ goal, mode, onSaved, onClose }) {
 
         <div className={styles.field}>
           <label className={styles.label} htmlFor="money-date">
-            Date
+            {t('common.date')}
           </label>
           <input
             id="money-date"
@@ -93,13 +95,13 @@ export default function MoneyDialog({ goal, mode, onSaved, onClose }) {
 
         <div className={styles.field}>
           <label className={styles.label} htmlFor="money-note">
-            Note
+            {t('common.note')}
           </label>
           <input
             id="money-note"
             className={styles.input}
             autoComplete="off"
-            placeholder="Optional"
+            placeholder={t('common.optional')}
             maxLength={200}
             value={note}
             onChange={(event) => setNote(event.target.value)}
@@ -110,10 +112,10 @@ export default function MoneyDialog({ goal, mode, onSaved, onClose }) {
 
         <div className={styles.actions}>
           <Button variant="secondary" onClick={onClose} disabled={saving}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button type="submit" disabled={saving}>
-            {saving ? 'Saving…' : isWithdraw ? 'Withdraw from goal' : 'Add to goal'}
+            {saving ? t('common.saving') : isWithdraw ? t('goals.withdrawFrom') : t('goals.addTo')}
           </Button>
         </div>
       </form>

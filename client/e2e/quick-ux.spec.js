@@ -60,12 +60,12 @@ const visibleNotes = (page, pattern) => page.getByText(pattern).filter({ visible
 const rows = (page) => page.locator('table, ul').filter({ visible: true });
 
 // Deletes one row with its own delete control: the trash button in the table, or (on a phone, where a tap opens
-// the edit dialog) the Delete button of that dialog.
+// the details drawer) the Delete button of the drawer.
 async function deleteRow(page, testInfo, note) {
   if (testInfo.project.name === 'mobile') {
     await visibleNotes(page, note).click();
-    const dialog = page.getByRole('dialog', { name: 'Edit transaction' });
-    await dialog.getByRole('button', { name: 'Delete', exact: true }).click();
+    const drawer = page.getByRole('dialog', { name: 'Transaction details' });
+    await drawer.getByRole('button', { name: 'Delete', exact: true }).click();
   } else {
     await page.getByRole('button', { name: `Delete ${note}` }).click();
   }
@@ -83,7 +83,7 @@ test('the N key opens Quick add, "coffee 35k #work" is understood and the open p
 
   // 2. One line is enough: the fields below show what was understood
   await dialog.getByLabel('Quick text').fill('coffee 35k #work');
-  await expect(dialog.getByLabel('Amount')).toHaveValue('35.000');
+  await expect(dialog.getByLabel('Amount')).toHaveValue('35,000');
   await expect(dialog.getByRole('button', { name: 'Food' })).toHaveAttribute('aria-pressed', 'true');
   await expect(dialog.getByLabel('Note')).toHaveValue('coffee');
   await expect(dialog.getByRole('button', { name: 'Remove tag work' })).toBeVisible();
@@ -94,11 +94,11 @@ test('the N key opens Quick add, "coffee 35k #work" is understood and the open p
   await expect(dialog).toBeHidden();
   await expect(visibleNotes(page, 'coffee')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Filter by tag work' }).filter({ visible: true })).toBeVisible();
-  await expect(rows(page)).toContainText('−35.000 ₫');
+  await expect(rows(page)).toContainText('−35,000 ₫');
   await expect(page.getByText(/· 1 transaction$/)).toBeVisible();
   // The category is Food, with its icon
   await expect(rows(page)).toContainText('Food');
-  await expect(rows(page)).toContainText('🍜');
+  await expect(rows(page).getByTestId('category-mark').locator('svg').first()).toBeVisible();
 });
 
 test('the + button opens Quick add on any page; "salary 15tr yesterday" picks an income category and the day', async ({
@@ -110,7 +110,7 @@ test('the + button opens Quick add on any page; "salary 15tr yesterday" picks an
   await page.getByRole('button', { name: 'Quick add' }).click();
   const dialog = page.getByRole('dialog', { name: 'Quick add' });
   await dialog.getByLabel('Quick text').fill('salary 15tr yesterday');
-  await expect(dialog.getByLabel('Amount')).toHaveValue('15.000.000');
+  await expect(dialog.getByLabel('Amount')).toHaveValue('15,000,000');
   await expect(dialog.getByRole('button', { name: 'Salary' })).toHaveAttribute('aria-pressed', 'true');
 
   const yesterday = new Date(Date.now() + 7 * 3600 * 1000 - 24 * 3600 * 1000).toISOString().slice(0, 10);
@@ -120,7 +120,7 @@ test('the + button opens Quick add on any page; "salary 15tr yesterday" picks an
   await expect(dialog).toBeHidden();
 
   // The Dashboard reloaded: the income card shows it
-  await expect(page.locator('article', { hasText: 'Total Income' })).toContainText('15.000.000');
+  await expect(page.locator('article', { hasText: 'Total Income' })).toContainText('15,000,000');
 });
 
 test('Quick add: the default categories show their icons, and a field edited by hand is kept', async ({ page }, testInfo) => {
@@ -128,13 +128,13 @@ test('Quick add: the default categories show their icons, and a field edited by 
   await page.getByRole('button', { name: 'Quick add' }).click();
   const dialog = page.getByRole('dialog', { name: 'Quick add' });
 
-  await expect(dialog.getByRole('button', { name: 'Food' })).toContainText('🍜');
-  await expect(dialog.getByRole('button', { name: 'Transport' })).toContainText('🚌');
+  await expect(dialog.getByRole('button', { name: 'Food' }).getByTestId('category-mark').locator('svg')).toBeVisible();
+  await expect(dialog.getByRole('button', { name: 'Transport' }).getByTestId('category-mark').locator('svg')).toBeVisible();
 
   await dialog.getByLabel('Quick text').fill('coffee 35k');
   await dialog.getByLabel('Amount').fill('50000');
   await dialog.getByLabel('Quick text').fill('coffee 99k');
-  await expect(dialog.getByLabel('Amount')).toHaveValue('50.000');
+  await expect(dialog.getByLabel('Amount')).toHaveValue('50,000');
 });
 
 test('a template chip saves a transaction in one click; "Save as template" makes the chip', async ({ page }, testInfo) => {
@@ -149,7 +149,7 @@ test('a template chip saves a transaction in one click; "Save as template" makes
   await expect(page.getByText('Added "Morning coffee"')).toBeVisible();
   await expect(dialog).toBeHidden();
   await expect(visibleNotes(page, 'Coffee run')).toBeVisible();
-  await expect(rows(page)).toContainText('−35.000 ₫');
+  await expect(rows(page)).toContainText('−35,000 ₫');
 
   // 2. "Save as template" in the transaction dialog
   await page.getByRole('button', { name: 'Add transaction' }).first().click();
@@ -184,16 +184,18 @@ test('a category icon picked in the form shows on its card and in the lists', as
   await page.goto('/categories');
 
   await page.getByLabel('Name').fill('Gym');
-  await page.getByRole('button', { name: '🏋️' }).click();
-  await expect(page.getByRole('button', { name: '🏋️' })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: 'dumbbell' }).click();
+  await expect(page.getByRole('button', { name: 'dumbbell' })).toHaveAttribute('aria-pressed', 'true');
   await page.getByRole('button', { name: 'Create category' }).click();
   await expect(page.getByRole('heading', { name: 'Gym', level: 2 })).toBeVisible();
-  await expect(page.locator('li', { has: page.getByRole('heading', { name: 'Gym', level: 2 }) })).toContainText('🏋️');
+  await expect(
+    page.locator('li', { has: page.getByRole('heading', { name: 'Gym', level: 2 }) }).getByTestId('category-mark').locator('svg')
+  ).toBeVisible();
 
   // It is on the chip of the Quick add dialog too
   await page.getByRole('button', { name: 'Quick add' }).click();
   const dialog = page.getByRole('dialog', { name: 'Quick add' });
-  await expect(dialog.getByRole('button', { name: 'Gym' })).toContainText('🏋️');
+  await expect(dialog.getByRole('button', { name: 'Gym' }).getByTestId('category-mark').locator('svg')).toBeVisible();
 });
 
 test('tick rows, change their category, then delete the ticked ones after confirming', async ({ page }, testInfo) => {

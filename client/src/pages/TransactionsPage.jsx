@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { AnimatePresence } from 'motion/react';
+import { useTranslation } from 'react-i18next';
 import { getCategories } from '../api/categories.js';
 import { deleteTransaction, exportTransactions, getTransactions } from '../api/transactions.js';
 import { getSummary } from '../api/stats.js';
@@ -20,6 +22,7 @@ import ErrorState from '../components/ErrorState/ErrorState.jsx';
 import Icon from '../components/Icon.jsx';
 import TransactionList from './transactions/TransactionList.jsx';
 import TransactionFormDialog from './transactions/TransactionFormDialog.jsx';
+import TransactionDrawer from './transactions/TransactionDrawer.jsx';
 import BulkBar from './transactions/BulkBar.jsx';
 import BulkDeleteDialog from './transactions/BulkDeleteDialog.jsx';
 import BulkCategoryDialog from './transactions/BulkCategoryDialog.jsx';
@@ -49,11 +52,12 @@ function SummaryCard({ tone, icon, label, value }) {
   );
 }
 
+// The values the API accepts; the label is the translation key transactions.sort.<key>
 const SORT_OPTIONS = [
-  { value: '-date', label: 'Newest' },
-  { value: 'date', label: 'Oldest' },
-  { value: '-amount', label: 'Highest amount' },
-  { value: 'amount', label: 'Lowest amount' },
+  { value: '-date', key: 'newest' },
+  { value: 'date', key: 'oldest' },
+  { value: '-amount', key: 'highest' },
+  { value: 'amount', key: 'lowest' },
 ];
 const DEFAULT_SORT = '-date';
 
@@ -114,14 +118,15 @@ function withChanges(current, changes) {
 }
 
 // "12 Oct 2026 – 20 Oct 2026", "From 12 Oct 2026" or "Until 20 Oct 2026"
-function formatRange(from, to) {
+function formatRange(from, to, t) {
   const start = from && formatDate(fromDateInput(from));
   const end = to && formatDate(fromDateInput(to));
   if (start && end) return `${start} – ${end}`;
-  return start ? `From ${start}` : `Until ${end}`;
+  return start ? t('transactions.fromDate', { date: start }) : t('transactions.untilDate', { date: end });
 }
 
 export default function TransactionsPage() {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { month, categoryId, tag, q, sort, from, to, page } = readFilters(searchParams);
   const hasRange = Boolean(from || to);
@@ -153,8 +158,8 @@ export default function TransactionsPage() {
   // "Try again" and a save change these, which runs the matching effect again
   const [categoriesKey, setCategoriesKey] = useState(0);
   const [reloadKey, setReloadKey] = useState(0);
-  // The open dialog: null, { kind: 'form', transaction } (transaction = null for a new one), { kind: 'import' },
-  // { kind: 'bulk-delete' } or { kind: 'bulk-category' }
+  // The open dialog: null, { kind: 'detail', transaction } (the drawer), { kind: 'form', transaction }
+  // (transaction = null for a new one), { kind: 'import' }, { kind: 'bulk-delete' } or { kind: 'bulk-category' }
   const [dialog, setDialog] = useState(null);
   const [exporting, setExporting] = useState(false);
   // The ids of the ticked rows (bulk actions)
@@ -358,7 +363,7 @@ export default function TransactionsPage() {
 
   // The form calls this with the transaction the API returned (new or updated).
   function handleSaved(saved) {
-    toast.success(dialog.transaction ? 'Transaction updated' : 'Transaction added');
+    toast.success(dialog.transaction ? t('transactions.updated') : t('transactions.added'));
     setDialog(null);
     // Follow the transaction: show its month (leaving any date range), in its category, and drop the search
     // (the note may not match it). The list goes back to page 1; the sort stays.
@@ -384,9 +389,9 @@ export default function TransactionsPage() {
       next.delete(transaction._id);
       return next;
     });
-    toast.success('Transaction deleted', {
+    toast.success(t('transactions.deleted'), {
       duration: UNDO_MS,
-      action: { label: 'Undo', onClick: () => undoDelete.undo(transaction._id) },
+      action: { label: t('transactions.undo'), onClick: () => undoDelete.undo(transaction._id) },
     });
   }
 
@@ -414,14 +419,14 @@ export default function TransactionsPage() {
   }
 
   function handleBulkDeleted(count) {
-    afterBulk(`Deleted ${count} ${count === 1 ? 'transaction' : 'transactions'}`);
+    afterBulk(t('transactions.bulkDeleted', { count }));
   }
 
   function handleBulkCategory({ updated, category }) {
     afterBulk(
       updated === 0
-        ? `Already in ${category.name}`
-        : `Moved ${updated} ${updated === 1 ? 'transaction' : 'transactions'} to ${category.name}`
+        ? t('transactions.alreadyIn', { name: category.name })
+        : t('transactions.bulkMoved', { count: updated, name: category.name })
     );
   }
 
@@ -436,7 +441,7 @@ export default function TransactionsPage() {
 
   // The card shows one of four states: loading, error, empty or the list.
   function renderContent() {
-    if (loading) return <LoadingState skeleton="rows">Loading transactions…</LoadingState>;
+    if (loading) return <LoadingState skeleton="rows">{t('transactions.loading')}</LoadingState>;
     if (loadError) return <ErrorState message={loadError} onRetry={retry} />;
 
     if (visibleTransactions.length === 0) {
@@ -444,11 +449,11 @@ export default function TransactionsPage() {
         return (
           <EmptyState
             icon="search"
-            title={`No transactions match "${q}"`}
-            text="Check the spelling or try another word."
+            title={t('transactions.noMatch', { q })}
+            text={t('transactions.noMatchText')}
           >
             <Button variant="secondary" onClick={clearSearch}>
-              Clear search
+              {t('transactions.clearSearch')}
             </Button>
           </EmptyState>
         );
@@ -460,17 +465,17 @@ export default function TransactionsPage() {
           icon="transactions"
           title={
             filtered
-              ? 'No transactions match these filters'
-              : `No transactions in ${formatMonth(month)}`
+              ? t('transactions.noMatchFilters')
+              : t('transactions.noneInMonth', { month: formatMonth(month) })
           }
           text={
             filtered
-              ? 'Try another date range, category or tag, or add one now.'
-              : 'Add your first income or expense for this month.'
+              ? t('transactions.noMatchFiltersText')
+              : t('transactions.emptyText')
           }
         >
           <Button icon="plus" onClick={() => setDialog({ kind: 'form', transaction: null })}>
-            Add transaction
+            {t('transactions.add')}
           </Button>
         </EmptyState>
       );
@@ -480,6 +485,7 @@ export default function TransactionsPage() {
       <>
         <TransactionList
           transactions={visibleTransactions}
+          onOpen={(transaction) => setDialog({ kind: 'detail', transaction })}
           onEdit={(transaction) => setDialog({ kind: 'form', transaction })}
           onDelete={handleDelete}
           onTagClick={filterByTag}
@@ -492,33 +498,33 @@ export default function TransactionsPage() {
     );
   }
 
-  const period = hasRange ? formatRange(from, to) : formatMonth(month);
+  const period = hasRange ? formatRange(from, to, t) : formatMonth(month);
 
   return (
     <div className={styles.page}>
       <PageHeader
-        title="Transactions"
-        subtitle={ready ? `${period} · ${total} ${total === 1 ? 'transaction' : 'transactions'}` : period}
+        title={t('nav.transactions')}
+        subtitle={ready ? `${period} · ${t('transactions.count', { count: total })}` : period}
       >
         <MonthPicker month={month} onChange={changeMonth} />
         <Button variant="secondary" icon="upload" onClick={() => setDialog({ kind: 'import' })} disabled={loading}>
-          Import CSV
+          {t('import.title')}
         </Button>
         <Button variant="secondary" icon="download" onClick={handleExport} disabled={!ready || total === 0 || exporting}>
-          {exporting ? 'Exporting…' : 'Export CSV'}
+          {exporting ? t('transactions.exporting') : t('transactions.export')}
         </Button>
         <Button icon="plus" onClick={() => setDialog({ kind: 'form', transaction: null })} disabled={loading}>
-          Add transaction
+          {t('transactions.add')}
         </Button>
       </PageHeader>
 
       {showTotals && (
-        <section className={styles.summary} aria-label={`Totals for ${formatMonth(month)}`}>
-          <SummaryCard tone="income" icon="arrowDownLeft" label="Income" value={formatSignedVnd(summary.totalIncome, 'income')} />
-          <SummaryCard tone="expense" icon="arrowUpRight" label="Expense" value={formatSignedVnd(summary.totalExpense, 'expense')} />
-          <SummaryCard tone="net" icon="wallet" label="Net" value={formatVnd(summary.balance)} />
+        <section className={styles.summary} aria-label={t('common.totalsFor', { period: formatMonth(month) })}>
+          <SummaryCard tone="income" icon="arrowDownLeft" label={t('common.income')} value={formatSignedVnd(summary.totalIncome, 'income')} />
+          <SummaryCard tone="expense" icon="arrowUpRight" label={t('common.expense')} value={formatSignedVnd(summary.totalExpense, 'expense')} />
+          <SummaryCard tone="net" icon="wallet" label={t('transactions.net')} value={formatVnd(summary.balance)} />
           <p className={styles.summaryNote}>
-            Totals for all of {formatMonth(month)} in VND, whatever the search or category below.
+            {t('transactions.totalsNote', { month: formatMonth(month) })}
           </p>
         </section>
       )}
@@ -534,20 +540,20 @@ export default function TransactionsPage() {
               type="search"
               value={searchInput}
               onChange={(event) => setSearchInput(event.target.value)}
-              placeholder="Search notes"
-              aria-label="Search notes"
+              placeholder={t('transactions.searchNotes')}
+              aria-label={t('transactions.searchNotes')}
               maxLength={100}
             />
           </span>
           <label className={styles.field}>
-            <span className={styles.filterLabel}>Category</span>
+            <span className={styles.filterLabel}>{t('common.category')}</span>
             <select
               className={styles.select}
               value={categoryId}
               onChange={(event) => updateFilters({ category: event.target.value })}
             >
-              <option value="all">All categories</option>
-              <optgroup label="Expense">
+              <option value="all">{t('transactions.allCategories')}</option>
+              <optgroup label={t('common.expense')}>
                 {categories
                   .filter((c) => c.type === 'expense')
                   .map((c) => (
@@ -556,7 +562,7 @@ export default function TransactionsPage() {
                     </option>
                   ))}
               </optgroup>
-              <optgroup label="Income">
+              <optgroup label={t('common.income')}>
                 {categories
                   .filter((c) => c.type === 'income')
                   .map((c) => (
@@ -568,7 +574,7 @@ export default function TransactionsPage() {
             </select>
           </label>
           <label className={styles.field}>
-            <span className={styles.filterLabel}>Sort</span>
+            <span className={styles.filterLabel}>{t('transactions.sortLabel')}</span>
             <select
               className={styles.select}
               value={sort}
@@ -576,26 +582,26 @@ export default function TransactionsPage() {
             >
               {SORT_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
-                  {option.label}
+                  {t(`transactions.sort.${option.key}`)}
                 </option>
               ))}
             </select>
           </label>
           <label className={styles.field}>
-            <span className={styles.filterLabel}>From</span>
+            <span className={styles.filterLabel}>{t('transactions.from')}</span>
             <input className={styles.select} type="date" value={from} max={to || undefined} onChange={changeFrom} />
           </label>
           <label className={styles.field}>
-            <span className={styles.filterLabel}>To</span>
+            <span className={styles.filterLabel}>{t('transactions.to')}</span>
             <input className={styles.select} type="date" value={to} min={from || undefined} onChange={changeTo} />
           </label>
           {tag && (
             <span className={styles.activeTag}>
-              Tag: #{tag}
+              {t('transactions.tagFilter', { tag })}
               <button
                 type="button"
                 className={styles.activeTagRemove}
-                aria-label={`Remove tag filter ${tag}`}
+                aria-label={t('transactions.removeTagFilter', { tag })}
                 onClick={() => filterByTag('')}
               >
                 <Icon name="x" size={14} />
@@ -604,12 +610,12 @@ export default function TransactionsPage() {
           )}
           {hasFilters && (
             <Button variant="secondary" onClick={clearFilters}>
-              Clear filters
+              {t('transactions.clearFilters')}
             </Button>
           )}
         </div>
         {hasRange && (
-          <p className={styles.rangeNote}>The date range replaces the month picker while it is set.</p>
+          <p className={styles.rangeNote}>{t('transactions.rangeNote')}</p>
         )}
 
         {ready && selectedIds.size > 0 && (
@@ -624,29 +630,42 @@ export default function TransactionsPage() {
         {renderContent()}
       </Card>
 
-      {dialog?.kind === 'form' && (
-        <TransactionFormDialog
-          transaction={dialog.transaction}
-          categories={categories}
-          onSaved={handleSaved}
-          onClose={() => setDialog(null)}
-          onDelete={handleDelete}
-        />
-      )}
-      {dialog?.kind === 'import' && (
-        <ImportDialog categories={categories} onImported={handleImported} onClose={() => setDialog(null)} />
-      )}
-      {dialog?.kind === 'bulk-delete' && (
-        <BulkDeleteDialog ids={[...selectedIds]} onDeleted={handleBulkDeleted} onClose={() => setDialog(null)} />
-      )}
-      {dialog?.kind === 'bulk-category' && (
-        <BulkCategoryDialog
-          ids={[...selectedIds]}
-          categories={categories}
-          onChanged={handleBulkCategory}
-          onClose={() => setDialog(null)}
-        />
-      )}
+      <AnimatePresence>
+        {dialog?.kind === 'detail' && (
+          <TransactionDrawer
+            key="detail"
+            transaction={dialog.transaction}
+            onEdit={(transaction) => setDialog({ kind: 'form', transaction })}
+            onDelete={handleDelete}
+            onClose={() => setDialog(null)}
+          />
+        )}
+        {dialog?.kind === 'form' && (
+          <TransactionFormDialog
+            key="form"
+            transaction={dialog.transaction}
+            categories={categories}
+            onSaved={handleSaved}
+            onClose={() => setDialog(null)}
+            onDelete={handleDelete}
+          />
+        )}
+        {dialog?.kind === 'import' && (
+          <ImportDialog key="import" categories={categories} onImported={handleImported} onClose={() => setDialog(null)} />
+        )}
+        {dialog?.kind === 'bulk-delete' && (
+          <BulkDeleteDialog key="bulk-delete" ids={[...selectedIds]} onDeleted={handleBulkDeleted} onClose={() => setDialog(null)} />
+        )}
+        {dialog?.kind === 'bulk-category' && (
+          <BulkCategoryDialog
+            key="bulk-category"
+            ids={[...selectedIds]}
+            categories={categories}
+            onChanged={handleBulkCategory}
+            onClose={() => setDialog(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import i18n from '../../i18n/index.js';
 import FullPageMessage from '../FullPageMessage/FullPageMessage.jsx';
 import Button from '../Button/Button.jsx';
 
@@ -23,11 +24,11 @@ export default class ErrorBoundary extends Component {
     return (
       <FullPageMessage
         icon="alert"
-        title="Something went wrong"
-        text="An unexpected error happened. Reloading the page usually fixes it."
+        title={i18n.t('errorPage.title')}
+        text={i18n.t('errorPage.text')}
       >
         <Button icon="sprout" onClick={() => window.location.reload()}>
-          Reload
+          {i18n.t('errorPage.reload')}
         </Button>
       </FullPageMessage>
     );

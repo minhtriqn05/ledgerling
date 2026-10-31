@@ -1,13 +1,16 @@
 import { useId, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Card from '../../components/Card/Card.jsx';
 import Button from '../../components/Button/Button.jsx';
 import IconButton from '../../components/IconButton/IconButton.jsx';
+import CategoryMark from '../../components/CategoryMark/CategoryMark.jsx';
 import styles from './CategoryCard.module.css';
 
 // One category in the grid. The card gets the category's own color (from the API) as --tone:
-// the stripe on top and the letter avatar use it.
+// the stripe on top and the icon tile use it.
 // Delete is confirmed inside the card: its content swaps to a question with Cancel / Delete.
 export default function CategoryCard({ category, onEdit, onDelete }) {
+  const { t } = useTranslation();
   const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const titleId = useId();
@@ -25,16 +28,16 @@ export default function CategoryCard({ category, onEdit, onDelete }) {
     return (
       <Card className={styles.card} style={{ '--tone': category.color }} role="group" aria-labelledby={titleId}>
         <h2 id={titleId} className={styles.name}>
-          Delete "{category.name}"?
+          {t('categories.deleteQuestion', { name: category.name })}
         </h2>
-        <p className={styles.confirmText}>This can't be undone.</p>
+        <p className={styles.confirmText}>{t('common.cannotUndo')}</p>
         <div className={styles.confirmActions}>
           {/* autoFocus: keyboard users land on the safe choice */}
           <Button variant="secondary" onClick={() => setConfirming(false)} disabled={deleting} autoFocus>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button variant="danger" onClick={handleDelete} disabled={deleting}>
-            {deleting ? 'Deleting…' : 'Delete'}
+            {deleting ? t('common.deleting') : t('common.delete')}
           </Button>
         </div>
       </Card>
@@ -42,17 +45,15 @@ export default function CategoryCard({ category, onEdit, onDelete }) {
   }
 
   return (
-    <Card className={styles.card} style={{ '--tone': category.color }}>
+    <Card className={styles.card} lift style={{ '--tone': category.color }}>
       <div className={styles.top}>
-        <span className={`${styles.avatar} ${category.icon ? styles.avatarIcon : ''}`} aria-hidden="true">
-          {category.icon || category.name.charAt(0).toUpperCase()}
-        </span>
+        <CategoryMark category={category} size="lg" />
         <span className={styles.actions}>
-          <IconButton icon="edit" size={16} label={`Edit ${category.name}`} onClick={() => onEdit(category)} />
+          <IconButton icon="edit" size={16} label={t('common.editName', { name: category.name })} onClick={() => onEdit(category)} />
           <IconButton
             icon="trash"
             size={16}
-            label={`Delete ${category.name}`}
+            label={t('common.deleteName', { name: category.name })}
             danger
             onClick={() => setConfirming(true)}
           />

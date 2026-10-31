@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { getMonthlyReport } from '../../api/reports.js';
 import { useLoad } from '../../hooks/useLoad.js';
-import { formatDate, formatVnd } from '../../utils/format.js';
+import { formatDate, formatPercent, formatVnd } from '../../utils/format.js';
 import { categoryLabel } from '../../utils/emoji.js';
 import { formatMonth } from '../../utils/vnDate.js';
 import Card, { CardHeader } from '../../components/Card/Card.jsx';
@@ -9,6 +10,7 @@ import Button from '../../components/Button/Button.jsx';
 import EmptyState from '../../components/EmptyState/EmptyState.jsx';
 import LoadingState from '../../components/LoadingState/LoadingState.jsx';
 import ErrorState from '../../components/ErrorState/ErrorState.jsx';
+import CategoryMark from '../../components/CategoryMark/CategoryMark.jsx';
 import ChangeBadge from './ChangeBadge.jsx';
 import InsightsCard from './InsightsCard.jsx';
 import StatCard from './StatCard.jsx';
@@ -29,10 +31,11 @@ function Fact({ icon, tone, label, value, detail }) {
 // The Monthly tab: three cards with the change from last month, the daily expense line, the insights,
 // the top 5 categories and tags, and a few facts. Everything comes from GET /api/reports/monthly.
 export default function MonthlyTab({ month }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { data: report, loading, error, reload } = useLoad(() => getMonthlyReport(month), [month]);
 
-  if (loading) return <LoadingState skeleton="cards">Loading report…</LoadingState>;
+  if (loading) return <LoadingState skeleton="cards">{t('reports.loading')}</LoadingState>;
   if (error) return <ErrorState message={error} onRetry={reload} />;
 
   const { totals, changes, topCategories, topTags, largestExpense } = report;
@@ -42,11 +45,11 @@ export default function MonthlyTab({ month }) {
     return (
       <EmptyState
         icon="chart"
-        title={`No transactions in ${formatMonth(month)}`}
-        text="Add your first income or expense and this report will fill in."
+        title={t('transactions.noneInMonth', { month: formatMonth(month) })}
+        text={t('reports.emptyText')}
       >
         <Button icon="plus" onClick={() => navigate('/transactions')}>
-          Add transaction
+          {t('transactions.add')}
         </Button>
       </EmptyState>
     );
@@ -54,46 +57,46 @@ export default function MonthlyTab({ month }) {
 
   return (
     <div className={styles.tab}>
-      <section className={styles.stats} aria-label={`Totals for ${formatMonth(month)}`}>
-        <StatCard tone="income" icon="arrowDownLeft" label="Income" value={formatVnd(totals.income)}>
+      <section className={styles.stats} aria-label={t('common.totalsFor', { period: formatMonth(month) })}>
+        <StatCard tone="income" icon="arrowDownLeft" label={t('common.income')} value={formatVnd(totals.income)}>
           <ChangeBadge percent={changes.income} kind="income" />
-          {changes.income !== null && <span>vs last month</span>}
+          {changes.income !== null && <span>{t('reports.vsLastMonth')}</span>}
         </StatCard>
-        <StatCard tone="expense" icon="arrowUpRight" label="Expense" value={formatVnd(totals.expense)}>
+        <StatCard tone="expense" icon="arrowUpRight" label={t('common.expense')} value={formatVnd(totals.expense)}>
           <ChangeBadge percent={changes.expense} kind="expense" />
-          {changes.expense !== null && <span>vs last month</span>}
+          {changes.expense !== null && <span>{t('reports.vsLastMonth')}</span>}
         </StatCard>
-        <StatCard tone="balance" icon="wallet" label="Balance" value={formatVnd(totals.balance)}>
+        <StatCard tone="balance" icon="wallet" label={t('common.balance')} value={formatVnd(totals.balance)}>
           <ChangeBadge percent={changes.balance} kind="balance" />
-          {changes.balance !== null && <span>vs last month</span>}
+          {changes.balance !== null && <span>{t('reports.vsLastMonth')}</span>}
         </StatCard>
       </section>
 
-      <section className={styles.facts} aria-label="Quick facts">
-        <Fact icon="chart" tone="sky" label="Average per day" value={formatVnd(report.averagePerDay)} />
+      <section className={styles.facts} aria-label={t('reports.quickFacts')}>
+        <Fact icon="chart" tone="sky" label={t('reports.averagePerDay')} value={formatVnd(report.averagePerDay)} />
         <Fact
           icon="calendar"
           tone="mint"
-          label="No-spend days"
+          label={t('reports.noSpendDays')}
           value={report.noSpendDays}
-          detail={report.noSpendDays === 1 ? 'day without an expense' : 'days without an expense'}
+          detail={t('reports.daysWithoutExpense', { count: report.noSpendDays })}
         />
         <Fact
           icon="arrowUpRight"
           tone="coral"
-          label="Largest expense"
+          label={t('reports.largestExpense')}
           value={largestExpense ? formatVnd(largestExpense.amount) : '—'}
           detail={
             largestExpense
               ? `${categoryLabel(largestExpense.category)} · ${formatDate(largestExpense.date)}${largestExpense.note ? ` · ${largestExpense.note}` : ''}`
-              : 'No expenses this month'
+              : t('reports.noExpensesThisMonth')
           }
         />
       </section>
 
       <section className={styles.row}>
         <Card className={styles.chartCard}>
-          <CardHeader icon="chart" tone="coral" title="Daily expense" subtitle={formatMonth(month)} />
+          <CardHeader icon="chart" tone="coral" title={t('reports.dailyExpense')} subtitle={formatMonth(month)} />
           <DailyExpenseChart dailyExpense={report.dailyExpense} month={month} />
         </Card>
         <InsightsCard month={month} />
@@ -101,18 +104,18 @@ export default function MonthlyTab({ month }) {
 
       <section className={styles.row}>
         <Card>
-          <CardHeader icon="pie" tone="sun" title="Top categories" subtitle="Where the money went" />
+          <CardHeader icon="pie" tone="sun" title={t('reports.topCategories')} subtitle={t('reports.whereMoneyWent')} />
           {topCategories.length === 0 ? (
-            <p className={styles.note}>No expenses in {formatMonth(month)}.</p>
+            <p className={styles.note}>{t('dashboard.noExpenses', { month: formatMonth(month) })}</p>
           ) : (
             <div className={styles.tableWrap}>
               <table className={styles.table}>
                 <thead>
                   <tr>
-                    <th scope="col">Category</th>
-                    <th scope="col" className={styles.number}>Spent</th>
-                    <th scope="col" className={`${styles.number} ${styles.hideSmall}`}>Share</th>
-                    <th scope="col" className={styles.number}>vs last month</th>
+                    <th scope="col">{t('common.category')}</th>
+                    <th scope="col" className={styles.number}>{t('reports.spent')}</th>
+                    <th scope="col" className={`${styles.number} ${styles.hideSmall}`}>{t('reports.share')}</th>
+                    <th scope="col" className={styles.number}>{t('reports.vsLastMonth')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -120,13 +123,12 @@ export default function MonthlyTab({ month }) {
                     <tr key={c.categoryId} style={{ '--tone': c.color }}>
                       <th scope="row">
                         <span className={styles.categoryName}>
-                          <i className={styles.dot} aria-hidden="true" />
-                          {c.icon && <span aria-hidden="true">{c.icon}</span>}
+                          <CategoryMark category={c} />
                           <span>{c.name}</span>
                         </span>
                       </th>
                       <td className={styles.number}>{formatVnd(c.total)}</td>
-                      <td className={`${styles.number} ${styles.hideSmall}`}>{c.percent}%</td>
+                      <td className={`${styles.number} ${styles.hideSmall}`}>{formatPercent(c.percent)}</td>
                       <td className={styles.number}>
                         <ChangeBadge percent={c.changePercent} kind="expense" />
                       </td>
@@ -139,18 +141,18 @@ export default function MonthlyTab({ month }) {
         </Card>
 
         <Card>
-          <CardHeader icon="categories" tone="periwinkle" title="Top tags" subtitle="Expense by tag" />
+          <CardHeader icon="categories" tone="periwinkle" title={t('reports.topTags')} subtitle={t('reports.expenseByTag')} />
           {topTags.length === 0 ? (
-            <p className={styles.note}>No tags used on expenses in {formatMonth(month)}.</p>
+            <p className={styles.note}>{t('reports.noTags', { month: formatMonth(month) })}</p>
           ) : (
             <ul className={styles.tags}>
-              {topTags.map((t) => (
-                <li key={t.tag}>
-                  <span className={styles.tag}>#{t.tag}</span>
+              {topTags.map((item) => (
+                <li key={item.tag}>
+                  <span className={styles.tag}>#{item.tag}</span>
                   <span className={styles.tagCount}>
-                    {t.count} {t.count === 1 ? 'transaction' : 'transactions'}
+                    {t('transactions.count', { count: item.count })}
                   </span>
-                  <strong>{formatVnd(t.total)}</strong>
+                  <strong>{formatVnd(item.total)}</strong>
                 </li>
               ))}
             </ul>

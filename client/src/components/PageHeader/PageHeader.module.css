@@ -1,13 +1,23 @@
-/* Title on the left, actions on the right; on narrow screens the actions wrap below the title. */
+/* A soft banner: title on the left, actions on the right; on narrow screens the actions wrap below the title. */
 .header {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
+  padding: var(--space-5);
+  border-radius: var(--radius-xl);
+  background: var(--gradient-banner);
 }
 
-/* Secondary (not muted) text: it sits on the sky band, where muted would be too light. */
+@media print {
+  .header {
+    padding: 0;
+    background: none;
+  }
+}
+
+/* Secondary (not muted) text: it sits on the banner, where muted would be too light. */
 .subtitle {
   margin: var(--space-1) 0 0;
   color: var(--color-text-secondary);

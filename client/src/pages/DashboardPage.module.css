@@ -21,6 +21,12 @@
   border: 1px solid color-mix(in srgb, var(--tone) 22%, var(--color-surface));
   border-radius: var(--radius-lg);
   background: color-mix(in srgb, var(--tone) 10%, var(--color-surface));
+  transition: transform var(--duration-base) var(--ease-out), box-shadow var(--duration-base) var(--ease-out);
+}
+
+.statCard:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
 .income {
@@ -109,10 +115,10 @@
   list-style: none;
 }
 
-/* The name gets at least 92px (as in the mock) and grows on wide cards; the bar gets twice its share. */
+/* The name gets room for its icon tile and a word like "Entertainment"; the bar takes what is left. */
 .categoryList li {
   display: grid;
-  grid-template-columns: minmax(92px, 1fr) minmax(0, 2fr) auto 34px;
+  grid-template-columns: minmax(136px, 1.2fr) minmax(32px, 1.6fr) auto 38px;
   align-items: center;
   gap: var(--space-2);
 }
@@ -130,14 +136,6 @@
 .categoryName > span {
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.categoryDot {
-  flex-shrink: 0;
-  width: 8px;
-  height: 8px;
-  border-radius: var(--radius-full);
-  background: var(--tone);
 }
 
 .categoryBar {

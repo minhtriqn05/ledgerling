@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import Icon from '../Icon.jsx';
 import styles from '../MonthPicker/MonthPicker.module.css';
 
@@ -7,6 +8,7 @@ const MIN_YEAR = 1970;
 const MAX_YEAR = 2100;
 
 export default function YearPicker({ year, onChange }) {
+  const { t } = useTranslation();
   const number = Number(year);
 
   return (
@@ -14,7 +16,7 @@ export default function YearPicker({ year, onChange }) {
       <button
         type="button"
         className={styles.arrow}
-        aria-label="Previous year"
+        aria-label={t('picker.previousYear')}
         disabled={number <= MIN_YEAR}
         onClick={() => onChange(String(number - 1))}
       >
@@ -24,7 +26,7 @@ export default function YearPicker({ year, onChange }) {
       <button
         type="button"
         className={styles.arrow}
-        aria-label="Next year"
+        aria-label={t('picker.nextYear')}
         disabled={number >= MAX_YEAR}
         onClick={() => onChange(String(number + 1))}
       >

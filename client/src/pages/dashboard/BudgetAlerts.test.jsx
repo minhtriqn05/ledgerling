@@ -57,8 +57,8 @@ describe('BudgetAlerts', () => {
     ]);
     renderCard();
 
-    expect(await screen.findByText(`Over by 200.000${NBSP}₫`)).toBeInTheDocument();
-    expect(screen.getByText(`150.000${NBSP}₫ left`)).toBeInTheDocument();
+    expect(await screen.findByText(`Over by 200,000${NBSP}₫`)).toBeInTheDocument();
+    expect(screen.getByText(`150,000${NBSP}₫ left`)).toBeInTheDocument();
     expect(screen.queryByText('Coffee')).not.toBeInTheDocument();
     expect(screen.queryByText('All budgets on track')).not.toBeInTheDocument();
 

@@ -2,7 +2,8 @@ import { listBudgets } from "./budgetService.js";
 import { loadMonthlyReport } from "./reportService.js";
 import { currentMonth, monthProgress, todayInVietnam, vietnamDay } from "../utils/month.js";
 
-// Insights are plain rules on the numbers of the month (no AI). Each one is { type, severity, message, link }.
+// Insights are plain rules on the numbers of the month (no AI). Each one is { type, severity, message, code, params, link }.
+// message is the English sentence; the client builds the sentence in the user's language from code and params.
 const MAX_INSIGHTS = 6;
 // A category must change by this many percent (up or down) from last month to be mentioned
 const CATEGORY_CHANGE_PERCENT = 20;
@@ -58,6 +59,8 @@ function categoryInsights(month, categories) {
       type: "category-up",
       severity: "warning",
       message: `You spent ${money(difference(up))} (${up.changePercent}%) more on ${up.name} than last month.`,
+      code: "CATEGORY_UP",
+      params: { amount: difference(up), percent: up.changePercent, category: up.name },
       link: `/transactions?month=${month}&category=${up.categoryId}`,
     });
   }
@@ -66,6 +69,8 @@ function categoryInsights(month, categories) {
       type: "category-down",
       severity: "success",
       message: `Nice! You spent ${money(-difference(down))} (${Math.abs(down.changePercent)}%) less on ${down.name} than last month.`,
+      code: "CATEGORY_DOWN",
+      params: { amount: -difference(down), percent: Math.abs(down.changePercent), category: down.name },
       link: `/transactions?month=${month}&category=${down.categoryId}`,
     });
   }
@@ -90,6 +95,8 @@ function budgetInsights(month, budgets, progress, today) {
         b.spent >= b.amount
           ? `You are already over your ${b.category.name} budget (${money(b.spent)} of ${money(b.amount)}).`
           : `At this pace you will spend about ${money(b.projected)} on ${b.category.name} by the end of the month, over your ${money(b.amount)} budget.`,
+      code: b.spent >= b.amount ? "BUDGET_OVER" : "BUDGET_FORECAST",
+      params: { spent: b.spent, budget: b.amount, projected: Math.round(b.projected), category: b.category.name },
       link: `/budgets?month=${month}`,
     }));
 }
@@ -103,6 +110,8 @@ function noSpendInsight(month, report, progress) {
       type: "no-spend-days",
       severity: "info",
       message: `You spent money every day so far in ${monthName(month)}. Try a no-spend day.`,
+      code: "NO_SPEND_NONE",
+      params: { month },
       link: `/reports?tab=calendar&month=${month}`,
     }];
   }
@@ -110,6 +119,8 @@ function noSpendInsight(month, report, progress) {
     type: "no-spend-days",
     severity: days >= GOOD_NO_SPEND_DAYS ? "success" : "info",
     message: `You had ${plural(days, "no-spend day")} in ${monthName(month)}.`,
+    code: "NO_SPEND_DAYS",
+    params: { count: days, month },
     link: `/reports?tab=calendar&month=${month}`,
   }];
 }
@@ -124,6 +135,8 @@ function savingsInsight(month, report) {
       type: "savings-rate",
       severity: "warning",
       message: `You spent ${money(expense)} but recorded no income in ${monthName(month)}.`,
+      code: "SAVINGS_NO_INCOME",
+      params: { amount: expense, month },
       link,
     }];
   }
@@ -134,6 +147,8 @@ function savingsInsight(month, report) {
       type: "savings-rate",
       severity: "warning",
       message: `You spent ${money(expense - income)} more than you earned in ${monthName(month)} (savings rate ${rate}%).`,
+      code: "SAVINGS_NEGATIVE",
+      params: { amount: expense - income, month, rate },
       link,
     }];
   }
@@ -144,6 +159,8 @@ function savingsInsight(month, report) {
       rate >= GOOD_SAVINGS_PERCENT
         ? `Great! You saved ${rate}% of your income in ${monthName(month)}.`
         : `You saved ${rate}% of your income in ${monthName(month)}. Aim for ${GOOD_SAVINGS_PERCENT}% or more.`,
+    code: rate >= GOOD_SAVINGS_PERCENT ? "SAVINGS_GOOD" : "SAVINGS_LOW",
+    params: { rate, month, target: GOOD_SAVINGS_PERCENT },
     link,
   }];
 }
@@ -156,6 +173,8 @@ function largestExpenseInsight(report) {
     type: "largest-expense",
     severity: "info",
     message: `Your largest expense was ${money(largest.amount)} on ${largest.category.name} (${dayName(day)}).`,
+    code: "LARGEST_EXPENSE",
+    params: { amount: largest.amount, category: largest.category.name, day },
     link: `/transactions?from=${day}&to=${day}`,
   }];
 }

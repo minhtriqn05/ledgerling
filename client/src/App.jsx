@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import AppLayout from './components/AppLayout/AppLayout.jsx';
 import AuthLayout from './components/AuthLayout/AuthLayout.jsx';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute.jsx';
@@ -15,6 +16,9 @@ import StyleGuidePage from './pages/StyleGuidePage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 
 export default function App() {
+  // Subscribes to the language, so everything below renders again when it changes
+  useTranslation();
+
   return (
     <Routes>
       {/* Pages without the sidebar */}

@@ -79,7 +79,7 @@
   height: 8px;
   overflow: hidden;
   border-radius: var(--radius-full);
-  background: var(--color-surface-muted);
+  background: var(--pattern-track);
 }
 
 .bar {

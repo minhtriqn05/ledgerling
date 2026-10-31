@@ -85,7 +85,7 @@ describe("POST /api/transactions/bulk-delete", () => {
 
     const tooMany = await bulkDelete(owner.token, { ids: fakeIds(201) });
     expect(tooMany.status).toBe(400);
-    expect(tooMany.body).toEqual({ success: false, message: "You can change at most 200 transactions at a time" });
+    expect(tooMany.body).toEqual({ success: false, message: "You can change at most 200 transactions at a time", code: expect.any(String) });
   });
 
   it("does not delete anything when there are too many ids", async () => {
@@ -188,7 +188,7 @@ describe("PATCH /api/transactions/bulk-category", () => {
   ])("refuses %s (400)", async (_label, body, message) => {
     const res = await bulkCategory(owner.token, { ...body, categoryId: body.categoryId === "CAT" ? transport._id : body.categoryId });
     expect(res.status).toBe(400);
-    expect(res.body).toEqual({ success: false, message });
+    expect(res.body).toEqual({ success: false, message, code: expect.any(String) });
   });
 
   it("needs a token (401)", async () => {

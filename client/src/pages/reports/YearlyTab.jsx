@@ -1,8 +1,9 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { getYearlyReport } from '../../api/reports.js';
 import { useLoad } from '../../hooks/useLoad.js';
 import { formatVnd } from '../../utils/format.js';
-import { formatMonth, formatMonthShort } from '../../utils/vnDate.js';
+import { formatMonthName, formatMonthShort } from '../../utils/vnDate.js';
 import Card, { CardHeader } from '../../components/Card/Card.jsx';
 import Button from '../../components/Button/Button.jsx';
 import EmptyState from '../../components/EmptyState/EmptyState.jsx';
@@ -15,10 +16,11 @@ import styles from './YearlyTab.module.css';
 // The Yearly tab: income and expense of the 12 months as bars, the totals of the year and a table with the exact numbers.
 // Everything comes from GET /api/reports/yearly.
 export default function YearlyTab({ year }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { data: report, loading, error, reload } = useLoad(() => getYearlyReport(year), [year]);
 
-  if (loading) return <LoadingState skeleton="cards">Loading report…</LoadingState>;
+  if (loading) return <LoadingState skeleton="cards">{t('reports.loading')}</LoadingState>;
   if (error) return <ErrorState message={error} onRetry={reload} />;
 
   const { totals, months, topExpenseMonth } = report;
@@ -27,11 +29,11 @@ export default function YearlyTab({ year }) {
     return (
       <EmptyState
         icon="chart"
-        title={`No transactions in ${year}`}
-        text="Add your first income or expense and this report will fill in."
+        title={t('transactions.noneInMonth', { month: year })}
+        text={t('reports.emptyText')}
       >
         <Button icon="plus" onClick={() => navigate('/transactions')}>
-          Add transaction
+          {t('transactions.add')}
         </Button>
       </EmptyState>
     );
@@ -39,19 +41,19 @@ export default function YearlyTab({ year }) {
 
   return (
     <div className={styles.tab}>
-      <section className={styles.stats} aria-label={`Totals for ${year}`}>
-        <StatCard tone="income" icon="arrowDownLeft" label="Total income" value={formatVnd(totals.income)} />
-        <StatCard tone="expense" icon="arrowUpRight" label="Total expense" value={formatVnd(totals.expense)} />
-        <StatCard tone="balance" icon="wallet" label="Balance" value={formatVnd(totals.balance)} />
+      <section className={styles.stats} aria-label={t('common.totalsFor', { period: year })}>
+        <StatCard tone="income" icon="arrowDownLeft" label={t('common.totalIncome')} value={formatVnd(totals.income)} />
+        <StatCard tone="expense" icon="arrowUpRight" label={t('common.totalExpense')} value={formatVnd(totals.expense)} />
+        <StatCard tone="balance" icon="wallet" label={t('common.balance')} value={formatVnd(totals.balance)} />
       </section>
 
       <Card>
-        <CardHeader icon="chart" tone="sky" title="Income and expense by month" subtitle={year}>
+        <CardHeader icon="chart" tone="sky" title={t('reports.incomeExpenseByMonth')} subtitle={year}>
           <div className={styles.headerExtra}>
             {topExpenseMonth && (
               <p className={styles.topMonth}>
-                <span>Highest-spending month:</span>
-                <strong>{formatMonth(topExpenseMonth.month).replace(` ${year}`, '')}</strong>
+                <span>{t('reports.highestMonth')}</span>
+                <strong>{formatMonthName(topExpenseMonth.month)}</strong>
                 <span>{formatVnd(topExpenseMonth.expense)}</span>
               </p>
             )}
@@ -62,15 +64,15 @@ export default function YearlyTab({ year }) {
       </Card>
 
       <Card>
-        <CardHeader icon="transactions" tone="mint" title="Month by month" subtitle={year} />
+        <CardHeader icon="transactions" tone="mint" title={t('reports.monthByMonth')} subtitle={year} />
         <div className={styles.tableWrap}>
           <table className={styles.table}>
             <thead>
               <tr>
-                <th scope="col">Month</th>
-                <th scope="col" className={styles.number}>Income</th>
-                <th scope="col" className={styles.number}>Expense</th>
-                <th scope="col" className={styles.number}>Balance</th>
+                <th scope="col">{t('reports.month')}</th>
+                <th scope="col" className={styles.number}>{t('common.income')}</th>
+                <th scope="col" className={styles.number}>{t('common.expense')}</th>
+                <th scope="col" className={styles.number}>{t('common.balance')}</th>
               </tr>
             </thead>
             <tbody>

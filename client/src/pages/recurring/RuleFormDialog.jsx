@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Trans, useTranslation } from 'react-i18next';
 import { createRecurringRule, updateRecurringRule } from '../../api/recurring.js';
 import { getErrorMessage } from '../../api/axios.js';
 import { useToast } from '../../context/ToastContext.jsx';
@@ -14,20 +15,19 @@ import CategoryMark from '../../components/CategoryMark/CategoryMark.jsx';
 // Same fields as the "Add transaction" dialog, so it uses the same styles
 import styles from '../transactions/TransactionFormDialog.module.css';
 
-const TYPE_OPTIONS = [
-  { value: 'expense', label: 'Expense', tone: 'expense' },
-  { value: 'income', label: 'Income', tone: 'income' },
-];
-
-const FREQUENCY_OPTIONS = [
-  { value: 'monthly', label: 'Monthly' },
-  { value: 'weekly', label: 'Weekly' },
-];
-
 // "Add rule" dialog, or "Edit rule" when `rule` is given.
 // The page mounts it only while it is open, so the fields start from the props each time.
 // categories: all the user's categories. onSaved(rule) receives the rule returned by the API.
 export default function RuleFormDialog({ rule, categories, onSaved, onClose }) {
+  const { t } = useTranslation();
+  const typeOptions = [
+    { value: 'expense', label: t('common.expense'), tone: 'expense' },
+    { value: 'income', label: t('common.income'), tone: 'income' },
+  ];
+  const frequencyOptions = [
+    { value: 'monthly', label: t('recurring.monthly') },
+    { value: 'weekly', label: t('recurring.weekly') },
+  ];
   const isEdit = Boolean(rule);
 
   const [type, setType] = useState(rule?.category.type ?? 'expense');
@@ -60,11 +60,11 @@ export default function RuleFormDialog({ rule, categories, onSaved, onClose }) {
     event.preventDefault();
 
     // Basic checks first; the server validates again.
-    if (!Number(amount)) return setError('Please enter an amount greater than 0.');
-    if (!categoryId) return setError('Please choose a category.');
-    if (!startDate) return setError('Please pick a start date.');
+    if (!Number(amount)) return setError(t('form.enterAmount'));
+    if (!categoryId) return setError(t('form.chooseCategory'));
+    if (!startDate) return setError(t('recurring.pickStart'));
     // Same format, so comparing the strings compares the days
-    if (endDate && endDate <= startDate) return setError('The end date must be after the start date.');
+    if (endDate && endDate <= startDate) return setError(t('recurring.endAfterStart'));
 
     const data = { categoryId, amount: Number(amount), note: note.trim(), frequency, startDate, endDate: endDate || null };
 
@@ -81,13 +81,13 @@ export default function RuleFormDialog({ rule, categories, onSaved, onClose }) {
   }
 
   return (
-    <Modal title={isEdit ? 'Edit rule' : 'Add rule'} onClose={onClose} busy={saving}>
+    <Modal title={isEdit ? t('recurring.edit') : t('recurring.add')} onClose={onClose} busy={saving}>
       <form className={styles.form} onSubmit={handleSubmit} noValidate>
-        <SegmentedControl block label="Type" options={TYPE_OPTIONS} value={type} onChange={changeType} disabled={saving} />
+        <SegmentedControl block label={t('common.type')} options={typeOptions} value={type} onChange={changeType} disabled={saving} />
 
         <div className={styles.field}>
           <label className={styles.label} htmlFor="rule-amount">
-            Amount
+            {t('common.amount')}
           </label>
           <div className={styles.amountBox}>
             <input
@@ -105,10 +105,10 @@ export default function RuleFormDialog({ rule, categories, onSaved, onClose }) {
         </div>
 
         <fieldset className={styles.fieldset}>
-          <legend className={styles.label}>Category</legend>
+          <legend className={styles.label}>{t('common.category')}</legend>
           {typeCategories.length === 0 ? (
             <p className={styles.hint}>
-              No {type} categories yet. <Link to="/categories">Create one</Link> first.
+              <Trans i18nKey={`form.noCategories.${type}`} components={{ link: <Link to="/categories" /> }} />
             </p>
           ) : (
             <div className={styles.categoryPicker}>
@@ -126,9 +126,7 @@ export default function RuleFormDialog({ rule, categories, onSaved, onClose }) {
                     {selected ? (
                       <Icon name="check" size={14} />
                     ) : (
-                      <CategoryMark icon={c.icon}>
-                        <i className={styles.dot} />
-                      </CategoryMark>
+                      <CategoryMark category={c} />
                     )}
                     {c.name}
                   </button>
@@ -139,11 +137,11 @@ export default function RuleFormDialog({ rule, categories, onSaved, onClose }) {
         </fieldset>
 
         <fieldset className={styles.fieldset}>
-          <legend className={styles.label}>Frequency</legend>
+          <legend className={styles.label}>{t('recurring.frequency')}</legend>
           <SegmentedControl
             block
-            label="Frequency"
-            options={FREQUENCY_OPTIONS}
+            label={t('recurring.frequency')}
+            options={frequencyOptions}
             value={frequency}
             onChange={setFrequency}
             disabled={saving}
@@ -153,7 +151,7 @@ export default function RuleFormDialog({ rule, categories, onSaved, onClose }) {
         <div className={styles.row}>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="rule-start">
-              Start date
+              {t('recurring.startDate')}
             </label>
             <input
               id="rule-start"
@@ -165,7 +163,7 @@ export default function RuleFormDialog({ rule, categories, onSaved, onClose }) {
           </div>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="rule-end">
-              End date (optional)
+              {t('recurring.endDate')}
             </label>
             <input
               id="rule-end"
@@ -177,33 +175,33 @@ export default function RuleFormDialog({ rule, categories, onSaved, onClose }) {
           </div>
         </div>
 
-        {runsOnLastDay && <p className={styles.hint}>In shorter months this rule runs on the last day of the month.</p>}
+        {runsOnLastDay && <p className={styles.hint}>{t('recurring.lastDayHint')}</p>}
 
         <div className={styles.field}>
           <label className={styles.label} htmlFor="rule-note">
-            Note
+            {t('common.note')}
           </label>
           <input
             id="rule-note"
             className={styles.input}
             autoComplete="off"
-            placeholder="Optional"
+            placeholder={t('common.optional')}
             maxLength={200}
             value={note}
             onChange={(event) => setNote(event.target.value)}
           />
         </div>
 
-        {isEdit && <p className={styles.hint}>Transactions already created stay as they are.</p>}
+        {isEdit && <p className={styles.hint}>{t('recurring.editHint')}</p>}
 
         {error && <Alert>{error}</Alert>}
 
         <div className={styles.actions}>
           <Button variant="secondary" onClick={onClose} disabled={saving}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button type="submit" disabled={saving}>
-            {saving ? 'Saving…' : isEdit ? 'Save changes' : 'Save rule'}
+            {saving ? t('common.saving') : isEdit ? t('common.saveChanges') : t('recurring.save')}
           </Button>
         </div>
       </form>

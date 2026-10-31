@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Trans, useTranslation } from 'react-i18next';
 import { createTransaction, updateTransaction } from '../../api/transactions.js';
 import { createTemplate } from '../../api/templates.js';
 import { getTags } from '../../api/tags.js';
@@ -16,16 +17,16 @@ import Icon from '../../components/Icon.jsx';
 import CategoryMark from '../../components/CategoryMark/CategoryMark.jsx';
 import styles from './TransactionFormDialog.module.css';
 
-const TYPE_OPTIONS = [
-  { value: 'expense', label: 'Expense', tone: 'expense' },
-  { value: 'income', label: 'Income', tone: 'income' },
-];
-
 // "Add transaction" dialog, or "Edit transaction" when `transaction` is given.
 // The page mounts it only while it is open, so the fields start from the props each time.
 // categories: all the user's categories. onSaved(transaction) receives the transaction returned by the API.
 // onDelete (edit only) adds a Delete button; the page then shows the delete confirmation.
 export default function TransactionFormDialog({ transaction, categories, onSaved, onClose, onDelete }) {
+  const { t } = useTranslation();
+  const typeOptions = [
+    { value: 'expense', label: t('common.expense'), tone: 'expense' },
+    { value: 'income', label: t('common.income'), tone: 'income' },
+  ];
   const isEdit = Boolean(transaction);
   const initialDate = transaction ? toDateInput(transaction.date) : todayInput();
 
@@ -73,9 +74,9 @@ export default function TransactionFormDialog({ transaction, categories, onSaved
     event.preventDefault();
 
     // Basic checks first; the server validates again.
-    if (!Number(amount)) return setError('Please enter an amount greater than 0.');
-    if (!categoryId) return setError('Please choose a category.');
-    if (!date) return setError('Please pick a date.');
+    if (!Number(amount)) return setError(t('form.enterAmount'));
+    if (!categoryId) return setError(t('form.chooseCategory'));
+    if (!date) return setError(t('form.pickDate'));
 
     const data = { categoryId, amount: Number(amount), note: note.trim(), tags };
 
@@ -95,9 +96,9 @@ export default function TransactionFormDialog({ transaction, categories, onSaved
         try {
           const name = templateName.trim() || data.note || saved.category.name;
           await createTemplate({ name: name.slice(0, 40), categoryId, amount: data.amount, note: data.note });
-          toast.success('Template saved');
+          toast.success(t('transactions.templateSaved'));
         } catch (err) {
-          toast.error(`The transaction was saved, but the template was not: ${getErrorMessage(err)}`);
+          toast.error(t('transactions.templateFailed', { reason: getErrorMessage(err) }));
         }
       }
       // The page closes the dialog and reloads the list.
@@ -109,13 +110,13 @@ export default function TransactionFormDialog({ transaction, categories, onSaved
   }
 
   return (
-    <Modal title={isEdit ? 'Edit transaction' : 'Add transaction'} onClose={onClose} busy={saving}>
+    <Modal title={isEdit ? t('transactions.edit') : t('transactions.add')} onClose={onClose} busy={saving}>
       <form className={styles.form} onSubmit={handleSubmit} noValidate>
-        <SegmentedControl block label="Type" options={TYPE_OPTIONS} value={type} onChange={changeType} disabled={saving} />
+        <SegmentedControl block label={t('common.type')} options={typeOptions} value={type} onChange={changeType} disabled={saving} />
 
         <div className={styles.field}>
           <label className={styles.label} htmlFor="transaction-amount">
-            Amount
+            {t('common.amount')}
           </label>
           <div className={styles.amountBox}>
             <input
@@ -133,10 +134,10 @@ export default function TransactionFormDialog({ transaction, categories, onSaved
         </div>
 
         <fieldset className={styles.fieldset}>
-          <legend className={styles.label}>Category</legend>
+          <legend className={styles.label}>{t('common.category')}</legend>
           {typeCategories.length === 0 ? (
             <p className={styles.hint}>
-              No {type} categories yet. <Link to="/categories">Create one</Link> first.
+              <Trans i18nKey={`form.noCategories.${type}`} components={{ link: <Link to="/categories" /> }} />
             </p>
           ) : (
             <div className={styles.categoryPicker}>
@@ -154,9 +155,7 @@ export default function TransactionFormDialog({ transaction, categories, onSaved
                     {selected ? (
                       <Icon name="check" size={14} />
                     ) : (
-                      <CategoryMark icon={c.icon}>
-                        <i className={styles.dot} />
-                      </CategoryMark>
+                      <CategoryMark category={c} />
                     )}
                     {c.name}
                   </button>
@@ -169,7 +168,7 @@ export default function TransactionFormDialog({ transaction, categories, onSaved
         <div className={styles.row}>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="transaction-date">
-              Date
+              {t('common.date')}
             </label>
             <input
               id="transaction-date"
@@ -181,13 +180,13 @@ export default function TransactionFormDialog({ transaction, categories, onSaved
           </div>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="transaction-note">
-              Note
+              {t('common.note')}
             </label>
             <input
               id="transaction-note"
               className={styles.input}
               autoComplete="off"
-              placeholder="Optional"
+              placeholder={t('common.optional')}
               maxLength={200}
               value={note}
               onChange={(event) => setNote(event.target.value)}
@@ -197,7 +196,7 @@ export default function TransactionFormDialog({ transaction, categories, onSaved
 
         <div className={styles.field}>
           <label className={styles.label} htmlFor="transaction-tags">
-            Tags
+            {t('common.tags')}
           </label>
           <TagInput id="transaction-tags" value={tags} onChange={setTags} suggestions={knownTags} disabled={saving} />
         </div>
@@ -210,24 +209,24 @@ export default function TransactionFormDialog({ transaction, categories, onSaved
               disabled={saving}
               onChange={(event) => setSaveTemplate(event.target.checked)}
             />
-            Save as template
+            {t('transactions.saveAsTemplate')}
           </label>
           {saveTemplate && (
             <>
               <label className={styles.srOnly} htmlFor="template-name">
-                Template name
+                {t('transactions.templateName')}
               </label>
               <input
                 id="template-name"
                 className={styles.input}
                 autoComplete="off"
-                placeholder="Template name (default: the note or the category)"
+                placeholder={t('transactions.templatePlaceholder')}
                 maxLength={40}
                 value={templateName}
                 disabled={saving}
                 onChange={(event) => setTemplateName(event.target.value)}
               />
-              <p className={styles.hint}>Keeps the category, amount and note. Find it as a chip in Quick add.</p>
+              <p className={styles.hint}>{t('transactions.templateHint')}</p>
             </>
           )}
         </div>
@@ -237,14 +236,14 @@ export default function TransactionFormDialog({ transaction, categories, onSaved
         <div className={styles.actions}>
           {isEdit && (
             <Button variant="danger" className={styles.deleteButton} onClick={() => onDelete(transaction)} disabled={saving}>
-              Delete
+              {t('common.delete')}
             </Button>
           )}
           <Button variant="secondary" onClick={onClose} disabled={saving}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button type="submit" disabled={saving}>
-            {saving ? 'Saving…' : isEdit ? 'Save changes' : 'Save transaction'}
+            {saving ? t('common.saving') : isEdit ? t('common.saveChanges') : t('transactions.save')}
           </Button>
         </div>
       </form>

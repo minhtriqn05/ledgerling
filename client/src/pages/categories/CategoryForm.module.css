@@ -81,25 +81,17 @@
   color: var(--color-text-secondary);
 }
 
-/* Category chip: a dot in the category color + the name, on a light tint of the color. */
+/* Category chip: the icon tile + the name, on a light tint of the color. */
 .chip {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
   min-width: 0;
-  padding: var(--space-1) var(--space-3);
+  padding: 3px var(--space-3) 3px 3px;
   border-radius: var(--radius-full);
   background: color-mix(in srgb, var(--tone) 14%, var(--color-surface));
   color: var(--color-text);
   font-weight: var(--font-weight-medium);
-}
-
-.dot {
-  flex-shrink: 0;
-  width: 8px;
-  height: 8px;
-  border-radius: var(--radius-full);
-  background: var(--tone);
 }
 
 /* A long name ends with "…" instead of pushing the chip out of the card. */

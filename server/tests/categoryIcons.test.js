@@ -11,7 +11,7 @@ describe("category icon", () => {
   it("gives the default categories an icon", async () => {
     const res = await api().get("/api/categories").set(auth(owner.token));
     const icons = Object.fromEntries(res.body.data.map((c) => [c.name, c.icon]));
-    expect(icons).toMatchObject({ Food: "🍜", Transport: "🚌", Bills: "🧾", Salary: "💰" });
+    expect(icons).toMatchObject({ Food: "utensils", Transport: "bus", Bills: "receipt", Salary: "banknote" });
     expect(res.body.data.every((c) => typeof c.icon === "string")).toBe(true);
   });
 
@@ -36,6 +36,22 @@ describe("category icon", () => {
     await api().patch(`/api/categories/${id}`).set(auth(owner.token)).send({ icon: "🥗" });
     const cleared = await api().patch(`/api/categories/${id}`).set(auth(owner.token)).send({ icon: "" });
     expect(cleared.body.data.icon).toBeNull();
+  });
+
+  it("accepts a name from the icon set, and refuses an unknown name (400)", async () => {
+    const ok = await api()
+      .post("/api/categories")
+      .set(auth(owner.token))
+      .send({ name: "Coffee shops", type: "expense", color: "#223344", icon: "coffee" });
+    expect(ok.status).toBe(201);
+    expect(ok.body.data.icon).toBe("coffee");
+
+    const bad = await api()
+      .patch(`/api/categories/${ok.body.data._id}`)
+      .set(auth(owner.token))
+      .send({ icon: "not-an-icon" });
+    expect(bad.status).toBe(400);
+    expect(bad.body.code).toBe("ICON_INVALID");
   });
 
   it("keeps the icon when only the name changes", async () => {
@@ -65,7 +81,8 @@ describe("category icon", () => {
       .set(auth(owner.token))
       .send({ name: "Bad icon", type: "expense", color: "#223344", icon });
     expect(create.status).toBe(400);
-    expect(create.body.message).toBe("Icon must be a single emoji");
+    expect(create.body.message).toBe("Icon must be an icon name or a single emoji");
+    expect(create.body.code).toBe("ICON_INVALID");
 
     const food = await findCategory(owner.token, "Food");
     const update = await api().patch(`/api/categories/${food._id}`).set(auth(owner.token)).send({ icon });
@@ -79,14 +96,14 @@ describe("category icon", () => {
       .set(auth(owner.token))
       .send({ categoryId: food._id, amount: 10000 });
     expect(res.status).toBe(201);
-    expect(res.body.data.category).toMatchObject({ name: "Food", icon: "🍜" });
+    expect(res.body.data.category).toMatchObject({ name: "Food", icon: "utensils" });
   });
 
   it("returns the icon in the expense per category of the stats", async () => {
     const res = await api().get("/api/stats/summary").set(auth(owner.token));
     expect(res.status).toBe(200);
     const food = res.body.data.expenseByCategory.find((c) => c.name === "Food");
-    expect(food.icon).toBe("🍜");
+    expect(food.icon).toBe("utensils");
   });
 
   it("deletes the templates of a deleted category", async () => {

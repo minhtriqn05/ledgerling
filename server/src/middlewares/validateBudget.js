@@ -17,13 +17,13 @@ function checkCategoryId(value) {
 
 function checkMonth(value, label = "Month") {
   const month = text(value).trim();
-  if (!MONTH_REGEX.test(month)) throw httpError(400, `${label} must be in YYYY-MM format`);
+  if (!MONTH_REGEX.test(month)) throw httpError(400, `${label} must be in YYYY-MM format`, "MONTH_INVALID");
   return month;
 }
 
 function checkAmount(value) {
   if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) {
-    throw httpError(400, "Amount must be greater than 0");
+    throw httpError(400, "Amount must be greater than 0", "AMOUNT_INVALID");
   }
   return value;
 }
@@ -67,7 +67,7 @@ export function validateUpdateBudget(req, res, next) {
 
 // A malformed id can never match anything, so answer 404 instead of letting Mongoose throw a CastError.
 export function validateBudgetId(req, res, next) {
-  if (!OBJECT_ID_REGEX.test(req.params.id)) throw httpError(404, "Budget not found");
+  if (!OBJECT_ID_REGEX.test(req.params.id)) throw httpError(404, "Budget not found", "BUDGET_NOT_FOUND");
   next();
 }
 
@@ -75,7 +75,7 @@ export function validateBudgetId(req, res, next) {
 export function validateListBudgets(req, res, next) {
   const { month } = req.query;
   if (month !== undefined && !MONTH_REGEX.test(month)) {
-    throw httpError(400, "Month must be in YYYY-MM format");
+    throw httpError(400, "Month must be in YYYY-MM format", "MONTH_INVALID");
   }
   next();
 }

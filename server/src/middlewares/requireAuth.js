@@ -9,7 +9,7 @@ export function requireAuth(req, res, next) {
   const [scheme, token] = header.split(" ");
 
   if (scheme !== "Bearer" || !token) {
-    throw httpError(401, "Not authorized, token missing");
+    throw httpError(401, "Not authorized, token missing", "TOKEN_MISSING");
   }
 
   let payload;
@@ -17,7 +17,7 @@ export function requireAuth(req, res, next) {
     payload = jwt.verify(token, process.env.JWT_SECRET);
   } catch {
     // Wrong signature, malformed or expired token
-    throw httpError(401, "Not authorized, invalid token");
+    throw httpError(401, "Not authorized, invalid token", "TOKEN_INVALID");
   }
 
   req.user = { id: payload.sub };

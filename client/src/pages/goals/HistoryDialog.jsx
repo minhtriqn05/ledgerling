@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { deleteContribution, getGoal } from '../../api/goals.js';
 import { getErrorMessage } from '../../api/axios.js';
 import { useToast } from '../../context/ToastContext.jsx';
@@ -14,6 +15,7 @@ import styles from './HistoryDialog.module.css';
 // It loads the goal itself (the list on the page has no history). `goal` is the card's goal: only its id and name are used.
 // onChanged(goal) receives the goal returned after a delete, so the page can show the new saved amount.
 export default function HistoryDialog({ goal, onChanged, onClose }) {
+  const { t } = useTranslation();
   // The goal with its contributions, or null while loading
   const [full, setFull] = useState(null);
   const [loadError, setLoadError] = useState('');
@@ -46,7 +48,7 @@ export default function HistoryDialog({ goal, onChanged, onClose }) {
     setDeletingId(entry._id);
     try {
       const updated = await deleteContribution(goal._id, entry._id);
-      toast.success('Entry deleted');
+      toast.success(t('goals.entryDeleted'));
       setFull(updated);
       onChanged(updated);
     } catch (err) {
@@ -59,26 +61,25 @@ export default function HistoryDialog({ goal, onChanged, onClose }) {
 
   function renderBody() {
     if (loadError) return <ErrorState message={loadError} onRetry={retry} />;
-    if (!full) return <LoadingState>Loading history…</LoadingState>;
+    if (!full) return <LoadingState>{t('goals.loadingHistory')}</LoadingState>;
 
     return (
       <>
         <p className={styles.summary}>
-          {formatVnd(full.savedAmount)} saved of {formatVnd(full.targetAmount)}
+          {t('goals.savedOf', { saved: formatVnd(full.savedAmount), target: formatVnd(full.targetAmount) })}
         </p>
 
         {full.contributions.length === 0 ? (
-          <p className={styles.empty}>No money added yet. Use Add money to start saving.</p>
+          <p className={styles.empty}>{t('goals.noHistory')}</p>
         ) : (
           <ul className={styles.list}>
             {full.contributions.map((entry) => {
               const isDeposit = entry.amount > 0;
-              const kind = isDeposit ? 'deposit' : 'withdrawal';
               const amountText = formatSignedVnd(Math.abs(entry.amount), isDeposit ? 'income' : 'expense');
               return (
                 <li key={entry._id} className={styles.row}>
                   <div className={styles.main}>
-                    <span className={styles.kind}>{isDeposit ? 'Deposit' : 'Withdrawal'}</span>
+                    <span className={styles.kind}>{isDeposit ? t('goals.deposit') : t('goals.withdrawal')}</span>
                     <span className={styles.meta}>
                       {formatDate(entry.date)}
                       {entry.note && ` · ${entry.note}`}
@@ -89,7 +90,7 @@ export default function HistoryDialog({ goal, onChanged, onClose }) {
                     icon="trash"
                     size={16}
                     danger
-                    label={`Delete ${kind} of ${formatVnd(Math.abs(entry.amount))}`}
+                    label={t(isDeposit ? 'goals.deleteDeposit' : 'goals.deleteWithdrawal', { amount: formatVnd(Math.abs(entry.amount)) })}
                     disabled={deletingId !== null}
                     onClick={() => handleDelete(entry)}
                   />
@@ -103,12 +104,12 @@ export default function HistoryDialog({ goal, onChanged, onClose }) {
   }
 
   return (
-    <Modal title={`History · ${goal.name}`} onClose={onClose} busy={deletingId !== null}>
+    <Modal title={t('goals.historyTitle', { name: goal.name })} onClose={onClose} busy={deletingId !== null}>
       <div className={styles.body}>
         {renderBody()}
         <div className={styles.actions}>
           <Button variant="secondary" onClick={onClose} disabled={deletingId !== null} data-autofocus>
-            Done
+            {t('common.done')}
           </Button>
         </div>
       </div>

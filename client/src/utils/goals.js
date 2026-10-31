@@ -1,4 +1,5 @@
 // Helpers for the savings goals pages. Days are "YYYY-MM-DD" in Vietnam time, like everywhere else.
+import i18n from '../i18n/index.js';
 import { toDateInput, todayInput } from './vnDate.js';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -17,10 +18,9 @@ export function daysUntil(deadline, today = todayInput()) {
 
 // "152 days left", "1 day left", "Due today", "3 days overdue"
 export function formatDaysLeft(days) {
-  if (days === 0) return 'Due today';
+  if (days === 0) return i18n.t('goals.dueToday');
   const count = Math.abs(days);
-  const unit = count === 1 ? 'day' : 'days';
-  return days > 0 ? `${count} ${unit} left` : `${count} ${unit} overdue`;
+  return i18n.t(days > 0 ? 'goals.daysLeft' : 'goals.daysOverdue', { count });
 }
 
 // How much to put aside each month to reach the goal by its deadline (VND, rounded up), or null when the line makes

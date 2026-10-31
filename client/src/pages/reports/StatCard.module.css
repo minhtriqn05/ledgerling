@@ -8,6 +8,12 @@
   border: 1px solid color-mix(in srgb, var(--tone) 22%, var(--color-surface));
   border-radius: var(--radius-lg);
   background: color-mix(in srgb, var(--tone) 10%, var(--color-surface));
+  transition: transform var(--duration-base) var(--ease-out), box-shadow var(--duration-base) var(--ease-out);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
 .income {

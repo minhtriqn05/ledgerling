@@ -33,10 +33,10 @@
   border-radius: var(--radius-full);
 }
 
-/* Lined up with the category name: dot 12px + gap */
+/* Lined up with the category name: icon tile 32px + gap */
 .note {
   overflow: hidden;
-  padding-left: calc(12px + var(--space-2));
+  padding-left: calc(32px + var(--space-2));
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
   text-overflow: ellipsis;

@@ -55,9 +55,9 @@ describe('MonthlyTab', () => {
     renderTab();
 
     const totals = await screen.findByRole('region', { name: 'Totals for October 2026' });
-    expect(within(totals).getByText('21.500.000 ₫')).toBeInTheDocument();
-    expect(within(totals).getByText('1.250.000 ₫')).toBeInTheDocument();
-    expect(within(totals).getByText('20.250.000 ₫')).toBeInTheDocument();
+    expect(within(totals).getByText('21,500,000 ₫')).toBeInTheDocument();
+    expect(within(totals).getByText('1,250,000 ₫')).toBeInTheDocument();
+    expect(within(totals).getByText('20,250,000 ₫')).toBeInTheDocument();
     expect(within(totals).getByText('Up 19.4% from last month')).toBeInTheDocument();
     expect(within(totals).getByText('Up 13.6% from last month')).toBeInTheDocument();
     expect(within(totals).getByText('Up 19.8% from last month')).toBeInTheDocument();
@@ -76,9 +76,9 @@ describe('MonthlyTab', () => {
     renderTab();
 
     const facts = await screen.findByRole('region', { name: 'Quick facts' });
-    expect(within(facts).getByText('40.323 ₫')).toBeInTheDocument();
+    expect(within(facts).getByText('40,323 ₫')).toBeInTheDocument();
     expect(within(facts).getByText('27')).toBeInTheDocument();
-    expect(within(facts).getByText('1.000.000 ₫')).toBeInTheDocument();
+    expect(within(facts).getByText('1,000,000 ₫')).toBeInTheDocument();
     expect(within(facts).getByText(/Bills · 10 Oct 2026 · Electricity/)).toBeInTheDocument();
   });
 
@@ -87,7 +87,7 @@ describe('MonthlyTab', () => {
     renderTab();
 
     const bills = (await screen.findByRole('rowheader', { name: 'Bills' })).closest('tr');
-    expect(within(bills).getByText('1.000.000 ₫')).toBeInTheDocument();
+    expect(within(bills).getByText('1,000,000 ₫')).toBeInTheDocument();
     expect(within(bills).getByText('80%')).toBeInTheDocument();
     expect(within(bills).getByText('Up 25% from last month')).toBeInTheDocument();
 
@@ -96,7 +96,7 @@ describe('MonthlyTab', () => {
 
     expect(screen.getByText('#work')).toBeInTheDocument();
     expect(screen.getByText('2 transactions')).toBeInTheDocument();
-    expect(screen.getByText('200.000 ₫')).toBeInTheDocument();
+    expect(screen.getByText('200,000 ₫')).toBeInTheDocument();
   });
 
   it('shows an empty state for a month without transactions', async () => {

@@ -14,7 +14,11 @@
   color: var(--color-hero-text);
   box-shadow: var(--shadow-md);
   cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
+  transition: transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.fab:active {
+  transform: scale(0.95);
 }
 
 .fab:hover {

@@ -1,20 +1,23 @@
 .layout {
   display: grid;
-  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+  grid-template-columns: calc(var(--sidebar-width) + var(--frame-gap)) minmax(0, 1fr);
   min-height: 100vh;
 }
 
 /* ---------- Sidebar ---------- */
+/* A floating white panel on the canvas. */
 .sidebar {
   position: sticky;
-  top: 0;
+  top: var(--frame-gap);
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
-  height: 100vh;
-  padding: var(--space-5) var(--space-4);
+  height: calc(100vh - 2 * var(--frame-gap));
+  margin: var(--frame-gap) 0 var(--frame-gap) var(--frame-gap);
+  padding: var(--space-5) var(--space-3);
   background: var(--color-surface);
-  border-right: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
 }
 
 /* Brand (+ the menu button on narrow screens). */
@@ -40,28 +43,43 @@
 .brand {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
   padding: 0 var(--space-2);
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-tight);
-}
-
-.logo {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-md);
-  background: var(--gradient-hero);
-  color: var(--color-hero-text);
-  box-shadow: var(--shadow-sm);
+  color: var(--color-text);
 }
 
 .nav {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
+}
+
+/* The pill behind the open page's link. AppLayout measures the link; CSS slides the pill there. */
+.indicator {
+  position: absolute;
+  right: 0;
+  left: 0;
+  border-radius: var(--radius-md);
+  background: var(--gradient-banner);
+  transition: top var(--duration-base) var(--ease-out), height var(--duration-base) var(--ease-out);
+}
+
+/* A small bar on the left edge, so the open page is clear even without the color. */
+.indicator::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 4px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  transform: translateY(-50%);
+}
+
+.navLabel {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 /* Used by the three links and by the Log out button, so they look the same. */
@@ -81,7 +99,12 @@
   text-align: left;
   text-decoration: none;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+}
+
+.navItem:active {
+  transform: scale(0.98);
 }
 
 .navItem:hover {
@@ -96,42 +119,34 @@
 
 .navActive,
 .navActive:hover {
-  background: var(--color-primary-soft);
+  background: transparent; /* the sliding pill is behind it */
   color: var(--color-primary-text);
   font-weight: var(--font-weight-semibold);
 }
 
-/* A small bar on the left edge, so the open page is clear even without the color. */
-.navActive::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 0;
-  width: 4px;
-  height: 20px;
-  border-radius: var(--radius-full);
-  background: var(--color-primary);
-  transform: translateY(-50%);
+/* The language picker and Log out, at the bottom of the sidebar. */
+.panelFooter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: auto;
 }
 
-/* Pushes Log out to the bottom of the sidebar. */
-.logout {
-  margin-top: auto;
+.language {
+  width: 100%;
 }
 
 /* ---------- Main area ---------- */
 /* The right column: page content on top, footer pushed to the bottom of the screen. */
-/* A light sky band fades in behind the page header. */
 .body {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  background: var(--gradient-page-top) top / 100% 320px no-repeat, var(--color-bg);
 }
 
 .main {
   flex: 1;
-  padding: var(--space-6) var(--space-6) 0;
+  padding: var(--frame-gap) var(--space-5) 0;
 }
 
 .footer {
@@ -139,9 +154,9 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
-  padding: var(--space-4) var(--space-6);
+  padding: var(--space-4) var(--space-5);
   /* Room below, so the floating + button never covers the last line */
-  padding-right: calc(var(--space-6) + 72px);
+  padding-right: calc(var(--space-5) + 72px);
 }
 
 /* A quiet text button; keyboards only, so phones do not show it. */
@@ -180,11 +195,14 @@
   }
 
   .sidebar {
+    top: 0;
     z-index: 10;
     height: auto;
+    margin: 0;
     padding: 0 var(--space-4);
-    border-right: none;
+    border-radius: 0;
     border-bottom: 1px solid var(--color-border);
+    box-shadow: none;
   }
 
   .bar {
@@ -232,11 +250,11 @@
     display: flex;
   }
 
-  /* A thin line between the links and Log out. */
-  .logout {
+  /* A thin line between the links and the footer of the menu. */
+  .panelFooter {
     margin-top: 0;
+    padding-top: var(--space-2);
     border-top: 1px solid var(--color-border);
-    border-radius: 0 0 var(--radius-md) var(--radius-md);
   }
 
   .main {

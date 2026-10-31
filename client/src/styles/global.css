@@ -23,6 +23,18 @@ h4 {
   font-weight: var(--font-weight-semibold);
 }
 
+/* Turns off every CSS animation and transition for people who asked for less motion.
+   (The motion components check the same setting themselves.) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* Form controls do not inherit the page font by default. */
 button,
 input,

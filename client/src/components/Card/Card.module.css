@@ -9,6 +9,16 @@
   box-shadow: var(--shadow-sm);
 }
 
+/* Rises a little on hover. Only for cards that stand for one thing (a category, a budget, a goal). */
+.lift {
+  transition: transform var(--duration-base) var(--ease-out), box-shadow var(--duration-base) var(--ease-out);
+}
+
+.lift:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
 /* ---------- Card header ---------- */
 /* On narrow cards the right-hand part (legend, "View all") moves to its own line. */
 .header {

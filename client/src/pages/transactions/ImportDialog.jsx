@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { importTransactions } from '../../api/transactions.js';
-import { getErrorMessage } from '../../api/axios.js';
+import { getErrorMessage, translateApiError } from '../../api/axios.js';
 import { formatNumber } from '../../utils/format.js';
 import { MAX_IMPORT_ROWS, parseCsvText, validateImportRow } from '../../utils/csvImport.js';
 import Modal from '../../components/Modal/Modal.jsx';
@@ -11,13 +12,12 @@ import styles from './ImportDialog.module.css';
 // A CSV file is a few dozen kB for 500 rows; anything much bigger is not a Ledgerling export.
 const MAX_FILE_BYTES = 1024 * 1024;
 
-const plural = (count, word) => `${count} ${word}${count === 1 ? '' : 's'}`;
-
 // "Import CSV" dialog in three steps: choose a file -> preview (rows with a problem are marked) -> result.
 // The file is read in the browser (papaparse); only its rows are sent to the API.
 // categories: the user's categories (a row can only use one that exists).
 // onImported(result) is called once the API answered, so the page can reload its list while the result is shown.
 export default function ImportDialog({ categories, onImported, onClose }) {
+  const { t } = useTranslation();
   const [rows, setRows] = useState(null); // rows read from the file, null until a good file is chosen
   const [fileError, setFileError] = useState('');
   const [importError, setImportError] = useState('');
@@ -36,7 +36,7 @@ export default function ImportDialog({ categories, onImported, onClose }) {
     setImportError('');
     if (!file) return;
     if (file.size > MAX_FILE_BYTES) {
-      setFileError('This file is too big. Choose a CSV file exported from Ledgerling.');
+      setFileError(t('import.tooBig'));
       return;
     }
 
@@ -45,7 +45,7 @@ export default function ImportDialog({ categories, onImported, onClose }) {
       if (parsed.error) setFileError(parsed.error);
       else setRows(parsed.rows);
     } catch {
-      setFileError('The file could not be read.');
+      setFileError(t('import.unreadable'));
     }
   }
 
@@ -66,23 +66,23 @@ export default function ImportDialog({ categories, onImported, onClose }) {
 
   if (result) {
     return (
-      <Modal title="Import CSV" onClose={onClose}>
+      <Modal title={t('import.title')} onClose={onClose}>
         <div className={styles.body}>
           <p className={styles.summary} role="status">
-            Imported {plural(result.imported, 'transaction')}.
-            {result.failed > 0 && ` ${plural(result.failed, 'row')} could not be imported.`}
+            {t('import.imported', { count: result.imported })}
+            {result.failed > 0 && ` ${t('import.failed', { count: result.failed })}`}
           </p>
           {result.errors.length > 0 && (
-            <ul className={styles.errorList} aria-label="Rows that were not imported">
+            <ul className={styles.errorList} aria-label={t('import.failedRows')}>
               {result.errors.map((error) => (
                 <li key={error.row}>
-                  <strong>Row {error.row}:</strong> {error.message}
+                  <strong>{t('import.rowNumber', { row: error.row })}</strong> {translateApiError(error)}
                 </li>
               ))}
             </ul>
           )}
           <div className={styles.actions}>
-            <Button onClick={onClose}>Done</Button>
+            <Button onClick={onClose}>{t('common.done')}</Button>
           </div>
         </div>
       </Modal>
@@ -90,11 +90,11 @@ export default function ImportDialog({ categories, onImported, onClose }) {
   }
 
   return (
-    <Modal title="Import CSV" onClose={onClose} busy={importing} wide>
+    <Modal title={t('import.title')} onClose={onClose} busy={importing} wide>
       <div className={styles.body}>
         <div className={styles.field}>
           <label className={styles.label} htmlFor="import-file">
-            CSV file
+            {t('import.file')}
           </label>
           <input
             id="import-file"
@@ -106,8 +106,7 @@ export default function ImportDialog({ categories, onImported, onClose }) {
             data-autofocus
           />
           <p className={styles.hint}>
-            Use a file made by Export CSV: Date, Type, Category, Amount, Currency, Note, Tags. Up to {MAX_IMPORT_ROWS}{' '}
-            rows. Every category in the file must already exist.
+            {t('import.hint', { max: MAX_IMPORT_ROWS })}
           </p>
         </div>
 
@@ -116,21 +115,21 @@ export default function ImportDialog({ categories, onImported, onClose }) {
         {rows && (
           <>
             <p className={styles.summary} role="status">
-              {plural(rows.length, 'row')} found.{' '}
-              {badCount > 0 ? `${plural(badCount, 'row')} with a problem will be skipped.` : 'All rows look fine.'}
+              {t('import.found', { count: rows.length })}{' '}
+              {badCount > 0 ? t('import.skipped', { count: badCount }) : t('import.allFine')}
             </p>
-            <div className={styles.previewWrap} role="region" aria-label="Preview of the file" tabIndex={0}>
+            <div className={styles.previewWrap} role="region" aria-label={t('import.preview')} tabIndex={0}>
               <table className={styles.table}>
                 <thead>
                   <tr>
-                    <th>Row</th>
-                    <th>Date</th>
-                    <th>Type</th>
-                    <th>Category</th>
-                    <th className={styles.alignRight}>Amount</th>
-                    <th>Note</th>
-                    <th>Tags</th>
-                    <th>Status</th>
+                    <th>{t('import.row')}</th>
+                    <th>{t('common.date')}</th>
+                    <th>{t('common.type')}</th>
+                    <th>{t('common.category')}</th>
+                    <th className={styles.alignRight}>{t('common.amount')}</th>
+                    <th>{t('common.note')}</th>
+                    <th>{t('common.tags')}</th>
+                    <th>{t('import.status')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -145,7 +144,7 @@ export default function ImportDialog({ categories, onImported, onClose }) {
                       </td>
                       <td className={styles.noteCell}>{row.note}</td>
                       <td>{row.tags.map((tag) => `#${tag}`).join(' ')}</td>
-                      <td className={problems[index] ? styles.problem : styles.ok}>{problems[index] || 'Ready'}</td>
+                      <td className={problems[index] ? styles.problem : styles.ok}>{problems[index] || t('import.ready')}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -158,10 +157,10 @@ export default function ImportDialog({ categories, onImported, onClose }) {
 
         <div className={styles.actions}>
           <Button variant="secondary" onClick={onClose} disabled={importing}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button onClick={handleImport} disabled={!rows || validCount === 0 || importing}>
-            {importing ? 'Importing…' : `Import ${plural(validCount, 'row')}`}
+            {importing ? t('import.importing') : t('import.action', { count: validCount })}
           </Button>
         </div>
       </div>

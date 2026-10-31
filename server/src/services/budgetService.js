@@ -16,15 +16,15 @@ const OVER_PERCENT = 100;
 // The category must belong to the same user (otherwise 404, as if it did not exist) and be an expense category
 async function findOwnedExpenseCategory(userId, categoryId) {
   const category = await Category.findOne({ _id: categoryId, userId });
-  if (!category) throw httpError(404, "Category not found");
-  if (category.type !== "expense") throw httpError(400, "Budgets are only for expense categories");
+  if (!category) throw httpError(404, "Category not found", "CATEGORY_NOT_FOUND");
+  if (category.type !== "expense") throw httpError(400, "Budgets are only for expense categories", "BUDGET_EXPENSE_ONLY");
   return category;
 }
 
 // Filtering by userId as well means another user's budget looks like it does not exist (404)
 async function findOwned(userId, id) {
   const budget = await Budget.findOne({ _id: id, userId }).populate("categoryId", CATEGORY_FIELDS);
-  if (!budget) throw httpError(404, "Budget not found");
+  if (!budget) throw httpError(404, "Budget not found", "BUDGET_NOT_FOUND");
   return budget;
 }
 
@@ -87,7 +87,7 @@ export async function createBudget(userId, { categoryId, month, amount }) {
 
   // Friendly message first; the unique index is the safety net if two requests race
   const existing = await Budget.exists({ userId, categoryId, month });
-  if (existing) throw httpError(409, "Budget already exists for this category and month");
+  if (existing) throw httpError(409, "Budget already exists for this category and month", "BUDGET_EXISTS");
 
   const budget = await Budget.create({ userId, categoryId, month, amount });
   await budget.populate("categoryId", CATEGORY_FIELDS);

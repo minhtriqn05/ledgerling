@@ -133,7 +133,7 @@ describe("recurring rules: create", () => {
       ...overrides,
     });
     expect(res.status).toBe(400);
-    expect(res.body).toEqual({ success: false, message });
+    expect(res.body).toEqual({ success: false, message, code: expect.any(String) });
   });
 
   it("refuses another user's category (404)", async () => {
@@ -619,7 +619,7 @@ describe("deleting a category that still has a recurring rule", () => {
 
     const blocked = await api().delete(`/api/categories/${categoryId}`).set(auth(user.token));
     expect(blocked.status).toBe(409);
-    expect(blocked.body).toEqual({ success: false, message: "Category still has recurring rules" });
+    expect(blocked.body).toEqual({ success: false, message: "Category still has recurring rules", code: expect.any(String) });
 
     // A rule that is off still uses the category
     await api().patch(`/api/recurring/${rule._id}/toggle`).set(auth(user.token));

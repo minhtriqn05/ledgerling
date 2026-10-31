@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { getBudgets } from '../../api/budgets.js';
-import { formatVnd } from '../../utils/format.js';
+import { formatPercent, formatVnd } from '../../utils/format.js';
 import { formatMonth } from '../../utils/vnDate.js';
 import Card, { CardHeader } from '../../components/Card/Card.jsx';
 import Button from '../../components/Button/Button.jsx';
@@ -14,6 +15,7 @@ import styles from './BudgetAlerts.module.css';
 // It loads its own data, so a failed request never breaks the rest of the dashboard: the card shows a short
 // message instead. The card has five states: loading, error, no budgets yet, all on track, or the alerts.
 export default function BudgetAlerts({ month }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   // null while loading, then the list of budgets of the month
   const [budgets, setBudgets] = useState(null);
@@ -38,17 +40,17 @@ export default function BudgetAlerts({ month }) {
   const alerts = (budgets ?? []).filter((b) => b.status !== 'ok').sort((a, b) => b.percent - a.percent);
 
   function renderBody() {
-    if (failed) return <p className={styles.note}>Budgets could not be loaded.</p>;
-    if (budgets === null) return <LoadingState skeleton="rows" count={2}>Loading budgets…</LoadingState>;
+    if (failed) return <p className={styles.note}>{t('dashboard.budgetsFailed')}</p>;
+    if (budgets === null) return <LoadingState skeleton="rows" count={2}>{t('budgets.loading')}</LoadingState>;
 
     if (budgets.length === 0) {
       return (
         <div className={styles.invite}>
           <p className={styles.note}>
-            No budgets in {formatMonth(month)} yet. Set a monthly limit for a category and you will get a warning at 80% and 100%.
+            {t('dashboard.noBudgets', { month: formatMonth(month) })}
           </p>
           <Button icon="plus" onClick={() => navigate('/budgets')}>
-            Create a budget
+            {t('dashboard.createBudget')}
           </Button>
         </div>
       );
@@ -58,7 +60,7 @@ export default function BudgetAlerts({ month }) {
       return (
         <p className={styles.onTrack}>
           <Icon name="check" size={18} />
-          <span>All budgets on track</span>
+          <span>{t('dashboard.budgetsOnTrack')}</span>
         </p>
       );
     }
@@ -68,19 +70,17 @@ export default function BudgetAlerts({ month }) {
         {alerts.map((budget) => (
           <li key={budget._id} className={`${styles.item} ${styles[budget.status]}`}>
             <span className={styles.name}>
-              <CategoryMark icon={budget.category.icon}>
-                <i className={styles.dot} style={{ background: budget.category.color }} aria-hidden="true" />
-              </CategoryMark>
+              <CategoryMark category={budget.category} />
               <span>{budget.category.name}</span>
             </span>
             <span className={styles.message}>
               {budget.remaining < 0
-                ? `Over by ${formatVnd(-budget.remaining)}`
+                ? t('budgets.overBy', { amount: formatVnd(-budget.remaining) })
                 : budget.status === 'over'
-                  ? 'Limit reached'
-                  : `${formatVnd(budget.remaining)} left`}
+                  ? t('budgets.limitReached')
+                  : t('budgets.left', { amount: formatVnd(budget.remaining) })}
             </span>
-            <span className={styles.percent}>{budget.percent}%</span>
+            <span className={styles.percent}>{formatPercent(budget.percent)}</span>
           </li>
         ))}
       </ul>
@@ -89,9 +89,9 @@ export default function BudgetAlerts({ month }) {
 
   return (
     <Card>
-      <CardHeader icon="alert" tone="coral" title="Budget alerts" subtitle={formatMonth(month)}>
+      <CardHeader icon="alert" tone="coral" title={t('dashboard.budgetAlerts')} subtitle={formatMonth(month)}>
         <Button variant="secondary" onClick={() => navigate('/budgets')}>
-          Manage budgets
+          {t('dashboard.manageBudgets')}
         </Button>
       </CardHeader>
       {renderBody()}

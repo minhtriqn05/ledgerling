@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { deleteGoal } from '../../api/goals.js';
 import { getErrorMessage } from '../../api/axios.js';
 import { useToast } from '../../context/ToastContext.jsx';
@@ -10,6 +11,7 @@ import styles from '../transactions/DeleteTransactionDialog.module.css';
 
 // "Are you sure?" step before a goal is deleted. onDeleted(goal) runs after the API said OK.
 export default function DeleteGoalDialog({ goal, onDeleted, onClose }) {
+  const { t } = useTranslation();
   const [deleting, setDeleting] = useState(false);
   const toast = useToast();
 
@@ -25,22 +27,22 @@ export default function DeleteGoalDialog({ goal, onDeleted, onClose }) {
   }
 
   return (
-    <Modal title="Delete this goal?" onClose={onClose} busy={deleting}>
+    <Modal title={t('goals.deleteQuestion')} onClose={onClose} busy={deleting}>
       <p className={styles.summary}>
         <strong>{goal.name}</strong>
         <span>
-          {formatVnd(goal.savedAmount)} saved of {formatVnd(goal.targetAmount)}
+          {t('goals.savedOf', { saved: formatVnd(goal.savedAmount), target: formatVnd(goal.targetAmount) })}
         </span>
       </p>
-      <p className={styles.text}>The goal and its history of added and withdrawn money will be deleted. This can't be undone.</p>
+      <p className={styles.text}>{t('goals.deleteText')}</p>
 
       <div className={styles.actions}>
         {/* data-autofocus: keyboard users land on the safe choice (see Modal) */}
         <Button variant="secondary" onClick={onClose} disabled={deleting} data-autofocus>
-          Cancel
+          {t('common.cancel')}
         </Button>
         <Button variant="danger" onClick={handleDelete} disabled={deleting}>
-          {deleting ? 'Deleting…' : 'Delete'}
+          {deleting ? t('common.deleting') : t('common.delete')}
         </Button>
       </div>
     </Modal>

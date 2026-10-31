@@ -10,8 +10,8 @@ function text(value) {
 // Each helper checks one field and returns the cleaned value, or throws a 400.
 function checkName(value) {
   const name = text(value).trim();
-  if (!name) throw httpError(400, "Name is required");
-  if (name.length > 40) throw httpError(400, "Name must be at most 40 characters");
+  if (!name) throw httpError(400, "Name is required", "NAME_REQUIRED");
+  if (name.length > 40) throw httpError(400, "Name must be at most 40 characters", "NAME_TOO_LONG");
   return name;
 }
 
@@ -23,7 +23,7 @@ function checkCategoryId(value) {
 
 function checkAmount(value) {
   if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) {
-    throw httpError(400, "Amount must be greater than 0");
+    throw httpError(400, "Amount must be greater than 0", "AMOUNT_INVALID");
   }
   return value;
 }
@@ -31,7 +31,7 @@ function checkAmount(value) {
 function checkNote(value) {
   if (typeof value !== "string") throw httpError(400, "Note must be a string");
   const note = value.trim();
-  if (note.length > 200) throw httpError(400, "Note must be at most 200 characters");
+  if (note.length > 200) throw httpError(400, "Note must be at most 200 characters", "NOTE_TOO_LONG");
   return note;
 }
 
@@ -67,6 +67,6 @@ export function validateUpdateTemplate(req, res, next) {
 
 // A malformed id can never match anything, so answer 404 instead of letting Mongoose throw a CastError.
 export function validateTemplateId(req, res, next) {
-  if (!OBJECT_ID_REGEX.test(req.params.id)) throw httpError(404, "Template not found");
+  if (!OBJECT_ID_REGEX.test(req.params.id)) throw httpError(404, "Template not found", "TEMPLATE_NOT_FOUND");
   next();
 }

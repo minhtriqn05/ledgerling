@@ -5,7 +5,7 @@ import { dayNoon, todayInVietnam } from "../utils/month.js";
 // Filtering by userId as well means another user's goal looks like it does not exist (404)
 async function findOwned(userId, id) {
   const goal = await Goal.findOne({ _id: id, userId });
-  if (!goal) throw httpError(404, "Goal not found");
+  if (!goal) throw httpError(404, "Goal not found", "GOAL_NOT_FOUND");
   return goal;
 }
 
@@ -100,7 +100,7 @@ export async function addContribution(userId, id, { amount, note, date }) {
 
   // No match: either the goal is not the user's (404) or the withdrawal is bigger than what was saved (400)
   await findOwned(userId, id);
-  throw httpError(400, "You cannot withdraw more than the saved amount");
+  throw httpError(400, "You cannot withdraw more than the saved amount", "WITHDRAW_TOO_MUCH");
 }
 
 // Removes a contribution that was entered by mistake and takes its effect back.
@@ -109,7 +109,7 @@ export async function addContribution(userId, id, { amount, note, date }) {
 export async function removeContribution(userId, id, contributionId) {
   const goal = await findOwned(userId, id);
   const contribution = goal.contributions.id(contributionId);
-  if (!contribution) throw httpError(404, "Contribution not found");
+  if (!contribution) throw httpError(404, "Contribution not found", "CONTRIBUTION_NOT_FOUND");
 
   // Taking back a deposit lowers savedAmount, so it needs savedAmount >= amount.
   // Taking back a withdrawal raises it, so the condition is always true.
@@ -127,6 +127,6 @@ export async function removeContribution(userId, id, contributionId) {
 
   // No match: someone deleted it first (404), or the money of this deposit was already withdrawn (400)
   const current = await findOwned(userId, id);
-  if (!current.contributions.id(contribution._id)) throw httpError(404, "Contribution not found");
-  throw httpError(400, "Deleting this deposit would make the saved amount negative");
+  if (!current.contributions.id(contribution._id)) throw httpError(404, "Contribution not found", "CONTRIBUTION_NOT_FOUND");
+  throw httpError(400, "Deleting this deposit would make the saved amount negative", "DEPOSIT_IN_USE");
 }

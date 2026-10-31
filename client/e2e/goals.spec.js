@@ -92,10 +92,10 @@ test('create a goal → add money → the progress grows → saving the rest sho
   const card = cardOf(page, 'Laptop');
   const bar = card.getByRole('progressbar');
   await expect(bar).toHaveAttribute('aria-valuenow', '0');
-  await expect(card.getByText(/1\.000\.000\s₫ to go/)).toBeVisible();
+  await expect(card.getByText(/1,000,000\s₫ to go/)).toBeVisible();
   await expect(card.getByText('45 days left')).toBeVisible();
-  // 45 days = 2 months → 500.000 a month
-  await expect(card.getByText(/Save 500\.000\s₫ per month to reach it/)).toBeVisible();
+  // 45 days = 2 months → 500,000 a month
+  await expect(card.getByText(/Save 500,000\s₫ per month to reach it/)).toBeVisible();
   await expect(card.getByText('Completed', { exact: true })).toBeHidden();
   // Nothing saved yet, nothing to withdraw
   await expect(card.getByRole('button', { name: 'Withdraw', exact: true })).toBeDisabled();
@@ -104,10 +104,10 @@ test('create a goal → add money → the progress grows → saving the rest sho
   await moveMoney(page, 'Laptop', { mode: 'add', amount: 400000, note: 'Bonus' });
   await expect(page.getByText('Money added')).toBeVisible();
   await expect(bar).toHaveAttribute('aria-valuenow', '40');
-  await expect(card.getByText(/600\.000\s₫ to go/)).toBeVisible();
+  await expect(card.getByText(/600,000\s₫ to go/)).toBeVisible();
   await expect(card.getByText('40%')).toBeVisible();
-  // 600.000 left, 2 months → 300.000 a month
-  await expect(card.getByText(/Save 300\.000\s₫ per month to reach it/)).toBeVisible();
+  // 600,000 left, 2 months → 300,000 a month
+  await expect(card.getByText(/Save 300,000\s₫ per month to reach it/)).toBeVisible();
 
   // 5. Take some out: the bar goes down
   await moveMoney(page, 'Laptop', { mode: 'withdraw', amount: 100000 });
@@ -141,34 +141,34 @@ test('a withdrawal cannot be bigger than the saved money, and a mistake can be d
   const withdrawDialog = page.getByRole('dialog', { name: 'Withdraw money' });
   await withdrawDialog.getByLabel('Amount').fill('600000');
   await withdrawDialog.getByRole('button', { name: 'Withdraw from goal' }).click();
-  await expect(withdrawDialog.getByText(/You can withdraw at most 500\.000\s₫/)).toBeVisible();
+  await expect(withdrawDialog.getByText(/You can withdraw at most 500,000\s₫/)).toBeVisible();
   await withdrawDialog.getByRole('button', { name: 'Cancel' }).click();
   await expect(card.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '25');
 
-  // 2. Take 400.000 out; the history lists both entries, newest first
+  // 2. Take 400,000 out; the history lists both entries, newest first
   await moveMoney(page, 'Trip', { mode: 'withdraw', amount: 400000 });
   await expect(card.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '5');
   await card.getByRole('button', { name: 'History of Trip' }).click();
   const history = page.getByRole('dialog', { name: /History/ });
-  await expect(history.getByText(/100\.000\s₫ saved of 2\.000\.000\s₫/)).toBeVisible();
+  await expect(history.getByText(/100,000\s₫ saved of 2,000,000\s₫/)).toBeVisible();
   const rows = history.getByRole('listitem');
   await expect(rows).toHaveCount(2);
   await expect(rows.first()).toContainText('Withdrawal');
-  await expect(rows.first()).toContainText(/−400\.000\s₫/);
+  await expect(rows.first()).toContainText(/−400,000\s₫/);
   await expect(rows.last()).toContainText('Deposit');
   await expect(rows.last()).toContainText('Gift');
 
   // 3. The deposit was spent by the withdrawal: deleting it is refused
-  await history.getByRole('button', { name: /Delete deposit of 500\.000/ }).click();
+  await history.getByRole('button', { name: /Delete deposit of 500,000/ }).click();
   await expect(page.getByText('Deleting this deposit would make the saved amount negative')).toBeVisible();
   await expect(rows).toHaveCount(2);
 
   // 4. Deleting the withdrawal puts the money back; then the deposit can go too
-  await history.getByRole('button', { name: /Delete withdrawal of 400\.000/ }).click();
+  await history.getByRole('button', { name: /Delete withdrawal of 400,000/ }).click();
   await expect(page.getByText('Entry deleted')).toBeVisible();
-  await expect(history.getByText(/500\.000\s₫ saved of 2\.000\.000\s₫/)).toBeVisible();
+  await expect(history.getByText(/500,000\s₫ saved of 2,000,000\s₫/)).toBeVisible();
   await expect(rows).toHaveCount(1);
-  await history.getByRole('button', { name: /Delete deposit of 500\.000/ }).click();
+  await history.getByRole('button', { name: /Delete deposit of 500,000/ }).click();
   await expect(history.getByText('No money added yet. Use Add money to start saving.')).toBeVisible();
 
   // 5. The card behind shows the new numbers
@@ -194,14 +194,14 @@ test('edit a goal, see completed goals move to the end, then delete a goal', asy
   await cardOf(page, 'Bike').getByRole('button', { name: 'Edit Bike' }).click();
   const editDialog = page.getByRole('dialog', { name: 'Edit goal' });
   await expect(editDialog.getByLabel('Name')).toHaveValue('Bike');
-  await expect(editDialog.getByLabel('Target amount')).toHaveValue('3.000.000');
+  await expect(editDialog.getByLabel('Target amount')).toHaveValue('3,000,000');
   await expect(editDialog.getByLabel('Deadline (optional)')).toHaveValue(dayFromToday(90));
   await editDialog.getByLabel('Name').fill('Electric bike');
   await editDialog.getByLabel('Target amount').fill('4000000');
   await editDialog.getByRole('button', { name: 'Save changes' }).click();
   await expect(editDialog).toBeHidden();
   await expect(page.getByText('Goal updated')).toBeVisible();
-  await expect(cardOf(page, 'Electric bike').getByText(/\/ 4\.000\.000\s₫$/)).toBeVisible();
+  await expect(cardOf(page, 'Electric bike').getByText(/\/ 4,000,000\s₫$/)).toBeVisible();
 
   // 3. Completing the first goal moves it to the end of the list
   await moveMoney(page, 'Phone', { mode: 'add', amount: 800000 });

@@ -120,7 +120,7 @@ describe('RuleFormDialog', () => {
     updateRecurringRule.mockResolvedValue(savedRule);
     const { onSaved } = renderDialog(savedRule);
 
-    expect(screen.getByLabelText('Amount')).toHaveValue('3.500.000');
+    expect(screen.getByLabelText('Amount')).toHaveValue('3,500,000');
     expect(screen.getByLabelText('Start date')).toHaveValue('2026-08-10');
     expect(screen.getByLabelText('End date (optional)')).toHaveValue('2027-08-10');
     expect(screen.getByText('Transactions already created stay as they are.')).toBeInTheDocument();

@@ -14,7 +14,8 @@ const options = {
         "2. Click **Authorize** (top right), paste the token (without the word `Bearer`) and confirm.",
         "3. Every protected request now sends `Authorization: Bearer <token>`.",
         "",
-        "Success: `{ \"success\": true, \"data\": ... }`. Error: `{ \"success\": false, \"message\": \"...\" }`.",
+        "Success: `{ \"success\": true, \"data\": ... }`. Error: `{ \"success\": false, \"message\": \"...\", \"code\": \"...\" }`.",
+        "`message` is English text for people; `code` is a stable identifier such as `EMAIL_TAKEN`, `INVALID_CREDENTIALS`, `CATEGORY_IN_USE` or `VALIDATION_ERROR`, which a client can translate.",
         "Every route can also answer 500 (server error). A body that is not valid JSON gets 400 `Invalid JSON body`.",
       ].join("\n"),
     },
@@ -66,8 +67,8 @@ const options = {
             "application/json": {
               schema: { $ref: "#/components/schemas/ErrorResponse" },
               examples: {
-                missing: { summary: "No Authorization header", value: { success: false, message: "Not authorized, token missing" } },
-                invalid: { summary: "Wrong, malformed or expired token", value: { success: false, message: "Not authorized, invalid token" } },
+                missing: { summary: "No Authorization header", value: { success: false, message: "Not authorized, token missing", code: "TOKEN_MISSING" } },
+                invalid: { summary: "Wrong, malformed or expired token", value: { success: false, message: "Not authorized, invalid token", code: "TOKEN_INVALID" } },
               },
             },
           },
@@ -77,7 +78,7 @@ const options = {
           content: {
             "application/json": {
               schema: { $ref: "#/components/schemas/ErrorResponse" },
-              example: { success: false, message: "Internal server error" },
+              example: { success: false, message: "Internal server error", code: "INTERNAL_ERROR" },
             },
           },
         },
@@ -101,7 +102,12 @@ const options = {
             name: { type: "string", example: "Food" },
             type: { type: "string", enum: ["income", "expense"], example: "expense" },
             color: { type: "string", example: "#FF7043" },
-            icon: { type: "string", nullable: true, description: "One emoji, or null when the category has none", example: "🍜" },
+            icon: {
+              type: "string",
+              nullable: true,
+              description: "An icon name such as utensils, an emoji on older categories, or null when none was chosen",
+              example: "utensils",
+            },
             createdAt: { type: "string", format: "date-time", example: "2026-10-27T03:05:00.000Z" },
             updatedAt: { type: "string", format: "date-time", example: "2026-10-27T03:05:00.000Z" },
           },
@@ -330,7 +336,8 @@ const options = {
           type: "object",
           properties: {
             success: { type: "boolean", example: false },
-            message: { type: "string", example: "Email is invalid" },
+            message: { type: "string", description: "English text for people", example: "Email is invalid" },
+            code: { type: "string", description: "Stable identifier the client translates (see docs/api-plan.md)", example: "EMAIL_INVALID" },
           },
         },
       },

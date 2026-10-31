@@ -1,28 +1,34 @@
 import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { formatDateDMY, formatDayMonth, formatSignedVnd } from '../../utils/format.js';
 import IconButton from '../../components/IconButton/IconButton.jsx';
 import CategoryMark from '../../components/CategoryMark/CategoryMark.jsx';
 import Icon from '../../components/Icon.jsx';
+import Reveal from '../../components/Motion/Reveal.jsx';
 import styles from './TransactionList.module.css';
 
 // Marks a transaction that a recurring rule created
 function RecurringLabel() {
+  const { t } = useTranslation();
+
   return (
     <span className={styles.recurring}>
       <Icon name="repeat" size={12} />
-      Recurring
+      {t('transactions.recurringLabel')}
     </span>
   );
 }
 
 // The tags of one transaction as small buttons: a click filters the list by that tag.
 function TagChips({ tags = [], onTagClick }) {
+  const { t } = useTranslation();
+
   return tags.map((tag) => (
     <button
       key={tag}
       type="button"
       className={styles.tag}
-      aria-label={`Filter by tag ${tag}`}
+      aria-label={t('transactions.filterByTag', { tag })}
       onClick={() => onTagClick(tag)}
     >
       #{tag}
@@ -52,12 +58,14 @@ function SelectAll({ label, checked, indeterminate, onChange }) {
 
 // The month's transactions: a table on wide screens, a simple list on phones (≤640px, see the css).
 // Design: TransactionsPreview in pages/styleGuide.
-// On the phone list a tap opens the edit dialog (which also has the Delete button).
+// A click on a row (or a tap on the phone list) calls onOpen(transaction), which opens the details drawer.
+// Without onOpen (old callers) the row opens the edit dialog.
 // onTagClick(tag) is called when a tag chip is clicked.
 // Selection (bulk actions) is on when onToggle is given: selectedIds is a Set of transaction ids,
 // onToggle(id) flips one row and onToggleAll(checked) selects or clears every row shown.
 export default function TransactionList({
   transactions,
+  onOpen,
   onEdit,
   onDelete,
   onTagClick,
@@ -65,12 +73,14 @@ export default function TransactionList({
   onToggle,
   onToggleAll,
 }) {
+  const { t } = useTranslation();
   const selectable = Boolean(onToggle);
+  const open = onOpen ?? onEdit;
   const selectedCount = transactions.filter((t) => selectedIds.has(t._id)).length;
   const allSelected = transactions.length > 0 && selectedCount === transactions.length;
   const someSelected = selectedCount > 0 && !allSelected;
   const selectAll = (
-    <SelectAll label="Select all on this page" checked={allSelected} indeterminate={someSelected} onChange={onToggleAll} />
+    <SelectAll label={t('transactions.selectAllOnPage')} checked={allSelected} indeterminate={someSelected} onChange={onToggleAll} />
   );
 
   return (
@@ -80,61 +90,79 @@ export default function TransactionList({
           <thead>
             <tr>
               {selectable && <th className={styles.checkCell}>{selectAll}</th>}
-              <th>Date</th>
-              <th>Category</th>
-              <th>Note</th>
-              <th>Tags</th>
-              <th className={styles.alignRight}>Amount</th>
+              <th>{t('common.date')}</th>
+              <th>{t('common.category')}</th>
+              <th>{t('common.note')}</th>
+              <th>{t('common.tags')}</th>
+              <th className={styles.alignRight}>{t('common.amount')}</th>
               <th className={styles.alignRight}>
-                <span className={styles.srOnly}>Actions</span>
+                <span className={styles.srOnly}>{t('common.actions')}</span>
               </th>
             </tr>
           </thead>
           <tbody>
-            {transactions.map((t) => (
-              <tr key={t._id} className={selectedIds.has(t._id) ? styles.selectedRow : undefined}>
+            {transactions.map((item, index) => (
+              <Reveal
+                as="tr"
+                key={item._id}
+                index={index}
+                className={`${styles.row} ${selectedIds.has(item._id) ? styles.selectedRow : ''}`}
+                data-testid="transaction-row"
+                onClick={(event) => {
+                  // Buttons, tag chips and checkboxes in the row do their own thing
+                  if (!event.target.closest('button, input, a, label')) open(item);
+                }}
+              >
                 {selectable && (
                   <td className={styles.checkCell}>
                     <input
                       type="checkbox"
                       className={styles.check}
-                      aria-label={`Select ${t.note || t.category.name}`}
-                      checked={selectedIds.has(t._id)}
-                      onChange={() => onToggle(t._id)}
+                      aria-label={t('common.selectName', { name: item.note || item.category.name })}
+                      checked={selectedIds.has(item._id)}
+                      onChange={() => onToggle(item._id)}
                     />
                   </td>
                 )}
-                <td className={styles.muted}>{formatDateDMY(t.date)}</td>
+                <td className={styles.muted}>{formatDateDMY(item.date)}</td>
                 <td>
-                  <span className={styles.chip} style={{ '--tone': t.category.color }}>
-                    <CategoryMark icon={t.category.icon}>
-                      <i className={styles.dot} />
-                    </CategoryMark>
-                    {t.category.name}
+                  <span className={styles.chip} style={{ '--tone': item.category.color }}>
+                    <CategoryMark category={item.category} />
+                    {item.category.name}
                   </span>
-                  {t.recurringRuleId && <RecurringLabel />}
+                  {item.recurringRuleId && <RecurringLabel />}
                 </td>
-                <td className={styles.note}>{t.note || <span className={styles.muted}>—</span>}</td>
+                {/* The note is a real button too, so the details also open from the keyboard */}
+                <td className={styles.note}>
+                  <button
+                    type="button"
+                    className={styles.noteButton}
+                    aria-label={t('transactions.openDetails', { name: item.note || item.category.name })}
+                    onClick={() => open(item)}
+                  >
+                    {item.note || <span className={styles.muted}>—</span>}
+                  </button>
+                </td>
                 <td>
                   <span className={styles.tags}>
-                    <TagChips tags={t.tags} onTagClick={onTagClick} />
+                    <TagChips tags={item.tags} onTagClick={onTagClick} />
                   </span>
                 </td>
-                <td className={`${styles.alignRight} ${styles.amount} ${styles[t.type]}`}>
-                  {formatSignedVnd(t.amount, t.type)}
+                <td className={`${styles.alignRight} ${styles.amount} ${styles[item.type]}`}>
+                  {formatSignedVnd(item.amount, item.type)}
                 </td>
                 <td className={styles.alignRight}>
                   <span className={styles.rowActions}>
-                    <IconButton icon="edit" label={`Edit ${t.note || t.category.name}`} onClick={() => onEdit(t)} />
+                    <IconButton icon="edit" label={t('common.editName', { name: item.note || item.category.name })} onClick={() => onEdit(item)} />
                     <IconButton
                       icon="trash"
-                      label={`Delete ${t.note || t.category.name}`}
+                      label={t('common.deleteName', { name: item.note || item.category.name })}
                       danger
-                      onClick={() => onDelete(t)}
+                      onClick={() => onDelete(item)}
                     />
                   </span>
                 </td>
-              </tr>
+              </Reveal>
             ))}
           </tbody>
         </table>
@@ -144,47 +172,41 @@ export default function TransactionList({
         {selectable && (
           <label className={styles.mobileSelectAll}>
             {selectAll}
-            <span>Select all</span>
+            <span>{t('transactions.selectAll')}</span>
           </label>
         )}
         <ul className={styles.mobileItems}>
-          {transactions.map((t) => (
-            <li key={t._id} className={selectedIds.has(t._id) ? styles.selectedRow : undefined}>
+          {transactions.map((item, index) => (
+            <Reveal as="li" key={item._id} index={index} className={selectedIds.has(item._id) ? styles.selectedRow : undefined}>
               <div className={styles.mobileItem}>
                 {selectable && (
                   <input
                     type="checkbox"
                     className={styles.check}
-                    aria-label={`Select ${t.note || t.category.name}`}
-                    checked={selectedIds.has(t._id)}
-                    onChange={() => onToggle(t._id)}
+                    aria-label={t('common.selectName', { name: item.note || item.category.name })}
+                    checked={selectedIds.has(item._id)}
+                    onChange={() => onToggle(item._id)}
                   />
                 )}
-                <button type="button" className={styles.mobileRow} onClick={() => onEdit(t)}>
-                  <span
-                    className={`${styles.avatar} ${t.category.icon ? styles.avatarIcon : ''}`}
-                    style={{ '--tone': t.category.color }}
-                    aria-hidden="true"
-                  >
-                    {t.category.icon || t.category.name.charAt(0).toUpperCase()}
-                  </span>
+                <button type="button" className={styles.mobileRow} onClick={() => open(item)}>
+                  <CategoryMark category={item.category} size="lg" />
                   <span className={styles.mobileText}>
-                    <strong>{t.note || t.category.name}</strong>
+                    <strong>{item.note || item.category.name}</strong>
                     <span>
-                      {t.category.name} · {formatDayMonth(t.date)}
-                      {t.recurringRuleId && <RecurringLabel />}
+                      {item.category.name} · {formatDayMonth(item.date)}
+                      {item.recurringRuleId && <RecurringLabel />}
                     </span>
                   </span>
-                  <span className={`${styles.amount} ${styles[t.type]}`}>{formatSignedVnd(t.amount, t.type)}</span>
+                  <span className={`${styles.amount} ${styles[item.type]}`}>{formatSignedVnd(item.amount, item.type)}</span>
                 </button>
               </div>
               {/* Outside the row button: a button cannot hold other buttons */}
-              {t.tags?.length > 0 && (
+              {item.tags?.length > 0 && (
                 <span className={`${styles.tags} ${styles.mobileTags} ${selectable ? styles.mobileTagsSelectable : ''}`}>
-                  <TagChips tags={t.tags} onTagClick={onTagClick} />
+                  <TagChips tags={item.tags} onTagClick={onTagClick} />
                 </span>
               )}
-            </li>
+            </Reveal>
           ))}
         </ul>
       </div>

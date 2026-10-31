@@ -55,7 +55,7 @@ describe("goals: auth", () => {
   it("refuses a token that is not valid (401)", async () => {
     const res = await api().get("/api/goals").set(auth("not-a-token"));
     expect(res.status).toBe(401);
-    expect(res.body).toEqual({ success: false, message: "Not authorized, invalid token" });
+    expect(res.body).toEqual({ success: false, message: "Not authorized, invalid token", code: expect.any(String) });
   });
 });
 
@@ -139,7 +139,7 @@ describe("goals: create", () => {
       ...change,
     });
     expect(res.status).toBe(400);
-    expect(res.body).toEqual({ success: false, message });
+    expect(res.body).toEqual({ success: false, message, code: expect.any(String) });
   });
 
   it("accepts tomorrow as the deadline", async () => {
@@ -221,7 +221,7 @@ describe("goals: list and get", () => {
 
     const foreign = await getGoal(other, goal._id);
     expect(foreign.status).toBe(404);
-    expect(foreign.body).toEqual({ success: false, message: "Goal not found" });
+    expect(foreign.body).toEqual({ success: false, message: "Goal not found", code: expect.any(String) });
 
     expect((await getGoal(user, "6720f1b2c3d4e5f601234699")).status).toBe(404);
     expect((await getGoal(user, "not-an-id")).status).toBe(404);
@@ -326,7 +326,7 @@ describe("goals: update", () => {
 
     const res = await putGoal(other.token, goal._id, { name: "Hacked", targetAmount: 1, color: "#000000" });
     expect(res.status).toBe(404);
-    expect(res.body).toEqual({ success: false, message: "Goal not found" });
+    expect(res.body).toEqual({ success: false, message: "Goal not found", code: expect.any(String) });
     expect((await Goal.findById(goal._id)).name).toBe("New laptop");
 
     expect((await putGoal(user.token, "not-an-id", { name: "x", targetAmount: 1, color: "#000000" })).status).toBe(404);
@@ -357,7 +357,7 @@ describe("goals: delete", () => {
 
     const res = await api().delete(`/api/goals/${goal._id}`).set(auth(other.token));
     expect(res.status).toBe(404);
-    expect(res.body).toEqual({ success: false, message: "Goal not found" });
+    expect(res.body).toEqual({ success: false, message: "Goal not found", code: expect.any(String) });
     expect(await Goal.findById(goal._id)).not.toBeNull();
 
     expect((await api().delete("/api/goals/not-an-id").set(auth(user.token))).status).toBe(404);
@@ -410,7 +410,7 @@ describe("goals: contributions", () => {
 
     const res = await postContribution(user, goal._id, { amount: -100001 });
     expect(res.status).toBe(400);
-    expect(res.body).toEqual({ success: false, message: "You cannot withdraw more than the saved amount" });
+    expect(res.body).toEqual({ success: false, message: "You cannot withdraw more than the saved amount", code: expect.any(String) });
 
     const after = await getGoal(user, goal._id);
     expect(after.body.data.savedAmount).toBe(100000);
@@ -453,7 +453,7 @@ describe("goals: contributions", () => {
     const goal = await createGoal(user);
     const res = await postContribution(user, goal._id, body);
     expect(res.status).toBe(400);
-    expect(res.body).toEqual({ success: false, message });
+    expect(res.body).toEqual({ success: false, message, code: expect.any(String) });
     expect(await savedInDatabase(goal._id)).toBe(0);
   });
 
@@ -463,7 +463,7 @@ describe("goals: contributions", () => {
 
     const res = await postContribution(other, goal._id, { amount: 5000 });
     expect(res.status).toBe(404);
-    expect(res.body).toEqual({ success: false, message: "Goal not found" });
+    expect(res.body).toEqual({ success: false, message: "Goal not found", code: expect.any(String) });
     expect(await savedInDatabase(goal._id)).toBe(0);
 
     // A withdrawal on another user's goal is 404 too, not the 400 of the owner
@@ -571,7 +571,7 @@ describe("goals: delete a contribution", () => {
     const res = await deleteContribution(user, goal._id, entry._id);
 
     expect(res.status).toBe(400);
-    expect(res.body).toEqual({ success: false, message: "Deleting this deposit would make the saved amount negative" });
+    expect(res.body).toEqual({ success: false, message: "Deleting this deposit would make the saved amount negative", code: expect.any(String) });
     expect(await savedInDatabase(goal._id)).toBe(100000);
     expect((await getGoal(user, goal._id)).body.data.contributions).toHaveLength(2);
   });
@@ -584,7 +584,7 @@ describe("goals: delete a contribution", () => {
     expect((await deleteContribution(user, goal._id, entry._id)).status).toBe(200);
     const again = await deleteContribution(user, goal._id, entry._id);
     expect(again.status).toBe(404);
-    expect(again.body).toEqual({ success: false, message: "Contribution not found" });
+    expect(again.body).toEqual({ success: false, message: "Contribution not found", code: expect.any(String) });
     expect(await savedInDatabase(goal._id)).toBe(0);
   });
 
@@ -613,7 +613,7 @@ describe("goals: delete a contribution", () => {
 
     const res = await deleteContribution(other, goal._id, entry._id);
     expect(res.status).toBe(404);
-    expect(res.body).toEqual({ success: false, message: "Goal not found" });
+    expect(res.body).toEqual({ success: false, message: "Goal not found", code: expect.any(String) });
     expect(await savedInDatabase(goal._id)).toBe(1000);
   });
 

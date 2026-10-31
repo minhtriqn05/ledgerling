@@ -1,7 +1,8 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import i18n from '../../i18n/index.js';
 import InsightsCard from './InsightsCard.jsx';
 import { getInsights } from '../../api/reports.js';
 
@@ -40,7 +41,7 @@ describe('InsightsCard', () => {
         {
           type: 'category-up',
           severity: 'warning',
-          message: 'You spent 200.000 ₫ (25%) more on Bills than last month.',
+          message: 'You spent 200,000 ₫ (25%) more on Bills than last month.',
           link: '/transactions?month=2026-10',
         },
         { type: 'savings-rate', severity: 'success', message: 'Great! You saved 94% of your income.', link: '/reports' },
@@ -48,10 +49,10 @@ describe('InsightsCard', () => {
     });
     renderCard();
 
-    const warning = await screen.findByRole('link', { name: /You spent 200\.000/ });
+    const warning = await screen.findByRole('link', { name: /You spent 200,000/ });
     expect(warning).toHaveAttribute('href', '/transactions?month=2026-10');
     // The severity is written out for screen readers, so the color is never the only signal
-    expect(warning).toHaveTextContent('Warning: You spent 200.000');
+    expect(warning).toHaveTextContent('Warning: You spent 200,000');
     expect(screen.getByRole('link', { name: /Great! You saved 94%/ })).toHaveTextContent('Good news: Great! You saved 94%');
   });
 
@@ -76,5 +77,39 @@ describe('InsightsCard', () => {
 
     expect(await screen.findByText(/No insights for October 2026 yet/)).toBeInTheDocument();
     expect(getInsights).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('InsightsCard in another language', () => {
+  afterEach(() => i18n.changeLanguage('en'));
+
+  const insight = (fields) => ({ type: 'x', severity: 'info', link: '/transactions', ...fields });
+
+  it('builds the sentence from the code and the params, also for a key with a plural', async () => {
+    await i18n.changeLanguage('de');
+    getInsights.mockResolvedValue({
+      month: '2026-10',
+      insights: [
+        insight({ code: 'NO_SPEND_DAYS', message: 'English sentence 1', params: { count: 24, month: '2026-10' } }),
+        insight({ code: 'CATEGORY_UP', message: 'English sentence 2', params: { amount: 200000, percent: 13.6, category: 'Bills' } }),
+      ],
+    });
+    renderCard();
+
+    expect(await screen.findByText(/Du hattest im Oktober 2026 24 Tage ohne Ausgaben/)).toBeInTheDocument();
+    expect(screen.getByText(/200\.000.₫ \(13,6 %\) mehr für Bills/)).toBeInTheDocument();
+    expect(screen.queryByText(/English sentence/)).not.toBeInTheDocument();
+  });
+
+  it('shows the message of the API for a code it does not know, or without a code', async () => {
+    await i18n.changeLanguage('de');
+    getInsights.mockResolvedValue({
+      month: '2026-10',
+      insights: [insight({ code: 'FROM_THE_FUTURE', message: 'First' }), insight({ message: 'Second' })],
+    });
+    renderCard();
+
+    expect(await screen.findByText(/First/)).toBeInTheDocument();
+    expect(screen.getByText(/Second/)).toBeInTheDocument();
   });
 });

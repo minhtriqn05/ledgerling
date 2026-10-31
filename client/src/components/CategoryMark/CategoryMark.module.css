@@ -1,6 +1,31 @@
-/* An emoji takes the place of the 8px dot, so it is a little bigger than the text and never shrinks. */
+/* Same recipe as the card title tiles: a light tint of the color behind a darker icon (3.8:1 or more).
+   --tone (the category color) is set inline from the API data. */
 .mark {
+  display: inline-grid;
+  place-items: center;
   flex-shrink: 0;
-  font-size: 1.1em;
+  background: color-mix(in srgb, var(--tone) 16%, var(--color-surface));
+  color: color-mix(in srgb, var(--tone) 62%, var(--color-text));
   line-height: 1;
+}
+
+.sm {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+}
+
+.md {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-md);
+}
+
+.lg {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-lg);
 }

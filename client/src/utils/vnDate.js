@@ -1,3 +1,5 @@
+import { currentLocale } from './format.js';
+
 // Month and date helpers in Vietnam time (UTC+7), the time zone the API uses for its "month" filter.
 // A month is a "YYYY-MM" string, a day for <input type="date"> is "YYYY-MM-DD".
 
@@ -10,8 +12,13 @@ const dayParts = new Intl.DateTimeFormat('en-CA', {
   day: '2-digit',
   timeZone: TIME_ZONE,
 });
-const monthLabel = new Intl.DateTimeFormat('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' });
-const monthShortLabel = new Intl.DateTimeFormat('en-GB', { month: 'short', timeZone: 'UTC' });
+
+// These three follow the user's language. The months are built in UTC, so no time zone can shift them.
+const monthLabel = (options) => new Intl.DateTimeFormat(currentLocale(), { ...options, timeZone: 'UTC' });
+function firstOfMonth(month) {
+  const [year, number] = month.split('-').map(Number);
+  return new Date(Date.UTC(year, number - 1, 1));
+}
 
 // Today in Vietnam: "2026-10-28"
 export function todayInput() {
@@ -32,14 +39,17 @@ export function shiftMonth(month, delta) {
 
 // "2026-10" -> "October 2026"
 export function formatMonth(month) {
-  const [year, number] = month.split('-').map(Number);
-  return monthLabel.format(new Date(Date.UTC(year, number - 1, 1)));
+  return monthLabel({ month: 'long', year: 'numeric' }).format(firstOfMonth(month));
+}
+
+// "2026-10" -> "October" (a month inside a year that is already on screen)
+export function formatMonthName(month) {
+  return monthLabel({ month: 'long' }).format(firstOfMonth(month));
 }
 
 // "2026-10" -> "Oct" (chart axis labels)
 export function formatMonthShort(month) {
-  const [year, number] = month.split('-').map(Number);
-  return monthShortLabel.format(new Date(Date.UTC(year, number - 1, 1)));
+  return monthLabel({ month: 'short' }).format(firstOfMonth(month));
 }
 
 // An ISO date from the API -> the Vietnam day for an <input type="date">: "2026-10-27T20:00:00.000Z" -> "2026-10-28"

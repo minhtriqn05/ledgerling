@@ -1,7 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { useTranslation } from 'react-i18next';
 import ApiStatus from '../ApiStatus/ApiStatus.jsx';
 import Icon from '../Icon.jsx';
+import LanguageSwitcher from '../LanguageSwitcher/LanguageSwitcher.jsx';
+import Logo from '../Logo/Logo.jsx';
 import QuickAddButton from '../QuickAdd/QuickAddButton.jsx';
 import QuickAddDialog from '../QuickAdd/QuickAddDialog.jsx';
 import ShortcutsDialog from '../QuickAdd/ShortcutsDialog.jsx';
@@ -15,7 +19,10 @@ import styles from './AppLayout.module.css';
 // It also holds what every signed-in page shares: the "+" button / N key (Quick add), and the shortcuts / and ?.
 
 export default function AppLayout() {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
+  const reduced = useReducedMotion();
   const { logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false); // only matters on narrow screens
   const [quickAddOpen, setQuickAddOpen] = useState(false);
@@ -23,6 +30,20 @@ export default function AppLayout() {
   // Changing this key makes React build the open page again, so it loads its data again after a Quick add.
   const [pageKey, setPageKey] = useState(0);
   const sidebarRef = useRef(null);
+  const navRef = useRef(null);
+  // The sliding pill behind the open page's link. Measured from the link, so it fits any language and screen.
+  const [indicator, setIndicator] = useState(null);
+
+  useLayoutEffect(() => {
+    function measure() {
+      const active = navRef.current?.querySelector('[aria-current="page"]');
+      setIndicator(active ? { top: active.offsetTop, height: active.offsetHeight } : null);
+    }
+    measure();
+    // A closed phone menu measures 0, so going from a narrow to a wide window needs a new measurement
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, [location.pathname, menuOpen, i18n.resolvedLanguage]);
 
   // "/" jumps to the search box of the Transactions page (and opens that page first if it is not the one shown)
   function focusSearch() {
@@ -67,15 +88,14 @@ export default function AppLayout() {
       <aside className={styles.sidebar} ref={sidebarRef}>
         <div className={styles.bar}>
           <div className={styles.brand}>
-            <span className={styles.logo}>L</span>
-            Ledgerling
+            <Logo size={32} />
           </div>
 
           {/* Only visible on narrow screens */}
           <button
             type="button"
             className={styles.menuButton}
-            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-label={menuOpen ? t('nav.closeMenu') : t('nav.openMenu')}
             aria-expanded={menuOpen}
             aria-controls="main-menu"
             onClick={() => setMenuOpen((open) => !open)}
@@ -86,7 +106,8 @@ export default function AppLayout() {
 
         {/* A column inside the sidebar on wide screens, a dropdown panel on narrow ones */}
         <div id="main-menu" className={`${styles.panel} ${menuOpen ? styles.panelOpen : ''}`}>
-          <nav className={styles.nav} aria-label="Main navigation">
+          <nav className={styles.nav} ref={navRef} aria-label={t('nav.main')}>
+            {indicator && <span className={styles.indicator} style={{ top: indicator.top, height: indicator.height }} aria-hidden="true" />}
             {navItems.map((item) => (
               <NavLink
                 key={item.path}
@@ -96,35 +117,48 @@ export default function AppLayout() {
                 onClick={() => setMenuOpen(false)}
               >
                 {item.icon && <Icon name={item.icon} />}
-                {item.label}
+                <span className={styles.navLabel}>{t(item.labelKey)}</span>
               </NavLink>
             ))}
           </nav>
 
-          <button type="button" className={`${styles.navItem} ${styles.logout}`} onClick={handleLogout}>
-            <Icon name="logout" />
-            Log out
-          </button>
+          <div className={styles.panelFooter}>
+            <LanguageSwitcher className={styles.language} />
+            <button type="button" className={`${styles.navItem} ${styles.logout}`} onClick={handleLogout}>
+              <Icon name="logout" />
+              <span className={styles.navLabel}>{t('nav.logout')}</span>
+            </button>
+          </div>
         </div>
       </aside>
 
       <div className={styles.body}>
         <main className={styles.main}>
-          <Outlet key={pageKey} />
+          {/* A short fade and an 8px slide when another page opens. No exit animation: the new page is there at once. */}
+          <motion.div
+            key={location.pathname}
+            initial={reduced ? false : { opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.22, ease: [0.22, 0.61, 0.36, 1] }}
+          >
+            <Outlet key={pageKey} />
+          </motion.div>
         </main>
         <footer className={styles.footer}>
           <ApiStatus />
           <button type="button" className={styles.shortcutsLink} onClick={() => setShortcutsOpen(true)}>
-            <kbd>?</kbd> Keyboard shortcuts
+            <kbd>?</kbd> {t('shortcuts.title')}
           </button>
         </footer>
       </div>
 
       <QuickAddButton onClick={() => setQuickAddOpen(true)} />
-      {quickAddOpen && (
-        <QuickAddDialog onSaved={() => setPageKey((key) => key + 1)} onClose={() => setQuickAddOpen(false)} />
-      )}
-      {shortcutsOpen && <ShortcutsDialog onClose={() => setShortcutsOpen(false)} />}
+      <AnimatePresence>
+        {quickAddOpen && (
+          <QuickAddDialog key="quick-add" onSaved={() => setPageKey((key) => key + 1)} onClose={() => setQuickAddOpen(false)} />
+        )}
+        {shortcutsOpen && <ShortcutsDialog key="shortcuts" onClose={() => setShortcutsOpen(false)} />}
+      </AnimatePresence>
     </div>
   );
 }

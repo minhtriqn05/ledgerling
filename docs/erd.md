@@ -32,7 +32,7 @@ erDiagram
         string name "unique per user and type"
         string type "income | expense"
         string color "hex, e.g. #FF7043"
-        string icon "optional, one emoji, null = none"
+        string icon "optional, icon name or one emoji, null = none"
         date createdAt
         date updatedAt
     }
@@ -129,6 +129,6 @@ erDiagram
 - `Goal.savedAmount` is the sum of the contributions. It is changed only by an atomic `$inc` together with `$push` / `$pull` of a contribution, with a condition that keeps it at 0 or more.
 - `progress`, `remaining` and `completed` of a goal are not stored: they are computed from `savedAmount` and `targetAmount`.
 - Index on Goal: `(userId)` for the list.
-- `Category.icon` is one optional emoji (`null` = none). Default categories are created with an icon; older categories keep `null`.
+- `Category.icon` is optional: an icon name from the app's icon set (`utensils`, `bus`, ...; list in `server/src/utils/categoryIcons.js`, max 30 characters) or one emoji saved by an older version. `null` = none chosen, and the client then guesses an icon from the name (nothing is written back). Default categories are created with an icon name; stored emoji are never rewritten, the client shows them as the matching line icon.
 - One User has many Transaction Templates (`TransactionTemplate.userId`); one Category has many Templates (`TransactionTemplate.categoryId`). A template has no `type`: the type of a transaction made from it comes from the category.
 - Deleting a Category also deletes its Templates (after the 409 checks for transactions and recurring rules).

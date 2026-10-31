@@ -8,7 +8,7 @@ export default defineConfig({
     VitePWA({
       // New deploys are downloaded in the background and activated automatically
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
+      includeAssets: ['favicon.svg', 'favicon.ico', 'apple-touch-icon.png'],
       manifest: {
         name: 'Ledgerling',
         short_name: 'Ledgerling',
@@ -18,9 +18,10 @@ export default defineConfig({
         display: 'standalone',
         start_url: '/',
         icons: [
+          { src: 'pwa-64x64.png', sizes: '64x64', type: 'image/png' },
           { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
           { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png' },
-          { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          { src: 'maskable-icon-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
       // Only the built app files are precached. There is no runtimeCaching,

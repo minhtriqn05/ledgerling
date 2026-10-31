@@ -1,6 +1,10 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext.jsx';
+import { formatSignedVnd, formatVnd } from '../../utils/format.js';
 import Icon from '../Icon.jsx';
+import LanguageSwitcher from '../LanguageSwitcher/LanguageSwitcher.jsx';
+import Logo from '../Logo/Logo.jsx';
 import styles from './AuthLayout.module.css';
 
 // Layout for the Login and Register pages: a gradient panel on the left, the page's form on the right.
@@ -9,6 +13,7 @@ import styles from './AuthLayout.module.css';
 const weekBars = [30, 62, 22, 44, 100, 54, 34]; // bar heights in % of the tallest day
 
 export default function AuthLayout() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const location = useLocation();
 
@@ -23,13 +28,12 @@ export default function AuthLayout() {
       <div className={styles.frame}>
         <section className={styles.visual}>
           <div className={styles.brand}>
-            <span className={styles.logo}>L</span>
-            Ledgerling
+            <Logo size={36} inverse />
           </div>
 
           <div className={styles.pitch}>
-            <p className={styles.headline}>Know where your money goes.</p>
-            <p className={styles.lead}>Track income and expenses in a calm, simple way.</p>
+            <p className={styles.headline}>{t('auth.pitchHeadline')}</p>
+            <p className={styles.lead}>{t('auth.pitchLead')}</p>
           </div>
 
           {/* Decoration only: two small cards that hint at what the app shows. */}
@@ -39,14 +43,14 @@ export default function AuthLayout() {
                 <Icon name="sprout" size={18} />
               </span>
               <div>
-                <span className={styles.floatLabel}>Saved this month</span>
-                <strong className={styles.income}>+7.900.000&nbsp;₫</strong>
+                <span className={styles.floatLabel}>{t('auth.savedThisMonth')}</span>
+                <strong className={styles.income}>{formatSignedVnd(7900000, 'income')}</strong>
               </div>
             </div>
 
             <div className={`${styles.floatCard} ${styles.floatWeek}`}>
-              <span className={styles.floatLabel}>This week</span>
-              <strong>1.855.000&nbsp;₫</strong>
+              <span className={styles.floatLabel}>{t('auth.thisWeek')}</span>
+              <strong>{formatVnd(1855000)}</strong>
               <div className={styles.miniBars}>
                 {weekBars.map((height, index) => (
                   <span key={index} className={height === 100 ? styles.miniPeak : ''} style={{ height: `${height}%` }} />
@@ -57,6 +61,7 @@ export default function AuthLayout() {
         </section>
 
         <section className={styles.formSide}>
+          <LanguageSwitcher className={styles.language} />
           <Outlet />
         </section>
       </div>

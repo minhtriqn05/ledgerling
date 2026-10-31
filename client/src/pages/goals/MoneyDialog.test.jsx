@@ -73,7 +73,7 @@ describe('MoneyDialog', () => {
     await userEvent.type(screen.getByLabelText('Amount'), '500001');
     await userEvent.click(screen.getByRole('button', { name: 'Withdraw from goal' }));
 
-    expect(screen.getByText(`You can withdraw at most 500.000${NBSP}₫, the amount saved in this goal.`)).toBeInTheDocument();
+    expect(screen.getByText(`You can withdraw at most 500,000${NBSP}₫, the amount saved in this goal.`)).toBeInTheDocument();
     expect(addContribution).not.toHaveBeenCalled();
   });
 
@@ -91,7 +91,7 @@ describe('MoneyDialog', () => {
 
     const amount = screen.getByLabelText('Amount');
     await userEvent.type(amount, '1a2.5,0e0');
-    expect(amount).toHaveValue('12.500');
+    expect(amount).toHaveValue('12,500');
   });
 
   it('stays open and keeps the fields when the API refuses', async () => {
@@ -103,7 +103,7 @@ describe('MoneyDialog', () => {
 
     expect(onSaved).not.toHaveBeenCalled();
     expect(onClose).not.toHaveBeenCalled();
-    expect(screen.getByLabelText('Amount')).toHaveValue('100.000');
+    expect(screen.getByLabelText('Amount')).toHaveValue('100,000');
     expect(screen.getByRole('button', { name: 'Withdraw from goal' })).toBeEnabled();
   });
 });

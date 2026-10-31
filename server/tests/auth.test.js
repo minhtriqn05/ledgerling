@@ -21,7 +21,7 @@ describe("POST /api/auth/register", () => {
       .send({ name: "Someone", email: email.toUpperCase(), password: "secret123" });
 
     expect(res.status).toBe(409);
-    expect(res.body).toEqual({ success: false, message: "Email is already registered" });
+    expect(res.body).toEqual({ success: false, message: "Email is already registered", code: expect.any(String) });
   });
 
   it.each([
@@ -31,7 +31,7 @@ describe("POST /api/auth/register", () => {
   ])("refuses invalid input (400): %o", async (body, message) => {
     const res = await api().post("/api/auth/register").send(body);
     expect(res.status).toBe(400);
-    expect(res.body).toEqual({ success: false, message });
+    expect(res.body).toEqual({ success: false, message, code: expect.any(String) });
   });
 });
 
@@ -50,7 +50,7 @@ describe("POST /api/auth/login", () => {
     const res = await api().post("/api/auth/login").send({ email, password: "wrong-password" });
 
     expect(res.status).toBe(401);
-    expect(res.body).toEqual({ success: false, message: "Invalid email or password" });
+    expect(res.body).toEqual({ success: false, message: "Invalid email or password", code: expect.any(String) });
   });
 
   it("gives the same 401 for an unknown email", async () => {
@@ -76,7 +76,7 @@ describe("GET /api/auth/me", () => {
   it("refuses a request without a token (401)", async () => {
     const res = await api().get("/api/auth/me");
     expect(res.status).toBe(401);
-    expect(res.body).toEqual({ success: false, message: "Not authorized, token missing" });
+    expect(res.body).toEqual({ success: false, message: "Not authorized, token missing", code: expect.any(String) });
   });
 
   it("refuses an invalid token (401)", async () => {

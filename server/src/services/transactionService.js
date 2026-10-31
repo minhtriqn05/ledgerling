@@ -16,7 +16,7 @@ const CATEGORY_FIELDS = "name color icon";
 // The category must belong to the same user, otherwise it looks like it does not exist (404)
 async function findOwnedCategory(userId, categoryId) {
   const category = await Category.findOne({ _id: categoryId, userId });
-  if (!category) throw httpError(404, "Category not found");
+  if (!category) throw httpError(404, "Category not found", "CATEGORY_NOT_FOUND");
   return category;
 }
 
@@ -112,7 +112,7 @@ async function findOwned(userId, id) {
     "categoryId",
     CATEGORY_FIELDS
   );
-  if (!transaction) throw httpError(404, "Transaction not found");
+  if (!transaction) throw httpError(404, "Transaction not found", "TRANSACTION_NOT_FOUND");
   return transaction;
 }
 
@@ -160,7 +160,12 @@ export async function importTransactions(userId, rows, errors) {
   for (const { row, categoryName, ...data } of rows) {
     const category = byNameAndType.get(`${data.type}:${categoryName.toLowerCase()}`);
     if (!category) {
-      allErrors.push({ row, message: `Category "${categoryName}" (${data.type}) not found` });
+      allErrors.push({
+        row,
+        message: `Category "${categoryName}" (${data.type}) not found`,
+        code: "IMPORT_CATEGORY_NOT_FOUND",
+        params: { name: categoryName, type: data.type },
+      });
       continue;
     }
     docs.push({ ...data, userId, categoryId: category._id });

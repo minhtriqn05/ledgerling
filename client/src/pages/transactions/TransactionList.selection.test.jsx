@@ -70,10 +70,13 @@ describe('TransactionList selection', () => {
     expect(box.indeterminate).toBe(true);
   });
 
-  it('shows the category icon, or the first letter on the phone list when there is none', () => {
+  it('shows an icon tile on every row, never the first letter, also for a category without an icon', () => {
     renderList();
-    expect(screen.getAllByText('🍜').length).toBeGreaterThan(0);
-    expect(screen.getByText('B')).toBeInTheDocument(); // Bills has no icon
+    // Each row has one tile in the table and one in the phone list
+    const rows = screen.getAllByTestId('transaction-row');
+    expect(screen.getAllByTestId('category-mark').length).toBe(rows.length * 2);
+    screen.getAllByTestId('category-mark').forEach((mark) => expect(mark.querySelector('svg')).toBeInTheDocument());
+    expect(screen.queryByText('B')).not.toBeInTheDocument(); // Bills has no icon
   });
 });
 

@@ -17,14 +17,15 @@ never feel monotonous.
 
 Principles:
 
-1. **Light first.** Cool off-white page, white cards, a light sky band behind each page header.
+1. **Light first.** A pale sky-grey canvas with white floating panels (sidebar, cards) and a soft
+   sky-to-mint banner that holds each page title.
 2. **One vivid hero per screen:** the sky-to-teal gradient card holds the number to read first
    (total balance). Everything else stays light.
 3. **Accent rhythm:** every card title has a small icon tile in its own accent color
    (sky, sun, mint, periwinkle…), so color repeats in a calm, predictable way.
 4. **Color with meaning:** green = income, coral = expense, category colors = identity.
    Amounts always carry `+` / `−`, so color is never the only signal.
-5. **Soft shapes:** 20px cards, pill buttons and chips, capsule chart bars, smooth curves.
+5. **Soft shapes:** 20px cards, pill buttons and chips, capsule chart bars, smooth curves, line icons.
 6. **Readable:** every text color passes WCAG AA (4.5:1) on its background.
 7. Light mode only for the MVP. Dark mode is a possible bonus feature later.
 
@@ -46,7 +47,8 @@ Principles:
 | v2 | Cream + orange (Mera) | Orange felt too loud for daily use and sat close to the expense red. |
 | v3 | Sage green on soft paper | Too dark and muted; the ochre category color was disliked; charts looked like library defaults. |
 | v4 | Sky & Mint, pastel | Brighter and softer; charts redesigned in the asklepios style. Felt a bit monotonous. |
-| **v5 (current)** | **Sky & Mint + accents** | Vivid sky-to-teal hero, colored icon tiles, savings ring, tinted summary cards, category stripes and bars. All MVP screens designed. |
+| v5 | Sky & Mint + accents | Vivid sky-to-teal hero, colored icon tiles, savings ring, tinted summary cards, category stripes and bars. All MVP screens designed. |
+| **v6 (current)** | **Sky & Mint, refined + motion** | New "Ruled L" logo (`docs/brand/`), floating sidebar on a deeper canvas, banner page headers, pill rows, tight negative-spread shadows, short motion, line icons for categories instead of letters, 8 languages. Ideas from porto-exp, see `docs/brand/inspiration.md`. |
 
 ## 3. Color palette
 
@@ -61,19 +63,21 @@ Principles:
 | `--color-hero-text-soft` | white 80% | Large text on the hero only (the `₫` unit) |
 | `--color-hero-decor` | white 12% | The two soft circles on the hero and the login panel |
 | `--gradient-soft` | `#dceefc` → `#e3f6ed` | Pastel sky-to-mint: savings card, empty states |
-| `--gradient-page-top` | `#e4f0fb` → transparent | Light sky band behind each page header (320px tall) |
+| `--gradient-banner` | `#d9ebfb` → `#dff3ec` (115°) | The page header banner (`PageHeader`) |
+| `--color-logo-accent` | `#a9efcf` | The ruled lines of the logo mark |
 
 ### Surfaces, text and borders
 
 | Token | Value | Contrast (white / page bg) | Use |
 |---|---|---|---|
-| `--color-bg` | `#f4f7fa` | – | Page background |
+| `--color-bg` | `#edf3f8` | – | The canvas behind the floating panels |
 | `--color-surface` | `#ffffff` | – | Cards, tables, inputs, sidebar |
-| `--color-surface-muted` | `#eff4f8` | – | Table header, row hover, progress tracks |
+| `--color-surface-muted` | `#f1f5f9` | – | Pill rows of the transaction list, hover states |
+| `--color-skeleton` | `#e6edf4` | – | Loading placeholders (the shimmer runs over it) |
 | `--color-overlay` | navy 45% | – | Behind dialogs |
 | `--color-text` | `#172534` | 15.6 / 14.5 | Main text, headings, big numbers |
 | `--color-text-secondary` | `#4a5868` | 7.3 / 6.8 | Labels, captions, subtitles on the sky band |
-| `--color-text-muted` | `#617082` | 5.1 / 4.7 | Hints, dates, axis labels – only on white or the page bg |
+| `--color-text-muted` | `#5b6a7c` | 5.5 / 4.6 | Hints, dates, axis labels – only on white or the canvas |
 | `--color-border` / `--color-border-strong` | `#e3eaf1` / `#c9d5e0` | – | Dividers and card borders / input borders |
 
 ### Income and expense
@@ -99,7 +103,7 @@ Six accent colors reuse the category hues: `--accent-sky` (chart-1), `--accent-c
 | Element | Background | Foreground |
 |---|---|---|
 | Icon tile | 15% tone on white | 62% tone + ink (icons: 3.8:1 or more) |
-| Category avatar (letter) | 15% tone on white | 50% tone + ink (text: 4.8:1 or more) |
+| Category mark (line icon) | 16% tone on white | 62% tone + ink (icons: 3.8:1 or more) |
 | Category chip | 14% tone on white | `--color-text` |
 | Tinted summary card | 10% tone, border 22% tone | money text color |
 | Alert | 12% tone | icon 62% tone + ink, text `--color-text` |
@@ -113,39 +117,74 @@ Eight presets in a **fixed order**: sky `#4a9fe3`, coral `#f07d62`, teal `#22ada
 apricot `#f19a52`, periwinkle `#7d8ce8`, mint `#3db383`, cornflower `#5d7fd8`, lime `#94c24f`
 (`--chart-1` … `--chart-8`). Checked for color blindness including the donut wrap-around: worst
 neighbor pair ΔE 9.5 (color-blind) / 22.1 (normal vision). Most are below 3:1 on white, so a
-category color is always shown with its name (chip label, avatar letter, legend row).
+category color is always shown with its name (chip label, legend row) next to its icon tile.
+
+### Category icons
+
+Every category surface (cards, lists, chips, drawer, forms, budgets, reports) shows `CategoryMark`: a line icon
+from lucide-react on a light tint of the category color, in three sizes (`sm` 22px, `md` 32px, `lg` 40px).
+The registry is `client/src/utils/categoryIcons.js` (50 icons in 11 groups; the server keeps the same names).
+The icon is chosen in the category form (`IconPicker`, with "Auto"). Without a chosen icon the client guesses one
+from the name (English and Vietnamese words) and falls back to a tag icon, so a tile never shows a letter.
+Emoji saved by the earlier picker are shown as the matching line icon; nothing is rewritten in the database.
 
 ### Chart helpers
 
 `--chart-bar` `#8fc2ec` (pastel capsules), `--chart-bar-track` `#eef4fa`, `--chart-highlight`
-`#2874b5`, `--chart-grid` `#e3eaf1`, `--chart-axis` `#617082`.
+`#2874b5`, `--chart-grid` `#e3eaf1`, `--chart-axis` `#617082`. `--pattern-track` (pale diagonal stripes)
+is the free part of budget and goal progress bars.
 
 ## 4. Typography
 
 - **Font:** [Be Vietnam Pro](https://fonts.google.com/specimen/Be+Vietnam+Pro) (Google Fonts) 400 / 500 / 600 / 700,
-  loaded in `client/index.html`. Full Vietnamese diacritics. One font for the whole product.
+  loaded in `client/index.html`. Full Vietnamese diacritics. One font for the whole product. It has no Chinese,
+  Japanese or Korean letters, so `:lang(zh-CN)`, `:lang(ja)` and `:lang(ko)` switch `--font-sans` to a stack that adds
+  the system font of that script (`--font-sans-zh` / `-ja` / `-ko`); `<html lang>` follows the chosen language.
 - Sizes: `--font-size-xs` 12 · `sm` 14 (body) · `md` 16 (card titles) · `lg` 20 · `xl` 24 (page titles,
   stat numbers) · `2xl` 32 · `3xl` 36 (the hero number).
 - Big numbers: bold + `--letter-spacing-tight` (-0.02em); the `₫` unit is 0.55em and secondary.
 - Amounts in lists use `font-variant-numeric: tabular-nums`.
-- Formatting helpers (`client/src/utils/format.js`): `formatVnd` → `12.450.000 ₫`,
-  `formatSignedVnd` → `+18.500.000 ₫`, `formatCompact` → `13.6M`, `formatDate` → `25 Oct 2026`,
-  `formatDayMonth` → `25 Oct` (Vietnam time).
+- Formatting helpers (`client/src/utils/format.js`) use `Intl` with the locale of the chosen language; the unit stays
+  VND and dates stay in Vietnam time: `formatVnd` → `12,450,000 ₫` (English) / `12.450.000 ₫` (Tiếng Việt, Deutsch),
+  `formatSignedVnd` → `+18,500,000 ₫`, `formatCompact` → `13.6M`, `formatPercent` → `86.3%` / `86,3 %`,
+  `formatDate` → `25 Oct 2026` / `2026年10月25日`, `formatDayMonth` → `25 Oct`.
 
 ## 5. Spacing, radius and shadows
 
 - 4px scale: `--space-1` 4 · `2` 8 · `3` 12 · `4` 16 · `5` 24 · `6` 32 · `7` 48 (px).
 - Radius: `--radius-sm` 8 (swatches) · `md` 12 (inputs, tiles, avatars, tooltips) · `lg` 20 (cards,
-  dialogs) · `xl` 28 (app frame) · `full` (buttons, pills, chips, capsules).
-- Shadows: `--shadow-sm` cards at rest · `--shadow-md` hero, frame, tooltips · `--shadow-lg` dialogs,
-  floating cards.
+  dialogs) · `xl` 24 (sidebar, page banner, drawer) · `full` (buttons, pills, chips, capsules).
+- Shadows use a negative spread, so they stay tight under the element instead of a grey halo:
+  `--shadow-sm` cards at rest · `--shadow-md` hero, hovered cards, tooltips · `--shadow-lg` dialogs, drawer, floating
+  cards · `--shadow-primary` / `--shadow-danger` primary and danger buttons (a lit top edge plus a shadow in their own color).
+
+## 5b. Motion
+
+Library: `motion` (`motion/react`). One curve, `--ease-out` `cubic-bezier(0.22, 0.61, 0.36, 1)`, and three durations:
+`--duration-fast` 150ms (hover, press), `--duration-base` 220ms (menu pill, cards), `--duration-slow` 320ms (drawer).
+Movements stay within 150–400ms; only the skeleton shimmer repeats while data loads.
+
+- **Page change:** the content fades in and rises 8px (`AppLayout`).
+- **Lists and cards:** a short stagger (`components/Motion/Reveal.jsx`); summary numbers count up (`CountUp.jsx`).
+- **Hover and press:** cards lift 2px; buttons scale to 0.97 (icon buttons 0.92) while pressed.
+- **Menu:** the active pill is measured from the open link and slides between items, so it fits every language.
+- **Charts:** Recharts draws bars and lines in 400ms; skeletons shimmer over `--color-skeleton`.
+- **Dialogs, drawer and toasts:** enter and leave with a fade and a small slide or scale; the transaction drawer
+  slides in from the right (full width on phones).
+- **prefers-reduced-motion:** `MotionConfig reducedMotion="user"` in `main.jsx`, `useReducedMotion()` in the
+  components and a rule in `global.css` stop the movement; things then appear at once. An E2E test covers it.
 
 ## 6. Layout
 
-- **App frame:** sidebar (240px, white) + main area (32px padding, sky band at the top).
-- **Sidebar:** gradient logo tile, nav items (Dashboard, Transactions, Categories) with line icons,
-  active item = primary-soft background + primary-text; a "Saved in October" card (pastel wash +
-  mint progress ring); user block (sun-tinted initials) and "Log out" at the bottom.
+- **App frame:** a floating white sidebar (248px, `--radius-xl`, `--frame-gap` 12px around it) on the `--color-bg`
+  canvas + the main area (32px padding).
+- **Sidebar:** the logo (`components/Logo/`: the mark + the wordmark drawn as strokes), nav items with line icons,
+  active item = primary-soft pill + primary-text; the language switcher; user block (sun-tinted initials) and
+  "Log out" at the bottom.
+- **Logo:** "Ruled L", see `docs/brand/README.md`. The same mark is the favicon and the PWA icons.
+- **Language switcher** (`components/LanguageSwitcher/`): a native select with the lucide "languages" icon, each language written in
+  its own language. In the sidebar, in the phone menu and on Login / Register. English is the default; the choice
+  is kept in localStorage.
 - **Navigation items:** one array, `navItems` in `client/src/config/navItems.js` (`label`, `path`, optional
   `icon`). Adding a page to the menu is one new line there plus its route in `App.jsx`.
 - **Active page:** primary-soft background, primary-text, semibold, plus a 4px primary bar on the left
@@ -155,7 +194,8 @@ category color is always shown with its name (chip label, avatar letter, legend 
   **panel** under the bar (white, 20px radius, `--shadow-lg`) with the same items and "Log out" after a divider.
   The panel closes on Escape, on a click outside, or after choosing a link. Implemented in
   `client/src/components/AppLayout/`.
-- **Page header:** title + subtitle on the left; month picker pill and primary action on the right.
+- **Page header:** a soft banner (`--gradient-banner`, `--radius-xl`) with title + subtitle on the left and the month
+  picker pill and primary action on the right. It also sets the tab title ("Dashboard · Ledgerling").
 - **Breakpoints:** ≤1100px dashboard stats and the transactions summary cards in 2 columns (balance / net
   full width), categories form below the list; ≤960px all rows one column; <768px the sidebar turns into
   the top bar + menu panel; ≤760px summary cards stacked; ≤640px the transactions table becomes a list (a wider
@@ -167,16 +207,18 @@ category color is always shown with its name (chip label, avatar letter, legend 
 - **Dashboard:** greeting · hero card (total balance, change pill, white sparkline, two soft circles)
   · income and expense cards (accent tile, number, change, progress bar: % saved / % spent)
   · Cash flow · Spending by category (donut + rows with colored bars) · This week (big total +
-  capsule chart) · Recent transactions (avatar, note, category · date, signed amount, "View all").
+  capsule chart) · Recent transactions (category mark, note, category · date, signed amount, "View all").
 - **Transactions:** header with month picker · three tinted summary cards (income green, expense
-  coral, net sky) · filter bar (search, All/Income/Expense, category select) · table (avatar + note,
-  category chip, date, signed amount, edit/delete) · pagination. On phones the table becomes a list.
+  coral, net sky) · filter bar (search, All/Income/Expense, category select) · rows as rounded pills on
+  `--color-surface-muted` (category mark + note, category chip, date, signed amount, edit/delete) · pagination.
+  On phones the table becomes a list. A click on a row opens the **details drawer** (`TransactionDrawer`:
+  amount, category, date, note, tags, Edit and Delete; Escape or the X closes it).
 - **Add / edit transaction dialog:** Expense/Income switch (the active side takes the money color),
   big amount field in the type color, categories as colored chips (one selected, with a check),
   date and note, Cancel / Save.
 - **Categories:** Expense/Income switch with counts · cards with a 4px stripe in the category color,
-  avatar, edit/delete, transaction count, amount, share bar · "New category" form (name,
-  type, 8 color swatches in two rows, live chip preview). The count, amount and share bar come with
+  category mark, edit/delete, transaction count, amount, share bar · "New category" form (name,
+  type, icon picker, 8 color swatches in two rows, live chip preview). The count, amount and share bar come with
   Transactions; until then a card shows the avatar, the name and the two icon buttons.
   - **Edit:** the same form card becomes "Edit category" (edit icon tile); the Type switch is locked
     (the other side fades out) with the hint "Type can't be changed after a category is created.";
@@ -243,7 +285,11 @@ because SVG needs real color values.
 | `client/src/styles/tokens.css` | Every design value (colors, gradients, fonts, spacing, radius, shadows) |
 | `client/src/styles/global.css` | Base page styles (font, background, heading reset) |
 | `client/src/components/` | Shared React components used by the real pages (§8) |
-| `client/src/utils/format.js` | Money and date formatting |
+| `client/src/utils/format.js` | Money, number and date formatting (follows the language) |
+| `client/src/utils/categoryIcons.js` | Category icon registry, emoji mapping and the guess from the name |
+| `client/src/components/Motion/` | `Reveal` (stagger) and `CountUp` |
+| `client/src/i18n/`, `client/src/locales/` | i18next setup and the 8 translation files |
+| `docs/brand/` | Logo concepts, comparison, decision and inspiration notes |
 | `client/src/utils/cssVar.js` | Reads a token in JavaScript (for charts) |
 | `client/src/pages/StyleGuidePage.jsx` | The dev-only page with tabs |
 | `client/src/pages/styleGuide/` | Screen mocks, shared kit (`ui.module.css`), app frame, charts, icons, sample data |
