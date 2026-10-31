@@ -64,6 +64,12 @@
     "previousMonth": "이전 달",
     "previousYear": "이전 해"
   },
+  "datePicker": {
+    "clear": "지우기",
+    "dialog": "날짜 선택",
+    "placeholder": "날짜 선택",
+    "today": "오늘"
+  },
   "pager": {
     "label": "페이지 이동",
     "next": "다음",
@@ -257,10 +263,16 @@
     "action_one": "{{count}}행 가져오기",
     "action_other": "{{count}}행 가져오기",
     "allFine": "모든 행에 문제가 없습니다.",
+    "browse": "파일 찾아보기",
+    "change": "다른 파일 선택",
+    "dropNow": "놓으면 파일이 추가됩니다",
+    "dropOr": "또는",
+    "dropTitle": "CSV 파일을 여기로 끌어 오세요",
     "failedRows": "가져오지 못한 행",
     "failed_one": "{{count}}행을 가져오지 못했습니다.",
     "failed_other": "{{count}}행을 가져오지 못했습니다.",
     "file": "CSV 파일",
+    "fileSize": "{{size}} KB",
     "found_one": "{{count}}행을 찾았습니다.",
     "found_other": "{{count}}행을 찾았습니다.",
     "hint": "CSV 내보내기로 만든 파일을 사용하세요: Date, Type, Category, Amount, Currency, Note, Tags. 최대 {{max}}행. 파일의 모든 카테고리가 이미 있어야 합니다.",

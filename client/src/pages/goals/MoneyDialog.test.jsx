@@ -1,6 +1,7 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { pickDate } from '../../test/pickDate.js';
 import MoneyDialog from './MoneyDialog.jsx';
 import { addContribution } from '../../api/goals.js';
 
@@ -37,7 +38,7 @@ describe('MoneyDialog', () => {
 
     expect(screen.getByText('Add money', { selector: 'h2' })).toBeInTheDocument();
     await userEvent.type(screen.getByLabelText('Amount'), '300000');
-    fireEvent.change(screen.getByLabelText('Date'), { target: { value: '2026-10-28' } });
+    await pickDate('Date', '2026-10-28');
     await userEvent.type(screen.getByLabelText('Note'), ' Bonus ');
     await userEvent.click(screen.getByRole('button', { name: 'Add to goal' }));
 

@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { chooseOption } from './helpers/controls.js';
 
 // The UI upgrade: languages, category icons and the details drawer.
 
@@ -28,13 +29,13 @@ test('a first visit is in English, whatever the browser language', async ({ brow
 
   await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
-  await expect(page.getByTestId('language-select')).toHaveValue('en');
+  await expect(page.getByTestId('language-select')).toHaveAttribute('data-value', 'en');
   await context.close();
 });
 
 test('the language picker on the Login page changes the page, and server errors follow by their code', async ({ page }) => {
   await page.goto('/login');
-  await page.getByTestId('language-select').selectOption('vi');
+  await chooseOption(page.getByTestId('language-select'), 'Tiếng Việt');
 
   await expect(page.getByRole('heading', { name: 'Chào mừng trở lại' })).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute('lang', 'vi');
@@ -52,7 +53,7 @@ test('switching to Tiếng Việt translates the menu, and F5 keeps the language
   const nav = page.getByRole('navigation', { name: 'Main navigation' });
   await expect(nav.getByRole('link', { name: 'Transactions' })).toBeVisible();
 
-  await page.getByTestId('language-select').selectOption('vi');
+  await chooseOption(page.getByTestId('language-select'), 'Tiếng Việt');
 
   const translated = page.getByRole('navigation', { name: 'Điều hướng chính' });
   await expect(translated.getByRole('link', { name: 'Giao dịch' })).toBeVisible();
@@ -65,7 +66,7 @@ test('switching to Tiếng Việt translates the menu, and F5 keeps the language
   await openMenu(page, testInfo, 'Mở menu');
   await expect(translated.getByRole('link', { name: 'Giao dịch' })).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute('lang', 'vi');
-  await expect(page.getByTestId('language-select')).toHaveValue('vi');
+  await expect(page.getByTestId('language-select')).toHaveAttribute('data-value', 'vi');
 });
 
 test('category cards show an icon and never a letter, also for an old category without an icon', async ({ page }, testInfo) => {

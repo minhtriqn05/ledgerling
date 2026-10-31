@@ -64,6 +64,12 @@
     "previousMonth": "Previous month",
     "previousYear": "Previous year"
   },
+  "datePicker": {
+    "clear": "Clear",
+    "dialog": "Choose a date",
+    "placeholder": "Pick a date",
+    "today": "Today"
+  },
   "pager": {
     "label": "Pagination",
     "next": "Next",
@@ -257,10 +263,16 @@
     "action_one": "Import {{count}} row",
     "action_other": "Import {{count}} rows",
     "allFine": "All rows look fine.",
+    "browse": "browse your files",
+    "change": "Choose another file",
+    "dropNow": "Drop to add the file",
+    "dropOr": "or",
+    "dropTitle": "Drag your CSV file here",
     "failedRows": "Rows that were not imported",
     "failed_one": "{{count}} row could not be imported.",
     "failed_other": "{{count}} rows could not be imported.",
     "file": "CSV file",
+    "fileSize": "{{size}} KB",
     "found_one": "{{count}} row found.",
     "found_other": "{{count}} rows found.",
     "hint": "Use a file made by Export CSV: Date, Type, Category, Amount, Currency, Note, Tags. Up to {{max}} rows. Every category in the file must already exist.",

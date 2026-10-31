@@ -64,6 +64,12 @@
     "previousMonth": "Mois précédent",
     "previousYear": "Année précédente"
   },
+  "datePicker": {
+    "clear": "Effacer",
+    "dialog": "Choisir une date",
+    "placeholder": "Choisir une date",
+    "today": "Aujourd'hui"
+  },
   "pager": {
     "label": "Pagination",
     "next": "Suivant",
@@ -257,10 +263,16 @@
     "action_one": "Importer {{count}} ligne",
     "action_other": "Importer {{count}} lignes",
     "allFine": "Toutes les lignes sont correctes.",
+    "browse": "parcourez vos fichiers",
+    "change": "Choisir un autre fichier",
+    "dropNow": "Relâchez pour ajouter le fichier",
+    "dropOr": "ou",
+    "dropTitle": "Glissez votre fichier CSV ici",
     "failedRows": "Lignes non importées",
     "failed_one": "{{count}} ligne n'a pas pu être importée.",
     "failed_other": "{{count}} lignes n'ont pas pu être importées.",
     "file": "Fichier CSV",
+    "fileSize": "{{size}} Ko",
     "found_one": "{{count}} ligne trouvée.",
     "found_other": "{{count}} lignes trouvées.",
     "hint": "Utilisez un fichier créé par Exporter en CSV : Date, Type, Category, Amount, Currency, Note, Tags. {{max}} lignes maximum. Toutes les catégories du fichier doivent déjà exister.",

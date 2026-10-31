@@ -1,29 +1,27 @@
 import { useTranslation } from 'react-i18next';
 import { Languages } from 'lucide-react';
 import { LANGUAGES } from '../../i18n/languages.js';
+import Select from '../Select/Select.jsx';
 import styles from './LanguageSwitcher.module.css';
 
+const OPTIONS = LANGUAGES.map((language) => ({ value: language.code, label: language.name, lang: language.code }));
+
 // The language picker. i18next stores the choice in localStorage and changes <html lang> (see i18n/index.js).
-// A native <select>, so it works with the keyboard and uses the phone's own list.
+// Each language is written in its own language; the list is our Select (keyboard, typeahead, animated).
 export default function LanguageSwitcher({ className = '' }) {
   const { t, i18n } = useTranslation();
 
   return (
-    <label className={`${styles.switcher} ${className}`}>
-      <Languages size={16} aria-hidden="true" />
-      <span className={styles.srOnly}>{t('language.label')}</span>
-      <select
-        className={styles.select}
+    <div className={`${styles.switcher} ${className}`}>
+      <Select
+        variant="pill"
+        label={t('language.label')}
+        icon={<Languages size={16} aria-hidden="true" />}
         value={i18n.resolvedLanguage}
+        options={OPTIONS}
+        onChange={(code) => i18n.changeLanguage(code)}
         data-testid="language-select"
-        onChange={(event) => i18n.changeLanguage(event.target.value)}
-      >
-        {LANGUAGES.map((language) => (
-          <option key={language.code} value={language.code} lang={language.code}>
-            {language.name}
-          </option>
-        ))}
-      </select>
-    </label>
+      />
+    </div>
   );
 }

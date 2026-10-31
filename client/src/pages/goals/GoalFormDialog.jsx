@@ -13,6 +13,7 @@ import Icon from '../../components/Icon.jsx';
 // Same fields as the "Add transaction" dialog, so it uses the same styles
 import fields from '../transactions/TransactionFormDialog.module.css';
 import styles from './GoalFormDialog.module.css';
+import DatePicker from '../../components/DatePicker/DatePicker.jsx';
 
 // The 8 preset colors, in the fixed order of docs/ui-style.md (--chart-1 … --chart-8 in tokens.css),
 // the same ones as the categories.
@@ -115,12 +116,11 @@ export default function GoalFormDialog({ goal, onSaved, onClose }) {
           <label className={fields.label} htmlFor="goal-deadline">
             {t('goals.deadline')}
           </label>
-          <input
+          <DatePicker
             id="goal-deadline"
-            className={fields.input}
-            type="date"
+            clearable
             value={deadline}
-            onChange={(event) => setDeadline(event.target.value)}
+            onChange={setDeadline}
           />
         </div>
 

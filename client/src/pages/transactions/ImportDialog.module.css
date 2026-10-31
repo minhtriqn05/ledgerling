@@ -18,19 +18,118 @@
   color: var(--color-text-secondary);
 }
 
-.file {
-  width: 100%;
-  padding: var(--space-2) var(--space-3);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-md);
-  color: var(--color-text);
+/* ---------- Drop zone ---------- */
+/* A dashed card; the whole card opens the file chooser and accepts a dropped file. */
+.zone {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 92px;
+  padding: var(--space-4);
+  border: 1.5px dashed var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-muted);
+  cursor: pointer;
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    background var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out),
+    transform var(--duration-base) var(--ease-out);
 }
 
-.file:focus {
-  outline: none;
+.zone:hover {
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary-soft) 60%, var(--color-surface));
+}
+
+.zone:focus-within {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+/* A file is being dragged over the zone */
+.dragging {
+  border-style: solid;
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+  transform: scale(1.01);
+}
+
+.hasFile {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--color-income) 40%, var(--color-border));
+  background: color-mix(in srgb, var(--color-income-soft) 55%, var(--color-surface));
+}
+
+.zone[aria-disabled='true'] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* The real <input type="file">: hidden from view, still reachable with the keyboard and screen readers */
+.fileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.zoneContent {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.zoneIcon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.fileIcon {
+  color: var(--color-income-text);
+}
+
+.zoneText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  font-size: var(--font-size-sm);
+}
+
+.zoneText strong {
+  font-weight: var(--font-weight-semibold);
+}
+
+.fileName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.zoneHint {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.browse {
+  color: var(--color-primary-text);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .hint {

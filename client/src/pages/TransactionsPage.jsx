@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { AnimatePresence } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import { getCategories } from '../api/categories.js';
 import { deleteTransaction, exportTransactions, getTransactions } from '../api/transactions.js';
@@ -20,6 +20,8 @@ import EmptyState from '../components/EmptyState/EmptyState.jsx';
 import LoadingState from '../components/LoadingState/LoadingState.jsx';
 import ErrorState from '../components/ErrorState/ErrorState.jsx';
 import Icon from '../components/Icon.jsx';
+import Select from '../components/Select/Select.jsx';
+import DatePicker from '../components/DatePicker/DatePicker.jsx';
 import TransactionList from './transactions/TransactionList.jsx';
 import TransactionFormDialog from './transactions/TransactionFormDialog.jsx';
 import TransactionDrawer from './transactions/TransactionDrawer.jsx';
@@ -299,13 +301,11 @@ export default function TransactionsPage() {
   }
 
   // Keep From <= To: moving one past the other drags the other along.
-  function changeFrom(event) {
-    const value = event.target.value;
+  function changeFrom(value) {
     updateFilters({ from: value, ...(value && to && value > to ? { to: value } : {}) });
   }
 
-  function changeTo(event) {
-    const value = event.target.value;
+  function changeTo(value) {
     updateFilters({ to: value, ...(value && from && value < from ? { from: value } : {}) });
   }
 
@@ -500,6 +500,17 @@ export default function TransactionsPage() {
 
   const period = hasRange ? formatRange(from, to, t) : formatMonth(month);
 
+  // "All categories", then the categories grouped by type (a group without categories is left out)
+  const categoryOptions = [
+    { value: 'all', label: t('transactions.allCategories') },
+    ...['expense', 'income']
+      .map((type) => ({
+        group: t(`common.${type}`),
+        options: categories.filter((c) => c.type === type).map((c) => ({ value: c._id, label: categoryLabel(c) })),
+      }))
+      .filter((group) => group.options.length > 0),
+  ];
+
   return (
     <div className={styles.page}>
       <PageHeader
@@ -544,57 +555,62 @@ export default function TransactionsPage() {
               aria-label={t('transactions.searchNotes')}
               maxLength={100}
             />
+            <AnimatePresence>
+              {searchInput && (
+                <motion.button
+                  type="button"
+                  className={styles.searchClear}
+                  aria-label={t('transactions.clearSearch')}
+                  onClick={() => {
+                    clearSearch();
+                    searchRef.current?.focus();
+                  }}
+                  initial={{ opacity: 0, scale: 0.6 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.6 }}
+                  transition={{ duration: 0.15 }}
+                >
+                  <Icon name="x" size={14} />
+                </motion.button>
+              )}
+            </AnimatePresence>
           </span>
-          <label className={styles.field}>
-            <span className={styles.filterLabel}>{t('common.category')}</span>
-            <select
+          <div className={styles.field}>
+            <label className={styles.filterLabel} htmlFor="filter-category">
+              {t('common.category')}
+            </label>
+            <Select
+              id="filter-category"
               className={styles.select}
               value={categoryId}
-              onChange={(event) => updateFilters({ category: event.target.value })}
-            >
-              <option value="all">{t('transactions.allCategories')}</option>
-              <optgroup label={t('common.expense')}>
-                {categories
-                  .filter((c) => c.type === 'expense')
-                  .map((c) => (
-                    <option key={c._id} value={c._id}>
-                      {categoryLabel(c)}
-                    </option>
-                  ))}
-              </optgroup>
-              <optgroup label={t('common.income')}>
-                {categories
-                  .filter((c) => c.type === 'income')
-                  .map((c) => (
-                    <option key={c._id} value={c._id}>
-                      {categoryLabel(c)}
-                    </option>
-                  ))}
-              </optgroup>
-            </select>
-          </label>
-          <label className={styles.field}>
-            <span className={styles.filterLabel}>{t('transactions.sortLabel')}</span>
-            <select
+              options={categoryOptions}
+              onChange={(value) => updateFilters({ category: value })}
+            />
+          </div>
+          <div className={styles.field}>
+            <label className={styles.filterLabel} htmlFor="filter-sort">
+              {t('transactions.sortLabel')}
+            </label>
+            <Select
+              id="filter-sort"
               className={styles.select}
               value={sort}
-              onChange={(event) => updateFilters({ sort: event.target.value })}
-            >
-              {SORT_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {t(`transactions.sort.${option.key}`)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className={styles.field}>
-            <span className={styles.filterLabel}>{t('transactions.from')}</span>
-            <input className={styles.select} type="date" value={from} max={to || undefined} onChange={changeFrom} />
-          </label>
-          <label className={styles.field}>
-            <span className={styles.filterLabel}>{t('transactions.to')}</span>
-            <input className={styles.select} type="date" value={to} min={from || undefined} onChange={changeTo} />
-          </label>
+              options={SORT_OPTIONS.map((option) => ({ value: option.value, label: t(`transactions.sort.${option.key}`) }))}
+              onChange={(value) => updateFilters({ sort: value })}
+            />
+          </div>
+          <div className={styles.field}>
+            <label className={styles.filterLabel} htmlFor="filter-from">
+              {t('transactions.from')}
+            </label>
+            <DatePicker id="filter-from" className={styles.select} value={from} max={to || undefined} onChange={changeFrom} clearable />
+          </div>
+          <div className={styles.field}>
+            <label className={styles.filterLabel} htmlFor="filter-to">
+              {t('transactions.to')}
+            </label>
+            <DatePicker id="filter-to" className={styles.select} value={to} min={from || undefined} onChange={changeTo} clearable />
+          </div>
           {tag && (
             <span className={styles.activeTag}>
               {t('transactions.tagFilter', { tag })}
