@@ -1,7 +1,8 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
+import { pickDate } from '../../test/pickDate.js';
 import RuleFormDialog from './RuleFormDialog.jsx';
 import { createRecurringRule, updateRecurringRule } from '../../api/recurring.js';
 
@@ -36,11 +37,6 @@ function renderDialog(rule = null) {
   return handlers;
 }
 
-// A date input is simplest to change with one event
-function setDate(label, value) {
-  fireEvent.change(screen.getByLabelText(label), { target: { value } });
-}
-
 beforeAll(() => {
   // jsdom has no <dialog> behaviour yet; the Modal only needs showModal to exist
   HTMLDialogElement.prototype.showModal ??= function showModal() {
@@ -59,7 +55,7 @@ describe('RuleFormDialog', () => {
 
     await userEvent.type(screen.getByLabelText('Amount'), '3500000');
     await userEvent.click(screen.getByRole('button', { name: 'Bills' }));
-    setDate('Start date', '2026-08-31');
+    await pickDate('Start date', '2026-08-31');
     await userEvent.type(screen.getByLabelText('Note'), ' Rent ');
     await userEvent.click(screen.getByRole('button', { name: 'Save rule' }));
 
@@ -95,8 +91,8 @@ describe('RuleFormDialog', () => {
     expect(screen.getByText('Please choose a category.')).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', { name: 'Bills' }));
-    setDate('Start date', '2026-10-10');
-    setDate('End date (optional)', '2026-10-10');
+    await pickDate('Start date', '2026-10-10');
+    await pickDate('End date (optional)', '2026-10-10');
     await userEvent.click(save);
     expect(screen.getByText('The end date must be after the start date.')).toBeInTheDocument();
     expect(createRecurringRule).not.toHaveBeenCalled();
@@ -106,10 +102,10 @@ describe('RuleFormDialog', () => {
     const text = 'In shorter months this rule runs on the last day of the month.';
     renderDialog();
 
-    setDate('Start date', '2026-10-28');
+    await pickDate('Start date', '2026-10-28');
     expect(screen.queryByText(text)).not.toBeInTheDocument();
 
-    setDate('Start date', '2026-10-31');
+    await pickDate('Start date', '2026-10-31');
     expect(screen.getByText(text)).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', { name: 'Weekly' }));
@@ -125,7 +121,7 @@ describe('RuleFormDialog', () => {
     expect(screen.getByLabelText('End date (optional)')).toHaveValue('2027-08-10');
     expect(screen.getByText('Transactions already created stay as they are.')).toBeInTheDocument();
 
-    setDate('End date (optional)', '');
+    await pickDate('End date (optional)', '');
     await userEvent.click(screen.getByRole('button', { name: 'Save changes' }));
 
     expect(updateRecurringRule).toHaveBeenCalledWith('r1', {

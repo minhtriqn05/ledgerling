@@ -1,5 +1,5 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ImportDialog from './ImportDialog.jsx';
 import { importTransactions } from '../../api/transactions.js';
@@ -90,6 +90,21 @@ describe('ImportDialog', () => {
       'Row 2: Category "Groceries" (expense) not found'
     );
     expect(screen.getByRole('button', { name: 'Done' })).toBeInTheDocument();
+  });
+
+  it('reads a file dropped on the drop zone and shows its name', async () => {
+    renderDialog();
+    const zone = screen.getByText('Drag your CSV file here').closest('div[class*="zone"]');
+
+    fireEvent.dragOver(zone, { dataTransfer: { files: [] } });
+    expect(screen.getByText('Drop to add the file')).toBeInTheDocument();
+    fireEvent.drop(zone, { dataTransfer: { files: [csvFile(HEADER, GOOD)] } });
+
+    expect(await screen.findByText(/1 row found\./)).toBeInTheDocument();
+    // The empty state fades out before the file appears
+    expect(await screen.findByText('ledgerling-2026-10.csv')).toBeInTheDocument();
+    expect(screen.getByText('Choose another file')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Import 1 row' })).toBeEnabled();
   });
 
   it('refuses a file without the needed columns', async () => {

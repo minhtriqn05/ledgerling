@@ -1,5 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
+import { FileSpreadsheet, UploadCloud } from 'lucide-react';
 import { importTransactions } from '../../api/transactions.js';
 import { getErrorMessage, translateApiError } from '../../api/axios.js';
 import { formatNumber } from '../../utils/format.js';
@@ -11,6 +13,7 @@ import styles from './ImportDialog.module.css';
 
 // A CSV file is a few dozen kB for 500 rows; anything much bigger is not a Ledgerling export.
 const MAX_FILE_BYTES = 1024 * 1024;
+const EASE = [0.22, 0.61, 0.36, 1];
 
 // "Import CSV" dialog in three steps: choose a file -> preview (rows with a problem are marked) -> result.
 // The file is read in the browser (papaparse); only its rows are sent to the API.
@@ -23,18 +26,21 @@ export default function ImportDialog({ categories, onImported, onClose }) {
   const [importError, setImportError] = useState('');
   const [importing, setImporting] = useState(false);
   const [result, setResult] = useState(null); // { imported, failed, errors } from the API
+  const [chosen, setChosen] = useState(null); // { name, size } of the file, shown in the drop zone
+  const [dragging, setDragging] = useState(false);
+  const inputRef = useRef(null);
 
   // One message per row ('' = fine). Checked again by the server; this only marks the rows in the preview.
   const problems = useMemo(() => (rows ? rows.map((row) => validateImportRow(row, categories)) : []), [rows, categories]);
   const validCount = problems.filter((problem) => !problem).length;
   const badCount = problems.length - validCount;
 
-  async function handleFile(event) {
-    const file = event.target.files[0];
+  async function readFile(file) {
     setRows(null);
     setFileError('');
     setImportError('');
     if (!file) return;
+    setChosen({ name: file.name, size: file.size });
     if (file.size > MAX_FILE_BYTES) {
       setFileError(t('import.tooBig'));
       return;
@@ -47,6 +53,32 @@ export default function ImportDialog({ categories, onImported, onClose }) {
     } catch {
       setFileError(t('import.unreadable'));
     }
+  }
+
+  function handleFileInput(event) {
+    readFile(event.target.files[0]);
+    event.target.value = ''; // the same file can be chosen again
+  }
+
+  // The whole zone opens the file chooser (the input inside it is only visible to screen readers)
+  function handleZoneClick(event) {
+    if (event.target !== inputRef.current && !importing) inputRef.current.click();
+  }
+
+  function handleDragOver(event) {
+    event.preventDefault();
+    if (!importing) setDragging(true);
+  }
+
+  function handleDragLeave(event) {
+    if (!event.currentTarget.contains(event.relatedTarget)) setDragging(false);
+  }
+
+  function handleDrop(event) {
+    event.preventDefault();
+    event.stopPropagation(); // dropped on the zone: the dialog body below must not read it a second time
+    setDragging(false);
+    if (!importing) readFile(event.dataTransfer.files[0]);
   }
 
   async function handleImport() {
@@ -91,21 +123,80 @@ export default function ImportDialog({ categories, onImported, onClose }) {
 
   return (
     <Modal title={t('import.title')} onClose={onClose} busy={importing} wide>
-      <div className={styles.body}>
+      {/* A file dropped beside the zone is read too, instead of the browser opening it and leaving the app */}
+      <div className={styles.body} onDragOver={(event) => event.preventDefault()} onDrop={handleDrop}>
         <div className={styles.field}>
           <label className={styles.label} htmlFor="import-file">
             {t('import.file')}
           </label>
-          <input
-            id="import-file"
-            className={styles.file}
-            type="file"
-            accept=".csv,text/csv"
-            onChange={handleFile}
-            disabled={importing}
-            data-autofocus
-          />
-          <p className={styles.hint}>
+          <div
+            className={`${styles.zone} ${dragging ? styles.dragging : ''} ${rows ? styles.hasFile : ''}`}
+            onClick={handleZoneClick}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            aria-disabled={importing || undefined}
+          >
+            <input
+              ref={inputRef}
+              id="import-file"
+              className={styles.fileInput}
+              type="file"
+              accept=".csv,text/csv"
+              onChange={handleFileInput}
+              disabled={importing}
+              aria-describedby="import-hint"
+              data-autofocus
+            />
+            <AnimatePresence mode="wait" initial={false}>
+              {chosen && !dragging ? (
+                <motion.div
+                  key="file"
+                  className={styles.zoneContent}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.18, ease: EASE }}
+                >
+                  <span className={`${styles.zoneIcon} ${styles.fileIcon}`}>
+                    <FileSpreadsheet size={22} aria-hidden="true" />
+                  </span>
+                  <span className={styles.zoneText}>
+                    <strong className={styles.fileName}>{chosen.name}</strong>
+                    <span className={styles.zoneHint}>
+                      {t('import.fileSize', { size: formatNumber(Math.max(1, Math.round(chosen.size / 1024))) })}
+                      {' · '}
+                      <span className={styles.browse}>{t('import.change')}</span>
+                    </span>
+                  </span>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="empty"
+                  className={styles.zoneContent}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.18, ease: EASE }}
+                >
+                  <motion.span
+                    className={styles.zoneIcon}
+                    animate={dragging ? { y: -4, scale: 1.08 } : { y: 0, scale: 1 }}
+                    transition={{ duration: 0.22, ease: EASE }}
+                  >
+                    <UploadCloud size={22} aria-hidden="true" />
+                  </motion.span>
+                  <span className={styles.zoneText}>
+                    <strong>{dragging ? t('import.dropNow') : t('import.dropTitle')}</strong>
+                    <span className={styles.zoneHint}>
+                      {t('import.dropOr')} <span className={styles.browse}>{t('import.browse')}</span>
+                    </span>
+                  </span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+          <p id="import-hint" className={styles.hint}>
             {t('import.hint', { max: MAX_IMPORT_ROWS })}
           </p>
         </div>

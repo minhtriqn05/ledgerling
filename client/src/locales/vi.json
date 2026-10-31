@@ -64,6 +64,12 @@
     "previousMonth": "Tháng trước",
     "previousYear": "Năm trước"
   },
+  "datePicker": {
+    "clear": "Xoá",
+    "dialog": "Chọn ngày",
+    "placeholder": "Chọn ngày",
+    "today": "Hôm nay"
+  },
   "pager": {
     "label": "Phân trang",
     "next": "Sau",
@@ -257,10 +263,16 @@
     "action_one": "Nhập {{count}} dòng",
     "action_other": "Nhập {{count}} dòng",
     "allFine": "Tất cả các dòng đều hợp lệ.",
+    "browse": "chọn tệp từ máy",
+    "change": "Chọn tệp khác",
+    "dropNow": "Thả ra để thêm tệp",
+    "dropOr": "hoặc",
+    "dropTitle": "Kéo tệp CSV vào đây",
     "failedRows": "Các dòng không nhập được",
     "failed_one": "{{count}} dòng không nhập được.",
     "failed_other": "{{count}} dòng không nhập được.",
     "file": "Tệp CSV",
+    "fileSize": "{{size}} KB",
     "found_one": "Tìm thấy {{count}} dòng.",
     "found_other": "Tìm thấy {{count}} dòng.",
     "hint": "Dùng tệp tạo từ Xuất CSV, gồm các cột: Date, Type, Category, Amount, Currency, Note, Tags. Tối đa {{max}} dòng. Mọi danh mục trong tệp phải có sẵn.",

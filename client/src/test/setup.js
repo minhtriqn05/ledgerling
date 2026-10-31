@@ -19,3 +19,9 @@ window.matchMedia = (query) => ({
 afterEach(() => {
   cleanup();
 });
+
+// jsdom hides every [popover] but has no showPopover() to open one. The panels of Select and DatePicker are
+// only rendered while open, so here they are simply shown.
+const popoverStyle = document.createElement('style');
+popoverStyle.textContent = '[popover] { display: block !important; }';
+document.head.appendChild(popoverStyle);

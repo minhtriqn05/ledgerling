@@ -10,6 +10,7 @@ import Button from '../../components/Button/Button.jsx';
 import Alert from '../../components/Alert/Alert.jsx';
 // Same fields as the "Add transaction" dialog, so it uses the same styles
 import styles from '../transactions/TransactionFormDialog.module.css';
+import DatePicker from '../../components/DatePicker/DatePicker.jsx';
 
 // "Add money" (mode 'add') or "Withdraw money" (mode 'withdraw') dialog for one goal.
 // The server gets a positive amount for a deposit and a negative one for a withdrawal.
@@ -83,13 +84,11 @@ export default function MoneyDialog({ goal, mode, onSaved, onClose }) {
           <label className={styles.label} htmlFor="money-date">
             {t('common.date')}
           </label>
-          <input
+          <DatePicker
             id="money-date"
-            className={styles.input}
-            type="date"
             max={todayInput()}
             value={date}
-            onChange={(event) => setDate(event.target.value)}
+            onChange={setDate}
           />
         </div>
 

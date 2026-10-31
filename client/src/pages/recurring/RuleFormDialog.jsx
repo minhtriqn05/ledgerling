@@ -14,6 +14,7 @@ import Icon from '../../components/Icon.jsx';
 import CategoryMark from '../../components/CategoryMark/CategoryMark.jsx';
 // Same fields as the "Add transaction" dialog, so it uses the same styles
 import styles from '../transactions/TransactionFormDialog.module.css';
+import DatePicker from '../../components/DatePicker/DatePicker.jsx';
 
 // "Add rule" dialog, or "Edit rule" when `rule` is given.
 // The page mounts it only while it is open, so the fields start from the props each time.
@@ -153,24 +154,21 @@ export default function RuleFormDialog({ rule, categories, onSaved, onClose }) {
             <label className={styles.label} htmlFor="rule-start">
               {t('recurring.startDate')}
             </label>
-            <input
+            <DatePicker
               id="rule-start"
-              className={styles.input}
-              type="date"
               value={startDate}
-              onChange={(event) => setStartDate(event.target.value)}
+              onChange={setStartDate}
             />
           </div>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="rule-end">
               {t('recurring.endDate')}
             </label>
-            <input
+            <DatePicker
               id="rule-end"
-              className={styles.input}
-              type="date"
+              clearable
               value={endDate}
-              onChange={(event) => setEndDate(event.target.value)}
+              onChange={setEndDate}
             />
           </div>
         </div>

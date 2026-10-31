@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { dateField } from './helpers/controls.js';
 
 // The API Playwright starts (see playwright.config.js). Used to put data in quickly, so each test only
 // clicks through the part it is about.
@@ -114,7 +115,7 @@ test('the + button opens Quick add on any page; "salary 15tr yesterday" picks an
   await expect(dialog.getByRole('button', { name: 'Salary' })).toHaveAttribute('aria-pressed', 'true');
 
   const yesterday = new Date(Date.now() + 7 * 3600 * 1000 - 24 * 3600 * 1000).toISOString().slice(0, 10);
-  await expect(dialog.getByLabel('Date')).toHaveValue(yesterday);
+  await expect(dateField(dialog, 'Date')).toHaveAttribute('data-value', yesterday);
 
   await dialog.getByRole('button', { name: 'Save transaction' }).click();
   await expect(dialog).toBeHidden();

@@ -64,6 +64,12 @@
     "previousMonth": "Vorheriger Monat",
     "previousYear": "Vorheriges Jahr"
   },
+  "datePicker": {
+    "clear": "Leeren",
+    "dialog": "Datum wählen",
+    "placeholder": "Datum wählen",
+    "today": "Heute"
+  },
   "pager": {
     "label": "Seitennavigation",
     "next": "Weiter",
@@ -257,10 +263,16 @@
     "action_one": "{{count}} Zeile importieren",
     "action_other": "{{count}} Zeilen importieren",
     "allFine": "Alle Zeilen sehen gut aus.",
+    "browse": "Dateien durchsuchen",
+    "change": "Andere Datei wählen",
+    "dropNow": "Loslassen, um die Datei hinzuzufügen",
+    "dropOr": "oder",
+    "dropTitle": "CSV-Datei hierher ziehen",
     "failedRows": "Nicht importierte Zeilen",
     "failed_one": "{{count}} Zeile konnte nicht importiert werden.",
     "failed_other": "{{count}} Zeilen konnten nicht importiert werden.",
     "file": "CSV-Datei",
+    "fileSize": "{{size}} KB",
     "found_one": "{{count}} Zeile gefunden.",
     "found_other": "{{count}} Zeilen gefunden.",
     "hint": "Verwende eine Datei aus „CSV exportieren“: Date, Type, Category, Amount, Currency, Note, Tags. Höchstens {{max}} Zeilen. Alle Kategorien der Datei müssen bereits existieren.",

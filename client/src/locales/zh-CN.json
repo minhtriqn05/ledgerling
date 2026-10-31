@@ -64,6 +64,12 @@
     "previousMonth": "上个月",
     "previousYear": "上一年"
   },
+  "datePicker": {
+    "clear": "清除",
+    "dialog": "选择日期",
+    "placeholder": "选择日期",
+    "today": "今天"
+  },
   "pager": {
     "label": "分页",
     "next": "下一页",
@@ -257,10 +263,16 @@
     "action_one": "导入 {{count}} 行",
     "action_other": "导入 {{count}} 行",
     "allFine": "所有行都没有问题。",
+    "browse": "浏览文件",
+    "change": "选择其他文件",
+    "dropNow": "松开即可添加文件",
+    "dropOr": "或",
+    "dropTitle": "将 CSV 文件拖到这里",
     "failedRows": "未导入的行",
     "failed_one": "{{count}} 行未能导入。",
     "failed_other": "{{count}} 行未能导入。",
     "file": "CSV 文件",
+    "fileSize": "{{size}} KB",
     "found_one": "找到 {{count}} 行。",
     "found_other": "找到 {{count}} 行。",
     "hint": "请使用“导出 CSV”生成的文件：Date、Type、Category、Amount、Currency、Note、Tags。最多 {{max}} 行。文件中的分类必须已存在。",

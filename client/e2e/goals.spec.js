@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { dateField, pickDate } from './helpers/controls.js';
 
 // The API started by playwright.config.js (in-memory database)
 const API_URL = 'http://localhost:4100/api';
@@ -43,7 +44,7 @@ async function addGoal(page, { name, target, deadline }) {
   const dialog = page.getByRole('dialog', { name: 'New goal' });
   await dialog.getByLabel('Name').fill(name);
   await dialog.getByLabel('Target amount').fill(String(target));
-  if (deadline) await dialog.getByLabel('Deadline (optional)').fill(deadline);
+  if (deadline) await pickDate(dialog, 'Deadline (optional)', deadline);
   await dialog.getByRole('button', { name: 'Save goal' }).click();
   await expect(dialog).toBeHidden();
 }
@@ -79,12 +80,12 @@ test('create a goal → add money → the progress grows → saving the rest sho
   await expect(dialog.getByText('Please enter a name.')).toBeVisible();
   await dialog.getByLabel('Name').fill('Laptop');
   await dialog.getByLabel('Target amount').fill('1000000');
-  await dialog.getByLabel('Deadline (optional)').fill(dayFromToday(0));
+  await pickDate(dialog, 'Deadline (optional)', dayFromToday(0));
   await dialog.getByRole('button', { name: 'Save goal' }).click();
   await expect(dialog.getByText('The deadline must be after today.')).toBeVisible();
 
   // 3. A valid goal: it starts at 0% with the deadline, the days left and the monthly line
-  await dialog.getByLabel('Deadline (optional)').fill(dayFromToday(45));
+  await pickDate(dialog, 'Deadline (optional)', dayFromToday(45));
   await dialog.getByRole('button', { name: 'Save goal' }).click();
   await expect(dialog).toBeHidden();
   await expect(page.getByText('Goal added')).toBeVisible();
@@ -195,7 +196,7 @@ test('edit a goal, see completed goals move to the end, then delete a goal', asy
   const editDialog = page.getByRole('dialog', { name: 'Edit goal' });
   await expect(editDialog.getByLabel('Name')).toHaveValue('Bike');
   await expect(editDialog.getByLabel('Target amount')).toHaveValue('3,000,000');
-  await expect(editDialog.getByLabel('Deadline (optional)')).toHaveValue(dayFromToday(90));
+  await expect(dateField(editDialog, 'Deadline (optional)')).toHaveAttribute('data-value', dayFromToday(90));
   await editDialog.getByLabel('Name').fill('Electric bike');
   await editDialog.getByLabel('Target amount').fill('4000000');
   await editDialog.getByRole('button', { name: 'Save changes' }).click();

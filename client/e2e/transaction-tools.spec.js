@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import { expect, test } from '@playwright/test';
+import { chooseOption } from './helpers/controls.js';
 
 // The API Playwright starts (see playwright.config.js). Used to put data in quickly, so each test only
 // clicks through the part it is about.
@@ -78,7 +79,7 @@ test('search, page through the results and keep the filters after F5', async ({ 
   await expect(visibleNotes(page, /^Coffee \d+$/)).toHaveCount(10);
 
   // A new filter goes back to page 1; Clear filters empties the search box and the URL
-  await page.getByLabel('Sort').selectOption('amount');
+  await chooseOption(page.getByLabel('Sort'), 'Lowest amount');
   await expect(page).toHaveURL(/sort=amount/);
   await expect(page).not.toHaveURL(/page=/);
   await expect(page.getByText('Page 1 of 2')).toBeVisible();

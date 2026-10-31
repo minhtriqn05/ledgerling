@@ -1,0 +1,165 @@
+.select {
+  position: relative;
+  display: inline-flex;
+  min-width: 0;
+}
+
+/* ---------- The button ---------- */
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-width: 0;
+  height: var(--control-height);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    background var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.trigger > svg:first-child:not(.chevron) {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+}
+
+.trigger:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--color-primary) 45%, var(--color-border-strong));
+}
+
+.trigger:focus-visible,
+.trigger[aria-expanded='true'] {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+.trigger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chevron {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  transition: transform var(--duration-base) var(--ease-out), color var(--duration-fast) var(--ease-out);
+}
+
+.trigger[aria-expanded='true'] .chevron {
+  transform: rotate(180deg);
+  color: var(--color-primary);
+}
+
+/* The rounded variant (language switcher) */
+.pill .trigger {
+  min-height: 36px;
+  height: auto;
+  border-color: var(--color-border);
+  border-radius: var(--radius-full);
+  color: var(--color-text);
+  font-weight: var(--font-weight-medium);
+}
+
+.pill .trigger:hover:not(:disabled) {
+  background: var(--color-surface-muted);
+}
+
+/* ---------- The list ---------- */
+.panel {
+  max-width: min(360px, calc(100vw - 16px));
+}
+
+.list,
+.groupList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.groupLabel {
+  padding: var(--space-2) var(--space-3) var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+li[role='presentation'] + li[role='presentation'] .groupLabel {
+  margin-top: var(--space-1);
+  border-top: 1px solid var(--color-border);
+}
+
+.option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 36px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  user-select: none;
+}
+
+/* The soft pill that slides behind the highlighted option */
+.highlight {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-muted);
+}
+
+.optionLabel,
+.check {
+  position: relative;
+  z-index: 1;
+}
+
+.optionLabel {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.active .optionLabel {
+  transform: translateX(2px);
+}
+
+.selected {
+  color: var(--color-primary-text);
+  font-weight: var(--font-weight-semibold);
+}
+
+.selected .highlight {
+  background: var(--color-primary-soft);
+}
+
+.check {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: var(--color-primary);
+}

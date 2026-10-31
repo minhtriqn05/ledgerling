@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { dateField, pickDate } from './helpers/controls.js';
 
 // Playwright runs in Node, and the app's date helpers now need the browser (they follow the chosen language).
 // So the few this test needs are written here: dates as the app shows them in English, in Vietnam time.
@@ -54,7 +55,7 @@ test('create a rule that started last month → its transactions appear with the
   const dialog = page.getByRole('dialog', { name: 'Add rule' });
   await dialog.getByLabel('Amount').fill('3500000');
   await dialog.getByRole('button', { name: 'Bills' }).click();
-  await dialog.getByLabel('Start date').fill(`${lastMonth}-01`);
+  await pickDate(dialog, 'Start date', `${lastMonth}-01`);
   await dialog.getByLabel('Note').fill('Rent');
   await dialog.getByRole('button', { name: 'Save rule' }).click();
   await expect(dialog).toBeHidden();
@@ -108,7 +109,7 @@ test('turn a rule off and on, edit it, then delete it and keep its transactions'
   await addDialog.getByLabel('Amount').fill('200000');
   await addDialog.getByRole('button', { name: 'Income' }).click();
   await addDialog.getByRole('button', { name: 'Salary' }).click();
-  await addDialog.getByLabel('Start date').fill(`${lastMonth}-01`);
+  await pickDate(addDialog, 'Start date', `${lastMonth}-01`);
   await addDialog.getByLabel('Note').fill('Side job');
   await addDialog.getByRole('button', { name: 'Save rule' }).click();
   await expect(addDialog).toBeHidden();
@@ -126,7 +127,7 @@ test('turn a rule off and on, edit it, then delete it and keep its transactions'
   // 2. Edit: the form starts from the rule
   await page.getByRole('button', { name: 'Edit Side job' }).click();
   const editDialog = page.getByRole('dialog', { name: 'Edit rule' });
-  await expect(editDialog.getByLabel('Start date')).toHaveValue(`${lastMonth}-01`);
+  await expect(dateField(editDialog, 'Start date')).toHaveAttribute('data-value', `${lastMonth}-01`);
   await editDialog.getByLabel('Note').fill('Freelance');
   await editDialog.getByRole('button', { name: 'Weekly' }).click();
   await editDialog.getByRole('button', { name: 'Save changes' }).click();
@@ -161,7 +162,7 @@ test('a category with a rule cannot be deleted', async ({ page }, testInfo) => {
   const dialog = page.getByRole('dialog', { name: 'Add rule' });
   await dialog.getByLabel('Amount').fill('100000');
   await dialog.getByRole('button', { name: 'Shopping' }).click();
-  await dialog.getByLabel('Start date').fill(`${Number(currentMonth().slice(0, 4)) + 1}-01-15`);
+  await pickDate(dialog, 'Start date', `${Number(currentMonth().slice(0, 4)) + 1}-01-15`);
   await dialog.getByRole('button', { name: 'Save rule' }).click();
   await expect(dialog).toBeHidden();
 

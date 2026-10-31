@@ -16,6 +16,7 @@ import TagInput from '../../components/TagInput/TagInput.jsx';
 import Icon from '../../components/Icon.jsx';
 import CategoryMark from '../../components/CategoryMark/CategoryMark.jsx';
 import styles from './TransactionFormDialog.module.css';
+import DatePicker from '../../components/DatePicker/DatePicker.jsx';
 
 // "Add transaction" dialog, or "Edit transaction" when `transaction` is given.
 // The page mounts it only while it is open, so the fields start from the props each time.
@@ -170,12 +171,10 @@ export default function TransactionFormDialog({ transaction, categories, onSaved
             <label className={styles.label} htmlFor="transaction-date">
               {t('common.date')}
             </label>
-            <input
+            <DatePicker
               id="transaction-date"
-              className={styles.input}
-              type="date"
               value={date}
-              onChange={(event) => setDate(event.target.value)}
+              onChange={setDate}
             />
           </div>
           <div className={styles.field}>

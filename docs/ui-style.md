@@ -160,7 +160,7 @@ is the free part of budget and goal progress bars.
 
 ## 5b. Motion
 
-Library: `motion` (`motion/react`). One curve, `--ease-out` `cubic-bezier(0.22, 0.61, 0.36, 1)`, and three durations:
+Library: `motion` (`motion/react`). One main curve, `--ease-out` `cubic-bezier(0.22, 0.61, 0.36, 1)` (plus `--ease-pop` `cubic-bezier(0.34, 1.56, 0.64, 1)` for small "pop" moments), and three durations:
 `--duration-fast` 150ms (hover, press), `--duration-base` 220ms (menu pill, cards), `--duration-slow` 320ms (drawer).
 Movements stay within 150–400ms; only the skeleton shimmer repeats while data loads.
 
@@ -171,6 +171,9 @@ Movements stay within 150–400ms; only the skeleton shimmer repeats while data 
 - **Charts:** Recharts draws bars and lines in 400ms; skeletons shimmer over `--color-skeleton`.
 - **Dialogs, drawer and toasts:** enter and leave with a fade and a small slide or scale; the transaction drawer
   slides in from the right (full width on phones).
+- **Lists and calendars:** a `Select` list or a `DatePicker` calendar fades and scales in from its field (180ms);
+  a soft pill slides behind the highlighted option, the check mark of the chosen one pops in, the month grid slides
+  left or right. Checkboxes fill and their check pops in with `--ease-pop` (a small overshoot).
 - **prefers-reduced-motion:** `MotionConfig reducedMotion="user"` in `main.jsx`, `useReducedMotion()` in the
   components and a rule in `global.css` stop the movement; things then appear at once. An E2E test covers it.
 
@@ -182,8 +185,8 @@ Movements stay within 150–400ms; only the skeleton shimmer repeats while data 
   active item = primary-soft pill + primary-text; the language switcher; user block (sun-tinted initials) and
   "Log out" at the bottom.
 - **Logo:** "Ruled L", see `docs/brand/README.md`. The same mark is the favicon and the PWA icons.
-- **Language switcher** (`components/LanguageSwitcher/`): a native select with the lucide "languages" icon, each language written in
-  its own language. In the sidebar, in the phone menu and on Login / Register. English is the default; the choice
+- **Language switcher** (`components/LanguageSwitcher/`): our `Select` (pill variant) with the lucide "languages" icon, each
+  language written in its own language; the list opens upward when the sidebar has no room below. In the sidebar, in the phone menu and on Login / Register. English is the default; the choice
   is kept in localStorage.
 - **Navigation items:** one array, `navItems` in `client/src/config/navItems.js` (`label`, `path`, optional
   `icon`). Adding a page to the menu is one new line there plus its route in `App.jsx`.
@@ -254,6 +257,27 @@ The real pages use React components in `client/src/components/` that copy their 
 button and a click outside close it; an element with `data-autofocus` gets the focus). The Transactions page uses
 `Modal` for the add / edit form and for the delete confirmation.
 
+**Form controls – no browser defaults.** Every list, date, file field and checkbox is drawn by Ledgerling, so it
+looks the same in every browser and follows the chosen language:
+
+- `Popover`: the floating white card under a field (`--radius-md`, `--shadow-lg`). It is a browser popover, so it
+  shows in the top layer (above an open dialog, never cut off), opens above the field when there is no room below,
+  follows the field on scroll and closes on a click outside.
+- `Select` (`components/Select/`): replaces `<select>`. A combobox button that looks like an input (`field`) or a
+  pill (`pill`), a chevron that turns, a list with optional group titles (Transactions: All categories / Expense /
+  Income), a sliding highlight, a check on the chosen option. Keyboard: arrows, Home / End, Enter / Space, Escape,
+  typing a letter jumps to an option.
+- `DatePicker` (`components/DatePicker/`): replaces `<input type="date">`. The field shows the day in the user's
+  language ("25 Oct 2026"); the calendar has month arrows, weekdays from Monday, today with a dot, the chosen day as a
+  primary circle, days outside `min` / `max` struck through, and Today / Clear (Clear only for optional dates).
+  Keyboard: arrows, Home / End, Page Up / Page Down, Enter, Escape (closes the calendar, not the dialog).
+- **CSV drop zone** (Import dialog): a dashed card with a cloud icon; it turns sky while a file is dragged over it and
+  mint with the file name and size once a good file is read. The real file input stays inside it for the keyboard.
+- **Checkboxes** (global style in `global.css`): an 18px rounded box that fills with `--color-primary`; a bar for
+  "some selected".
+- The search box hides the browser's clear button and shows its own round × while there is text. Scrollbars are
+  thin, in `--color-border-strong`.
+
 **Toasts** (`components/Toast/` + `context/ToastContext.jsx`): small white cards in the top-right corner
 (full width minus 16px on phones) with a tinted icon tile (income green for success, expense coral for error),
 the message and a close button. They hide by themselves after 3 seconds. Any component calls
@@ -288,6 +312,7 @@ because SVG needs real color values.
 | `client/src/utils/format.js` | Money, number and date formatting (follows the language) |
 | `client/src/utils/categoryIcons.js` | Category icon registry, emoji mapping and the guess from the name |
 | `client/src/components/Motion/` | `Reveal` (stagger) and `CountUp` |
+| `client/src/components/Select/`, `DatePicker/`, `Popover/` | The form controls that replace the browser's own |
 | `client/src/i18n/`, `client/src/locales/` | i18next setup and the 8 translation files |
 | `docs/brand/` | Logo concepts, comparison, decision and inspiration notes |
 | `client/src/utils/cssVar.js` | Reads a token in JavaScript (for charts) |

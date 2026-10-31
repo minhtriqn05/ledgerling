@@ -64,6 +64,12 @@
     "previousMonth": "前月",
     "previousYear": "前年"
   },
+  "datePicker": {
+    "clear": "クリア",
+    "dialog": "日付を選択",
+    "placeholder": "日付を選択",
+    "today": "今日"
+  },
   "pager": {
     "label": "ページ送り",
     "next": "次へ",
@@ -257,10 +263,16 @@
     "action_one": "{{count}} 行を取り込む",
     "action_other": "{{count}} 行を取り込む",
     "allFine": "すべての行に問題はありません。",
+    "browse": "ファイルを選択",
+    "change": "別のファイルを選択",
+    "dropNow": "ドロップしてファイルを追加",
+    "dropOr": "または",
+    "dropTitle": "CSV ファイルをここにドラッグ",
     "failedRows": "取り込めなかった行",
     "failed_one": "{{count}} 行を取り込めませんでした。",
     "failed_other": "{{count}} 行を取り込めませんでした。",
     "file": "CSV ファイル",
+    "fileSize": "{{size}} KB",
     "found_one": "{{count}} 行見つかりました。",
     "found_other": "{{count}} 行見つかりました。",
     "hint": "「CSV を書き出す」で作成したファイルを使ってください：Date、Type、Category、Amount、Currency、Note、Tags。最大 {{max}} 行。ファイル内のカテゴリはすべて作成済みである必要があります。",

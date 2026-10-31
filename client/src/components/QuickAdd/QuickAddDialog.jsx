@@ -19,6 +19,7 @@ import CategoryMark from '../CategoryMark/CategoryMark.jsx';
 import Icon from '../Icon.jsx';
 import form from '../../pages/transactions/TransactionFormDialog.module.css';
 import styles from './QuickAddDialog.module.css';
+import DatePicker from '../DatePicker/DatePicker.jsx';
 
 // "Quick add" (the + button or the N key): a short form to add a transaction in a few seconds.
 //   1. Template chips: one click saves a transaction dated today.
@@ -271,12 +272,10 @@ export default function QuickAddDialog({ onSaved, onClose }) {
             <label className={form.label} htmlFor="quick-date">
               {t('common.date')}
             </label>
-            <input
+            <DatePicker
               id="quick-date"
-              className={form.input}
-              type="date"
               value={date}
-              onChange={(event) => setField('date', event.target.value)}
+              onChange={(day) => setField('date', day)}
               disabled={saving}
             />
           </div>
