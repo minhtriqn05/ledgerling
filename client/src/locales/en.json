@@ -49,6 +49,7 @@
     "openMenu": "Open menu",
     "recurring": "Recurring",
     "reports": "Reports",
+    "settings": "Settings",
     "transactions": "Transactions"
   },
   "language": {
@@ -544,6 +545,7 @@
       "weekly": "Weekly summary",
       "weeklyHint": "What you spent in the last 7 days, once a week"
     },
+    "settingsLink": "Notification settings",
     "settingsSaved": "Settings saved",
     "settingsText": "Choose which notifications you get. A kind that is off is not created at all.",
     "settingsTitle": "Notification settings",
@@ -584,6 +586,73 @@
     "unreadCount_other": "{{count}} unread",
     "viewAll": "View all notifications"
   },
+  "settings": {
+    "subtitle": "Your profile, account security and how Ledgerling looks and behaves.",
+    "profile": {
+      "title": "Profile",
+      "text": "Your name appears in the menu.",
+      "emailHint": "Your email is what you log in with, so it can't be changed here.",
+      "saved": "Name updated"
+    },
+    "password": {
+      "title": "Password",
+      "text": "Changing it logs you out of every other device.",
+      "current": "Current password",
+      "new": "New password",
+      "confirm": "Repeat new password",
+      "strength": "Password strength",
+      "weak": "Weak",
+      "medium": "Medium",
+      "strong": "Strong",
+      "hint": "Use at least 8 characters. Mixing letters, numbers and symbols makes it stronger.",
+      "enterCurrent": "Please enter your current password.",
+      "tooShort": "New password must be at least 8 characters.",
+      "mismatch": "The two new passwords don't match.",
+      "submit": "Change password",
+      "changing": "Changing…",
+      "changed": "Password changed. Other devices were logged out."
+    },
+    "sessions": {
+      "title": "Sessions",
+      "text": "Signed in somewhere you don't recognise? Log out of every other device. This device stays signed in.",
+      "logoutOthers": "Log out of all other devices",
+      "working": "Logging out…",
+      "done": "Logged out of all other devices."
+    },
+    "appearance": {
+      "title": "Appearance",
+      "text": "Pick a theme. System follows your device.",
+      "theme": "Theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "preferences": {
+      "title": "Preferences",
+      "text": "How calendars are arranged.",
+      "weekStartsOn": "Week starts on",
+      "monday": "Monday",
+      "sunday": "Sunday",
+      "weekHint": "The calendar in Reports starts its weeks on this day.",
+      "saved": "Preference saved"
+    },
+    "data": {
+      "title": "Your data",
+      "text": "Download everything you have in Ledgerling as one JSON file: profile, categories, transactions, budgets, recurring rules, goals and templates. Your password is never included.",
+      "download": "Download my data",
+      "working": "Preparing…",
+      "done": "Your data was downloaded."
+    },
+    "danger": {
+      "title": "Danger zone",
+      "text": "Deleting your account removes your profile and all your data for good. This can't be undone.",
+      "typeToConfirm": "Type {{word}} to confirm",
+      "password": "Your password",
+      "submit": "Delete my account",
+      "deleting": "Deleting…",
+      "deleted": "Your account was deleted."
+    }
+  },
   "errors": {
     "AMOUNT_INVALID": "Amount must be greater than 0",
     "BUDGET_EXISTS": "Budget already exists for this category and month",
@@ -598,6 +667,7 @@
     "CONFLICT": "This conflicts with something you already have",
     "CONTRIBUTION_NOT_FOUND": "Entry not found",
     "CURRENCY_INVALID": "Currency must be a 3-letter ISO code",
+    "CURRENT_PASSWORD_REQUIRED": "Current password is required",
     "DATE_INVALID": "Date is invalid, use YYYY-MM-DD HH:mm or ISO 8601",
     "DEADLINE_IN_PAST": "Deadline must be after today",
     "DEPOSIT_IN_USE": "Deleting this deposit would make the saved amount negative",
@@ -616,12 +686,14 @@
     "NAME_REQUIRED": "Name is required",
     "NAME_TOO_LONG": "This name is too long",
     "NETWORK": "Cannot reach the server. Please try again.",
+    "NEW_PASSWORD_TOO_SHORT": "New password must be at least 8 characters",
     "NOTE_TOO_LONG": "Note must be at most 200 characters",
-    "NOT_FOUND": "Not found",
     "NOTIFICATION_NOT_FOUND": "Notification not found",
+    "NOT_FOUND": "Not found",
     "PASSWORD_REQUIRED": "Password is required",
     "PASSWORD_TOO_LONG": "Password must be at most 72 characters",
     "PASSWORD_TOO_SHORT": "Password must be at least 6 characters",
+    "PASSWORD_UNCHANGED": "New password must be different from the current one",
     "ROUTE_NOT_FOUND": "Not found",
     "RULE_NOT_FOUND": "Recurring rule not found",
     "TAG_INVALID": "Each tag must be 1-20 letters, digits or hyphens",
@@ -636,6 +708,7 @@
     "UNAUTHORIZED": "Please log in to continue.",
     "UNKNOWN": "Something went wrong. Please try again.",
     "VALIDATION_ERROR": "Please check the values you entered.",
-    "WITHDRAW_TOO_MUCH": "You cannot withdraw more than the saved amount"
+    "WITHDRAW_TOO_MUCH": "You cannot withdraw more than the saved amount",
+    "WRONG_PASSWORD": "The password is incorrect"
   }
 }

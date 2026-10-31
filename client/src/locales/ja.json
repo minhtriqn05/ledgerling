@@ -49,6 +49,7 @@
     "openMenu": "メニューを開く",
     "recurring": "定期",
     "reports": "レポート",
+    "settings": "設定",
     "transactions": "取引"
   },
   "language": {
@@ -544,6 +545,7 @@
       "weekly": "週のまとめ",
       "weeklyHint": "過去 7 日間の支出を週に 1 回"
     },
+    "settingsLink": "通知設定",
     "settingsSaved": "設定を保存しました",
     "settingsText": "受け取る通知を選びます。オフにした種類は作成されません。",
     "settingsTitle": "通知の設定",
@@ -584,6 +586,73 @@
     "unreadCount_other": "未読 {{count}} 件",
     "viewAll": "すべての通知を見る"
   },
+  "settings": {
+    "subtitle": "プロフィール、アカウントのセキュリティ、Ledgerling の見た目と動作。",
+    "profile": {
+      "title": "プロフィール",
+      "text": "名前はメニューに表示されます。",
+      "emailHint": "メールアドレスはログインに使うため、ここでは変更できません。",
+      "saved": "名前を更新しました"
+    },
+    "password": {
+      "title": "パスワード",
+      "text": "変更すると、他のすべての端末からログアウトされます。",
+      "current": "現在のパスワード",
+      "new": "新しいパスワード",
+      "confirm": "新しいパスワード（確認）",
+      "strength": "パスワードの強度",
+      "weak": "弱い",
+      "medium": "普通",
+      "strong": "強い",
+      "hint": "8 文字以上にしてください。英字・数字・記号を組み合わせると強くなります。",
+      "enterCurrent": "現在のパスワードを入力してください。",
+      "tooShort": "新しいパスワードは 8 文字以上にしてください。",
+      "mismatch": "新しいパスワードが一致しません。",
+      "submit": "パスワードを変更",
+      "changing": "変更中…",
+      "changed": "パスワードを変更しました。他の端末はログアウトされました。"
+    },
+    "sessions": {
+      "title": "セッション",
+      "text": "心当たりのない端末でログインしていませんか？他のすべての端末をログアウトできます。この端末はログインしたままです。",
+      "logoutOthers": "他のすべての端末をログアウト",
+      "working": "ログアウト中…",
+      "done": "他のすべての端末をログアウトしました。"
+    },
+    "appearance": {
+      "title": "外観",
+      "text": "テーマを選びます。「システム」は端末の設定に合わせます。",
+      "theme": "テーマ",
+      "light": "ライト",
+      "dark": "ダーク",
+      "system": "システム"
+    },
+    "preferences": {
+      "title": "環境設定",
+      "text": "カレンダーの並び方です。",
+      "weekStartsOn": "週の始まり",
+      "monday": "月曜日",
+      "sunday": "日曜日",
+      "weekHint": "レポートのカレンダーは、この曜日から始まります。",
+      "saved": "設定を保存しました"
+    },
+    "data": {
+      "title": "データ",
+      "text": "Ledgerling にあるすべてのデータを 1 つの JSON ファイルとしてダウンロードできます（プロフィール、カテゴリ、取引、予算、定期ルール、目標、テンプレート）。パスワードは含まれません。",
+      "download": "データをダウンロード",
+      "working": "準備中…",
+      "done": "データをダウンロードしました。"
+    },
+    "danger": {
+      "title": "危険な操作",
+      "text": "アカウントを削除すると、プロフィールとすべてのデータが完全に削除されます。元に戻せません。",
+      "typeToConfirm": "確認のため {{word}} と入力してください",
+      "password": "パスワード",
+      "submit": "アカウントを削除",
+      "deleting": "削除中…",
+      "deleted": "アカウントを削除しました。"
+    }
+  },
   "errors": {
     "AMOUNT_INVALID": "金額は 0 より大きくしてください",
     "BUDGET_EXISTS": "このカテゴリと月の予算はすでにあります",
@@ -598,6 +667,7 @@
     "CONFLICT": "既存のデータと競合しています",
     "CONTRIBUTION_NOT_FOUND": "履歴が見つかりません",
     "CURRENCY_INVALID": "通貨は 3 文字の ISO コードで指定してください",
+    "CURRENT_PASSWORD_REQUIRED": "現在のパスワードが必要です",
     "DATE_INVALID": "日付が無効です。YYYY-MM-DD HH:mm または ISO 8601 を使ってください",
     "DEADLINE_IN_PAST": "期限は明日以降にしてください",
     "DEPOSIT_IN_USE": "この入金を削除すると貯蓄額がマイナスになります",
@@ -616,12 +686,14 @@
     "NAME_REQUIRED": "名前は必須です",
     "NAME_TOO_LONG": "名前が長すぎます",
     "NETWORK": "サーバーに接続できません。もう一度お試しください。",
+    "NEW_PASSWORD_TOO_SHORT": "新しいパスワードは 8 文字以上にしてください",
     "NOTE_TOO_LONG": "メモは 200 文字以内で入力してください",
-    "NOT_FOUND": "見つかりません",
     "NOTIFICATION_NOT_FOUND": "通知が見つかりません",
+    "NOT_FOUND": "見つかりません",
     "PASSWORD_REQUIRED": "パスワードは必須です",
     "PASSWORD_TOO_LONG": "パスワードは 72 文字以内で入力してください",
     "PASSWORD_TOO_SHORT": "パスワードは 6 文字以上で入力してください",
+    "PASSWORD_UNCHANGED": "新しいパスワードは現在のものと異なる必要があります",
     "ROUTE_NOT_FOUND": "見つかりません",
     "RULE_NOT_FOUND": "定期ルールが見つかりません",
     "TAG_INVALID": "タグは 1〜20 文字の英字、数字、ハイフンで入力してください",
@@ -636,6 +708,7 @@
     "UNAUTHORIZED": "続けるにはログインしてください。",
     "UNKNOWN": "問題が発生しました。もう一度お試しください。",
     "VALIDATION_ERROR": "入力内容を確認してください。",
-    "WITHDRAW_TOO_MUCH": "貯蓄額を超えて出金することはできません"
+    "WITHDRAW_TOO_MUCH": "貯蓄額を超えて出金することはできません",
+    "WRONG_PASSWORD": "パスワードが正しくありません"
   }
 }

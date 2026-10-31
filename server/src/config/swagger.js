@@ -54,7 +54,7 @@ const options = {
         description:
           "In-app notifications of the signed-in user: budget at 80% and 100%, a goal reached, recurring transactions added and a weekly summary. Each event notifies once (dedupeKey), and a type the user turned off in Users > preferences is never created.",
       },
-      { name: "Users", description: "The signed-in user's own settings" },
+      { name: "Users", description: "The signed-in user's own profile, password, preferences, data export and account deletion" },
     ],
     components: {
       securitySchemes: {
@@ -100,6 +100,9 @@ const options = {
             preferences: {
               type: "object",
               properties: {
+                theme: { type: "string", enum: ["light", "dark", "system"], example: "system" },
+                weekStartsOn: { type: "string", enum: ["monday", "sunday"], example: "monday" },
+                language: { type: "string", enum: ["en", "vi", "fr", "de", "es", "zh-CN", "ja", "ko"], description: "Absent until the user picks one", example: "vi" },
                 notifications: {
                   type: "object",
                   description: "false = that kind of notification is never created. All true by default.",

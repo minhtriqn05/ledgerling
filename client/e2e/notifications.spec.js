@@ -120,10 +120,12 @@ test('a switch that is off creates no notification of that kind', async ({ page 
   test.setTimeout(120000);
   await register(page, testInfo, 'switch');
 
-  // 1. The Notification settings are on the Notifications page; the page is empty for a new account
+  // 1. The Notifications page is empty for a new account; the switches are in Settings
   await page.goto('/notifications');
   await expect(page.getByRole('heading', { name: 'Notifications', level: 1 })).toBeVisible();
   await expect(page.getByRole('heading', { name: "You're all caught up" })).toBeVisible();
+  await page.getByRole('button', { name: 'Notification settings' }).click();
+  await expect(page.getByRole('heading', { name: 'Settings', level: 1 })).toBeVisible();
   const budgetSwitch = page.getByRole('checkbox', { name: /^Budgets/ });
   await expect(budgetSwitch).toBeChecked();
 
@@ -139,8 +141,11 @@ test('a switch that is off creates no notification of that kind', async ({ page 
   await page.reload();
   await expect(bell(page)).toBeVisible();
 
-  // 4. The choice is kept after a reload; turn Budgets on again
+  // 4. The choice is kept after a reload; turn Budgets on again. The Notifications page is opened first: listing
+  //    the notifications is what makes this week's summary.
   await page.goto('/notifications');
+  await expect(page.getByText('Your week in numbers')).toBeVisible();
+  await page.goto('/settings');
   await expect(budgetSwitch).not.toBeChecked();
   await budgetSwitch.check();
   await expect(budgetSwitch).toBeChecked();

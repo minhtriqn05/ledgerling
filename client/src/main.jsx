@@ -6,6 +6,7 @@ import './i18n/index.js';
 import App from './App.jsx';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary.jsx';
 import { AuthProvider } from './context/AuthContext.jsx';
+import { ThemeProvider } from './context/ThemeContext.jsx';
 import { ToastProvider } from './context/ToastContext.jsx';
 import './styles/tokens.css';
 import './styles/global.css';
@@ -16,11 +17,13 @@ createRoot(document.getElementById('root')).render(
       {/* reducedMotion="user": motion components follow the prefers-reduced-motion setting of the system */}
       <MotionConfig reducedMotion="user">
         <BrowserRouter>
-          <AuthProvider>
-            <ToastProvider>
-              <App />
-            </ToastProvider>
-          </AuthProvider>
+          <ThemeProvider>
+            <AuthProvider>
+              <ToastProvider>
+                <App />
+              </ToastProvider>
+            </AuthProvider>
+          </ThemeProvider>
         </BrowserRouter>
       </MotionConfig>
     </ErrorBoundary>

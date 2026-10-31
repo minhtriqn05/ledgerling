@@ -49,6 +49,7 @@
     "openMenu": "Mở menu",
     "recurring": "Định kỳ",
     "reports": "Báo cáo",
+    "settings": "Cài đặt",
     "transactions": "Giao dịch"
   },
   "language": {
@@ -544,6 +545,7 @@
       "weekly": "Tóm tắt tuần",
       "weeklyHint": "Số tiền đã chi trong 7 ngày qua, mỗi tuần một lần"
     },
+    "settingsLink": "Cài đặt thông báo",
     "settingsSaved": "Đã lưu cài đặt",
     "settingsText": "Chọn loại thông báo bạn muốn nhận. Loại đã tắt sẽ hoàn toàn không được tạo.",
     "settingsTitle": "Cài đặt thông báo",
@@ -584,6 +586,73 @@
     "unreadCount_other": "{{count}} chưa đọc",
     "viewAll": "Xem tất cả thông báo"
   },
+  "settings": {
+    "subtitle": "Hồ sơ, bảo mật tài khoản và cách Ledgerling hiển thị, hoạt động.",
+    "profile": {
+      "title": "Hồ sơ",
+      "text": "Tên của bạn hiển thị trong menu.",
+      "emailHint": "Email là thông tin đăng nhập nên không thể đổi ở đây.",
+      "saved": "Đã cập nhật tên"
+    },
+    "password": {
+      "title": "Mật khẩu",
+      "text": "Đổi mật khẩu sẽ đăng xuất mọi thiết bị khác.",
+      "current": "Mật khẩu hiện tại",
+      "new": "Mật khẩu mới",
+      "confirm": "Nhập lại mật khẩu mới",
+      "strength": "Độ mạnh mật khẩu",
+      "weak": "Yếu",
+      "medium": "Trung bình",
+      "strong": "Mạnh",
+      "hint": "Dùng ít nhất 8 ký tự. Kết hợp chữ, số và ký hiệu sẽ mạnh hơn.",
+      "enterCurrent": "Vui lòng nhập mật khẩu hiện tại.",
+      "tooShort": "Mật khẩu mới phải có ít nhất 8 ký tự.",
+      "mismatch": "Hai mật khẩu mới không khớp nhau.",
+      "submit": "Đổi mật khẩu",
+      "changing": "Đang đổi…",
+      "changed": "Đã đổi mật khẩu. Các thiết bị khác đã bị đăng xuất."
+    },
+    "sessions": {
+      "title": "Phiên đăng nhập",
+      "text": "Thấy đăng nhập ở nơi lạ? Hãy đăng xuất mọi thiết bị khác. Thiết bị này vẫn giữ đăng nhập.",
+      "logoutOthers": "Đăng xuất mọi thiết bị khác",
+      "working": "Đang đăng xuất…",
+      "done": "Đã đăng xuất mọi thiết bị khác."
+    },
+    "appearance": {
+      "title": "Giao diện",
+      "text": "Chọn giao diện. Hệ thống sẽ theo thiết bị của bạn.",
+      "theme": "Giao diện",
+      "light": "Sáng",
+      "dark": "Tối",
+      "system": "Hệ thống"
+    },
+    "preferences": {
+      "title": "Tùy chọn",
+      "text": "Cách sắp xếp lịch.",
+      "weekStartsOn": "Tuần bắt đầu từ",
+      "monday": "Thứ Hai",
+      "sunday": "Chủ nhật",
+      "weekHint": "Lịch trong mục Báo cáo bắt đầu mỗi tuần vào ngày này.",
+      "saved": "Đã lưu tùy chọn"
+    },
+    "data": {
+      "title": "Dữ liệu của bạn",
+      "text": "Tải xuống toàn bộ dữ liệu của bạn trong Ledgerling thành một tệp JSON: hồ sơ, danh mục, giao dịch, ngân sách, giao dịch định kỳ, mục tiêu và mẫu. Mật khẩu không bao giờ nằm trong tệp.",
+      "download": "Tải dữ liệu của tôi",
+      "working": "Đang chuẩn bị…",
+      "done": "Đã tải dữ liệu của bạn xuống."
+    },
+    "danger": {
+      "title": "Vùng nguy hiểm",
+      "text": "Xóa tài khoản sẽ xóa vĩnh viễn hồ sơ và toàn bộ dữ liệu của bạn. Không thể hoàn tác.",
+      "typeToConfirm": "Gõ {{word}} để xác nhận",
+      "password": "Mật khẩu của bạn",
+      "submit": "Xóa tài khoản của tôi",
+      "deleting": "Đang xóa…",
+      "deleted": "Tài khoản của bạn đã được xóa."
+    }
+  },
   "errors": {
     "AMOUNT_INVALID": "Số tiền phải lớn hơn 0",
     "BUDGET_EXISTS": "Danh mục này đã có ngân sách trong tháng",
@@ -598,6 +667,7 @@
     "CONFLICT": "Nội dung này xung đột với dữ liệu bạn đang có",
     "CONTRIBUTION_NOT_FOUND": "Không tìm thấy mục này",
     "CURRENCY_INVALID": "Mã tiền tệ phải gồm 3 chữ cái theo chuẩn ISO",
+    "CURRENT_PASSWORD_REQUIRED": "Vui lòng nhập mật khẩu hiện tại",
     "DATE_INVALID": "Ngày không hợp lệ, hãy dùng YYYY-MM-DD HH:mm hoặc ISO 8601",
     "DEADLINE_IN_PAST": "Hạn chót phải sau hôm nay",
     "DEPOSIT_IN_USE": "Xoá khoản gửi này sẽ làm số tiền đã để dành bị âm",
@@ -616,12 +686,14 @@
     "NAME_REQUIRED": "Thiếu tên",
     "NAME_TOO_LONG": "Tên này quá dài",
     "NETWORK": "Không kết nối được máy chủ. Vui lòng thử lại.",
+    "NEW_PASSWORD_TOO_SHORT": "Mật khẩu mới phải có ít nhất 8 ký tự",
     "NOTE_TOO_LONG": "Ghi chú tối đa 200 ký tự",
-    "NOT_FOUND": "Không tìm thấy",
     "NOTIFICATION_NOT_FOUND": "Không tìm thấy thông báo",
+    "NOT_FOUND": "Không tìm thấy",
     "PASSWORD_REQUIRED": "Thiếu mật khẩu",
     "PASSWORD_TOO_LONG": "Mật khẩu tối đa 72 ký tự",
     "PASSWORD_TOO_SHORT": "Mật khẩu phải có ít nhất 6 ký tự",
+    "PASSWORD_UNCHANGED": "Mật khẩu mới phải khác mật khẩu hiện tại",
     "ROUTE_NOT_FOUND": "Không tìm thấy",
     "RULE_NOT_FOUND": "Không tìm thấy quy tắc định kỳ",
     "TAG_INVALID": "Mỗi thẻ gồm 1-20 chữ cái, chữ số hoặc dấu gạch ngang",
@@ -636,6 +708,7 @@
     "UNAUTHORIZED": "Vui lòng đăng nhập để tiếp tục.",
     "UNKNOWN": "Đã có lỗi xảy ra. Vui lòng thử lại.",
     "VALIDATION_ERROR": "Vui lòng kiểm tra lại thông tin đã nhập.",
-    "WITHDRAW_TOO_MUCH": "Không thể rút nhiều hơn số tiền đã để dành"
+    "WITHDRAW_TOO_MUCH": "Không thể rút nhiều hơn số tiền đã để dành",
+    "WRONG_PASSWORD": "Mật khẩu không đúng"
   }
 }

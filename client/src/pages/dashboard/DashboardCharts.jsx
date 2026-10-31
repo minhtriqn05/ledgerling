@@ -12,6 +12,7 @@ import {
 } from 'recharts';
 import { useTranslation } from 'react-i18next';
 import { useReducedMotion } from 'motion/react';
+import { useTheme } from '../../context/ThemeContext.jsx';
 import { cssVar } from '../../utils/cssVar.js';
 import { formatCompact, formatVnd } from '../../utils/format.js';
 import styles from './DashboardCharts.module.css';
@@ -91,6 +92,7 @@ export function CategoryDonut({ data, total }) {
 // Expense of the last months: pastel capsules; the selected month uses the sky-to-teal gradient.
 // data: [{ month: 'YYYY-MM', label: 'Oct', expense }], selected: the 'YYYY-MM' to highlight.
 export function MonthlyExpenseChart({ data, selected }) {
+  useTheme(); // the colors below are read from the CSS variables, so draw again when the theme changes
   const { t } = useTranslation();
   const animate = !useReducedMotion();
   const bar = cssVar('--chart-bar');

@@ -60,7 +60,9 @@ export function AuthProvider({ children }) {
   }
 
   // updateUser puts a fresh copy of the user in place (e.g. after the settings changed), without touching the token.
-  const value = { user, token, loading, login, register, logout: clearSession, updateUser: setUser };
+  // saveSession stores a new token with its user: the API sends one after the password changed or after
+  // "log out of all devices", because the old token (the one in localStorage) stopped working at that moment.
+  const value = { user, token, loading, login, register, logout: clearSession, updateUser: setUser, saveSession };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
@@ -70,4 +72,11 @@ export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) throw new Error('useAuth must be used inside <AuthProvider>');
   return context;
+}
+
+// The first day of the week chosen in Settings: 'monday' (default) or 'sunday'.
+// Unlike useAuth it works without a provider (it answers 'monday'), so a unit test of one component needs no setup.
+export function useWeekStart() {
+  const context = useContext(AuthContext);
+  return context?.user?.preferences?.weekStartsOn === 'sunday' ? 'sunday' : 'monday';
 }

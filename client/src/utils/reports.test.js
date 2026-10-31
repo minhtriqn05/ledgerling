@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildCalendar, dayTransactionsPath, describeChange, formatLongDay, intensityLevel } from './reports.js';
+import { buildCalendar, dayTransactionsPath, describeChange, formatLongDay, intensityLevel, weekdayLabels } from './reports.js';
 
 describe('describeChange', () => {
   it('shows "No data last month" when there is nothing to compare with (null)', () => {
@@ -109,6 +109,43 @@ describe('buildCalendar', () => {
 
     expect(max).toBe(0);
     expect(cells.filter(Boolean).every((c) => c.level === 0)).toBe(true);
+  });
+});
+
+describe('buildCalendar when the week starts on Sunday', () => {
+  it('puts the 1st of a Thursday month (October 2026) after 4 empty cells', () => {
+    const { cells } = buildCalendar('2026-10', days('2026-10', 31), 'sunday');
+
+    expect(cells.slice(0, 4)).toEqual([null, null, null, null]);
+    expect(cells[4]).toMatchObject({ date: '2026-10-01', day: 1 });
+    expect(cells).toHaveLength(35);
+  });
+
+  it('has no empty cell when the 1st is a Sunday (March 2026) and the month fits 5 weeks', () => {
+    const { cells } = buildCalendar('2026-03', days('2026-03', 31), 'sunday');
+
+    expect(cells[0]).toMatchObject({ date: '2026-03-01' });
+    expect(cells).toHaveLength(35);
+  });
+
+  it('puts a month that starts on a Saturday after 6 empty cells (August 2026)', () => {
+    const { cells } = buildCalendar('2026-08', days('2026-08', 31), 'sunday');
+
+    expect(cells.slice(0, 6).every((c) => c === null)).toBe(true);
+    expect(cells[6].date).toBe('2026-08-01');
+  });
+
+  it('still starts on Monday when nothing is said, or for any other value', () => {
+    const monday = buildCalendar('2026-10', days('2026-10', 31), 'monday').cells;
+    expect(buildCalendar('2026-10', days('2026-10', 31)).cells).toEqual(monday);
+    expect(buildCalendar('2026-10', days('2026-10', 31), 'friday').cells).toEqual(monday);
+  });
+});
+
+describe('weekdayLabels', () => {
+  it('starts on Monday by default and on Sunday when asked', () => {
+    expect(weekdayLabels()).toEqual(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']);
+    expect(weekdayLabels('sunday')).toEqual(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']);
   });
 });
 

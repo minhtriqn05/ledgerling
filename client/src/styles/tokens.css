@@ -5,6 +5,8 @@
  * The decisions behind each value are documented in docs/ui-style.md.
  */
 :root {
+  color-scheme: light;
+
   /* ---------- Brand (clear sky blue) ---------- */
   --color-primary: #2874b5;       /* primary buttons, links, sparkline */
   --color-primary-hover: #1f639f;
@@ -54,6 +56,7 @@
   /* ---------- Feedback ---------- */
   --color-danger: #bd3f36;        /* delete buttons, error messages */
   --color-danger-hover: #a3362e;
+  --color-danger-text: #bd3f36;   /* error messages and icons written on a light surface */
   --color-danger-soft: #fdecea;
 
   /* ---------- Accents: icon tiles, tinted cards, illustrations ---------- */
@@ -147,6 +150,61 @@
   --topbar-height: 56px;  /* top bar with the menu button on narrow screens */
   --content-max-width: 1200px;
   --control-height: 40px; /* buttons and inputs share one height */
+}
+
+/*
+ * Dark theme. The script in index.html (and utils/theme.js) puts data-theme="dark" on <html> when the person chose
+ * Dark, or chose System and the device is dark. Only the values that must change are listed here: the brand blue,
+ * the hero gradient, the category/chart hues and every size stay as in :root.
+ * Contrast (checked with the WCAG formula): text 13.3:1, secondary 8.5:1, muted 6.1:1 on the surface; blue, green,
+ * coral and red text 6.9:1 or more on the surface; white on the brand blue 4.9:1.
+ */
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --color-primary-text: #7fbdf0;
+  --color-primary-soft: #1d3a56;
+
+  --gradient-soft: linear-gradient(135deg, #1a3550 0%, #1b3d3a 100%);
+  --gradient-banner: linear-gradient(115deg, #1a3552 0%, #1a3b40 100%);
+
+  --color-bg: #0f1923;
+  --color-surface: #172431;
+  --color-surface-muted: #1e2d3c;
+  --color-skeleton: #243546;
+  --color-overlay: rgba(4, 9, 14, 0.62);
+
+  --color-text: #e6edf4;
+  --color-text-secondary: #b3c0ce;
+  --color-text-muted: #93a3b5;
+
+  --color-border: #26384a;
+  --color-border-strong: #4b6279; /* input borders: 3:1 or more on the surface */
+  --color-focus-ring: rgba(110, 176, 235, 0.4);
+
+  --color-income: #3fc79a;
+  --color-income-text: #5fd6ab;
+  --color-income-soft: #163a2f;
+  --color-expense: #f2857a;
+  --color-expense-text: #ff9d93;
+  --color-expense-soft: #3d2124;
+
+  /* The red button keeps its fill (white text 5.4:1); red written as text gets a lighter red */
+  --color-danger-text: #ff8a80;
+  --color-danger-soft: #3d2124;
+
+  --chart-bar: #4a86bb;
+  --chart-bar-track: #1e3042;
+  --pattern-track: repeating-linear-gradient(135deg, #243a50 0 4px, #1c2e40 4px 8px);
+  --chart-highlight: #6db3ec;
+  --chart-grid: #2a3d50;
+  --chart-axis: #93a3b5;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 12px -4px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 12px 28px -10px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 24px 60px -20px rgba(0, 0, 0, 0.7);
+  --shadow-primary: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 8px 18px -8px rgba(40, 116, 181, 0.7);
+  --shadow-danger: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 8px 18px -8px rgba(189, 63, 54, 0.7);
 }
 
 :lang(zh-CN) {

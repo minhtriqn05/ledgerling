@@ -49,6 +49,7 @@
     "openMenu": "Abrir menú",
     "recurring": "Recurrentes",
     "reports": "Informes",
+    "settings": "Ajustes",
     "transactions": "Movimientos"
   },
   "language": {
@@ -544,6 +545,7 @@
       "weekly": "Resumen semanal",
       "weeklyHint": "Lo que gastaste en los últimos 7 días, una vez por semana"
     },
+    "settingsLink": "Ajustes de notificaciones",
     "settingsSaved": "Ajustes guardados",
     "settingsText": "Elige qué notificaciones recibes. Un tipo desactivado no se crea en absoluto.",
     "settingsTitle": "Ajustes de notificaciones",
@@ -584,6 +586,73 @@
     "unreadCount_other": "{{count}} sin leer",
     "viewAll": "Ver todas las notificaciones"
   },
+  "settings": {
+    "subtitle": "Tu perfil, la seguridad de tu cuenta y cómo se ve y se comporta Ledgerling.",
+    "profile": {
+      "title": "Perfil",
+      "text": "Tu nombre aparece en el menú.",
+      "emailHint": "Tu correo es con el que inicias sesión, por eso no se puede cambiar aquí.",
+      "saved": "Nombre actualizado"
+    },
+    "password": {
+      "title": "Contraseña",
+      "text": "Al cambiarla se cierra tu sesión en todos los demás dispositivos.",
+      "current": "Contraseña actual",
+      "new": "Contraseña nueva",
+      "confirm": "Repite la contraseña nueva",
+      "strength": "Seguridad de la contraseña",
+      "weak": "Débil",
+      "medium": "Media",
+      "strong": "Fuerte",
+      "hint": "Usa al menos 8 caracteres. Combinar letras, números y símbolos la hace más segura.",
+      "enterCurrent": "Introduce tu contraseña actual.",
+      "tooShort": "La contraseña nueva debe tener al menos 8 caracteres.",
+      "mismatch": "Las dos contraseñas nuevas no coinciden.",
+      "submit": "Cambiar contraseña",
+      "changing": "Cambiando…",
+      "changed": "Contraseña cambiada. Se cerró la sesión en los demás dispositivos."
+    },
+    "sessions": {
+      "title": "Sesiones",
+      "text": "¿Has iniciado sesión en un sitio que no reconoces? Cierra la sesión en todos los demás dispositivos. Este sigue conectado.",
+      "logoutOthers": "Cerrar sesión en los demás dispositivos",
+      "working": "Cerrando sesiones…",
+      "done": "Se cerró la sesión en los demás dispositivos."
+    },
+    "appearance": {
+      "title": "Apariencia",
+      "text": "Elige un tema. Sistema sigue tu dispositivo.",
+      "theme": "Tema",
+      "light": "Claro",
+      "dark": "Oscuro",
+      "system": "Sistema"
+    },
+    "preferences": {
+      "title": "Preferencias",
+      "text": "Cómo se organizan los calendarios.",
+      "weekStartsOn": "La semana empieza el",
+      "monday": "Lunes",
+      "sunday": "Domingo",
+      "weekHint": "El calendario de Informes empieza sus semanas este día.",
+      "saved": "Preferencia guardada"
+    },
+    "data": {
+      "title": "Tus datos",
+      "text": "Descarga todo lo que tienes en Ledgerling en un único archivo JSON: perfil, categorías, transacciones, presupuestos, reglas recurrentes, objetivos y plantillas. Tu contraseña nunca se incluye.",
+      "download": "Descargar mis datos",
+      "working": "Preparando…",
+      "done": "Tus datos se han descargado."
+    },
+    "danger": {
+      "title": "Zona de peligro",
+      "text": "Eliminar tu cuenta borra para siempre tu perfil y todos tus datos. No se puede deshacer.",
+      "typeToConfirm": "Escribe {{word}} para confirmar",
+      "password": "Tu contraseña",
+      "submit": "Eliminar mi cuenta",
+      "deleting": "Eliminando…",
+      "deleted": "Tu cuenta se ha eliminado."
+    }
+  },
   "errors": {
     "AMOUNT_INVALID": "El importe debe ser mayor que 0",
     "BUDGET_EXISTS": "Ya existe un presupuesto para esta categoría y este mes",
@@ -598,6 +667,7 @@
     "CONFLICT": "Esto entra en conflicto con algo que ya tienes",
     "CONTRIBUTION_NOT_FOUND": "Entrada no encontrada",
     "CURRENCY_INVALID": "La moneda debe ser un código ISO de 3 letras",
+    "CURRENT_PASSWORD_REQUIRED": "La contraseña actual es obligatoria",
     "DATE_INVALID": "Fecha no válida, usa AAAA-MM-DD HH:mm o ISO 8601",
     "DEADLINE_IN_PAST": "La fecha límite debe ser posterior a hoy",
     "DEPOSIT_IN_USE": "Eliminar este depósito dejaría el importe ahorrado en negativo",
@@ -616,12 +686,14 @@
     "NAME_REQUIRED": "El nombre es obligatorio",
     "NAME_TOO_LONG": "Este nombre es demasiado largo",
     "NETWORK": "No se puede conectar con el servidor. Inténtalo de nuevo.",
+    "NEW_PASSWORD_TOO_SHORT": "La contraseña nueva debe tener al menos 8 caracteres",
     "NOTE_TOO_LONG": "La nota debe tener como máximo 200 caracteres",
-    "NOT_FOUND": "No encontrado",
     "NOTIFICATION_NOT_FOUND": "Notificación no encontrada",
+    "NOT_FOUND": "No encontrado",
     "PASSWORD_REQUIRED": "La contraseña es obligatoria",
     "PASSWORD_TOO_LONG": "La contraseña debe tener como máximo 72 caracteres",
     "PASSWORD_TOO_SHORT": "La contraseña debe tener al menos 6 caracteres",
+    "PASSWORD_UNCHANGED": "La contraseña nueva debe ser distinta de la actual",
     "ROUTE_NOT_FOUND": "No encontrado",
     "RULE_NOT_FOUND": "Regla recurrente no encontrada",
     "TAG_INVALID": "Cada etiqueta debe tener de 1 a 20 letras, números o guiones",
@@ -636,6 +708,7 @@
     "UNAUTHORIZED": "Inicia sesión para continuar.",
     "UNKNOWN": "Algo ha ido mal. Inténtalo de nuevo.",
     "VALIDATION_ERROR": "Revisa los valores introducidos.",
-    "WITHDRAW_TOO_MUCH": "No puedes retirar más que el importe ahorrado"
+    "WITHDRAW_TOO_MUCH": "No puedes retirar más que el importe ahorrado",
+    "WRONG_PASSWORD": "La contraseña no es correcta"
   }
 }

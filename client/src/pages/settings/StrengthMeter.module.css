@@ -1,0 +1,50 @@
+.meter {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.weak {
+  --level: var(--color-expense);
+  --level-text: var(--color-expense-text);
+}
+
+.medium {
+  --level: var(--accent-sun);
+  --level-text: color-mix(in srgb, var(--accent-sun) 45%, var(--color-text));
+}
+
+.strong {
+  --level: var(--color-income);
+  --level-text: var(--color-income-text);
+}
+
+.bars {
+  display: flex;
+  flex: 1;
+  gap: var(--space-1);
+}
+
+.bar {
+  flex: 1;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-skeleton);
+  transition: background var(--duration-base) var(--ease-out);
+}
+
+.filled {
+  background: var(--level);
+}
+
+.label {
+  flex-shrink: 0;
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.label strong {
+  font-weight: var(--font-weight-semibold);
+  color: var(--level-text);
+}

@@ -35,14 +35,16 @@ export function intensityLevel(total, max) {
   return Math.min(4, Math.ceil((total / max) * 4));
 }
 
-// The cells of a month grid whose weeks start on Monday: empty (null) cells before the 1st, then one cell per day.
-// The list is padded with nulls to whole weeks, so it always has 28, 35 or 42 cells.
+// The cells of a month grid whose weeks start on Monday (default) or Sunday: empty (null) cells before the 1st,
+// then one cell per day. The list is padded with nulls to whole weeks, so it always has 28, 35 or 42 cells.
 // dailyExpense: [{ date: 'YYYY-MM-DD', total }] for every day of the month, like the monthly report.
+// weekStartsOn: 'monday' | 'sunday', the user's preference.
 // Returns { cells: [null | { date, day, total, level }], max } where max is the biggest day.
-export function buildCalendar(month, dailyExpense) {
+export function buildCalendar(month, dailyExpense, weekStartsOn = 'monday') {
   const [year, monthNumber] = month.split('-').map(Number);
-  // getUTCDay(): 0 = Sunday ... 6 = Saturday. Monday first means Monday = 0 ... Sunday = 6.
-  const offset = (new Date(Date.UTC(year, monthNumber - 1, 1)).getUTCDay() + 6) % 7;
+  // getUTCDay(): 0 = Sunday ... 6 = Saturday. Monday first means Monday = 0 ... Sunday = 6; Sunday first keeps it as is.
+  const firstDay = new Date(Date.UTC(year, monthNumber - 1, 1)).getUTCDay();
+  const offset = weekStartsOn === 'sunday' ? firstDay : (firstDay + 6) % 7;
   const max = dailyExpense.reduce((biggest, d) => Math.max(biggest, d.total), 0);
 
   const cells = [
@@ -58,11 +60,13 @@ export function buildCalendar(month, dailyExpense) {
   return { cells, max };
 }
 
-// The short names of the days of a week that starts on Monday: ['Mon', 'Tue', ...] in the user's language.
-export function weekdayLabels() {
+// The short names of the days of a week that starts on Monday (default) or Sunday:
+// ['Mon', 'Tue', ...] or ['Sun', 'Mon', ...] in the user's language.
+export function weekdayLabels(weekStartsOn = 'monday') {
   const format = new Intl.DateTimeFormat(currentLocale(), { weekday: 'short', timeZone: 'UTC' });
-  // 1 January 2024 was a Monday
-  return Array.from({ length: 7 }, (_, index) => format.format(new Date(Date.UTC(2024, 0, 1 + index))));
+  // 31 December 2023 was a Sunday, 1 January 2024 a Monday
+  const first = weekStartsOn === 'sunday' ? 31 : 32;
+  return Array.from({ length: 7 }, (_, index) => format.format(new Date(Date.UTC(2023, 11, first + index))));
 }
 
 // The Transactions page showing one day: '/transactions?from=2026-10-10&to=2026-10-10'

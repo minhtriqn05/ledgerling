@@ -200,7 +200,7 @@
 }
 
 .problem {
-  color: var(--color-danger);
+  color: var(--color-danger-text);
   font-weight: var(--font-weight-medium);
 }
 

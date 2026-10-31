@@ -49,6 +49,7 @@
     "openMenu": "Ouvrir le menu",
     "recurring": "Récurrences",
     "reports": "Rapports",
+    "settings": "Paramètres",
     "transactions": "Transactions"
   },
   "language": {
@@ -544,6 +545,7 @@
       "weekly": "Résumé hebdomadaire",
       "weeklyHint": "Ce que vous avez dépensé ces 7 derniers jours, une fois par semaine"
     },
+    "settingsLink": "Réglages des notifications",
     "settingsSaved": "Réglages enregistrés",
     "settingsText": "Choisissez les notifications que vous recevez. Un type désactivé n'est pas créé du tout.",
     "settingsTitle": "Réglages des notifications",
@@ -584,6 +586,73 @@
     "unreadCount_other": "{{count}} non lues",
     "viewAll": "Voir toutes les notifications"
   },
+  "settings": {
+    "subtitle": "Votre profil, la sécurité de votre compte et l'apparence de Ledgerling.",
+    "profile": {
+      "title": "Profil",
+      "text": "Votre nom apparaît dans le menu.",
+      "emailHint": "Votre e-mail sert à vous connecter, il ne peut pas être modifié ici.",
+      "saved": "Nom mis à jour"
+    },
+    "password": {
+      "title": "Mot de passe",
+      "text": "Le modifier vous déconnecte de tous les autres appareils.",
+      "current": "Mot de passe actuel",
+      "new": "Nouveau mot de passe",
+      "confirm": "Répétez le nouveau mot de passe",
+      "strength": "Robustesse du mot de passe",
+      "weak": "Faible",
+      "medium": "Moyen",
+      "strong": "Fort",
+      "hint": "Utilisez au moins 8 caractères. Mélanger lettres, chiffres et symboles la renforce.",
+      "enterCurrent": "Veuillez saisir votre mot de passe actuel.",
+      "tooShort": "Le nouveau mot de passe doit contenir au moins 8 caractères.",
+      "mismatch": "Les deux nouveaux mots de passe ne correspondent pas.",
+      "submit": "Changer le mot de passe",
+      "changing": "Modification…",
+      "changed": "Mot de passe modifié. Les autres appareils ont été déconnectés."
+    },
+    "sessions": {
+      "title": "Sessions",
+      "text": "Connecté quelque part que vous ne reconnaissez pas ? Déconnectez tous les autres appareils. Celui-ci reste connecté.",
+      "logoutOthers": "Déconnecter tous les autres appareils",
+      "working": "Déconnexion…",
+      "done": "Tous les autres appareils sont déconnectés."
+    },
+    "appearance": {
+      "title": "Apparence",
+      "text": "Choisissez un thème. Système suit votre appareil.",
+      "theme": "Thème",
+      "light": "Clair",
+      "dark": "Sombre",
+      "system": "Système"
+    },
+    "preferences": {
+      "title": "Préférences",
+      "text": "La présentation des calendriers.",
+      "weekStartsOn": "La semaine commence le",
+      "monday": "Lundi",
+      "sunday": "Dimanche",
+      "weekHint": "Le calendrier des Rapports commence ses semaines ce jour-là.",
+      "saved": "Préférence enregistrée"
+    },
+    "data": {
+      "title": "Vos données",
+      "text": "Téléchargez tout ce que vous avez dans Ledgerling dans un seul fichier JSON : profil, catégories, transactions, budgets, règles récurrentes, objectifs et modèles. Votre mot de passe n'y figure jamais.",
+      "download": "Télécharger mes données",
+      "working": "Préparation…",
+      "done": "Vos données ont été téléchargées."
+    },
+    "danger": {
+      "title": "Zone de danger",
+      "text": "Supprimer votre compte efface définitivement votre profil et toutes vos données. Cette action est irréversible.",
+      "typeToConfirm": "Saisissez {{word}} pour confirmer",
+      "password": "Votre mot de passe",
+      "submit": "Supprimer mon compte",
+      "deleting": "Suppression…",
+      "deleted": "Votre compte a été supprimé."
+    }
+  },
   "errors": {
     "AMOUNT_INVALID": "Le montant doit être supérieur à 0",
     "BUDGET_EXISTS": "Un budget existe déjà pour cette catégorie et ce mois",
@@ -598,6 +667,7 @@
     "CONFLICT": "Cela entre en conflit avec des données existantes",
     "CONTRIBUTION_NOT_FOUND": "Entrée introuvable",
     "CURRENCY_INVALID": "La devise doit être un code ISO à 3 lettres",
+    "CURRENT_PASSWORD_REQUIRED": "Le mot de passe actuel est obligatoire",
     "DATE_INVALID": "Date non valide, utilisez AAAA-MM-JJ HH:mm ou ISO 8601",
     "DEADLINE_IN_PAST": "L'échéance doit être postérieure à aujourd'hui",
     "DEPOSIT_IN_USE": "Supprimer ce versement rendrait le montant épargné négatif",
@@ -616,12 +686,14 @@
     "NAME_REQUIRED": "Le nom est obligatoire",
     "NAME_TOO_LONG": "Ce nom est trop long",
     "NETWORK": "Impossible de joindre le serveur. Veuillez réessayer.",
+    "NEW_PASSWORD_TOO_SHORT": "Le nouveau mot de passe doit contenir au moins 8 caractères",
     "NOTE_TOO_LONG": "La note ne doit pas dépasser 200 caractères",
-    "NOT_FOUND": "Introuvable",
     "NOTIFICATION_NOT_FOUND": "Notification introuvable",
+    "NOT_FOUND": "Introuvable",
     "PASSWORD_REQUIRED": "Le mot de passe est obligatoire",
     "PASSWORD_TOO_LONG": "Le mot de passe ne doit pas dépasser 72 caractères",
     "PASSWORD_TOO_SHORT": "Le mot de passe doit contenir au moins 6 caractères",
+    "PASSWORD_UNCHANGED": "Le nouveau mot de passe doit être différent de l'actuel",
     "ROUTE_NOT_FOUND": "Introuvable",
     "RULE_NOT_FOUND": "Règle récurrente introuvable",
     "TAG_INVALID": "Chaque étiquette contient de 1 à 20 lettres, chiffres ou tirets",
@@ -636,6 +708,7 @@
     "UNAUTHORIZED": "Veuillez vous connecter pour continuer.",
     "UNKNOWN": "Une erreur s'est produite. Veuillez réessayer.",
     "VALIDATION_ERROR": "Veuillez vérifier les valeurs saisies.",
-    "WITHDRAW_TOO_MUCH": "Vous ne pouvez pas retirer plus que le montant épargné"
+    "WITHDRAW_TOO_MUCH": "Vous ne pouvez pas retirer plus que le montant épargné",
+    "WRONG_PASSWORD": "Le mot de passe est incorrect"
   }
 }

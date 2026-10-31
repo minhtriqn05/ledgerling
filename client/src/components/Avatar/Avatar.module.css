@@ -1,0 +1,24 @@
+/* A soft tint of --tone with the letter in 62% tone + ink, like the icon tiles of the cards (3.8:1 or more). */
+.avatar {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--tone) 22%, var(--color-surface));
+  color: color-mix(in srgb, var(--tone) 62%, var(--color-text));
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  user-select: none;
+}
+
+.sm {
+  width: 36px;
+  height: 36px;
+  font-size: var(--font-size-md);
+}
+
+.lg {
+  width: 64px;
+  height: 64px;
+  font-size: var(--font-size-xl);
+}

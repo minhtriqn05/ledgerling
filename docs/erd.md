@@ -23,7 +23,8 @@ erDiagram
         string name
         string email UK "unique, lowercase"
         string passwordHash
-        object preferences "notifications { budget, goals, recurring, weekly }, booleans, default true"
+        number tokenVersion "default 0, stored in the JWT as tv; +1 logs out every device"
+        object preferences "theme, weekStartsOn, language, notifications { budget, goals, recurring, weekly }"
         date createdAt
         date updatedAt
     }
@@ -152,3 +153,6 @@ erDiagram
 - Index on Notification: `(userId, read, createdAt -1)` for the list and the unread count.
 - `Notification.params` is an extra field next to the ones in the data model: it keeps the numbers and names, so the app can write the text in the user's language.
 - `User.preferences.notifications` has one boolean per kind (`budget`, `goals`, `recurring`, `weekly`). A user without the field counts as all on. A kind that is off is not created at all.
+- `User.tokenVersion` (Number, default 0) is copied into every JWT as `tv`. `requireAuth` compares the two on each request, so raising it (new password, "log out of all devices") makes every older token invalid. It is never sent to the client.
+- `User.preferences.theme` (`light` | `dark` | `system`, default `system`), `weekStartsOn` (`monday` | `sunday`, default `monday`) and `language` (one of the 8 app languages, no default: until it is chosen each device keeps its own).
+- Deleting a User deletes every document with that `userId`: Category, Transaction, Budget, RecurringRule, Goal, TransactionTemplate and Notification.

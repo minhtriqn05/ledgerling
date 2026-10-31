@@ -217,7 +217,8 @@ describe("notifications: switches", () => {
       [{ notifications: [true] }, "Notifications must be an object"],
       [{ notifications: { budget: "no" } }, 'Notification setting "budget" must be true or false'],
       [{ notifications: { sound: true } }, "Notifications can only have budget, goals, recurring, weekly"],
-      [{ notifications: { budget: false }, theme: "dark" }, "Only notifications can be changed"],
+      // theme became a valid preference in the settings phase, so an unknown field is used here
+      [{ notifications: { budget: false }, sound: "on" }, "Only notifications, theme, weekStartsOn, language can be changed"],
     ];
     for (const [body, message] of bad) {
       const res = await api().patch("/api/users/me/preferences").set(auth(user.token)).send(body);

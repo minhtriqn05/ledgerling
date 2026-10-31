@@ -3,6 +3,7 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import ApiStatus from '../ApiStatus/ApiStatus.jsx';
+import Avatar from '../Avatar/Avatar.jsx';
 import Icon from '../Icon.jsx';
 import LanguageSwitcher from '../LanguageSwitcher/LanguageSwitcher.jsx';
 import Logo from '../Logo/Logo.jsx';
@@ -34,7 +35,7 @@ function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
   const reduced = useReducedMotion();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false); // only matters on narrow screens
   const [quickAddOpen, setQuickAddOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
@@ -138,6 +139,17 @@ function Layout() {
           </nav>
 
           <div className={styles.panelFooter}>
+            {user && (
+              <div className={styles.account} data-testid="account">
+                <Avatar name={user.name} />
+                <span className={styles.accountText}>
+                  <strong className={styles.accountName} data-testid="account-name">
+                    {user.name}
+                  </strong>
+                  <span className={styles.accountEmail}>{user.email}</span>
+                </span>
+              </div>
+            )}
             <LanguageSwitcher className={styles.language} />
             <button type="button" className={`${styles.navItem} ${styles.logout}`} onClick={handleLogout}>
               <Icon name="logout" />
