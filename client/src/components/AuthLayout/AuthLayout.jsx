@@ -1,8 +1,10 @@
+import { Suspense } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { formatSignedVnd, formatVnd } from '../../utils/format.js';
 import Icon from '../Icon.jsx';
+import LoadingState from '../LoadingState/LoadingState.jsx';
 import LanguageSwitcher from '../LanguageSwitcher/LanguageSwitcher.jsx';
 import Logo from '../Logo/Logo.jsx';
 import styles from './AuthLayout.module.css';
@@ -62,7 +64,9 @@ export default function AuthLayout() {
 
         <section className={styles.formSide}>
           <LanguageSwitcher className={styles.language} />
-          <Outlet />
+          <Suspense fallback={<LoadingState />}>
+            <Outlet />
+          </Suspense>
         </section>
       </div>
     </main>

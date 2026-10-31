@@ -33,6 +33,8 @@ const notificationSchema = new mongoose.Schema(
 notificationSchema.index({ userId: 1, dedupeKey: 1 }, { unique: true });
 // The list (newest first) and the unread count both filter by user and read
 notificationSchema.index({ userId: 1, read: 1, createdAt: -1 });
+// The list of all notifications (read or not), newest first
+notificationSchema.index({ userId: 1, createdAt: -1 });
 
 // userId and __v are internal, so they never reach the client
 notificationSchema.set("toJSON", {

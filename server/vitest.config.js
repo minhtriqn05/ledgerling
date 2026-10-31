@@ -13,6 +13,8 @@ export default defineConfig({
     testTimeout: 20000,
     // Tests never read .env, so they can never reach the Atlas database
     env: {
+      // src/app.js turns the rate limits off when NODE_ENV is "test"
+      NODE_ENV: "test",
       JWT_SECRET: "test-secret",
       JWT_EXPIRES_IN: "1h",
     },

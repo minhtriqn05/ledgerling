@@ -498,6 +498,8 @@ router.post("/", validateCreateTransaction, create);
  *               message: You can import at most 500 rows at a time
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
+ *       413:
+ *         $ref: '#/components/responses/PayloadTooLarge'
  */
 router.post("/import", validateImportTransactions, importCsv);
 

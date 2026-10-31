@@ -26,7 +26,7 @@ const money = (amount) => `${Math.round(amount).toLocaleString("en-US")} VND`;
 // Creates a notification, unless the user turned this type off or the same event (dedupeKey) already notified.
 // Returns the notification, or null when nothing was created.
 export async function notify(userId, { type, title, message, link = "", params = {}, dedupeKey }) {
-  const user = await User.findById(userId).select("preferences");
+  const user = await User.findById(userId).select("preferences").lean();
   // A missing switch (account made before preferences existed) counts as on, only an explicit false turns it off
   if (!user || user.preferences?.notifications?.[PREFERENCE_OF_TYPE[type]] === false) return null;
 
@@ -128,7 +128,7 @@ async function loadWeekSpending(userId, today) {
 
   const total = rows.reduce((sum, row) => sum + row.total, 0);
   const count = rows.reduce((sum, row) => sum + row.count, 0);
-  const top = rows[0] ? await Category.findOne({ _id: rows[0]._id, userId }).select("name") : null;
+  const top = rows[0] ? await Category.findOne({ _id: rows[0]._id, userId }).select("name").lean() : null;
   return { total, count, topCategory: top?.name ?? null };
 }
 

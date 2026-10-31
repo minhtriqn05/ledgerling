@@ -15,7 +15,7 @@ const OVER_PERCENT = 100;
 
 // The category must belong to the same user (otherwise 404, as if it did not exist) and be an expense category
 async function findOwnedExpenseCategory(userId, categoryId) {
-  const category = await Category.findOne({ _id: categoryId, userId });
+  const category = await Category.findOne({ _id: categoryId, userId }).select("type").lean();
   if (!category) throw httpError(404, "Category not found", "CATEGORY_NOT_FOUND");
   if (category.type !== "expense") throw httpError(400, "Budgets are only for expense categories", "BUDGET_EXPENSE_ONLY");
   return category;

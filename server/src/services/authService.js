@@ -16,7 +16,7 @@ export function signToken(user) {
 
 export async function register({ name, email, password }) {
   // Friendly message first; the unique index on email is the safety net if two requests race
-  const existing = await User.findOne({ email });
+  const existing = await User.exists({ email });
   if (existing) throw httpError(409, "Email is already registered", "EMAIL_TAKEN");
 
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
