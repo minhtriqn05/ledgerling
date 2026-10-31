@@ -55,6 +55,11 @@ const options = {
           "In-app notifications of the signed-in user: budget at 80% and 100%, a goal reached, recurring transactions added and a weekly summary. Each event notifies once (dedupeKey), and a type the user turned off in Users > preferences is never created.",
       },
       { name: "Users", description: "The signed-in user's own profile, password, preferences, data export and account deletion" },
+      {
+        name: "Admin",
+        description:
+          "Only for accounts with role \"admin\" (a normal user gets 403, no token gets 401): site statistics, the list of accounts and disabling / enabling an account. An admin never sees the transactions of a user, only how many there are. The first admin is made with `npm run make-admin -- <email>` in /server.",
+      },
     ],
     components: {
       securitySchemes: {
@@ -79,6 +84,15 @@ const options = {
             },
           },
         },
+        Forbidden: {
+          description: "The signed-in user is not an admin",
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/ErrorResponse" },
+              example: { success: false, message: "You do not have permission to do this", code: "FORBIDDEN" },
+            },
+          },
+        },
         ServerError: {
           description: "Unexpected server error",
           content: {
@@ -97,6 +111,8 @@ const options = {
             _id: { type: "string", example: "6720a1b2c3d4e5f601234567" },
             name: { type: "string", example: "Minh Tri" },
             email: { type: "string", example: "tri@example.com" },
+            role: { type: "string", enum: ["user", "admin"], description: "Only an admin can open the Admin pages", example: "user" },
+            status: { type: "string", enum: ["active", "disabled"], description: "A disabled account cannot log in", example: "active" },
             preferences: {
               type: "object",
               properties: {
@@ -117,6 +133,49 @@ const options = {
             },
             createdAt: { type: "string", format: "date-time", example: "2026-10-27T03:00:00.000Z" },
             updatedAt: { type: "string", format: "date-time", example: "2026-10-27T03:00:00.000Z" },
+          },
+        },
+        AdminUser: {
+          type: "object",
+          description: "A user as an admin sees it: no password hash, no preferences, no transactions (only their number)",
+          properties: {
+            _id: { type: "string", example: "6720a1b2c3d4e5f601234567" },
+            name: { type: "string", example: "Minh Tri" },
+            email: { type: "string", example: "tri@example.com" },
+            role: { type: "string", enum: ["user", "admin"], example: "user" },
+            status: { type: "string", enum: ["active", "disabled"], example: "active" },
+            createdAt: { type: "string", format: "date-time", example: "2026-10-27T03:00:00.000Z" },
+            transactionCount: { type: "integer", example: 128 },
+          },
+        },
+        AdminStats: {
+          type: "object",
+          properties: {
+            totalUsers: { type: "integer", example: 42 },
+            activeUsers7d: { type: "integer", description: "Users who added a transaction in the last 7 days", example: 17 },
+            totalTransactions: { type: "integer", example: 3150 },
+            newUsersPerDay: {
+              type: "array",
+              description: "The last 30 days (Vietnam time), oldest first, today last; a day without sign-ups has count 0",
+              items: {
+                type: "object",
+                properties: {
+                  date: { type: "string", example: "2026-10-31" },
+                  count: { type: "integer", example: 3 },
+                },
+              },
+            },
+            transactionsPerDay: {
+              type: "array",
+              description: "Same days as newUsersPerDay: transactions created that day",
+              items: {
+                type: "object",
+                properties: {
+                  date: { type: "string", example: "2026-10-31" },
+                  count: { type: "integer", example: 54 },
+                },
+              },
+            },
           },
         },
         Notification: {

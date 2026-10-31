@@ -38,6 +38,7 @@
     "viewAll": "查看全部"
   },
   "nav": {
+    "admin": "管理",
     "budgets": "预算",
     "categories": "分类",
     "closeMenu": "关闭菜单",
@@ -653,11 +654,72 @@
       "deleted": "你的账户已删除。"
     }
   },
+  "admin": {
+    "subtitle": "网站统计与账户。只有管理员能看到此页面。",
+    "stats": {
+      "activeUsers": "最近 7 天活跃",
+      "label": "网站总览",
+      "totalTransactions": "交易",
+      "totalUsers": "用户"
+    },
+    "charts": {
+      "last30": "最近 30 天",
+      "newUsers": "新增用户",
+      "newUsersLabel": "折线图：最近 30 天每日新增用户",
+      "transactions": "交易",
+      "transactionsLabel": "折线图：最近 30 天每日交易数"
+    },
+    "users": {
+      "title": "用户",
+      "search": "按姓名或邮箱搜索",
+      "loading": "正在加载用户…",
+      "count_one": "{{count}} 位用户",
+      "count_other": "{{count}} 位用户",
+      "emptyTitle": "未找到用户",
+      "emptyText": "没有姓名或邮箱匹配“{{q}}”。",
+      "columns": {
+        "name": "姓名",
+        "email": "邮箱",
+        "role": "角色",
+        "status": "状态",
+        "joined": "加入时间",
+        "transactions": "交易",
+        "actions": "操作"
+      },
+      "roles": {
+        "user": "用户",
+        "admin": "管理员"
+      },
+      "statuses": {
+        "active": "正常",
+        "disabled": "已停用"
+      },
+      "you": "你",
+      "disable": "停用",
+      "enable": "启用",
+      "disableFor": "停用 {{name}}",
+      "enableFor": "启用 {{name}}",
+      "noAction": "此账户无法更改"
+    },
+    "dialog": {
+      "disableText": "{{name}} 将在所有设备上退出登录，在你重新启用账户之前无法登录。其数据会保留。",
+      "disableTitle": "停用此账户？",
+      "disabled": "已停用 {{name}}",
+      "disabling": "正在停用…",
+      "enableText": "{{name}} 将可以重新登录。",
+      "enableTitle": "启用此账户？",
+      "enabled": "已启用 {{name}}",
+      "enabling": "正在启用…"
+    }
+  },
   "errors": {
+    "ACCOUNT_DISABLED": "此账户已被停用",
     "AMOUNT_INVALID": "金额必须大于 0",
     "BUDGET_EXISTS": "该分类本月已有预算",
     "BUDGET_EXPENSE_ONLY": "预算仅适用于支出分类",
     "BUDGET_NOT_FOUND": "找不到预算",
+    "CANNOT_DISABLE_ADMIN": "你不能停用其他管理员",
+    "CANNOT_DISABLE_SELF": "你不能停用自己的账户",
     "CATEGORY_EXISTS": "分类已存在",
     "CATEGORY_HAS_RULES": "该分类仍有定期规则",
     "CATEGORY_IN_USE": "该分类仍有交易",
@@ -675,6 +737,7 @@
     "EMAIL_INVALID": "邮箱无效",
     "EMAIL_TAKEN": "该邮箱已被注册",
     "END_BEFORE_START": "结束日期必须晚于开始日期",
+    "FORBIDDEN": "你没有权限执行此操作",
     "GOAL_NOT_FOUND": "找不到目标",
     "ICON_INVALID": "请从列表中选择图标",
     "IMPORT_CATEGORY_NOT_FOUND": "找不到分类“{{name}}”（{{type}}）",
@@ -696,6 +759,7 @@
     "PASSWORD_UNCHANGED": "新密码不能与当前密码相同",
     "ROUTE_NOT_FOUND": "未找到",
     "RULE_NOT_FOUND": "找不到定期规则",
+    "STATUS_INVALID": "状态必须是正常或已停用",
     "TAG_INVALID": "每个标签由 1-20 个字母、数字或连字符组成",
     "TARGET_INVALID": "目标金额必须是大于 0 的整数",
     "TEMPLATE_NOT_FOUND": "找不到模板",
@@ -707,6 +771,7 @@
     "TYPE_LOCKED": "类型无法更改",
     "UNAUTHORIZED": "请登录后继续。",
     "UNKNOWN": "出错了。请重试。",
+    "USER_NOT_FOUND": "未找到用户",
     "VALIDATION_ERROR": "请检查您输入的内容。",
     "WITHDRAW_TOO_MUCH": "取出金额不能超过已存金额",
     "WRONG_PASSWORD": "密码不正确"

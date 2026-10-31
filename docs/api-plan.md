@@ -27,6 +27,7 @@ Swagger UI: `/api-docs` (outside `/api`).
 | 201 | Created |
 | 400 | Invalid input (validation failed, unknown field value, bad format, body that is not valid JSON → `"Invalid JSON body"`) |
 | 401 | Missing/invalid/expired token (also a token made before the password changed or "log out of all devices", or of a deleted account), wrong email or password at login |
+| 403 | Signed in but not allowed: not an admin on `/api/admin/*` (`FORBIDDEN`), a disabled account at login (`ACCOUNT_DISABLED`), or an admin trying to disable himself or another admin |
 | 404 | Not found, belongs to another user, malformed `:id` in the URL, or unknown route (`"Route not found"`) |
 | 409 | Duplicate (email, category name, budget of the same category and month, two transactions of one recurring rule on the same date) or conflict (category still has transactions or recurring rules) |
 | 500 | Server error |
@@ -36,13 +37,14 @@ Swagger UI: `/api-docs` (outside `/api`).
 Every error has a `code`. A code never changes meaning, so the client can show its own translation of
 `errors.<code>` (see `client/src/locales/*.json`); for a code it does not know it shows `message`.
 When the place that throws an error names no specific code, the status gives a default:
-400 `VALIDATION_ERROR`, 401 `UNAUTHORIZED`, 404 `NOT_FOUND`, 409 `CONFLICT`, 500 `INTERNAL_ERROR`.
+400 `VALIDATION_ERROR`, 401 `UNAUTHORIZED`, 403 `FORBIDDEN`, 404 `NOT_FOUND`, 409 `CONFLICT`, 500 `INTERNAL_ERROR`.
 
 | Status | Codes |
 |--------|-------|
-| 400 | `VALIDATION_ERROR`, `INVALID_JSON`, `NAME_REQUIRED`, `NAME_TOO_LONG`, `EMAIL_INVALID`, `PASSWORD_REQUIRED`, `PASSWORD_TOO_SHORT`, `PASSWORD_TOO_LONG`, `CURRENT_PASSWORD_REQUIRED`, `NEW_PASSWORD_TOO_SHORT`, `PASSWORD_UNCHANGED`, `WRONG_PASSWORD`, `TYPE_INVALID`, `TYPE_LOCKED`, `COLOR_INVALID`, `ICON_INVALID`, `CATEGORY_REQUIRED`, `AMOUNT_INVALID`, `CURRENCY_INVALID`, `NOTE_TOO_LONG`, `DATE_INVALID`, `TAG_INVALID`, `TOO_MANY_TAGS`, `MONTH_INVALID`, `BUDGET_EXPENSE_ONLY`, `END_BEFORE_START`, `TARGET_INVALID`, `DEADLINE_IN_PAST`, `WITHDRAW_TOO_MUCH`, `DEPOSIT_IN_USE`, `IMPORT_TOO_MANY_ROWS` |
+| 400 | `VALIDATION_ERROR`, `INVALID_JSON`, `NAME_REQUIRED`, `NAME_TOO_LONG`, `EMAIL_INVALID`, `PASSWORD_REQUIRED`, `PASSWORD_TOO_SHORT`, `PASSWORD_TOO_LONG`, `CURRENT_PASSWORD_REQUIRED`, `NEW_PASSWORD_TOO_SHORT`, `PASSWORD_UNCHANGED`, `WRONG_PASSWORD`, `TYPE_INVALID`, `TYPE_LOCKED`, `COLOR_INVALID`, `ICON_INVALID`, `CATEGORY_REQUIRED`, `AMOUNT_INVALID`, `CURRENCY_INVALID`, `NOTE_TOO_LONG`, `DATE_INVALID`, `TAG_INVALID`, `TOO_MANY_TAGS`, `MONTH_INVALID`, `BUDGET_EXPENSE_ONLY`, `END_BEFORE_START`, `TARGET_INVALID`, `DEADLINE_IN_PAST`, `WITHDRAW_TOO_MUCH`, `DEPOSIT_IN_USE`, `IMPORT_TOO_MANY_ROWS`, `STATUS_INVALID` |
 | 401 | `TOKEN_MISSING`, `TOKEN_INVALID`, `INVALID_CREDENTIALS` |
-| 404 | `ROUTE_NOT_FOUND`, `CATEGORY_NOT_FOUND`, `TRANSACTION_NOT_FOUND`, `BUDGET_NOT_FOUND`, `RULE_NOT_FOUND`, `GOAL_NOT_FOUND`, `CONTRIBUTION_NOT_FOUND`, `TEMPLATE_NOT_FOUND`, `NOTIFICATION_NOT_FOUND` |
+| 403 | `FORBIDDEN`, `ACCOUNT_DISABLED`, `CANNOT_DISABLE_SELF`, `CANNOT_DISABLE_ADMIN` |
+| 404 | `USER_NOT_FOUND`, `ROUTE_NOT_FOUND`, `CATEGORY_NOT_FOUND`, `TRANSACTION_NOT_FOUND`, `BUDGET_NOT_FOUND`, `RULE_NOT_FOUND`, `GOAL_NOT_FOUND`, `CONTRIBUTION_NOT_FOUND`, `TEMPLATE_NOT_FOUND`, `NOTIFICATION_NOT_FOUND` |
 | 409 | `EMAIL_TAKEN`, `CATEGORY_EXISTS`, `CATEGORY_IN_USE`, `CATEGORY_HAS_RULES`, `BUDGET_EXISTS`, `DUPLICATE_VALUE` |
 | 500 | `INTERNAL_ERROR` |
 
@@ -138,6 +140,9 @@ The tables below list the `message` of each endpoint; the matching code is in th
 | 54 | POST | `/api/auth/logout-all` | Yes | Log out of all devices (returns a new token for this one) |
 | 55 | GET | `/api/users/me/export` | Yes | Download all my data as JSON |
 | 56 | DELETE | `/api/users/me` | Yes | Delete my account and all my data (password needed) |
+| 57 | GET | `/api/admin/stats` | Admin | Totals and the last 30 days: users, active users, transactions |
+| 58 | GET | `/api/admin/users` | Admin | List the accounts with their number of transactions (`?q=&page=&limit=`) |
+| 59 | PATCH | `/api/admin/users/:id/status` | Admin | Disable or enable an account |
 
 Every protected route (Auth = Yes) can also return **401** (`"Not authorized, token missing"` /
 `"Not authorized, invalid token"`) and every route can return **500** (`"Internal server error"`).
@@ -211,6 +216,7 @@ Auth: no.
 |------|---------|
 | 400 | `"Email is invalid"`, `"Password is required"` |
 | 401 | `"Invalid email or password"` (same message for unknown email and wrong password) |
+| 403 | `"Account disabled"` (`ACCOUNT_DISABLED`): the password is right but an admin disabled the account. The password is checked first, so someone who does not know it cannot find out that an account is disabled |
 
 ### 4. GET /api/auth/me
 Auth: yes. No body.
@@ -223,6 +229,8 @@ Auth: yes. No body.
     "_id": "6720a1b2c3d4e5f601234567",
     "name": "Minh Tri",
     "email": "tri@example.com",
+    "role": "user",
+    "status": "active",
     "preferences": {
       "theme": "system",
       "weekStartsOn": "monday",
@@ -234,7 +242,9 @@ Auth: yes. No body.
 }
 ```
 
-**Errors**: 401 also if the user in the token no longer exists.
+**Errors**: 401 also if the user in the token no longer exists or the account is disabled.
+
+`role` is `"user"` or `"admin"`; the app shows the Admin page only to an admin. Every user object (register, login, `me`) carries `role` and `status`.
 
 `preferences.language` is only there after the user picked a language. The token version (`tokenVersion`) never leaves the server.
 
@@ -1308,3 +1318,78 @@ belongs to the user. It cannot be undone.
 **200** – `{ "success": true, "data": { "deleted": true } }`. The token is useless afterwards (the user is gone).
 
 **Errors**: 400 `"Password is required"` (`PASSWORD_REQUIRED`), `"Password is incorrect"` (`WRONG_PASSWORD`).
+
+---
+
+## Admin
+
+Every `/api/admin/*` route needs a token **and** `role: "admin"`: no token = **401**, a normal user = **403** `FORBIDDEN`
+(`"You do not have permission to do this"`). The role is read from the database on every request, so a change applies at once.
+An admin never sees the content of a user's transactions, only how many there are, and never a password hash.
+
+The first admin is made by hand, because no route can change a role:
+`cd server && npm run make-admin -- tri@example.com` (it uses the database in `server/.env`; the account must exist, and the person logs in again afterwards).
+
+### 57. GET /api/admin/stats
+Auth: admin. No body. Counts only. Days are Vietnam days (UTC+7): the last 30, today included, oldest first, and a day without anything is `0`.
+"Active" = the user added at least one transaction in the last 7 days.
+
+**200**
+```json
+{
+  "success": true,
+  "data": {
+    "totalUsers": 42,
+    "activeUsers7d": 17,
+    "totalTransactions": 3150,
+    "newUsersPerDay": [{ "date": "2026-10-02", "count": 0 }, "... 28 more ...", { "date": "2026-10-31", "count": 3 }],
+    "transactionsPerDay": [{ "date": "2026-10-02", "count": 12 }, "... 28 more ...", { "date": "2026-10-31", "count": 54 }]
+  }
+}
+```
+
+### 58. GET /api/admin/users
+Auth: admin. Newest accounts first.
+
+| Query | Rule |
+|-------|------|
+| `q` | optional; part of the name or the email, case-insensitive, read as plain text (max 100 chars) |
+| `page` | optional; whole number from 1, default 1 |
+| `limit` | optional; whole number 1–50, default 10 |
+
+**200** – `data` is an array and `meta` is `{ page, limit, total, totalPages }`.
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "6720a1b2c3d4e5f601234567",
+      "name": "Minh Tri",
+      "email": "tri@example.com",
+      "role": "user",
+      "status": "active",
+      "createdAt": "2026-10-27T03:00:00.000Z",
+      "transactionCount": 128
+    }
+  ],
+  "meta": { "page": 1, "limit": 10, "total": 42, "totalPages": 5 }
+}
+```
+**Errors**: 400 `"Page must be a whole number from 1"`, `"Limit must be a whole number from 1 to 50"`, `"Search must be at most 100 characters"`.
+
+### 59. PATCH /api/admin/users/:id/status
+Auth: admin. **Body** `{ "status": "disabled" }` or `{ "status": "active" }`. Any other field is ignored.
+
+Disabling raises the user's `tokenVersion`, so every token the user already has stops working (**401**), and the user cannot log in
+(**403** `"Account disabled"`) until an admin enables the account again. Pressing Disable on an account that is already disabled changes nothing.
+Enabling does not give old tokens back: the user logs in again.
+
+**200** – `data` is the user in the shape of endpoint 58 (with the new `status`).
+
+**Errors**
+
+| Code | message |
+|------|---------|
+| 400 | `"Status must be one of active, disabled"` (`STATUS_INVALID`) |
+| 403 | `"You cannot disable your own account"` (`CANNOT_DISABLE_SELF`), `"You cannot disable another admin"` (`CANNOT_DISABLE_ADMIN`) |
+| 404 | `"User not found"` (`USER_NOT_FOUND`; also for a malformed id) |

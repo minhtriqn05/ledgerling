@@ -23,6 +23,8 @@ erDiagram
         string name
         string email UK "unique, lowercase"
         string passwordHash
+        string role "user | admin, default user; set only by npm run make-admin"
+        string status "active | disabled, default active"
         number tokenVersion "default 0, stored in the JWT as tv; +1 logs out every device"
         object preferences "theme, weekStartsOn, language, notifications { budget, goals, recurring, weekly }"
         date createdAt
@@ -155,4 +157,5 @@ erDiagram
 - `User.preferences.notifications` has one boolean per kind (`budget`, `goals`, `recurring`, `weekly`). A user without the field counts as all on. A kind that is off is not created at all.
 - `User.tokenVersion` (Number, default 0) is copied into every JWT as `tv`. `requireAuth` compares the two on each request, so raising it (new password, "log out of all devices") makes every older token invalid. It is never sent to the client.
 - `User.preferences.theme` (`light` | `dark` | `system`, default `system`), `weekStartsOn` (`monday` | `sunday`, default `monday`) and `language` (one of the 8 app languages, no default: until it is chosen each device keeps its own).
+- `User.role` (`user` | `admin`, default `user`) and `User.status` (`active` | `disabled`, default `active`). Only `server/src/scripts/make-admin.js` sets a role; no API route can. `requireAuth` reads both from the database on every request. Disabling an account (`PATCH /admin/users/:id/status`) also raises `tokenVersion`, so its tokens stop working; a disabled user cannot log in (403).
 - Deleting a User deletes every document with that `userId`: Category, Transaction, Budget, RecurringRule, Goal, TransactionTemplate and Notification.

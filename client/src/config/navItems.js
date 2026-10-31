@@ -10,4 +10,6 @@ export const navItems = [
   { labelKey: 'nav.reports', path: '/reports', icon: 'reports' },
   { labelKey: 'nav.notifications', path: '/notifications', icon: 'bell' },
   { labelKey: 'nav.settings', path: '/settings', icon: 'settings' },
+  // adminOnly: AppLayout shows it only to an account with role 'admin' (the route itself is guarded by AdminRoute)
+  { labelKey: 'nav.admin', path: '/admin', icon: 'shield', adminOnly: true },
 ];

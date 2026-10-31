@@ -39,6 +39,8 @@ export async function login({ email, password }) {
   // Same message for an unknown email and a wrong password, so nobody can learn which emails exist
   const ok = user && (await bcrypt.compare(password, user.passwordHash));
   if (!ok) throw httpError(401, "Invalid email or password", "INVALID_CREDENTIALS");
+  // Checked after the password, so only the owner of the account learns that it was disabled
+  if (user.status === "disabled") throw httpError(403, "Account disabled", "ACCOUNT_DISABLED");
 
   return { token: signToken(user), user };
 }

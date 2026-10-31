@@ -102,6 +102,16 @@ router.post("/register", validateRegister, register);
  *             example:
  *               success: false
  *               message: Invalid email or password
+ *       403:
+ *         description: The password is right but an admin disabled the account (code ACCOUNT_DISABLED)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Account disabled
+ *               code: ACCOUNT_DISABLED
  */
 router.post("/login", validateLogin, login);
 

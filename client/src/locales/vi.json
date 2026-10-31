@@ -38,6 +38,7 @@
     "viewAll": "Xem tất cả"
   },
   "nav": {
+    "admin": "Quản trị",
     "budgets": "Ngân sách",
     "categories": "Danh mục",
     "closeMenu": "Đóng menu",
@@ -653,11 +654,72 @@
       "deleted": "Tài khoản của bạn đã được xóa."
     }
   },
+  "admin": {
+    "subtitle": "Thống kê hệ thống và tài khoản. Chỉ quản trị viên mới xem được trang này.",
+    "stats": {
+      "activeUsers": "Hoạt động trong 7 ngày qua",
+      "label": "Tổng quan hệ thống",
+      "totalTransactions": "Giao dịch",
+      "totalUsers": "Người dùng"
+    },
+    "charts": {
+      "last30": "30 ngày qua",
+      "newUsers": "Người dùng mới",
+      "newUsersLabel": "Biểu đồ đường: người dùng mới mỗi ngày trong 30 ngày qua",
+      "transactions": "Giao dịch",
+      "transactionsLabel": "Biểu đồ đường: số giao dịch mỗi ngày trong 30 ngày qua"
+    },
+    "users": {
+      "title": "Người dùng",
+      "search": "Tìm theo tên hoặc email",
+      "loading": "Đang tải người dùng…",
+      "count_one": "{{count}} người dùng",
+      "count_other": "{{count}} người dùng",
+      "emptyTitle": "Không tìm thấy người dùng",
+      "emptyText": "Không có tên hoặc email nào khớp với “{{q}}”.",
+      "columns": {
+        "name": "Tên",
+        "email": "Email",
+        "role": "Vai trò",
+        "status": "Trạng thái",
+        "joined": "Ngày tham gia",
+        "transactions": "Giao dịch",
+        "actions": "Thao tác"
+      },
+      "roles": {
+        "user": "Người dùng",
+        "admin": "Quản trị viên"
+      },
+      "statuses": {
+        "active": "Hoạt động",
+        "disabled": "Đã khoá"
+      },
+      "you": "Bạn",
+      "disable": "Khoá",
+      "enable": "Mở khoá",
+      "disableFor": "Khoá {{name}}",
+      "enableFor": "Mở khoá {{name}}",
+      "noAction": "Không thể thay đổi tài khoản này"
+    },
+    "dialog": {
+      "disableText": "{{name}} sẽ bị đăng xuất trên mọi thiết bị và không đăng nhập được cho đến khi bạn mở khoá lại. Dữ liệu của họ vẫn được giữ.",
+      "disableTitle": "Khoá tài khoản này?",
+      "disabled": "Đã khoá {{name}}",
+      "disabling": "Đang khoá…",
+      "enableText": "{{name}} sẽ đăng nhập lại được.",
+      "enableTitle": "Mở khoá tài khoản này?",
+      "enabled": "Đã mở khoá {{name}}",
+      "enabling": "Đang mở khoá…"
+    }
+  },
   "errors": {
+    "ACCOUNT_DISABLED": "Tài khoản này đã bị khoá",
     "AMOUNT_INVALID": "Số tiền phải lớn hơn 0",
     "BUDGET_EXISTS": "Danh mục này đã có ngân sách trong tháng",
     "BUDGET_EXPENSE_ONLY": "Ngân sách chỉ dành cho danh mục chi tiêu",
     "BUDGET_NOT_FOUND": "Không tìm thấy ngân sách",
+    "CANNOT_DISABLE_ADMIN": "Bạn không thể khoá quản trị viên khác",
+    "CANNOT_DISABLE_SELF": "Bạn không thể khoá tài khoản của chính mình",
     "CATEGORY_EXISTS": "Danh mục đã tồn tại",
     "CATEGORY_HAS_RULES": "Danh mục vẫn còn quy tắc định kỳ",
     "CATEGORY_IN_USE": "Danh mục vẫn còn giao dịch",
@@ -675,6 +737,7 @@
     "EMAIL_INVALID": "Email không hợp lệ",
     "EMAIL_TAKEN": "Email này đã được đăng ký",
     "END_BEFORE_START": "Ngày kết thúc phải sau ngày bắt đầu",
+    "FORBIDDEN": "Bạn không có quyền thực hiện thao tác này",
     "GOAL_NOT_FOUND": "Không tìm thấy mục tiêu",
     "ICON_INVALID": "Vui lòng chọn biểu tượng trong danh sách",
     "IMPORT_CATEGORY_NOT_FOUND": "Không tìm thấy danh mục \"{{name}}\" ({{type}})",
@@ -696,6 +759,7 @@
     "PASSWORD_UNCHANGED": "Mật khẩu mới phải khác mật khẩu hiện tại",
     "ROUTE_NOT_FOUND": "Không tìm thấy",
     "RULE_NOT_FOUND": "Không tìm thấy quy tắc định kỳ",
+    "STATUS_INVALID": "Trạng thái phải là hoạt động hoặc đã khoá",
     "TAG_INVALID": "Mỗi thẻ gồm 1-20 chữ cái, chữ số hoặc dấu gạch ngang",
     "TARGET_INVALID": "Số tiền mục tiêu phải là số nguyên lớn hơn 0",
     "TEMPLATE_NOT_FOUND": "Không tìm thấy mẫu",
@@ -707,6 +771,7 @@
     "TYPE_LOCKED": "Không thể đổi loại",
     "UNAUTHORIZED": "Vui lòng đăng nhập để tiếp tục.",
     "UNKNOWN": "Đã có lỗi xảy ra. Vui lòng thử lại.",
+    "USER_NOT_FOUND": "Không tìm thấy người dùng",
     "VALIDATION_ERROR": "Vui lòng kiểm tra lại thông tin đã nhập.",
     "WITHDRAW_TOO_MUCH": "Không thể rút nhiều hơn số tiền đã để dành",
     "WRONG_PASSWORD": "Mật khẩu không đúng"

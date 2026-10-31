@@ -10,6 +10,10 @@ const userSchema = new mongoose.Schema(
     passwordHash: { type: String, required: true },
     // Stored in the JWT (as "tv"). Raising it makes every token issued before invalid, which logs out every device.
     tokenVersion: { type: Number, default: 0 },
+    // "admin" can open the Admin pages (/api/admin/*). Nobody can become one through the API: see scripts/make-admin.js.
+    role: { type: String, enum: ["user", "admin"], default: "user" },
+    // A "disabled" account cannot log in; disabling also raises tokenVersion so the tokens it already has stop working
+    status: { type: String, enum: ["active", "disabled"], default: "active" },
     preferences: {
       theme: { type: String, enum: ["light", "dark", "system"], default: "system" },
       weekStartsOn: { type: String, enum: ["monday", "sunday"], default: "monday" },
