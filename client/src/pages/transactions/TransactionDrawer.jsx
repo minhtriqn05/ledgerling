@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { formatDate, formatSignedVnd } from '../../utils/format.js';
+import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs.jsx';
 import Drawer from '../../components/Drawer/Drawer.jsx';
 import Button from '../../components/Button/Button.jsx';
 import CategoryMark from '../../components/CategoryMark/CategoryMark.jsx';
@@ -12,7 +13,7 @@ export default function TransactionDrawer({ transaction, onEdit, onDelete, onClo
   const { category, type, amount, note, date, tags = [], recurringRuleId } = transaction;
 
   return (
-    <Drawer title={t('transactions.details')} onClose={onClose}>
+    <Drawer title={t('transactions.details')} onClose={onClose} above={<Breadcrumbs />}>
       <div className={`${styles.hero} ${styles[type]}`}>
         <CategoryMark category={category} size="lg" />
         <strong className={styles.amount}>{formatSignedVnd(amount, type)}</strong>

@@ -1,0 +1,74 @@
+.help {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.stage {
+  display: grid;
+  place-items: center;
+}
+
+/* The square box. The photo inside is moved with a transform, the box itself never moves. */
+.viewport {
+  position: relative;
+  max-width: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.viewport:active {
+  cursor: grabbing;
+}
+
+.viewport:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+.photo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: none;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+/* A transparent circle with the rest of the box dimmed around it, and a thin ring on the edge of the circle */
+.mask {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at center, transparent 0 calc(50% - 1px), var(--color-surface) calc(50% - 1px) 50%, var(--color-overlay) 50%);
+}
+
+.zoom {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.zoom input {
+  flex: 1;
+  min-width: 0;
+  accent-color: var(--color-primary);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+@media (max-width: 480px) {
+  .actions > button {
+    flex: 1;
+  }
+}

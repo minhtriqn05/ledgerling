@@ -1,7 +1,7 @@
 {
   "name": "ledgerling-server",
   "version": "1.0.0",
-  "description": "Ledgerling backend API",
+  "description": "Ledgerling backend API. Course project, Phát triển ứng dụng web và cơ sở dữ liệu (CSBU109.R11.KHBC), UIT",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",

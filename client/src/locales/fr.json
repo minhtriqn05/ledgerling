@@ -53,6 +53,10 @@
     "settings": "Paramètres",
     "transactions": "Transactions"
   },
+  "breadcrumb": {
+    "label": "Fil d’Ariane",
+    "transactionDetails": "Détails de la transaction"
+  },
   "language": {
     "label": "Langue"
   },
@@ -662,6 +666,67 @@
       "installed": "Ledgerling est installé sur cet appareil."
     }
   },
+  "avatar": {
+    "title": "Votre avatar",
+    "text": "Choisissez un avatar prêt à l’emploi ou importez votre propre photo.",
+    "demoText": "Le compte démo garde un avatar fixe.",
+    "upload": "Importer une photo",
+    "remove": "Supprimer",
+    "saved": "Avatar mis à jour",
+    "removed": "Avatar supprimé",
+    "groupsLabel": "Groupes d’avatars",
+    "cropTitle": "Ajuster votre photo",
+    "cropHelp": "Faites glisser la photo et utilisez le curseur pour zoomer. La zone ronde sera votre avatar.",
+    "cropArea": "Zone de recadrage. Utilisez les flèches pour déplacer la photo.",
+    "zoom": "Zoom",
+    "usePhoto": "Utiliser cette photo",
+    "openProfile": "Votre profil",
+    "errors": {
+      "type": "Choisissez une image JPG, PNG ou WebP.",
+      "tooBig": "Cette photo est trop grande. Choisissez-en une de moins de 12 Mo.",
+      "unreadable": "Impossible de lire cette image. Essayez-en une autre."
+    },
+    "groups": {
+      "animals": "Animaux",
+      "food": "Nourriture",
+      "nature": "Nature",
+      "fun": "Amusant"
+    },
+    "names": {
+      "cat": "Chat",
+      "dog": "Chien",
+      "panda": "Panda",
+      "rabbit": "Lapin",
+      "fox": "Renard",
+      "penguin": "Manchot",
+      "bear": "Ours",
+      "tiger": "Tigre",
+      "cupcake": "Cupcake",
+      "milk": "Lait",
+      "strawberry": "Fraise",
+      "avocado": "Avocat",
+      "donut": "Donut",
+      "pancake": "Crêpes",
+      "boba": "Thé aux perles",
+      "onigiri": "Boule de riz",
+      "cloud": "Nuage",
+      "tree": "Arbre",
+      "mushroom": "Champignon",
+      "sun": "Soleil",
+      "flower": "Fleur",
+      "moon": "Lune",
+      "cactus": "Cactus",
+      "rainbow": "Arc-en-ciel",
+      "robot": "Robot",
+      "astronaut": "Astronaute",
+      "dino": "Dinosaure",
+      "ghost": "Fantôme",
+      "rocket": "Fusée",
+      "alien": "Extraterrestre",
+      "blob": "Blob gélatineux",
+      "gamepad": "Manette de jeu"
+    }
+  },
   "admin": {
     "subtitle": "Statistiques du site et comptes. Seuls les administrateurs voient cette page.",
     "stats": {
@@ -789,7 +854,7 @@
         "text": "Le tableau de bord et les rapports montrent où va votre argent chaque mois."
       }
     },
-    "footerNote": "Projet de cours de développement d’applications web (MSIS207).",
+    "footerNote": "UIT · CSBU109.R11.KHBC",
     "github": "Voir sur GitHub",
     "opensInNewTab": "(s’ouvre dans un nouvel onglet)"
   },
@@ -847,6 +912,8 @@
     "IMPORT_CATEGORY_NOT_FOUND": "Catégorie « {{name}} » ({{type}}) introuvable",
     "IMPORT_TOO_MANY_ROWS": "Trop de lignes à importer en une fois",
     "INTERNAL_ERROR": "Une erreur s'est produite sur le serveur. Veuillez réessayer.",
+    "INVALID_AVATAR": "Cet avatar n’existe pas.",
+    "INVALID_AVATAR_IMAGE": "La photo doit être une image JPG, PNG ou WebP.",
     "INVALID_CREDENTIALS": "E-mail ou mot de passe incorrect",
     "INVALID_INPUT": "Certaines des données envoyées n'ont pas pu être acceptées.",
     "INVALID_JSON": "Impossible de lire la requête",
@@ -858,11 +925,11 @@
     "NOTE_TOO_LONG": "La note ne doit pas dépasser 200 caractères",
     "NOTIFICATION_NOT_FOUND": "Notification introuvable",
     "NOT_FOUND": "Introuvable",
-    "PAYLOAD_TOO_LARGE": "Les données envoyées sont trop volumineuses.",
     "PASSWORD_REQUIRED": "Le mot de passe est obligatoire",
     "PASSWORD_TOO_LONG": "Le mot de passe ne doit pas dépasser 72 caractères",
     "PASSWORD_TOO_SHORT": "Le mot de passe doit contenir au moins 6 caractères",
     "PASSWORD_UNCHANGED": "Le nouveau mot de passe doit être différent de l'actuel",
+    "PAYLOAD_TOO_LARGE": "Les données envoyées sont trop volumineuses.",
     "RATE_LIMITED": "Trop de requêtes. Veuillez patienter quelques minutes puis réessayer.",
     "ROUTE_NOT_FOUND": "Introuvable",
     "RULE_NOT_FOUND": "Règle récurrente introuvable",

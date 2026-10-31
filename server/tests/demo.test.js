@@ -10,7 +10,7 @@ import Goal from "../src/models/Goal.js";
 import TransactionTemplate from "../src/models/TransactionTemplate.js";
 import Notification from "../src/models/Notification.js";
 import { seedDemo } from "../src/services/demoSeedService.js";
-import { DEMO_EMAIL } from "../src/utils/demo.js";
+import { DEMO_AVATAR, DEMO_EMAIL } from "../src/utils/demo.js";
 import { currentMonth } from "../src/utils/month.js";
 import { api, auth, registerUser } from "./helpers.js";
 
@@ -140,6 +140,8 @@ describe("POST /api/auth/demo after the seed", () => {
     expect(res.body.success).toBe(true);
     expect(typeof res.body.data.token).toBe("string");
     expect(res.body.data.user).toMatchObject({ email: DEMO_EMAIL, isDemo: true });
+    // The seed gives the demo account one fixed avatar
+    expect(res.body.data.user.avatar).toEqual(DEMO_AVATAR);
     expect(res.body.data.user.passwordHash).toBeUndefined();
   });
 
@@ -225,10 +227,23 @@ describe("what the demo account may not do (403 DEMO_READ_ONLY)", () => {
     expect(await Transaction.countDocuments({ userId: user._id })).toBeGreaterThan(0);
   });
 
+  it("cannot change or remove its avatar (the same avatar for every visitor)", async () => {
+    const token = (await demo()).body.data.token;
+    const changed = await api().patch("/api/users/me/avatar").set(auth(token)).send({ type: "preset", value: "tiger" });
+    const removed = await api().delete("/api/users/me/avatar").set(auth(token));
+
+    expect(changed.status).toBe(403);
+    expect(changed.body).toEqual(expected);
+    expect(removed.status).toBe(403);
+    expect(removed.body).toEqual(expected);
+    expect((await api().get("/api/auth/me").set(auth(token))).body.data.avatar).toEqual(DEMO_AVATAR);
+  });
+
   it("still needs a token for these routes (401 comes before 403)", async () => {
     expect((await api().patch("/api/users/me/password").send({})).status).toBe(401);
     expect((await api().post("/api/auth/logout-all")).status).toBe(401);
     expect((await api().delete("/api/users/me")).status).toBe(401);
+    expect((await api().patch("/api/users/me/avatar").send({})).status).toBe(401);
   });
 
   it("can still use the rest of the app: add a transaction, change the name and the theme, export", async () => {

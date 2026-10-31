@@ -3,12 +3,32 @@
   display: grid;
   flex-shrink: 0;
   place-items: center;
+  overflow: hidden;
   border-radius: var(--radius-full);
   background: color-mix(in srgb, var(--tone) 22%, var(--color-surface));
   color: color-mix(in srgb, var(--tone) 62%, var(--color-text));
   font-weight: var(--font-weight-bold);
   line-height: 1;
   user-select: none;
+}
+
+/* A picture (a drawing or a photo) has its own colors: a thin ring keeps its edge visible on the dark theme too */
+.picture {
+  background: var(--color-surface-muted);
+  box-shadow: 0 0 0 1px var(--color-border-strong);
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.xs {
+  width: 28px;
+  height: 28px;
+  font-size: var(--font-size-sm);
 }
 
 .sm {
@@ -21,4 +41,10 @@
   width: 64px;
   height: 64px;
   font-size: var(--font-size-xl);
+}
+
+.xl {
+  width: 88px;
+  height: 88px;
+  font-size: var(--font-size-2xl);
 }

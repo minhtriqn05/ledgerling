@@ -92,6 +92,37 @@ test('Try the demo says the server is starting, then opens the Dashboard with da
   await expect(page.getByTestId('account-name')).toHaveText('Demo User');
 });
 
+test('Try the demo explains it when the demo account is not on the server (503), and works again later', async ({ page }) => {
+  // What a server whose database was never seeded answers (see `npm run seed`)
+  let seeded = false;
+  await page.route('**/api/auth/demo', async (route) => {
+    if (seeded) return route.continue();
+    await route.fulfill({
+      status: 503,
+      contentType: 'application/json',
+      body: JSON.stringify({ success: false, message: 'Demo account is not available', code: 'DEMO_UNAVAILABLE' }),
+    });
+  });
+  await page.goto('/welcome');
+  await page.getByRole('button', { name: 'Try the demo' }).click();
+
+  // A message in plain words instead of silence; the button works again; nobody is signed in
+  await expect(page.getByRole('alert')).toContainText('The demo is not available right now. Please try again later.');
+  await expect(page.getByRole('button', { name: 'Try the demo' })).toBeEnabled();
+  await expect(page).toHaveURL(/\/welcome$/);
+  expect(await page.evaluate(() => localStorage.getItem('token'))).toBeNull();
+
+  // Once the account exists, the same button signs in
+  seeded = true;
+  await page.getByRole('button', { name: 'Try the demo' }).click();
+  await expect(page.getByRole('heading', { name: 'Dashboard', level: 1 })).toBeVisible();
+});
+
+test('the footer names the course class', async ({ page }) => {
+  await page.goto('/welcome');
+  await expect(page.getByRole('contentinfo')).toContainText('UIT · CSBU109.R11.KHBC');
+});
+
 test('the demo account has 3 months of transactions, two rules and no hand-made Rent or Salary', async ({ page }) => {
   await tryTheDemo(page);
   const token = await page.evaluate(() => localStorage.getItem('token'));

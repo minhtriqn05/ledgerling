@@ -42,7 +42,8 @@ test('register → add a transaction → see it everywhere → log out', async (
 
   // 5. The Dashboard numbers changed
   await openMenuIfNeeded(page);
-  await page.getByRole('link', { name: 'Dashboard' }).click();
+  // The menu link (the breadcrumb of the page has a link with the same name)
+  await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Dashboard' }).click();
   const expenseCard = page.locator('article', { hasText: 'Total Expense' });
   await expect(expenseCard).toContainText('185,000');
   await expect(page.locator('article', { hasText: 'Balance' })).toContainText('185,000');

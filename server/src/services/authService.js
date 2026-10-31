@@ -4,6 +4,7 @@ import User from "../models/User.js";
 import { createDefaultCategories } from "./categoryService.js";
 import { httpError } from "../utils/httpError.js";
 import { DEMO_EMAIL } from "../utils/demo.js";
+import { randomPresetAvatar } from "../utils/avatars.js";
 
 const SALT_ROUNDS = 10;
 
@@ -21,7 +22,7 @@ export async function register({ name, email, password }) {
   if (existing) throw httpError(409, "Email is already registered", "EMAIL_TAKEN");
 
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-  const user = await User.create({ name, email, passwordHash });
+  const user = await User.create({ name, email, passwordHash, avatar: randomPresetAvatar() });
   // Every new account starts with a ready-made set of categories
   await createDefaultCategories(user._id);
 

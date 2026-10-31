@@ -53,6 +53,10 @@
     "settings": "設定",
     "transactions": "取引"
   },
+  "breadcrumb": {
+    "label": "パンくずリスト",
+    "transactionDetails": "取引の詳細"
+  },
   "language": {
     "label": "言語"
   },
@@ -662,6 +666,67 @@
       "installed": "Ledgerling はこのデバイスにインストールされています。"
     }
   },
+  "avatar": {
+    "title": "アバター",
+    "text": "用意されたアバターを選ぶか、自分の写真をアップロードしてください。",
+    "demoText": "デモアカウントのアバターは固定です。",
+    "upload": "写真をアップロード",
+    "remove": "削除",
+    "saved": "アバターを更新しました",
+    "removed": "アバターを削除しました",
+    "groupsLabel": "アバターのグループ",
+    "cropTitle": "写真を調整",
+    "cropHelp": "写真をドラッグし、スライダーで拡大します。丸い部分がアバターになります。",
+    "cropArea": "写真の切り抜き範囲。矢印キーで写真を動かせます。",
+    "zoom": "ズーム",
+    "usePhoto": "この写真を使う",
+    "openProfile": "あなたのプロフィール",
+    "errors": {
+      "type": "JPG、PNG、WebP のいずれかの画像を選んでください。",
+      "tooBig": "写真が大きすぎます。12 MB 以下の写真を選んでください。",
+      "unreadable": "この画像を読み込めませんでした。別の画像をお試しください。"
+    },
+    "groups": {
+      "animals": "どうぶつ",
+      "food": "たべもの",
+      "nature": "しぜん",
+      "fun": "たのしい"
+    },
+    "names": {
+      "cat": "ねこ",
+      "dog": "いぬ",
+      "panda": "パンダ",
+      "rabbit": "うさぎ",
+      "fox": "きつね",
+      "penguin": "ペンギン",
+      "bear": "くま",
+      "tiger": "とら",
+      "cupcake": "カップケーキ",
+      "milk": "ぎゅうにゅう",
+      "strawberry": "いちご",
+      "avocado": "アボカド",
+      "donut": "ドーナツ",
+      "pancake": "パンケーキ",
+      "boba": "タピオカティー",
+      "onigiri": "おにぎり",
+      "cloud": "くも",
+      "tree": "き",
+      "mushroom": "きのこ",
+      "sun": "たいよう",
+      "flower": "はな",
+      "moon": "つき",
+      "cactus": "サボテン",
+      "rainbow": "にじ",
+      "robot": "ロボット",
+      "astronaut": "うちゅうひこうし",
+      "dino": "きょうりゅう",
+      "ghost": "おばけ",
+      "rocket": "ロケット",
+      "alien": "うちゅうじん",
+      "blob": "ゼリー",
+      "gamepad": "ゲームコントローラー"
+    }
+  },
   "admin": {
     "subtitle": "サイトの統計とアカウント。管理者だけがこのページを見られます。",
     "stats": {
@@ -789,7 +854,7 @@
         "text": "ダッシュボードとレポートで、毎月お金がどこに使われたかがわかります。"
       }
     },
-    "footerNote": "Webアプリケーション開発（MSIS207）の授業プロジェクトです。",
+    "footerNote": "UIT · CSBU109.R11.KHBC",
     "github": "GitHub で見る",
     "opensInNewTab": "（新しいタブで開きます）"
   },
@@ -847,6 +912,8 @@
     "IMPORT_CATEGORY_NOT_FOUND": "カテゴリ「{{name}}」（{{type}}）が見つかりません",
     "IMPORT_TOO_MANY_ROWS": "一度に取り込むには行数が多すぎます",
     "INTERNAL_ERROR": "サーバーで問題が発生しました。もう一度お試しください。",
+    "INVALID_AVATAR": "そのアバターは存在しません。",
+    "INVALID_AVATAR_IMAGE": "写真は JPG、PNG、WebP のいずれかの画像にしてください。",
     "INVALID_CREDENTIALS": "メールアドレスまたはパスワードが正しくありません",
     "INVALID_INPUT": "送信されたデータの一部を受け付けられませんでした。",
     "INVALID_JSON": "リクエストを読み取れませんでした",
@@ -858,11 +925,11 @@
     "NOTE_TOO_LONG": "メモは 200 文字以内で入力してください",
     "NOTIFICATION_NOT_FOUND": "通知が見つかりません",
     "NOT_FOUND": "見つかりません",
-    "PAYLOAD_TOO_LARGE": "送信したデータが大きすぎます。",
     "PASSWORD_REQUIRED": "パスワードは必須です",
     "PASSWORD_TOO_LONG": "パスワードは 72 文字以内で入力してください",
     "PASSWORD_TOO_SHORT": "パスワードは 6 文字以上で入力してください",
     "PASSWORD_UNCHANGED": "新しいパスワードは現在のものと異なる必要があります",
+    "PAYLOAD_TOO_LARGE": "送信したデータが大きすぎます。",
     "RATE_LIMITED": "リクエストが多すぎます。数分待ってからもう一度お試しください。",
     "ROUTE_NOT_FOUND": "見つかりません",
     "RULE_NOT_FOUND": "定期ルールが見つかりません",

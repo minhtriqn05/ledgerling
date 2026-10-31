@@ -8,6 +8,18 @@ export async function updateProfile(name) {
   return response.data.data;
 }
 
+// avatar: { type: 'preset', value: 'cat' } or { type: 'upload', value: 'data:image/webp;base64,...' }. Returns the user.
+export async function setAvatar(avatar) {
+  const response = await api.patch('/users/me/avatar', avatar);
+  return response.data.data;
+}
+
+// The app shows the first letter of the name again. Returns the user.
+export async function removeAvatar() {
+  const response = await api.delete('/users/me/avatar');
+  return response.data.data;
+}
+
 // Returns { token, user }. The old token stopped working, so the caller must store the new one.
 export async function changePassword(currentPassword, newPassword) {
   const response = await api.patch('/users/me/password', { currentPassword, newPassword });

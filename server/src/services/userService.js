@@ -42,6 +42,20 @@ export async function updateProfile(userId, { name }) {
   return user;
 }
 
+// avatar is { type, value } already checked by validateAvatar
+export async function setAvatar(userId, avatar) {
+  const user = await User.findByIdAndUpdate(userId, { $set: { avatar } }, { returnDocument: "after", runValidators: true });
+  if (!user) throw invalidToken();
+  return user;
+}
+
+// No avatar = the app shows the first letter of the name again
+export async function removeAvatar(userId) {
+  const user = await User.findByIdAndUpdate(userId, { $unset: { avatar: "" } }, { returnDocument: "after" });
+  if (!user) throw invalidToken();
+  return user;
+}
+
 // A wrong current password is a 400, not a 401: the client logs the user out on every 401.
 export async function changePassword(userId, { currentPassword, newPassword }) {
   const user = await User.findById(userId);

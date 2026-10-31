@@ -53,6 +53,10 @@
     "settings": "设置",
     "transactions": "交易"
   },
+  "breadcrumb": {
+    "label": "面包屑导航",
+    "transactionDetails": "交易详情"
+  },
   "language": {
     "label": "语言"
   },
@@ -662,6 +666,67 @@
       "installed": "Ledgerling 已安装在此设备上。"
     }
   },
+  "avatar": {
+    "title": "你的头像",
+    "text": "选择一个现成的头像，或上传你自己的照片。",
+    "demoText": "演示账户使用固定头像。",
+    "upload": "上传照片",
+    "remove": "移除",
+    "saved": "头像已更新",
+    "removed": "头像已移除",
+    "groupsLabel": "头像分组",
+    "cropTitle": "调整照片",
+    "cropHelp": "拖动照片，用滑块缩放。圆形区域就是你的头像。",
+    "cropArea": "照片裁剪区域。使用方向键移动照片。",
+    "zoom": "缩放",
+    "usePhoto": "使用这张照片",
+    "openProfile": "你的个人资料",
+    "errors": {
+      "type": "请选择 JPG、PNG 或 WebP 图片。",
+      "tooBig": "这张照片太大了，请选择 12 MB 以内的照片。",
+      "unreadable": "无法读取这张图片，请换一张试试。"
+    },
+    "groups": {
+      "animals": "动物",
+      "food": "美食",
+      "nature": "自然",
+      "fun": "趣味"
+    },
+    "names": {
+      "cat": "猫",
+      "dog": "狗",
+      "panda": "熊猫",
+      "rabbit": "兔子",
+      "fox": "狐狸",
+      "penguin": "企鹅",
+      "bear": "熊",
+      "tiger": "老虎",
+      "cupcake": "纸杯蛋糕",
+      "milk": "牛奶",
+      "strawberry": "草莓",
+      "avocado": "牛油果",
+      "donut": "甜甜圈",
+      "pancake": "松饼",
+      "boba": "珍珠奶茶",
+      "onigiri": "饭团",
+      "cloud": "云朵",
+      "tree": "大树",
+      "mushroom": "蘑菇",
+      "sun": "太阳",
+      "flower": "花朵",
+      "moon": "月亮",
+      "cactus": "仙人掌",
+      "rainbow": "彩虹",
+      "robot": "机器人",
+      "astronaut": "宇航员",
+      "dino": "恐龙",
+      "ghost": "小幽灵",
+      "rocket": "火箭",
+      "alien": "外星人",
+      "blob": "果冻团",
+      "gamepad": "游戏手柄"
+    }
+  },
   "admin": {
     "subtitle": "网站统计与账户。只有管理员能看到此页面。",
     "stats": {
@@ -789,7 +854,7 @@
         "text": "仪表盘和报表会显示你每个月的钱花在了哪里。"
       }
     },
-    "footerNote": "网络应用开发（MSIS207）课程项目。",
+    "footerNote": "UIT · CSBU109.R11.KHBC",
     "github": "在 GitHub 上查看",
     "opensInNewTab": "（在新标签页中打开）"
   },
@@ -847,6 +912,8 @@
     "IMPORT_CATEGORY_NOT_FOUND": "找不到分类“{{name}}”（{{type}}）",
     "IMPORT_TOO_MANY_ROWS": "一次导入的行数过多",
     "INTERNAL_ERROR": "服务器出错了。请重试。",
+    "INVALID_AVATAR": "该头像不存在。",
+    "INVALID_AVATAR_IMAGE": "照片必须是 JPG、PNG 或 WebP 图片。",
     "INVALID_CREDENTIALS": "邮箱或密码不正确",
     "INVALID_INPUT": "发送的部分数据无法被接受。",
     "INVALID_JSON": "无法读取请求",
@@ -858,11 +925,11 @@
     "NOTE_TOO_LONG": "备注最多 200 个字符",
     "NOTIFICATION_NOT_FOUND": "找不到通知",
     "NOT_FOUND": "未找到",
-    "PAYLOAD_TOO_LARGE": "您发送的数据太大。",
     "PASSWORD_REQUIRED": "请填写密码",
     "PASSWORD_TOO_LONG": "密码最多 72 个字符",
     "PASSWORD_TOO_SHORT": "密码至少需要 6 个字符",
     "PASSWORD_UNCHANGED": "新密码不能与当前密码相同",
+    "PAYLOAD_TOO_LARGE": "您发送的数据太大。",
     "RATE_LIMITED": "请求过多。请等待几分钟后重试。",
     "ROUTE_NOT_FOUND": "未找到",
     "RULE_NOT_FOUND": "找不到定期规则",

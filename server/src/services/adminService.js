@@ -49,6 +49,7 @@ function toAdminUser(user, transactionCount) {
     _id: user._id,
     name: user.name,
     email: user.email,
+    avatar: user.avatar,
     role: user.role ?? "user",
     status: user.status ?? "active",
     createdAt: user.createdAt,
@@ -56,7 +57,7 @@ function toAdminUser(user, transactionCount) {
   };
 }
 
-const USER_FIELDS = "name email role status createdAt";
+const USER_FIELDS = "name email avatar role status createdAt";
 
 // The user's own number of transactions, as a number only
 async function countsFor(userIds) {

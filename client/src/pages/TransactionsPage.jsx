@@ -6,6 +6,7 @@ import { getCategories } from '../api/categories.js';
 import { deleteTransaction, exportTransactions, getTransactions } from '../api/transactions.js';
 import { getSummary } from '../api/stats.js';
 import { getErrorMessage } from '../api/axios.js';
+import { useBreadcrumbDetail } from '../context/BreadcrumbContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { UNDO_MS, useUndoDelete } from '../hooks/useUndoDelete.js';
 import { categoryLabel } from '../utils/emoji.js';
@@ -165,6 +166,8 @@ export default function TransactionsPage() {
   // (transaction = null for a new one), { kind: 'import' }, { kind: 'bulk-delete' } or { kind: 'bulk-category' }
   const [dialog, setDialog] = useState(null);
   const [exporting, setExporting] = useState(false);
+  // While the drawer is open the breadcrumb ends with "Transaction details"; its "Transactions" item closes the drawer
+  useBreadcrumbDetail(dialog?.kind === 'detail' ? 'breadcrumb.transactionDetails' : null, () => setDialog(null));
   // The ids of the ticked rows (bulk actions)
   const [selectedIds, setSelectedIds] = useState(() => new Set());
   const searchRef = useRef(null);

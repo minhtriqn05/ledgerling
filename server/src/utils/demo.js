@@ -4,3 +4,6 @@ export const DEMO_EMAIL = "demo@example.com";
 export const DEMO_NAME = "Demo User";
 
 export const isDemoEmail = (email) => email === DEMO_EMAIL;
+
+// The demo account keeps one fixed avatar (the seed sets it), so every visitor sees the same face
+export const DEMO_AVATAR = { type: "preset", value: "panda" };

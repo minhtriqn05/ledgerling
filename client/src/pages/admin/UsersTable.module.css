@@ -53,6 +53,18 @@
   overflow-wrap: anywhere;
 }
 
+/* The face, the name and the "You" badge on one line */
+.person {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.personName {
+  overflow-wrap: anywhere;
+}
+
 .email {
   color: var(--color-text-secondary);
   overflow-wrap: anywhere;

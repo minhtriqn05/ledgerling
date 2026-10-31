@@ -42,7 +42,7 @@ or deleting the account. A device with an old token is then refused with `TOKEN_
 - **Limits** (per IP address, counted in the memory of the server, so they start again after a restart):
   300 requests per 15 minutes to `/api` (`/api/health` is free) and 20 requests per 15 minutes to
   `POST /auth/login`, `POST /auth/register` + `POST /auth/demo` (each has its own counter). More gets 429 `RATE_LIMITED`. A JSON body can be at most 100 kB
-  (300 kB for `POST /transactions/import`); a bigger one gets 413 `PAYLOAD_TOO_LARGE`.
+  (300 kB for `POST /transactions/import`, 200 kB for `PATCH /users/me/avatar`); a bigger one gets 413 `PAYLOAD_TOO_LARGE`.
 - **Input safety**: a body key that starts with `$` or contains `.`, or a query key that starts with `$` or contains `[`
   (for example `?month[$ne]=x`), gets 400 `INVALID_INPUT`. Besides that, every route turns each field into the type it
   expects (string, number, ObjectId) before it reaches the database; a query value sent twice (`?month=a&month=b`) is refused.
@@ -58,10 +58,10 @@ or deleting the account. A device with an old token is then refused with `TOKEN_
 | 201 | Created |
 | 400 | Invalid input (validation failed, unknown field value, bad format, body that is not valid JSON → `"Invalid JSON body"`) |
 | 401 | Missing/invalid/expired token (also a token made before the password changed or "log out of all devices", or of a deleted account), wrong email or password at login |
-| 403 | Signed in but not allowed: not an admin on `/api/admin/*` (`FORBIDDEN`), a disabled account at login (`ACCOUNT_DISABLED`), an admin trying to disable himself or another admin, or the demo account changing its password, logging out of all devices or deleting itself (`DEMO_READ_ONLY`) |
+| 403 | Signed in but not allowed: not an admin on `/api/admin/*` (`FORBIDDEN`), a disabled account at login (`ACCOUNT_DISABLED`), an admin trying to disable himself or another admin, or the demo account changing its password, avatar, logging out of all devices or deleting itself (`DEMO_READ_ONLY`) |
 | 404 | Not found, belongs to another user, malformed `:id` in the URL, or unknown route (`"Route not found"`) |
 | 409 | Duplicate (email, category name, budget of the same category and month, two transactions of one recurring rule on the same date) or conflict (category still has transactions or recurring rules) |
-| 413 | JSON body bigger than 100 kB (300 kB for the CSV import) → `PAYLOAD_TOO_LARGE` |
+| 413 | JSON body bigger than 100 kB (300 kB for the CSV import, 200 kB for an avatar photo), or a photo bigger than 120 kB → `PAYLOAD_TOO_LARGE` |
 | 429 | Too many requests from one IP address → `RATE_LIMITED` |
 | 503 | `POST /auth/demo` when the demo account has not been seeded → `DEMO_UNAVAILABLE` |
 | 500 | Server error (the answer never holds a stack trace; the details go to the server log) |
@@ -75,7 +75,7 @@ When the place that throws an error names no specific code, the status gives a d
 
 | Status | Codes |
 |--------|-------|
-| 400 | `VALIDATION_ERROR`, `INVALID_JSON`, `NAME_REQUIRED`, `NAME_TOO_LONG`, `EMAIL_INVALID`, `PASSWORD_REQUIRED`, `PASSWORD_TOO_SHORT`, `PASSWORD_TOO_LONG`, `CURRENT_PASSWORD_REQUIRED`, `NEW_PASSWORD_TOO_SHORT`, `PASSWORD_UNCHANGED`, `WRONG_PASSWORD`, `TYPE_INVALID`, `TYPE_LOCKED`, `COLOR_INVALID`, `ICON_INVALID`, `CATEGORY_REQUIRED`, `AMOUNT_INVALID`, `CURRENCY_INVALID`, `NOTE_TOO_LONG`, `DATE_INVALID`, `TAG_INVALID`, `TOO_MANY_TAGS`, `MONTH_INVALID`, `BUDGET_EXPENSE_ONLY`, `END_BEFORE_START`, `TARGET_INVALID`, `DEADLINE_IN_PAST`, `WITHDRAW_TOO_MUCH`, `DEPOSIT_IN_USE`, `IMPORT_TOO_MANY_ROWS`, `STATUS_INVALID`, `INVALID_INPUT` |
+| 400 | `VALIDATION_ERROR`, `INVALID_JSON`, `NAME_REQUIRED`, `NAME_TOO_LONG`, `EMAIL_INVALID`, `PASSWORD_REQUIRED`, `PASSWORD_TOO_SHORT`, `PASSWORD_TOO_LONG`, `CURRENT_PASSWORD_REQUIRED`, `NEW_PASSWORD_TOO_SHORT`, `PASSWORD_UNCHANGED`, `WRONG_PASSWORD`, `TYPE_INVALID`, `TYPE_LOCKED`, `COLOR_INVALID`, `ICON_INVALID`, `CATEGORY_REQUIRED`, `AMOUNT_INVALID`, `CURRENCY_INVALID`, `NOTE_TOO_LONG`, `DATE_INVALID`, `TAG_INVALID`, `TOO_MANY_TAGS`, `MONTH_INVALID`, `BUDGET_EXPENSE_ONLY`, `END_BEFORE_START`, `TARGET_INVALID`, `DEADLINE_IN_PAST`, `WITHDRAW_TOO_MUCH`, `DEPOSIT_IN_USE`, `IMPORT_TOO_MANY_ROWS`, `STATUS_INVALID`, `INVALID_INPUT`, `INVALID_AVATAR`, `INVALID_AVATAR_IMAGE` |
 | 401 | `TOKEN_MISSING`, `TOKEN_INVALID`, `INVALID_CREDENTIALS` |
 | 403 | `FORBIDDEN`, `ACCOUNT_DISABLED`, `CANNOT_DISABLE_SELF`, `CANNOT_DISABLE_ADMIN`, `DEMO_READ_ONLY` |
 | 404 | `USER_NOT_FOUND`, `ROUTE_NOT_FOUND`, `CATEGORY_NOT_FOUND`, `TRANSACTION_NOT_FOUND`, `BUDGET_NOT_FOUND`, `RULE_NOT_FOUND`, `GOAL_NOT_FOUND`, `CONTRIBUTION_NOT_FOUND`, `TEMPLATE_NOT_FOUND`, `NOTIFICATION_NOT_FOUND` |
@@ -181,6 +181,8 @@ The tables below list the `message` of each endpoint; the matching code is in th
 | 58 | GET | `/api/admin/users` | Admin | List the accounts with their number of transactions (`?q=&page=&limit=`) |
 | 59 | PATCH | `/api/admin/users/:id/status` | Admin | Disable or enable an account |
 | 60 | POST | `/api/auth/demo` | No | Sign in to the shared demo account (the "Try the demo" button) |
+| 61 | PATCH | `/api/users/me/avatar` | Yes | Choose a ready-made avatar or upload my own photo |
+| 62 | DELETE | `/api/users/me/avatar` | Yes | Remove my avatar (the app shows the first letter of my name again) |
 
 Every protected route (Auth = Yes) can also return **401** (`"Not authorized, token missing"` /
 `"Not authorized, invalid token"`) and every route can return **500** (`"Internal server error"`).
@@ -273,13 +275,15 @@ The demo account is full of sample data (10 categories with icons, about 90 tran
 budgets of the current month with one over 100% and one over 80%, two monthly recurring rules Rent and Salary that make their own
 transactions, two savings goals, three templates and a few notifications). Everything else works as for any user, except three actions
 that would lock out the next visitor or destroy the account. They answer **403** `"Not available in the demo account"` (`DEMO_READ_ONLY`):
-`PATCH /users/me/password` (53), `POST /auth/logout-all` (54) and `DELETE /users/me` (56).
+`PATCH /users/me/password` (53), `POST /auth/logout-all` (54), `DELETE /users/me` (56), and `PATCH` / `DELETE /users/me/avatar` (61, 62): the demo account keeps one fixed avatar (`panda`).
 
 **Seed**: `cd server && npm run seed` connects to `MONGODB_URI` and the password of the account comes from `DEMO_PASSWORD` in `server/.env`.
 It deletes and makes again only the documents of the demo user (the user document stays), so it is safe to run twice; run it again any time to
-move the sample dates up to today. Playwright's API (`npm run start:e2e`) seeds the same data in its in-memory database.
+move the sample dates up to today. **"Try the demo" answers 503 until this has been run against the database the server uses** (on Render: the one in its `MONGODB_URI`); the server also writes a warning to its log at start-up when the demo user is missing. Playwright's API (`npm run start:e2e`) seeds the same data in its in-memory database.
 
 ### 4. GET /api/auth/me
+The user has `avatar` (`{ type, value }`) when it has one, see endpoint 61.
+
 Auth: yes. No body.
 
 **200**
@@ -1382,6 +1386,37 @@ belongs to the user. It cannot be undone.
 **Errors**: 400 `"Password is required"` (`PASSWORD_REQUIRED`), `"Password is incorrect"` (`WRONG_PASSWORD`).
 
 ---
+
+### 61. PATCH /api/users/me/avatar
+Auth: yes. Always changes the avatar of the signed-in user (a user id in the body is ignored). This route reads a JSON body of up to **200 kB**
+(every other route 100 kB).
+
+**Body** one of
+```json
+{ "type": "preset", "value": "fox" }
+{ "type": "upload", "value": "data:image/webp;base64,UklGR..." }
+```
+- `preset`: one of the 32 ready-made avatars, in four groups of eight (the drawings are in `client/src/assets/avatars`):
+  animals `cat dog panda rabbit fox penguin bear tiger`, food `cupcake milk strawberry avocado donut pancake boba onigiri`,
+  nature `cloud tree mushroom sun flower moon cactus rainbow`, fun `robot astronaut dino ghost rocket alien blob gamepad`.
+  A new account gets one of them at random.
+- `upload`: a data URL of a JPEG, PNG or WebP photo, at most 120 kB once decoded (the app crops a square, shrinks it to 256x256 WebP of about 100 kB
+  in the browser before sending it). The first bytes of the file must match its type.
+
+**200** – `data` is the user with the new `avatar`.
+
+**Errors**
+
+| Code | message |
+|------|---------|
+| 400 | `"Unknown avatar"` / `"Avatar type must be preset or upload"` (`INVALID_AVATAR`), `"The photo must be a JPEG, PNG or WebP image"` (`INVALID_AVATAR_IMAGE`) |
+| 401 | `TOKEN_MISSING`, `TOKEN_INVALID` |
+| 403 | `"Not available in the demo account"` (`DEMO_READ_ONLY`) |
+| 413 | `"Request body is too large"` (`PAYLOAD_TOO_LARGE`): the body is over 200 kB or the photo over 120 kB |
+
+### 62. DELETE /api/users/me/avatar
+Auth: yes. Removes the avatar; the app shows the first letter of the name on a color. Removing an avatar that is not there is fine.
+**200** – `data` is the user without `avatar`. **Errors**: 401, 403 `DEMO_READ_ONLY`.
 
 ## Admin
 

@@ -53,6 +53,10 @@
     "settings": "설정",
     "transactions": "거래 내역"
   },
+  "breadcrumb": {
+    "label": "이동 경로",
+    "transactionDetails": "거래 상세"
+  },
   "language": {
     "label": "언어"
   },
@@ -662,6 +666,67 @@
       "installed": "Ledgerling이 이 기기에 설치되어 있습니다."
     }
   },
+  "avatar": {
+    "title": "내 아바타",
+    "text": "준비된 아바타를 고르거나 내 사진을 올려 보세요.",
+    "demoText": "데모 계정은 고정된 아바타를 사용합니다.",
+    "upload": "사진 올리기",
+    "remove": "삭제",
+    "saved": "아바타를 변경했어요",
+    "removed": "아바타를 삭제했어요",
+    "groupsLabel": "아바타 그룹",
+    "cropTitle": "사진 조정",
+    "cropHelp": "사진을 끌어 옮기고 슬라이더로 확대하세요. 둥근 영역이 아바타가 됩니다.",
+    "cropArea": "사진 자르기 영역. 방향키로 사진을 옮길 수 있어요.",
+    "zoom": "확대",
+    "usePhoto": "이 사진 사용",
+    "openProfile": "내 프로필",
+    "errors": {
+      "type": "JPG, PNG 또는 WebP 이미지를 선택하세요.",
+      "tooBig": "사진이 너무 큽니다. 12MB 이하의 사진을 선택하세요.",
+      "unreadable": "이 이미지를 읽을 수 없습니다. 다른 이미지를 시도해 보세요."
+    },
+    "groups": {
+      "animals": "동물",
+      "food": "음식",
+      "nature": "자연",
+      "fun": "재미"
+    },
+    "names": {
+      "cat": "고양이",
+      "dog": "강아지",
+      "panda": "판다",
+      "rabbit": "토끼",
+      "fox": "여우",
+      "penguin": "펭귄",
+      "bear": "곰",
+      "tiger": "호랑이",
+      "cupcake": "컵케이크",
+      "milk": "우유",
+      "strawberry": "딸기",
+      "avocado": "아보카도",
+      "donut": "도넛",
+      "pancake": "팬케이크",
+      "boba": "버블티",
+      "onigiri": "주먹밥",
+      "cloud": "구름",
+      "tree": "나무",
+      "mushroom": "버섯",
+      "sun": "해",
+      "flower": "꽃",
+      "moon": "달",
+      "cactus": "선인장",
+      "rainbow": "무지개",
+      "robot": "로봇",
+      "astronaut": "우주비행사",
+      "dino": "공룡",
+      "ghost": "유령",
+      "rocket": "로켓",
+      "alien": "외계인",
+      "blob": "젤리",
+      "gamepad": "게임 컨트롤러"
+    }
+  },
   "admin": {
     "subtitle": "사이트 통계와 계정입니다. 관리자만 이 페이지를 볼 수 있습니다.",
     "stats": {
@@ -789,7 +854,7 @@
         "text": "대시보드와 리포트에서 매달 돈이 어디로 가는지 확인하세요."
       }
     },
-    "footerNote": "웹 애플리케이션 개발(MSIS207) 수업 프로젝트입니다.",
+    "footerNote": "UIT · CSBU109.R11.KHBC",
     "github": "GitHub에서 보기",
     "opensInNewTab": "(새 탭에서 열림)"
   },
@@ -847,6 +912,8 @@
     "IMPORT_CATEGORY_NOT_FOUND": "카테고리 \"{{name}}\" ({{type}})을(를) 찾을 수 없습니다",
     "IMPORT_TOO_MANY_ROWS": "한 번에 가져오기에는 행이 너무 많습니다",
     "INTERNAL_ERROR": "서버에 문제가 발생했습니다. 다시 시도하세요.",
+    "INVALID_AVATAR": "존재하지 않는 아바타입니다.",
+    "INVALID_AVATAR_IMAGE": "사진은 JPG, PNG 또는 WebP 이미지여야 합니다.",
     "INVALID_CREDENTIALS": "이메일 또는 비밀번호가 올바르지 않습니다",
     "INVALID_INPUT": "전송한 데이터 중 일부를 받아들일 수 없습니다.",
     "INVALID_JSON": "요청을 읽을 수 없습니다",
@@ -858,11 +925,11 @@
     "NOTE_TOO_LONG": "메모는 최대 200자입니다",
     "NOTIFICATION_NOT_FOUND": "알림을 찾을 수 없습니다",
     "NOT_FOUND": "찾을 수 없습니다",
-    "PAYLOAD_TOO_LARGE": "전송한 데이터가 너무 큽니다.",
     "PASSWORD_REQUIRED": "비밀번호는 필수입니다",
     "PASSWORD_TOO_LONG": "비밀번호는 최대 72자입니다",
     "PASSWORD_TOO_SHORT": "비밀번호는 6자 이상이어야 합니다",
     "PASSWORD_UNCHANGED": "새 비밀번호는 현재 비밀번호와 달라야 합니다",
+    "PAYLOAD_TOO_LARGE": "전송한 데이터가 너무 큽니다.",
     "RATE_LIMITED": "요청이 너무 많습니다. 몇 분 후에 다시 시도하세요.",
     "ROUTE_NOT_FOUND": "찾을 수 없습니다",
     "RULE_NOT_FOUND": "정기 거래 규칙을 찾을 수 없습니다",

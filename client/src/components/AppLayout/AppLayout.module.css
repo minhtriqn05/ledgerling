@@ -38,6 +38,17 @@
   display: none;
 }
 
+/* The small face in the top bar of a phone (on a wide screen the account block of the sidebar shows it) */
+.barAvatar {
+  display: none;
+  border-radius: var(--radius-full);
+}
+
+.barAvatar:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
 /* The links and Log out. On wide screens it fills the sidebar below the brand. */
 .panel {
   display: flex;
@@ -250,6 +261,10 @@
 
   .bar {
     height: var(--topbar-height);
+  }
+
+  .barAvatar {
+    display: block;
   }
 
   .menuButton {

@@ -165,6 +165,8 @@ describe("GET /api/admin/users", () => {
       _id: user.user._id,
       name: "Counted Person",
       email: user.email,
+      // The Admin list shows the avatar next to the name
+      avatar: user.user.avatar,
       role: "user",
       status: "active",
       createdAt: expect.any(String),
@@ -177,7 +179,7 @@ describe("GET /api/admin/users", () => {
     const text = JSON.stringify(res.body);
     expect(text).not.toMatch(/passwordHash|tokenVersion|preferences|\$2[aby]\$/);
     for (const row of res.body.data) {
-      expect(Object.keys(row).sort()).toEqual(["_id", "createdAt", "email", "name", "role", "status", "transactionCount"]);
+      expect(Object.keys(row).sort()).toEqual(["_id", "avatar", "createdAt", "email", "name", "role", "status", "transactionCount"]);
     }
   });
 

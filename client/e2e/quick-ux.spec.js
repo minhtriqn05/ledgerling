@@ -314,7 +314,8 @@ test('a deleted row is really deleted after 5 seconds, and at once when the page
   await deleteRow(page, testInfo, 'Dinner');
   await expect(visibleNotes(page, 'Dinner')).toHaveCount(0);
   await openMenuIfNeeded(page);
-  await page.getByRole('link', { name: 'Dashboard' }).click();
+  // The menu link (the breadcrumb of the page has a link with the same name)
+  await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Dashboard' }).click();
   await expect(page.getByRole('heading', { name: 'Dashboard', level: 1 })).toBeVisible();
   await expect.poll(() => transactionCount(page), { timeout: 3000 }).toBe(1);
 });
