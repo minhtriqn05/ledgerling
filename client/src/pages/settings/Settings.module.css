@@ -78,7 +78,7 @@
 .themeChosen,
 .themeChosen:hover {
   background: var(--color-primary-soft);
-  border-color: var(--color-primary);
+  border-color: var(--color-primary-text);
   color: var(--color-primary-text);
 }
 

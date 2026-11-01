@@ -1,11 +1,12 @@
 import Icon from '../Icon.jsx';
 import styles from './Card.module.css';
 
-// White card with rounded corners. `lift` makes it rise a little on hover (for cards that stand for one thing).
+// A floating panel with a lit top edge. `lift` makes it rise a little on hover (for cards that stand for one thing).
+// data-spot: a soft light follows the mouse over the card (hooks/useSpotlight.js).
 // Any other prop (style, aria-label...) goes straight to the <div>.
 export default function Card({ className = '', lift = false, children, ...rest }) {
   return (
-    <div className={`${styles.card} ${lift ? styles.lift : ''} ${className}`} {...rest}>
+    <div className={`${styles.card} ${lift ? styles.lift : ''} ${className}`} data-spot {...rest}>
       {children}
     </div>
   );

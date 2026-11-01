@@ -4,6 +4,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import { getCategories } from '../../api/categories.js';
 import { getTags } from '../../api/tags.js';
 import { deleteTemplate, getTemplates } from '../../api/templates.js';
+import { getWallets } from '../../api/wallets.js';
 import { createTransaction } from '../../api/transactions.js';
 import { getErrorMessage } from '../../api/axios.js';
 import { useToast } from '../../context/ToastContext.jsx';
@@ -11,12 +12,14 @@ import { useLoad } from '../../hooks/useLoad.js';
 import { useOfflineLock } from '../../hooks/useOnline.js';
 import { formatNumber, formatVnd } from '../../utils/format.js';
 import { parseQuickAdd } from '../../utils/quickAdd.js';
+import { activeWallets, defaultWalletId } from '../../utils/wallets.js';
 import { fromDateInput, todayInput } from '../../utils/vnDate.js';
 import Modal from '../Modal/Modal.jsx';
 import Button from '../Button/Button.jsx';
 import Alert from '../Alert/Alert.jsx';
 import TagInput from '../TagInput/TagInput.jsx';
 import CategoryMark from '../CategoryMark/CategoryMark.jsx';
+import Select from '../Select/Select.jsx';
 import Icon from '../Icon.jsx';
 import form from '../../pages/transactions/TransactionFormDialog.module.css';
 import styles from './QuickAddDialog.module.css';
@@ -26,7 +29,7 @@ import DatePicker from '../DatePicker/DatePicker.jsx';
 //   1. Template chips: one click saves a transaction dated today.
 //   2. One line like "coffee 35k #work" or "salary 15tr yesterday": the app reads the amount, the day, the tags and
 //      guesses the category (utils/quickAdd.js). What it understood is shown in the fields below, so it is the preview.
-//   3. The fields (amount, category chips, date, note, tags), which can be changed before saving.
+//   3. The fields (amount, category chips, wallet, date, note, tags), which can be changed before saving.
 // onSaved() runs after a transaction is created; the app then reloads the page that is open. onClose closes the dialog.
 export default function QuickAddDialog({ onSaved, onClose }) {
   const { t } = useTranslation();
@@ -43,6 +46,9 @@ export default function QuickAddDialog({ onSaved, onClose }) {
 
   // Tags used before, for the suggestions. If they cannot be loaded the box simply has none.
   const { data: knownTags } = useLoad(() => getTags().catch(() => []), []);
+  // The wallets. If they cannot be loaded the picker is left out, and the server uses the default wallet.
+  const { data: walletData } = useLoad(() => getWallets().catch(() => []), []);
+  const wallets = activeWallets(walletData ?? []);
 
   const [smart, setSmart] = useState('');
   // What the user typed into a field by hand. A field in here is no longer filled from the text line.
@@ -58,6 +64,7 @@ export default function QuickAddDialog({ onSaved, onClose }) {
   const date = manual.date ?? parsed.date ?? todayInput();
   const note = manual.note ?? parsed.note;
   const tags = manual.tags ?? parsed.tags;
+  const walletId = manual.walletId ?? defaultWalletId(wallets);
 
   const selectedCategory = categories.find((c) => c._id === categoryId);
   const tone = selectedCategory?.type ?? 'expense'; // the amount takes the color of the type
@@ -95,6 +102,7 @@ export default function QuickAddDialog({ onSaved, onClose }) {
         note: note.trim(),
         tags,
         date: fromDateInput(date),
+        ...(walletId ? { walletId } : {}),
       });
       toast.success(t('transactions.added'));
       onSaved();
@@ -114,6 +122,7 @@ export default function QuickAddDialog({ onSaved, onClose }) {
         amount: template.amount,
         note: template.note,
         date: fromDateInput(todayInput()),
+        ...(walletId ? { walletId } : {}),
       });
       toast.success(t('quickAdd.templateUsed', { name: template.name }));
       onSaved();
@@ -270,6 +279,21 @@ export default function QuickAddDialog({ onSaved, onClose }) {
           <legend className={form.label}>{t('common.category')}</legend>
           {renderCategories()}
         </fieldset>
+
+        {wallets.length > 0 && (
+          <div className={form.field}>
+            <label className={form.label} htmlFor="quick-wallet">
+              {t('wallets.wallet')}
+            </label>
+            <Select
+              id="quick-wallet"
+              value={walletId}
+              options={wallets.map((wallet) => ({ value: wallet._id, label: wallet.name }))}
+              onChange={(value) => setField('walletId', value)}
+              disabled={saving}
+            />
+          </div>
+        )}
 
         <div className={form.row}>
           <div className={form.field}>

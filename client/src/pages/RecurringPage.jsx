@@ -132,6 +132,7 @@ export default function RecurringPage() {
   return (
     <div className={styles.page}>
       <PageHeader
+        icon="repeat"
         title={t('nav.recurring')}
         subtitle={ready ? t('recurring.count', { count: rules.length }) : undefined}
       >

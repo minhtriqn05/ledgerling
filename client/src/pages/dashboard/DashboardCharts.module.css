@@ -1,16 +1,16 @@
 /* ---------- Tooltip ---------- */
 .tooltip {
-  min-width: 150px;
-  padding: var(--space-2) var(--space-3);
-  background: var(--color-surface);
+  min-width: 170px;
+  padding: var(--space-3);
+  background: var(--color-surface-raised);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-lg);
   font-size: var(--font-size-xs);
 }
 
 .tooltipLabel {
-  margin: 0 0 var(--space-1);
+  margin: 0 0 var(--space-2);
   color: var(--color-text-muted);
   font-weight: var(--font-weight-medium);
 }
@@ -40,8 +40,8 @@
 /* ---------- Donut ---------- */
 .donut {
   position: relative;
-  width: 160px;
-  height: 160px;
+  width: 196px;
+  height: 196px;
   margin: 0 auto;
 }
 
@@ -58,7 +58,7 @@
 
 .donutCenter strong {
   font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-semibold);
   letter-spacing: var(--letter-spacing-tight);
 }
 
@@ -68,8 +68,14 @@
 }
 
 /* ---------- Bar chart ---------- */
-/* The card is a flex column, so the chart takes the height that is left (at least 240px). */
+/* The card is a flex column, so the chart takes the height that is left (at least 280px). */
 .barChart {
   flex: 1;
-  min-height: 240px;
+  min-height: 280px;
+}
+
+@media (max-width: 560px) {
+  .barChart {
+    min-height: 240px;
+  }
 }

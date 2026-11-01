@@ -1,4 +1,4 @@
-/* Floats over the page in the bottom-right corner. */
+/* Floats over the page in the bottom-right corner: the same pearl (or ink) as the primary button. */
 .fab {
   position: fixed;
   right: var(--space-5);
@@ -10,9 +10,9 @@
   height: 56px;
   border: none;
   border-radius: var(--radius-full);
-  background: var(--gradient-hero);
-  color: var(--color-hero-text);
-  box-shadow: var(--shadow-md);
+  background: var(--gradient-button);
+  color: var(--color-on-primary);
+  box-shadow: var(--shadow-primary), var(--shadow-md);
   cursor: pointer;
   transition: transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
 }
@@ -29,13 +29,14 @@
 }
 
 .fab:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px) rotate(90deg);
+  background: var(--gradient-button-hover);
+  box-shadow: var(--shadow-primary), var(--shadow-lg);
 }
 
 .fab:focus-visible {
   outline: none;
-  box-shadow: var(--shadow-md), 0 0 0 4px var(--color-focus-ring);
+  box-shadow: var(--shadow-primary), 0 0 0 4px var(--color-focus-ring);
 }
 
 @media (max-width: 767px) {

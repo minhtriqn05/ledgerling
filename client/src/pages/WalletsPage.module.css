@@ -1,0 +1,128 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* ---------- The total in the hero ---------- */
+.total {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: end;
+  gap: var(--space-4) var(--space-7);
+}
+
+.totalNumber {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  color: var(--color-hero-text-soft);
+}
+
+.totalNumber strong {
+  color: var(--color-hero-text);
+  font-size: var(--font-size-hero);
+  font-weight: var(--font-weight-light);
+  line-height: 1.04;
+  letter-spacing: var(--letter-spacing-display);
+  white-space: nowrap;
+}
+
+.totalNumber small {
+  color: var(--color-hero-text-soft);
+  font-size: 0.5em;
+  font-weight: var(--font-weight-regular);
+  letter-spacing: 0;
+}
+
+.split {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+  padding-bottom: var(--space-2);
+}
+
+/* The pieces stand apart by a small gap; a piece is as wide as its share */
+.splitBar {
+  display: flex;
+  gap: 3px;
+  height: 10px;
+}
+
+.splitBar i {
+  min-width: 6px;
+  border-radius: var(--radius-full);
+}
+
+.splitLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-5);
+  margin: 0;
+  padding: 0;
+  color: var(--color-hero-text-soft);
+  font-size: var(--font-size-sm);
+  list-style: none;
+}
+
+.splitLegend li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.splitLegend i {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+}
+
+.splitLegend b {
+  color: var(--color-hero-text);
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 960px) {
+  .total {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media print {
+  .totalNumber,
+  .totalNumber strong,
+  .totalNumber small,
+  .splitLegend,
+  .splitLegend b {
+    color: var(--color-text);
+  }
+}
+
+/* Cards fill the row; each is at least 300px wide (one column on phones). */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.archived {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+
+.archivedTitle {
+  font-size: var(--font-size-md);
+}
+
+.archivedHint {
+  margin: 2px 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}

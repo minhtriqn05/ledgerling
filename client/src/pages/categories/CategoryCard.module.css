@@ -5,13 +5,28 @@
   overflow: hidden;
 }
 
-/* 4px stripe in the category color along the top edge. */
+/* A soft light in the category color, from the corner of the card. */
 .card::before {
   content: '';
   position: absolute;
-  inset: 0 0 auto;
-  height: 4px;
+  top: -70px;
+  left: -50px;
+  width: 200px;
+  height: 160px;
+  border-radius: 50%;
   background: var(--tone);
+  filter: blur(46px);
+  opacity: 0.2;
+  pointer-events: none;
+  transition: opacity var(--duration-base) var(--ease-out);
+}
+
+.card:hover::before {
+  opacity: 0.32;
+}
+
+.card > * {
+  position: relative;
 }
 
 .top {

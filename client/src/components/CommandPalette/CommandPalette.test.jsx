@@ -86,6 +86,7 @@ describe('CommandPalette', () => {
   });
 
   it('runs Add transaction and Toggle theme', async () => {
+    localStorage.setItem('ledgerling.theme', 'light');
     const user = userEvent.setup();
     renderPalette();
 

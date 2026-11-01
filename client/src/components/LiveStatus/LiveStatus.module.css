@@ -18,4 +18,5 @@
 
 .live .dot {
   background: var(--color-income);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-income) 22%, transparent), 0 0 12px var(--color-income);
 }

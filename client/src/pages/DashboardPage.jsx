@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getSummary } from '../api/stats.js';
 import { getErrorMessage } from '../api/axios.js';
-import { formatCompact, formatPercent, formatVnd } from '../utils/format.js';
-import { currentMonth, formatMonth, formatMonthShort } from '../utils/vnDate.js';
+import { useAuth } from '../context/AuthContext.jsx';
+import { formatCompact, formatNumber, formatPercent, formatVnd } from '../utils/format.js';
+import { currentMonth, formatMonth, formatMonthShort, vietnamHour } from '../utils/vnDate.js';
 import PageHeader from '../components/PageHeader/PageHeader.jsx';
 import MonthPicker from '../components/MonthPicker/MonthPicker.jsx';
 import CollapsibleCard from '../components/CollapsibleCard/CollapsibleCard.jsx';
@@ -17,31 +18,55 @@ import CountUp from '../components/Motion/CountUp.jsx';
 import Reveal from '../components/Motion/Reveal.jsx';
 import BudgetAlerts from './dashboard/BudgetAlerts.jsx';
 import GetStarted from './dashboard/GetStarted.jsx';
+import RecentTransactions from './dashboard/RecentTransactions.jsx';
 import SavingsGoals from './dashboard/SavingsGoals.jsx';
+import WalletsCard from './dashboard/WalletsCard.jsx';
 import CategoryMark from '../components/CategoryMark/CategoryMark.jsx';
 import InsightsCard from './reports/InsightsCard.jsx';
 import { CategoryDonut, MonthlyExpenseChart } from './dashboard/DashboardCharts.jsx';
 import { useLiveRefresh } from '../hooks/useLiveRefresh.js';
 import styles from './DashboardPage.module.css';
 
-// Design: DashboardPreview in pages/styleGuide. Header with the month picker, three number cards,
-// then the spending donut and the 6-month expense chart. All numbers come from GET /api/stats/summary.
-// Plan: docs/plans/dashboard.md.
+// Header: the hero with the balance of the month, income and expense with their last 6 months.
+// Below it two columns: the charts and the newest transactions on the left, a narrower rail with the wallets, budget alerts,
+// goals and insights on the right. All the numbers of the hero and the charts come from GET /api/stats/summary.
+// The cards of the rail load their own data. Plan: docs/plans/premium-redesign.md.
 
-// One of the three number cards. tone: 'income' | 'expense' | 'balance' (balance is the vivid hero card).
-// The amount counts up from 0 when the card appears.
-function StatCard({ tone, icon, label, value, index }) {
+// The first words of the hero, by the hour in Vietnam (keys in dashboard.greeting)
+function greetingKey(hour) {
+  if (hour < 5) return 'night';
+  if (hour < 12) return 'morning';
+  if (hour < 18) return 'afternoon';
+  return 'evening';
+}
+
+// The amount with a smaller, softer ₫ next to it
+const heroAmount = (value) => (
+  <>
+    {formatNumber(value)}
+    <small>&nbsp;₫</small>
+  </>
+);
+
+// Income or expense in the hero, with six small capsules: the same number over the last months, the chosen month lit.
+function HeroTile({ tone, icon, label, value, series }) {
+  const biggest = Math.max(...series, 1);
   return (
-    <Reveal as="article" index={index} className={`${styles.statCard} ${styles[tone]}`}>
-      <span className={styles.statTile}>
-        <Icon name={icon} size={18} />
-      </span>
-      <div className={styles.statText}>
+    <Reveal as="article" index={1} className={`${styles.tile} ${styles[tone]}`}>
+      <div className={styles.tileHead}>
+        <span className={styles.tileIcon}>
+          <Icon name={icon} size={16} />
+        </span>
         <span>{label}</span>
-        <strong data-testid={`stat-${tone}`}>
-          <CountUp value={value} format={formatVnd} />
-        </strong>
       </div>
+      <strong data-testid={`stat-${tone}`} className={styles.tileValue}>
+        <CountUp value={value} format={heroAmount} />
+      </strong>
+      <span className={styles.spark} aria-hidden="true">
+        {series.map((amount, index) => (
+          <span key={index} className={index === series.length - 1 ? styles.sparkNow : ''} style={{ height: `${Math.max((amount / biggest) * 100, 8)}%` }} />
+        ))}
+      </span>
     </Reveal>
   );
 }
@@ -49,6 +74,7 @@ function StatCard({ tone, icon, label, value, index }) {
 export default function DashboardPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [month, setMonth] = useState(currentMonth);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -56,7 +82,7 @@ export default function DashboardPage() {
   // "Try again" changes this, which runs the effect below again
   const [reloadKey, setReloadKey] = useState(0);
 
-  // Everything on the page comes from one request, repeated whenever the month changes.
+  // Everything in the hero and the charts comes from one request, repeated whenever the month changes.
   useEffect(() => {
     let cancelled = false; // StrictMode runs effects twice in dev; ignore an outdated answer
     getSummary(month)
@@ -95,13 +121,38 @@ export default function DashboardPage() {
     setReloadKey((key) => key + 1);
   }
 
-  // The page shows one of four states: loading, error, empty or the dashboard.
+  const ready = !loading && !loadError;
+  // Nothing in the 6-month window at all: the numbers and charts would only show zeros.
+  const hasData = ready && summary.byMonth.some((m) => m.income > 0 || m.expense > 0);
+
+  // The numbers in the hero. byMonth ends with the chosen month.
+  function renderHeroStats() {
+    const savedShare = summary.totalIncome > 0 ? Math.round((summary.balance / summary.totalIncome) * 100) : null;
+    return (
+      <section className={styles.heroStats} aria-label={t('common.totalsFor', { period: formatMonth(month) })}>
+        <Reveal as="article" className={styles.balance}>
+          <span className="eyebrow">{t('common.balance')}</span>
+          <strong data-testid="stat-balance" className={styles.balanceValue}>
+            <CountUp value={summary.balance} format={heroAmount} />
+          </strong>
+          {savedShare !== null && savedShare > 0 && (
+            <span className={styles.saved}>
+              <Icon name="sprout" size={14} />
+              {t('dashboard.savedShare', { percent: formatPercent(savedShare) })}
+            </span>
+          )}
+        </Reveal>
+        <HeroTile tone="income" icon="arrowDownLeft" label={t('common.totalIncome')} value={summary.totalIncome} series={summary.byMonth.map((m) => m.income)} />
+        <HeroTile tone="expense" icon="arrowUpRight" label={t('common.totalExpense')} value={summary.totalExpense} series={summary.byMonth.map((m) => m.expense)} />
+      </section>
+    );
+  }
+
+  // The part under the hero shows one of four states: loading, error, empty or the two columns.
   function renderContent() {
     if (loading) return <LoadingState skeleton="cards">{t('dashboard.loading')}</LoadingState>;
     if (loadError) return <ErrorState message={loadError} onRetry={retry} />;
 
-    // Nothing in the 6-month window at all: the cards and charts would only show zeros.
-    const hasData = summary.byMonth.some((m) => m.income > 0 || m.expense > 0);
     if (!hasData) {
       // The "Get started" card shows the first steps and ticks the budget and goal steps by itself.
       return (
@@ -130,26 +181,17 @@ export default function DashboardPage() {
     }));
 
     return (
-      <>
-        <section className={styles.stats} aria-label={t('common.totalsFor', { period: formatMonth(month) })}>
-          <StatCard tone="income" index={0} icon="arrowDownLeft" label={t('common.totalIncome')} value={summary.totalIncome} />
-          <StatCard tone="expense" index={1} icon="arrowUpRight" label={t('common.totalExpense')} value={summary.totalExpense} />
-          <StatCard tone="balance" index={2} icon="wallet" label={t('common.balance')} value={summary.balance} />
-        </section>
+      <div className={styles.columns}>
+        <div className={styles.mainColumn}>
+          <CollapsibleCard id="dashboard.expenseByMonth" icon="chart" tone="sky" title={t('dashboard.expenseByMonth')} subtitle={t('dashboard.last6Months')}>
+            <MonthlyExpenseChart data={monthlyExpense} selected={month} />
+          </CollapsibleCard>
 
-        <section className={styles.infoRow}>
-          <BudgetAlerts month={month} />
-          <SavingsGoals />
-        </section>
-
-        <InsightsCard month={month} />
-
-        <section className={styles.chartsRow}>
           <CollapsibleCard id="dashboard.spendingByCategory" icon="pie" tone="sun" title={t('dashboard.spendingByCategory')} subtitle={formatMonth(month)}>
             {categories.length === 0 ? (
               <p className={styles.cardStatus}>{t('dashboard.noExpenses', { month: formatMonth(month) })}</p>
             ) : (
-              <>
+              <div className={styles.spending}>
                 <CategoryDonut data={categories} total={categoryTotal} />
                 <ul className={styles.categoryList}>
                   {categories.map((c) => (
@@ -166,21 +208,34 @@ export default function DashboardPage() {
                     </li>
                   ))}
                 </ul>
-              </>
+              </div>
             )}
           </CollapsibleCard>
 
-          <CollapsibleCard id="dashboard.expenseByMonth" icon="chart" tone="sky" title={t('dashboard.expenseByMonth')} subtitle={t('dashboard.last6Months')}>
-            <MonthlyExpenseChart data={monthlyExpense} selected={month} />
-          </CollapsibleCard>
-        </section>
-      </>
+          <RecentTransactions month={month} />
+        </div>
+
+        <div className={styles.rail}>
+          <WalletsCard />
+          <section className={styles.railGroup}>
+            <BudgetAlerts month={month} />
+            <SavingsGoals />
+          </section>
+          <InsightsCard month={month} />
+        </div>
+      </div>
     );
   }
 
   return (
     <div className={styles.page}>
-      <PageHeader title={t('nav.dashboard')} subtitle={t('dashboard.subtitle', { month: formatMonth(month) })}>
+      <PageHeader
+        logo
+        eyebrow={user?.name ? t(`dashboard.greeting.${greetingKey(vietnamHour())}`, { name: user.name }) : undefined}
+        title={t('nav.dashboard')}
+        subtitle={t('dashboard.subtitle', { month: formatMonth(month) })}
+        stats={hasData ? renderHeroStats() : null}
+      >
         <MonthPicker month={month} onChange={changeMonth} />
       </PageHeader>
 

@@ -1,0 +1,71 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* A row is a pill on a slightly lighter surface */
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4) var(--space-2) var(--space-2);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.row:hover {
+  background: var(--color-surface-hover);
+}
+
+.text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.text > * {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.text strong {
+  font-weight: var(--font-weight-semibold);
+}
+
+.text span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.amount {
+  flex-shrink: 0;
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.income {
+  color: var(--color-income-text);
+}
+
+.expense {
+  color: var(--color-text);
+}
+
+.note {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.invite {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+}

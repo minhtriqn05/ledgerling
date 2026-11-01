@@ -22,8 +22,9 @@
 
 .toggle {
   position: absolute;
-  top: var(--space-5);
+  top: calc(var(--space-5) + 3px);
   right: var(--space-4);
+  z-index: 1;
   display: grid;
   place-items: center;
   width: 32px;
@@ -39,8 +40,15 @@
 }
 
 .toggle:hover {
-  background: var(--color-surface-muted);
+  background: var(--color-surface-hover);
   color: var(--color-text);
+}
+
+@media (max-width: 767px) {
+  .toggle {
+    top: calc(var(--space-4) + 3px);
+    right: var(--space-3);
+  }
 }
 
 .toggle:focus-visible {

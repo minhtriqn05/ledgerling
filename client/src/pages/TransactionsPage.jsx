@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { getCategories } from '../api/categories.js';
 import { deleteTransaction, exportTransactions, getTransactions } from '../api/transactions.js';
 import { getSummary } from '../api/stats.js';
+import { getWallets } from '../api/wallets.js';
 import { getErrorMessage } from '../api/axios.js';
 import { useBreadcrumbDetail } from '../context/BreadcrumbContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
@@ -14,6 +15,7 @@ import { formatDate, formatSignedVnd, formatVnd } from '../utils/format.js';
 import { downloadFile } from '../utils/downloadFile.js';
 import { currentMonth, formatMonth, fromDateInput, toDateInput } from '../utils/vnDate.js';
 import PageHeader from '../components/PageHeader/PageHeader.jsx';
+import { HeroStat, HeroStats } from '../components/PageHeader/HeroStat.jsx';
 import MonthPicker from '../components/MonthPicker/MonthPicker.jsx';
 import Card from '../components/Card/Card.jsx';
 import Button from '../components/Button/Button.jsx';
@@ -34,27 +36,11 @@ import ImportDialog from './transactions/ImportDialog.jsx';
 import { useLiveRefresh } from '../hooks/useLiveRefresh.js';
 import styles from './TransactionsPage.module.css';
 
-// Design: TransactionsPreview in pages/styleGuide. Header with the month picker, three summary cards,
-// then a card with the search box, the category filter, the list and the pager.
-// Plans: docs/plans/transactions-page.md, then the search and paging change on feature/transactions-search.
+// The hero with the month picker and the three totals of the month, then a card with the search box, the filters,
+// the list and the pager. Plans: docs/plans/transactions-page.md, then the search and paging change on feature/transactions-search.
 
 // Wait this long after the last key before searching, so one request is sent per word and not per letter.
 const SEARCH_DELAY_MS = 300;
-
-// One of the three tinted cards (income / expense / net). tone: 'income' | 'expense' | 'net'.
-function SummaryCard({ tone, icon, label, value }) {
-  return (
-    <div className={`${styles.summaryCard} ${styles[tone]}`}>
-      <span className={styles.summaryTile}>
-        <Icon name={icon} size={18} />
-      </span>
-      <div className={styles.summaryText}>
-        <span>{label}</span>
-        <strong>{value}</strong>
-      </div>
-    </div>
-  );
-}
 
 // The values the API accepts; the label is the translation key transactions.sort.<key>
 const SORT_OPTIONS = [
@@ -77,12 +63,13 @@ function isRealDay(text) {
   return new Date(Date.UTC(year, month - 1, day)).toISOString().slice(0, 10) === text;
 }
 
-// Every filter lives in the URL (?month=2026-10&category=...&tag=work&q=coffee&sort=-amount&from=...&to=...&page=2),
+// Every filter lives in the URL (?month=2026-10&category=...&wallet=...&tag=work&q=coffee&sort=-amount&from=...&to=...&page=2),
 // so F5 or a shared link shows the same list. A value that is missing or hand-edited into nonsense falls back to its
 // default, so the API never gets a value it refuses (that would show an error screen instead of the list).
 function readFilters(searchParams) {
   const month = searchParams.get('month');
   const category = searchParams.get('category');
+  const wallet = searchParams.get('wallet');
   const tag = (searchParams.get('tag') ?? '').toLowerCase();
   const sort = searchParams.get('sort');
   let from = isRealDay(searchParams.get('from')) ? searchParams.get('from') : '';
@@ -96,6 +83,7 @@ function readFilters(searchParams) {
   return {
     month: MONTH_REGEX.test(month ?? '') ? month : currentMonth(),
     categoryId: OBJECT_ID_REGEX.test(category ?? '') ? category : 'all',
+    walletId: OBJECT_ID_REGEX.test(wallet ?? '') ? wallet : 'all',
     tag: TAG_REGEX.test(tag) ? tag : '',
     q: (searchParams.get('q') ?? '').trim(),
     sort: SORT_OPTIONS.some((option) => option.value === sort) ? sort : DEFAULT_SORT,
@@ -106,7 +94,7 @@ function readFilters(searchParams) {
 }
 
 // Values that mean "no filter" are left out of the URL, so it stays short.
-const URL_DEFAULTS = { category: 'all', sort: DEFAULT_SORT, page: '1' };
+const URL_DEFAULTS = { category: 'all', wallet: 'all', sort: DEFAULT_SORT, page: '1' };
 
 // Copies the current params and applies changes ({ key: value }; '' or null removes the key).
 // The page goes back to 1 unless the change sets it: a new filter always starts at the first page.
@@ -132,7 +120,7 @@ function formatRange(from, to, t) {
 export default function TransactionsPage() {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { month, categoryId, tag, q, sort, from, to, page } = readFilters(searchParams);
+  const { month, categoryId, walletId, tag, q, sort, from, to, page } = readFilters(searchParams);
   const hasRange = Boolean(from || to);
   // The filters as the API wants them, shared by the list and the CSV export.
   // A date range replaces the month (the API refuses both). useMemo keeps the same object until a filter changes.
@@ -145,15 +133,17 @@ export default function TransactionsPage() {
       filters.month = month;
     }
     if (categoryId !== 'all') filters.categoryId = categoryId;
+    if (walletId !== 'all') filters.walletId = walletId;
     if (tag) filters.tag = tag;
     if (q) filters.q = q;
     return filters;
-  }, [month, categoryId, tag, q, sort, from, to]);
+  }, [month, categoryId, walletId, tag, q, sort, from, to]);
   // What is typed in the search box. It reaches the URL (q) 300 ms after the last key.
   const [searchInput, setSearchInput] = useState(q);
   // The text the search box itself just put in the URL (null when none is on its way), see the two effects below
   const sentSearch = useRef(null);
   const [categories, setCategories] = useState([]);
+  const [wallets, setWallets] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [meta, setMeta] = useState(null); // { page, limit, total, totalPages } of the loaded page
   const [summary, setSummary] = useState(null); // totals of the whole month from /stats/summary
@@ -161,6 +151,7 @@ export default function TransactionsPage() {
   const [loadError, setLoadError] = useState('');
   // "Try again" and a save change these, which runs the matching effect again
   const [categoriesKey, setCategoriesKey] = useState(0);
+  const [walletsKey, setWalletsKey] = useState(0);
   const [reloadKey, setReloadKey] = useState(0);
   // The open dialog: null, { kind: 'detail', transaction } (the drawer), { kind: 'form', transaction }
   // (transaction = null for a new one), { kind: 'import' }, { kind: 'bulk-delete' } or { kind: 'bulk-category' }
@@ -190,6 +181,10 @@ export default function TransactionsPage() {
   useLiveRefresh('transactions', () => setReloadKey((key) => key + 1));
   useLiveRefresh('categories', () => {
     setCategoriesKey((key) => key + 1);
+    setReloadKey((key) => key + 1);
+  });
+  useLiveRefresh('wallets', () => {
+    setWalletsKey((key) => key + 1);
     setReloadKey((key) => key + 1);
   });
 
@@ -226,6 +221,20 @@ export default function TransactionsPage() {
       cancelled = true;
     };
   }, [categoriesKey]);
+
+  // The wallets fill the filter and the form. Without them the page still works: the filter is left out,
+  // and a new transaction goes to the default wallet.
+  useEffect(() => {
+    let cancelled = false;
+    getWallets()
+      .then((data) => {
+        if (!cancelled) setWallets(data);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [walletsKey]);
 
   // The search box: copy the text into the URL once the user stopped typing for a moment.
   // replace: true so every pause does not add an entry to the browser history.
@@ -331,15 +340,15 @@ export default function TransactionsPage() {
 
   // The month stays: it is where you are, not a filter.
   const hasFilters = Boolean(
-    q || searchInput.trim() || categoryId !== 'all' || tag || sort !== DEFAULT_SORT || hasRange
+    q || searchInput.trim() || categoryId !== 'all' || walletId !== 'all' || tag || sort !== DEFAULT_SORT || hasRange
   );
 
   function clearFilters() {
     setSearchInput('');
     // Only the search box had text, not sent yet: the URL stays the same, so no reload would come
     // to end "Loading…". The list is already unfiltered, there is nothing more to do.
-    if (!q && categoryId === 'all' && !tag && sort === DEFAULT_SORT && !hasRange) return;
-    updateFilters({ q: '', category: '', tag: '', sort: '', from: '', to: '' });
+    if (!q && categoryId === 'all' && walletId === 'all' && !tag && sort === DEFAULT_SORT && !hasRange) return;
+    updateFilters({ q: '', category: '', wallet: '', tag: '', sort: '', from: '', to: '' });
   }
 
   // A click on a tag chip in the list (or the x on the "Tag" chip, with an empty tag)
@@ -386,6 +395,7 @@ export default function TransactionsPage() {
       to: '',
       q: '',
       category: categoryId !== 'all' && categoryId !== saved.category._id ? '' : categoryId,
+      wallet: walletId !== 'all' && walletId !== saved.wallet?._id ? '' : walletId,
       tag: tag && saved.tags?.includes(tag) ? tag : '',
     });
     setReloadKey((key) => key + 1);
@@ -470,7 +480,7 @@ export default function TransactionsPage() {
         );
       }
 
-      const filtered = categoryId !== 'all' || hasRange || Boolean(tag);
+      const filtered = categoryId !== 'all' || walletId !== 'all' || hasRange || Boolean(tag);
       return (
         <EmptyState
           icon="transactions"
@@ -522,11 +532,29 @@ export default function TransactionsPage() {
       .filter((group) => group.options.length > 0),
   ];
 
+  const walletOptions = [
+    { value: 'all', label: t('wallets.all') },
+    ...wallets.map((wallet) => ({ value: wallet._id, label: wallet.name })),
+  ];
+
   return (
     <div className={styles.page}>
       <PageHeader
+        icon="transactions"
         title={t('nav.transactions')}
         subtitle={ready ? `${period} · ${t('transactions.count', { count: total })}` : period}
+        stats={
+          showTotals ? (
+            <>
+              <HeroStats label={t('common.totalsFor', { period: formatMonth(month) })}>
+                <HeroStat tone="income" icon="arrowDownLeft" label={t('common.income')} value={formatSignedVnd(summary.totalIncome, 'income')} />
+                <HeroStat tone="expense" icon="arrowUpRight" label={t('common.expense')} value={formatSignedVnd(summary.totalExpense, 'expense')} />
+                <HeroStat icon="wallet" label={t('transactions.net')} value={formatVnd(summary.balance)} />
+              </HeroStats>
+              <p className={styles.summaryNote}>{t('transactions.totalsNote', { month: formatMonth(month) })}</p>
+            </>
+          ) : null
+        }
       >
         <MonthPicker month={month} onChange={changeMonth} />
         <Button needsNetwork variant="secondary" icon="upload" onClick={() => setDialog({ kind: 'import' })} disabled={loading}>
@@ -539,17 +567,6 @@ export default function TransactionsPage() {
           {t('transactions.add')}
         </Button>
       </PageHeader>
-
-      {showTotals && (
-        <section className={styles.summary} aria-label={t('common.totalsFor', { period: formatMonth(month) })}>
-          <SummaryCard tone="income" icon="arrowDownLeft" label={t('common.income')} value={formatSignedVnd(summary.totalIncome, 'income')} />
-          <SummaryCard tone="expense" icon="arrowUpRight" label={t('common.expense')} value={formatSignedVnd(summary.totalExpense, 'expense')} />
-          <SummaryCard tone="net" icon="wallet" label={t('transactions.net')} value={formatVnd(summary.balance)} />
-          <p className={styles.summaryNote}>
-            {t('transactions.totalsNote', { month: formatMonth(month) })}
-          </p>
-        </section>
-      )}
 
       <Card>
         <div className={styles.filters}>
@@ -598,6 +615,20 @@ export default function TransactionsPage() {
               onChange={(value) => updateFilters({ category: value })}
             />
           </div>
+          {wallets.length > 0 && (
+            <div className={styles.field}>
+              <label className={styles.filterLabel} htmlFor="filter-wallet">
+                {t('wallets.wallet')}
+              </label>
+              <Select
+                id="filter-wallet"
+                className={styles.select}
+                value={walletId}
+                options={walletOptions}
+                onChange={(value) => updateFilters({ wallet: value })}
+              />
+            </div>
+          )}
           <div className={styles.field}>
             <label className={styles.filterLabel} htmlFor="filter-sort">
               {t('transactions.sortLabel')}
@@ -672,6 +703,7 @@ export default function TransactionsPage() {
             key="form"
             transaction={dialog.transaction}
             categories={categories}
+            wallets={wallets}
             onSaved={handleSaved}
             onClose={() => setDialog(null)}
             onDelete={handleDelete}

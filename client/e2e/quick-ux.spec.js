@@ -120,6 +120,11 @@ test('the + button opens Quick add on any page; "salary 15tr yesterday" picks an
   await dialog.getByRole('button', { name: 'Save transaction' }).click();
   await expect(dialog).toBeHidden();
 
+  // On the 1st of a month yesterday belongs to the month before: go there
+  if (yesterday.slice(0, 7) !== new Date(Date.now() + 7 * 3600 * 1000).toISOString().slice(0, 7)) {
+    await page.getByRole('button', { name: /previous month/i }).first().click();
+  }
+
   // The Dashboard reloaded: the income card shows it
   await expect(page.locator('article', { hasText: 'Total Income' })).toContainText('15,000,000');
 });

@@ -38,19 +38,19 @@
 }
 
 .zone:hover {
-  border-color: var(--color-primary);
+  border-color: var(--color-primary-text);
   background: color-mix(in srgb, var(--color-primary-soft) 60%, var(--color-surface));
 }
 
 .zone:focus-within {
-  border-color: var(--color-primary);
+  border-color: var(--color-primary-text);
   box-shadow: 0 0 0 3px var(--color-focus-ring);
 }
 
 /* A file is being dragged over the zone */
 .dragging {
   border-style: solid;
-  border-color: var(--color-primary);
+  border-color: var(--color-primary-text);
   background: var(--color-primary-soft);
   transform: scale(1.01);
 }
@@ -94,7 +94,7 @@
   height: 44px;
   border-radius: var(--radius-md);
   background: var(--color-surface);
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   box-shadow: var(--shadow-sm);
 }
 

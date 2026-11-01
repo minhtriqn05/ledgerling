@@ -56,7 +56,13 @@
     "transactions": "Transactions",
     "toWelcome": "Go to the home page",
     "collapseSidebar": "Collapse sidebar",
-    "expandSidebar": "Expand sidebar"
+    "expandSidebar": "Expand sidebar",
+    "wallets": "Wallets",
+    "groups": {
+      "money": "Money",
+      "planning": "Planning",
+      "account": "Account"
+    }
   },
   "breadcrumb": {
     "label": "Breadcrumb",
@@ -200,7 +206,16 @@
     "savingsGoals": "Savings goals",
     "spent": "spent",
     "spendingByCategory": "Spending by category",
-    "subtitle": "Here is how {{month}} is going."
+    "subtitle": "Here is how {{month}} is going.",
+    "recent": "Recent transactions",
+    "recentFailed": "Recent transactions could not be loaded.",
+    "savedShare": "Saved {{percent}} of income",
+    "greeting": {
+      "night": "Up late, {{name}}",
+      "morning": "Good morning, {{name}}",
+      "afternoon": "Good afternoon, {{name}}",
+      "evening": "Good evening, {{name}}"
+    }
   },
   "transactions": {
     "add": "Add transaction",
@@ -374,7 +389,10 @@
     "overBy": "Over by {{amount}}",
     "percentUsed": "{{percent}}% used",
     "save": "Save budget",
-    "updated": "Budget updated"
+    "updated": "Budget updated",
+    "totalLimit": "Total budget",
+    "totalSpent": "Spent",
+    "totalLeft": "Left to spend"
   },
   "recurring": {
     "active": "Active: {{name}}",
@@ -456,7 +474,9 @@
     "withdrawMax": "You can withdraw at most {{amount}}, the amount saved in this goal.",
     "withdrawMoney": "Withdraw money",
     "withdrawal": "Withdrawal",
-    "withdrawn": "Money withdrawn"
+    "withdrawn": "Money withdrawn",
+    "totalSaved": "Saved so far",
+    "totalTarget": "All targets together"
   },
   "reports": {
     "averagePerDay": "Average per day",
@@ -902,7 +922,18 @@
     "footerNote": "UIT · CSBU109.R11.KHBC",
     "github": "View on GitHub",
     "opensInNewTab": "(opens in a new tab)",
-    "openApp": "Open app"
+    "openApp": "Open app",
+    "trust": {
+      "label": "What comes with it",
+      "languages": "8 languages",
+      "install": "Install it as an app",
+      "sync": "Live sync across devices",
+      "themes": "Noir and Porcelain themes"
+    },
+    "closing": {
+      "title": "Your money, finally in one calm place.",
+      "text": "Make an account in under a minute and add your first transaction today."
+    }
   },
   "onboarding": {
     "title": "Get started with Ledgerling",
@@ -994,7 +1025,16 @@
     "USER_NOT_FOUND": "User not found",
     "VALIDATION_ERROR": "Please check the values you entered.",
     "WITHDRAW_TOO_MUCH": "You cannot withdraw more than the saved amount",
-    "WRONG_PASSWORD": "The password is incorrect"
+    "WRONG_PASSWORD": "The password is incorrect",
+    "WALLET_NOT_FOUND": "Wallet not found",
+    "WALLET_EXISTS": "You already have a wallet with this name",
+    "WALLET_ARCHIVED": "This wallet is archived",
+    "WALLET_IN_USE": "This wallet still has transactions or transfers. Archive it instead.",
+    "WALLET_DEFAULT_LOCKED": "The default wallet cannot be archived or deleted",
+    "WALLET_TYPE_INVALID": "Choose a type for the wallet",
+    "WALLET_BALANCE_INVALID": "The starting balance must be 0 or more",
+    "TRANSFER_NOT_FOUND": "Transfer not found",
+    "TRANSFER_SAME_WALLET": "Choose two different wallets"
   },
   "live": {
     "live": "Live",
@@ -1126,6 +1166,67 @@
         "title": "No guarantee",
         "text": "The service is free and comes without any guarantee. It does not give financial advice, and the numbers it shows are only as good as what you enter."
       }
+    }
+  },
+  "wallets": {
+    "wallet": "Wallet",
+    "all": "All wallets",
+    "yours": "Your wallets",
+    "subtitle": "Where your money is right now.",
+    "totalAll": "All wallets together",
+    "count_one": "{{count}} wallet",
+    "count_other": "{{count}} wallets",
+    "loading": "Loading wallets…",
+    "loadFailed": "Wallets could not be loaded.",
+    "new": "New wallet",
+    "edit": "Edit wallet",
+    "save": "Save wallet",
+    "added": "Wallet added",
+    "updated": "Wallet updated",
+    "deleted": "Wallet deleted",
+    "archived": "Wallet archived",
+    "restored": "Wallet back in use",
+    "archiveName": "Archive {{name}}",
+    "restoreName": "Bring back {{name}}",
+    "type": {
+      "label": "Type",
+      "cash": "Cash",
+      "bank": "Bank",
+      "ewallet": "E-wallet"
+    },
+    "namePlaceholder": "e.g. Vietcombank",
+    "initialBalance": "Starting balance",
+    "initialHint": "The money in this wallet before your first transaction here.",
+    "defaultBadge": "Default",
+    "defaultHint": "A transaction that names no wallet goes here. This wallet cannot be archived or deleted.",
+    "archivedTitle": "Archived",
+    "archivedHint": "They keep their balance and take no new transactions or transfers.",
+    "moneyIn": "In",
+    "moneyOut": "Out",
+    "startedWith": "Started with {{amount}}",
+    "deleteQuestion": "Delete this wallet?",
+    "deleteText": "This can't be undone. A wallet with transactions or transfers cannot be deleted: archive it instead.",
+    "transfer": {
+      "open": "Transfer money",
+      "title": "Transfer money",
+      "from": "From",
+      "to": "To",
+      "save": "Move money",
+      "done": "Money moved",
+      "chooseTwo": "Choose two different wallets.",
+      "needTwo": "You need at least two wallets to move money.",
+      "notCounted": "A transfer is not income or expense: your totals, budgets and reports stay the same.",
+      "history": "Transfers",
+      "historySubtitle": "Newest first",
+      "empty": "No transfers yet.",
+      "loading": "Loading transfers…",
+      "loadFailed": "Transfers could not be loaded.",
+      "count_one": "{{count}} transfer",
+      "count_other": "{{count}} transfers",
+      "deleteName": "Delete the transfer from {{from}} to {{to}}",
+      "deleteQuestion": "Delete this transfer?",
+      "deleteText": "The money goes back to {{from}}.",
+      "deleted": "Transfer deleted"
     }
   }
 }

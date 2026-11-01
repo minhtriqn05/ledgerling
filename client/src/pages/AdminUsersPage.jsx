@@ -11,7 +11,7 @@ export default function AdminUsersPage() {
   return (
     <div className={styles.page}>
       <BackButton to="/admin" />
-      <PageHeader title={t('admin.users.title')} subtitle={t('admin.users.pageText')} />
+      <PageHeader icon="shield" title={t('admin.users.title')} subtitle={t('admin.users.pageText')} />
       <UsersTable />
     </div>
   );

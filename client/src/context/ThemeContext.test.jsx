@@ -50,7 +50,14 @@ const renderProbe = () =>
   );
 
 describe('ThemeProvider', () => {
-  it('starts on system, which is light on a light device', () => {
+  it('starts on dark when nothing was chosen, also on a light device', () => {
+    renderProbe();
+    expect(screen.getByTestId('state')).toHaveTextContent('dark/dark');
+    expect(document.documentElement).toHaveAttribute('data-theme', 'dark');
+  });
+
+  it('system is light on a light device', () => {
+    localStorage.setItem(THEME_STORAGE_KEY, 'system');
     renderProbe();
     expect(screen.getByTestId('state')).toHaveTextContent('system/light');
     expect(document.documentElement).toHaveAttribute('data-theme', 'light');
@@ -76,6 +83,7 @@ describe('ThemeProvider', () => {
   });
 
   it('follows the device while the choice is system', async () => {
+    localStorage.setItem(THEME_STORAGE_KEY, 'system');
     renderProbe();
     act(() => {
       systemDark = true;

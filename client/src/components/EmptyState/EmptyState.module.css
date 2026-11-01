@@ -2,7 +2,7 @@
 .empty {
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-6) var(--space-5);
+  padding: var(--space-7) var(--space-5);
   text-align: center;
 }
 
@@ -21,22 +21,29 @@
   border-radius: var(--radius-full);
 }
 
+/* Soft lights behind the icon */
 .blobSky {
   top: 0;
   left: 8px;
-  background: color-mix(in srgb, var(--accent-sky) 30%, var(--color-surface));
+  background: var(--accent-sky);
+  opacity: 0.28;
+  filter: blur(14px);
 }
 
 .blobMint {
   top: 6px;
   right: 6px;
-  background: color-mix(in srgb, var(--accent-mint) 30%, var(--color-surface));
+  background: var(--accent-mint);
+  opacity: 0.28;
+  filter: blur(14px);
 }
 
 .blobSun {
   bottom: 0;
   left: 30px;
-  background: color-mix(in srgb, var(--accent-sun) 30%, var(--color-surface));
+  background: var(--accent-sun);
+  opacity: 0.16;
+  filter: blur(14px);
 }
 
 .icon {
@@ -45,22 +52,23 @@
   left: 50%;
   display: grid;
   place-items: center;
-  width: 52px;
-  height: 52px;
-  border-radius: var(--radius-full);
-  background: var(--color-surface);
+  width: 56px;
+  height: 56px;
+  border: 1px solid color-mix(in srgb, var(--color-text) 12%, transparent);
+  border-radius: 18px;
+  background: var(--color-surface-raised);
   color: var(--color-primary-text);
   box-shadow: var(--shadow-md);
   transform: translate(-50%, -50%);
 }
 
 .title {
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
 }
 
 .text {
-  max-width: 300px;
+  max-width: 340px;
   margin: 0 0 var(--space-3);
   color: var(--color-text-secondary);
 }

@@ -139,6 +139,7 @@ export default function NotificationsPage() {
   return (
     <div className={styles.page}>
       <PageHeader
+        icon="bell"
         title={t('nav.notifications')}
         subtitle={!loading && !loadError ? t('notifications.unreadCount', { count: unread }) : undefined}
       >

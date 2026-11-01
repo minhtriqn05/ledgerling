@@ -3,7 +3,6 @@
   place-items: center;
   min-height: 100vh;
   padding: var(--space-5) var(--space-4);
-  background: var(--gradient-page-top) no-repeat top / 100% 320px;
 }
 
 .content {
@@ -17,11 +16,12 @@
 /* The big number uses the hero gradient as its fill. */
 .code {
   margin: 0;
-  font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-tight);
-  line-height: var(--line-height-tight);
-  background: var(--gradient-hero);
+  font-family: var(--font-display);
+  font-size: clamp(4rem, 3rem + 4vw, 6.5rem);
+  font-weight: var(--font-weight-regular);
+  letter-spacing: var(--letter-spacing-display);
+  line-height: 1;
+  background: var(--gradient-progress);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;

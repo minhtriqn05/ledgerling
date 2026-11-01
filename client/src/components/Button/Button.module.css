@@ -11,12 +11,16 @@
   font-weight: var(--font-weight-semibold);
   white-space: nowrap;
   cursor: pointer;
-  transition: background var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out),
-    transform var(--duration-fast) var(--ease-out);
+  transition: background var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
+}
+
+.button:hover:not(:disabled) {
+  transform: translateY(-1px);
 }
 
 .button:active:not(:disabled) {
-  transform: scale(0.97);
+  transform: translateY(0) scale(0.98);
 }
 
 .button:focus-visible {
@@ -30,29 +34,32 @@
 }
 
 /* ---------- Variants ---------- */
+/* Pearl on Noir, ink on Porcelain: the only solid light (or dark) thing on the page */
 .primary {
-  background: var(--color-primary);
+  background: var(--gradient-button);
   color: var(--color-on-primary);
   box-shadow: var(--shadow-primary);
 }
 
 .primary:hover:not(:disabled) {
-  background: var(--color-primary-hover);
+  background: var(--gradient-button-hover);
 }
 
+/* Glass: a little of the text color over whatever is behind it, so it also works on the hero */
 .secondary {
-  background: var(--color-surface);
+  background: color-mix(in srgb, var(--color-text) 5%, transparent);
+  border-color: color-mix(in srgb, var(--color-text) 16%, transparent);
   color: var(--color-text);
-  border-color: var(--color-border-strong);
 }
 
 .secondary:hover:not(:disabled) {
-  background: var(--color-surface-muted);
+  background: color-mix(in srgb, var(--color-text) 10%, transparent);
+  border-color: color-mix(in srgb, var(--color-text) 26%, transparent);
 }
 
 .danger {
   background: var(--color-danger);
-  color: var(--color-on-primary);
+  color: var(--color-on-danger);
   box-shadow: var(--shadow-danger);
 }
 
@@ -67,4 +74,11 @@
 
 .block {
   width: 100%;
+}
+
+/* The small one, in the header of a card */
+.small {
+  height: 32px;
+  padding: 0 var(--space-3);
+  font-size: var(--font-size-xs);
 }

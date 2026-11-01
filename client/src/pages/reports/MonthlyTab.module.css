@@ -39,9 +39,8 @@
 
 .factValue {
   font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-tight);
-  font-variant-numeric: tabular-nums;
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--letter-spacing-display);
 }
 
 .factDetail {

@@ -95,7 +95,7 @@
 
 /* The chosen one gets a ring in the primary color (not only a color: the ring is also thicker) */
 .selected {
-  border-color: var(--color-primary);
+  border-color: var(--color-primary-text);
   box-shadow: 0 0 0 3px var(--color-primary-soft);
 }
 

@@ -56,7 +56,13 @@
     "transactions": "Buchungen",
     "toWelcome": "Zur Startseite",
     "collapseSidebar": "Seitenleiste einklappen",
-    "expandSidebar": "Seitenleiste ausklappen"
+    "expandSidebar": "Seitenleiste ausklappen",
+    "wallets": "Geldbörsen",
+    "groups": {
+      "money": "Geld",
+      "planning": "Planung",
+      "account": "Konto"
+    }
   },
   "breadcrumb": {
     "label": "Brotkrümelnavigation",
@@ -200,7 +206,16 @@
     "savingsGoals": "Sparziele",
     "spent": "ausgegeben",
     "spendingByCategory": "Ausgaben nach Kategorie",
-    "subtitle": "So läuft der {{month}}."
+    "subtitle": "So läuft der {{month}}.",
+    "recent": "Letzte Transaktionen",
+    "recentFailed": "Die letzten Transaktionen konnten nicht geladen werden.",
+    "savedShare": "{{percent}} der Einnahmen gespart",
+    "greeting": {
+      "night": "Noch wach, {{name}}",
+      "morning": "Guten Morgen, {{name}}",
+      "afternoon": "Guten Tag, {{name}}",
+      "evening": "Guten Abend, {{name}}"
+    }
   },
   "transactions": {
     "add": "Buchung hinzufügen",
@@ -374,7 +389,10 @@
     "overBy": "{{amount}} darüber",
     "percentUsed": "{{percent}} % verbraucht",
     "save": "Budget speichern",
-    "updated": "Budget aktualisiert"
+    "updated": "Budget aktualisiert",
+    "totalLimit": "Gesamtbudget",
+    "totalSpent": "Ausgegeben",
+    "totalLeft": "Noch verfügbar"
   },
   "recurring": {
     "active": "Aktiv: {{name}}",
@@ -456,7 +474,9 @@
     "withdrawMax": "Du kannst höchstens {{amount}} auszahlen – so viel ist für dieses Ziel gespart.",
     "withdrawMoney": "Geld auszahlen",
     "withdrawal": "Auszahlung",
-    "withdrawn": "Geld ausgezahlt"
+    "withdrawn": "Geld ausgezahlt",
+    "totalSaved": "Bisher gespart",
+    "totalTarget": "Alle Ziele zusammen"
   },
   "reports": {
     "averagePerDay": "Durchschnitt pro Tag",
@@ -902,7 +922,18 @@
     "footerNote": "UIT · CSBU109.R11.KHBC",
     "github": "Auf GitHub ansehen",
     "opensInNewTab": "(öffnet in einem neuen Tab)",
-    "openApp": "App öffnen"
+    "openApp": "App öffnen",
+    "trust": {
+      "label": "Das ist dabei",
+      "languages": "8 Sprachen",
+      "install": "Als App installierbar",
+      "sync": "Live-Abgleich zwischen Geräten",
+      "themes": "Designs Noir und Porzellan"
+    },
+    "closing": {
+      "title": "Dein Geld, endlich ruhig an einem Ort.",
+      "text": "Erstelle in unter einer Minute ein Konto und trage noch heute deine erste Transaktion ein."
+    }
   },
   "onboarding": {
     "title": "Erste Schritte mit Ledgerling",
@@ -994,7 +1025,16 @@
     "USER_NOT_FOUND": "Nutzer nicht gefunden",
     "VALIDATION_ERROR": "Bitte prüfe deine Eingaben.",
     "WITHDRAW_TOO_MUCH": "Du kannst nicht mehr auszahlen, als gespart ist",
-    "WRONG_PASSWORD": "Das Passwort ist falsch"
+    "WRONG_PASSWORD": "Das Passwort ist falsch",
+    "WALLET_NOT_FOUND": "Geldbörse nicht gefunden",
+    "WALLET_EXISTS": "Du hast bereits eine Geldbörse mit diesem Namen",
+    "WALLET_ARCHIVED": "Diese Geldbörse ist archiviert",
+    "WALLET_IN_USE": "Diese Geldbörse hat noch Transaktionen oder Überweisungen. Archiviere sie stattdessen.",
+    "WALLET_DEFAULT_LOCKED": "Die Standard-Geldbörse kann weder archiviert noch gelöscht werden",
+    "WALLET_TYPE_INVALID": "Wähle eine Art für die Geldbörse",
+    "WALLET_BALANCE_INVALID": "Der Anfangsbestand muss 0 oder mehr sein",
+    "TRANSFER_NOT_FOUND": "Überweisung nicht gefunden",
+    "TRANSFER_SAME_WALLET": "Wähle zwei verschiedene Geldbörsen"
   },
   "live": {
     "live": "Live",
@@ -1126,6 +1166,67 @@
         "title": "Keine Garantie",
         "text": "Der Dienst ist kostenlos und ohne jede Garantie. Er gibt keine Finanzberatung, und die Zahlen sind nur so gut wie deine Eingaben."
       }
+    }
+  },
+  "wallets": {
+    "wallet": "Geldbörse",
+    "all": "Alle Geldbörsen",
+    "yours": "Deine Geldbörsen",
+    "subtitle": "Wo dein Geld gerade liegt.",
+    "totalAll": "Alle Geldbörsen zusammen",
+    "count_one": "{{count}} Geldbörse",
+    "count_other": "{{count}} Geldbörsen",
+    "loading": "Geldbörsen werden geladen…",
+    "loadFailed": "Die Geldbörsen konnten nicht geladen werden.",
+    "new": "Neue Geldbörse",
+    "edit": "Geldbörse bearbeiten",
+    "save": "Geldbörse speichern",
+    "added": "Geldbörse hinzugefügt",
+    "updated": "Geldbörse aktualisiert",
+    "deleted": "Geldbörse gelöscht",
+    "archived": "Geldbörse archiviert",
+    "restored": "Geldbörse wieder in Gebrauch",
+    "archiveName": "{{name}} archivieren",
+    "restoreName": "{{name}} wieder verwenden",
+    "type": {
+      "label": "Art",
+      "cash": "Bargeld",
+      "bank": "Bank",
+      "ewallet": "E-Wallet"
+    },
+    "namePlaceholder": "z. B. Vietcombank",
+    "initialBalance": "Anfangsbestand",
+    "initialHint": "Das Geld in dieser Geldbörse vor deiner ersten Transaktion hier.",
+    "defaultBadge": "Standard",
+    "defaultHint": "Eine Transaktion ohne Geldbörse landet hier. Diese Geldbörse kann weder archiviert noch gelöscht werden.",
+    "archivedTitle": "Archiviert",
+    "archivedHint": "Sie behalten ihren Bestand und nehmen keine neuen Transaktionen oder Überweisungen an.",
+    "moneyIn": "Ein",
+    "moneyOut": "Aus",
+    "startedWith": "Start: {{amount}}",
+    "deleteQuestion": "Diese Geldbörse löschen?",
+    "deleteText": "Das kann nicht rückgängig gemacht werden. Eine Geldbörse mit Transaktionen oder Überweisungen lässt sich nicht löschen: archiviere sie stattdessen.",
+    "transfer": {
+      "open": "Geld überweisen",
+      "title": "Geld überweisen",
+      "from": "Von",
+      "to": "Nach",
+      "save": "Überweisen",
+      "done": "Geld überwiesen",
+      "chooseTwo": "Wähle zwei verschiedene Geldbörsen.",
+      "needTwo": "Du brauchst mindestens zwei Geldbörsen, um Geld zu überweisen.",
+      "notCounted": "Eine Überweisung ist weder Einnahme noch Ausgabe: Summen, Budgets und Berichte bleiben gleich.",
+      "history": "Überweisungen",
+      "historySubtitle": "Neueste zuerst",
+      "empty": "Noch keine Überweisungen.",
+      "loading": "Überweisungen werden geladen…",
+      "loadFailed": "Die Überweisungen konnten nicht geladen werden.",
+      "count_one": "{{count}} Überweisung",
+      "count_other": "{{count}} Überweisungen",
+      "deleteName": "Überweisung von {{from}} nach {{to}} löschen",
+      "deleteQuestion": "Diese Überweisung löschen?",
+      "deleteText": "Das Geld geht zurück nach {{from}}.",
+      "deleted": "Überweisung gelöscht"
     }
   }
 }

@@ -14,7 +14,7 @@
   padding: 0 var(--space-3);
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
-  background: var(--color-surface);
+  background: var(--color-input);
   color: var(--color-text);
   font-size: var(--font-size-sm);
   text-align: left;
@@ -25,13 +25,13 @@
 }
 
 .trigger:hover:not(:disabled) {
-  border-color: color-mix(in srgb, var(--color-primary) 45%, var(--color-border-strong));
+  border-color: color-mix(in srgb, var(--color-primary-text) 45%, var(--color-border-strong));
 }
 
 .trigger:focus-visible,
 .trigger[aria-expanded='true'] {
   outline: none;
-  border-color: var(--color-primary);
+  border-color: var(--color-primary-text);
   box-shadow: 0 0 0 3px var(--color-focus-ring);
 }
 
@@ -48,7 +48,7 @@
 
 .trigger:hover:not(:disabled) .icon,
 .trigger[aria-expanded='true'] .icon {
-  color: var(--color-primary);
+  color: var(--color-primary-text);
 }
 
 .trigger[aria-expanded='true'] .icon {
@@ -180,7 +180,7 @@
 
 .day:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-text);
 }
 
 .otherMonth {

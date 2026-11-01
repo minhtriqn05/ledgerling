@@ -2,8 +2,8 @@
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border: none;
   border-radius: var(--radius-full);
   background: transparent;
@@ -18,7 +18,7 @@
 }
 
 .button:hover {
-  background: var(--color-surface-muted);
+  background: color-mix(in srgb, var(--color-text) 9%, transparent);
   color: var(--color-text);
 }
 
@@ -30,4 +30,9 @@
 .button:focus-visible {
   outline: none;
   box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+.button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }

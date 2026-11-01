@@ -17,6 +17,11 @@ erDiagram
     CATEGORY ||--o{ TRANSACTION_TEMPLATE : prefills
     GOAL ||--o{ CONTRIBUTION : holds
     USER ||--o{ NOTIFICATION : receives
+    USER ||--o{ WALLET : holds
+    USER ||--o{ TRANSFER : makes
+    WALLET |o--o{ TRANSACTION : "keeps (none = default wallet)"
+    WALLET ||--o{ TRANSFER : "sends"
+    WALLET ||--o{ TRANSFER : "receives"
 
     USER {
         ObjectId _id PK
@@ -47,6 +52,7 @@ erDiagram
         ObjectId _id PK
         ObjectId userId FK
         ObjectId categoryId FK
+        ObjectId walletId FK "set on every new transaction; older ones have none and count in the default wallet"
         string type "income | expense, copied from category"
         number amount "greater than 0"
         string currency "ISO code, default VND"
@@ -120,6 +126,31 @@ erDiagram
         date updatedAt
     }
 
+    WALLET {
+        ObjectId _id PK
+        ObjectId userId FK
+        string name "1-30 characters, unique per user, ignores case"
+        string type "cash | bank | ewallet"
+        string color "hex, e.g. #4A9FE3"
+        number initialBalance "0 or more, VND, default 0"
+        boolean archived "default false"
+        boolean isDefault "the Cash wallet, one per user; only the server sets it"
+        date createdAt
+        date updatedAt
+    }
+
+    TRANSFER {
+        ObjectId _id PK
+        ObjectId userId FK
+        ObjectId fromWalletId FK
+        ObjectId toWalletId FK
+        number amount "greater than 0, VND"
+        string note "up to 200 characters"
+        date date
+        date createdAt
+        date updatedAt
+    }
+
     CONTRIBUTION {
         ObjectId _id PK
         number amount "whole VND, not 0: positive = deposit, negative = withdrawal"
@@ -157,7 +188,13 @@ erDiagram
 - `Notification.params` is an extra field next to the ones in the data model: it keeps the numbers and names, so the app can write the text in the user's language.
 - `User.preferences.notifications` has one boolean per kind (`budget`, `goals`, `recurring`, `weekly`). A user without the field counts as all on. A kind that is off is not created at all.
 - `User.tokenVersion` (Number, default 0) is copied into every JWT as `tv`. `requireAuth` compares the two on each request, so raising it (new password, "log out of all devices") makes every older token invalid. It is never sent to the client.
-- `User.preferences.theme` (`light` | `dark` | `system`, default `system`), `weekStartsOn` (`monday` | `sunday`, default `monday`) and `language` (one of the 8 app languages, no default: until it is chosen each device keeps its own).
+- `User.preferences.theme` (`light` | `dark` | `system`, default `dark`), `weekStartsOn` (`monday` | `sunday`, default `monday`) and `language` (one of the 8 app languages, no default: until it is chosen each device keeps its own).
 - `User.avatar` (optional) is `{ type, value }`: `preset` + the id of one of the 32 ready-made avatars (`server/src/utils/avatars.js`, drawings in `client/src/assets/avatars`), or `upload` + a data URL of a 256x256 WebP made in the browser (at most 120 kB). A new account gets a random preset; the demo account has the fixed preset `panda`. No separate collection: a photo is small enough to live in the user document.
 - `User.role` (`user` | `admin`, default `user`) and `User.status` (`active` | `disabled`, default `active`). Only `server/src/scripts/make-admin.js` sets a role; no API route can. `requireAuth` reads both from the database on every request. Disabling an account (`PATCH /admin/users/:id/status`) also raises `tokenVersion`, so its tokens stop working; a disabled user cannot log in (403).
-- Deleting a User deletes every document with that `userId`: Category, Transaction, Budget, RecurringRule, Goal, TransactionTemplate and Notification.
+- One User has many Wallets (`Wallet.userId`). The name is unique per user, ignoring case: compound unique index with a collation on `(userId, name)`. One default wallet per user: partial unique index on `(userId, isDefault)`, only for `isDefault: true`, so two requests at the same time can never make two.
+- `balance` of a wallet is not stored: it is `initialBalance + income − expense + transfersIn − transfersOut`, added up on every read from the VND transactions and the transfers.
+- `Transaction.walletId` is not "required" in the schema: a transaction saved before wallets existed has none and must still save when it is edited. The service sets it on every new transaction (the chosen wallet, or the default one). Without it a transaction counts in the default wallet (`$ifNull` in the balance, `$in: [id, null]` in the filter). Nothing is migrated.
+- A wallet with transactions or transfers cannot be deleted (409), because the balances would change: it can be archived. The default wallet can be neither.
+- One User has many Transfers (`Transfer.userId`). A transfer is a separate collection and not a transaction, so stats, budgets, reports and insights can never count it.
+- Indexes: on Transaction `(userId, walletId, date -1)` for the wallet filter; on Transfer `(userId, date -1)` for the history, `(userId, fromWalletId)` and `(userId, toWalletId)` for the balances and the check before a wallet is deleted.
+- Deleting a User deletes every document with that `userId`: Category, Transaction, Budget, RecurringRule, Goal, TransactionTemplate, Notification, Wallet and Transfer.

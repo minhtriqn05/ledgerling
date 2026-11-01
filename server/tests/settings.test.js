@@ -30,6 +30,11 @@ async function newUserWithData() {
   expect(contribution.status).toBe(201);
   const template = await api().post("/api/templates").set(headers).send({ name: "Coffee", categoryId: food._id, amount: 35000 });
   expect(template.status).toBe(201);
+  const wallet = await api().post("/api/wallets").set(headers).send({ name: "Bank", type: "bank", color: "#4A9FE3", initialBalance: 1000 });
+  expect(wallet.status).toBe(201);
+  const cash = (await api().get("/api/wallets").set(headers)).body.data.find((w) => w.isDefault);
+  const transfer = await api().post("/api/transfers").set(headers).send({ fromWalletId: wallet.body.data._id, toWalletId: cash._id, amount: 100 });
+  expect(transfer.status).toBe(201);
   // Whether a notification exists by now depends on the date, so one is stored directly
   await Notification.create({ userId: user.user._id, type: "weekly_summary", title: "T", message: "M", dedupeKey: "settings-test" });
 
@@ -195,10 +200,10 @@ describe("POST /api/auth/logout-all", () => {
 });
 
 describe("PATCH /api/users/me/preferences: theme, week start, language", () => {
-  it("starts with theme system and week on Monday, and no language", async () => {
+  it("starts with the dark theme and week on Monday, and no language", async () => {
     const user = await registerUser();
     const preferences = (await me(user.token)).body.data.preferences;
-    expect(preferences.theme).toBe("system");
+    expect(preferences.theme).toBe("dark");
     expect(preferences.weekStartsOn).toBe("monday");
     expect(preferences.language).toBeUndefined();
   });
@@ -248,7 +253,7 @@ describe("PATCH /api/users/me/preferences: theme, week start, language", () => {
       expect(res.body.message).toBe(message);
     }
     const preferences = (await me(user.token)).body.data.preferences;
-    expect(preferences).toMatchObject({ theme: "system", weekStartsOn: "monday" });
+    expect(preferences).toMatchObject({ theme: "dark", weekStartsOn: "monday" });
     expect(preferences.language).toBeUndefined();
   });
 });
@@ -261,7 +266,7 @@ describe("GET /api/users/me/export", () => {
     expect(res.status).toBe(200);
     const data = res.body.data;
     expect(Object.keys(data).sort()).toEqual(
-      ["budgets", "categories", "exportedAt", "goals", "profile", "recurringRules", "templates", "transactions"].sort()
+      ["budgets", "categories", "exportedAt", "goals", "profile", "recurringRules", "templates", "transactions", "transfers", "wallets"].sort()
     );
     expect(data.profile).toMatchObject({ _id: user.user._id, name: "Test User", email: user.email });
     expect(data.categories.length).toBeGreaterThan(5);
@@ -328,7 +333,7 @@ describe("DELETE /api/users/me", () => {
     // Every model that has a userId, found by looking at the schemas, so a model added later is checked too
     const owned = Object.values(mongoose.models).filter((model) => model.schema.path("userId"));
     expect(owned.map((model) => model.modelName).sort()).toEqual(
-      ["Budget", "Category", "Goal", "Notification", "RecurringRule", "Transaction", "TransactionTemplate"].sort()
+      ["Budget", "Category", "Goal", "Notification", "RecurringRule", "Transaction", "TransactionTemplate", "Transfer", "Wallet"].sort()
     );
     for (const model of owned) {
       expect(await model.countDocuments({ userId: user.user._id }), model.modelName).toBe(0);

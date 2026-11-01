@@ -15,7 +15,7 @@ const PAGES = [
   { file: 'goals', path: '/goals', heading: 'Goals' },
 ];
 
-test.use({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1, colorScheme: 'light' });
+test.use({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1, colorScheme: 'dark' });
 
 test('take the landing page pictures from the demo account', async ({ page }) => {
   test.setTimeout(120000);

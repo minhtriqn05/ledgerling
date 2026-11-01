@@ -4,40 +4,32 @@ This file records the visual decisions for the Ledgerling client.
 All values are implemented once as CSS variables in `client/src/styles/tokens.css`.
 Components must use those variables and never hardcode colors, fonts, radii or shadows.
 
-A live preview is available in dev mode at `http://localhost:5173/style-guide`
-(route registered only when `import.meta.env.DEV` is true). Tabs show a static mock of every
-screen with sample data – Dashboard, Transactions, Categories, Login – plus a Components catalog.
-A tab can be opened directly, e.g. `/style-guide#transactions`.
+A dev-only page lives at `http://localhost:5173/style-guide` (registered only when `import.meta.env.DEV` is true). Its mocks
+were made for the earlier look: they follow the tokens, but their layouts are older than this guide. The real pages are the reference.
 
-## 1. Mood – "Sky & Mint"
+## 1. Mood – "Noir"
 
-**Bright, airy and calm, with a few lively accents.** Light backgrounds and white cards, sky blue
-and mint as the main colors, and small touches of sun, coral, teal and periwinkle so the screens
-never feel monotonous.
+**A private bank at night: dark, quiet and expensive, with a little light where it matters.** Plan: `docs/plans/premium-redesign.md`.
 
 Principles:
 
-1. **Light first.** A pale sky-grey canvas with white floating panels (sidebar, cards) and a soft
-   sky-to-mint banner that holds each page title.
-2. **One vivid hero per screen:** the sky-to-teal gradient card holds the number to read first
-   (total balance). Everything else stays light.
-3. **Accent rhythm:** every card title has a small icon tile in its own accent color
-   (sky, sun, mint, periwinkle…), so color repeats in a calm, predictable way.
-4. **Color with meaning:** green = income, coral = expense, category colors = identity.
-   Amounts always carry `+` / `−`, so color is never the only signal.
-5. **Soft shapes:** 20px cards, pill buttons and chips, capsule chart bars, smooth curves, line icons.
-6. **Readable:** every text color passes WCAG AA (4.5:1) on its background.
-7. Light is the default look; a dark theme is chosen in Settings (section 3b).
+1. **Dark first.** A near-black canvas with floating panels. A new visitor gets Noir, whatever the device says. Porcelain (§3b) is a full choice.
+2. **One lit hero per page.** The aurora (emerald, ice, a little warmth) falls from the top edge of `PageHeader`. Everything else stays dark and calm.
+3. **Controls are monochrome.** The primary button is pearl on Noir and ink on Porcelain. Color belongs to the data, the hero and the wallets.
+4. **Physical surfaces.** Panels have a thin edge, a lit top and a tight shadow; gradients have a fine grain, so they never show bands. A soft light follows the mouse over a card.
+5. **Big and light.** The number a page leads with is large and thin (weight 300): it needs no bold to be read first.
+6. **Color with meaning:** green = income, coral = expense, category and wallet colors = identity. Amounts always carry `+` / `−`, so color is never the only signal. A list is mostly expenses, so they stay in the text color: no wall of red.
+7. **Soft shapes:** 24px cards, 32px hero and sidebar, pill buttons and chips, capsule chart bars, smooth curves, line icons.
+8. **Readable:** every text color passes WCAG AA (4.5:1) on every surface it sits on. axe checks each page in both themes.
 
 ## 2. References
 
 | Project | What we take from it |
 |---|---|
-| [asklepios – Health Metrics Chart](https://dribbble.com/shots/24625901-asklepios-AI-Healthcare-Wellness-App-Health-Metrics-Chart) (strangehelix) | Chart style: capsule bars on light tracks, smooth lines with fading fills, a vivid score card, big numbers next to charts. |
-| [Expenses Dashboard UI](https://www.behance.net/gallery/158203629/Expenses-Dashboard-UI) | Dashboard layout: sidebar with icons, stat cards in a row, charts below. |
-| [Folio – AI Finance Management](https://www.behance.net/gallery/255846073/AI-Finance-Management-Voice-Payments-App-UIUX) | Big bold balance number, simple charts, pill buttons. |
+| [porto-exp.vercel.app](https://porto-exp.vercel.app/) | The starting point of v7: dark floating panels, a hero with the key numbers, a right rail, a top bar, pastel capsules. See `docs/brand/inspiration.md`. |
+| [asklepios – Health Metrics Chart](https://dribbble.com/shots/24625901-asklepios-AI-Healthcare-Wellness-App-Health-Metrics-Chart) (strangehelix) | Chart style: capsule bars on tracks, smooth lines with fading fills, big numbers next to charts. |
+| [Folio – AI Finance Management](https://www.behance.net/gallery/255846073/AI-Finance-Management-Voice-Payments-App-UIUX) | Big balance number, simple charts, pill buttons. |
 | [Mera – Smart expense tracking](https://www.behance.net/gallery/256203067/Mera-smart-expense-tracking-from-bank-statements) | "One focal card per screen" and "amount first". |
-| [Tasky – Task management](https://www.behance.net/gallery/247037315/Tasky-A-smart-task-management-system) | Pill buttons and tags, soft cards, clean sidebar active state. |
 
 ### Decision log
 
@@ -47,337 +39,223 @@ Principles:
 | v2 | Cream + orange (Mera) | Orange felt too loud for daily use and sat close to the expense red. |
 | v3 | Sage green on soft paper | Too dark and muted; the ochre category color was disliked; charts looked like library defaults. |
 | v4 | Sky & Mint, pastel | Brighter and softer; charts redesigned in the asklepios style. Felt a bit monotonous. |
-| v5 | Sky & Mint + accents | Vivid sky-to-teal hero, colored icon tiles, savings ring, tinted summary cards, category stripes and bars. All MVP screens designed. |
-| **v6 (current)** | **Sky & Mint, refined + motion** | New "Ruled L" logo (`docs/brand/`), floating sidebar on a deeper canvas, banner page headers, pill rows, tight negative-spread shadows, short motion, line icons for categories instead of letters, 8 languages. Ideas from porto-exp, see `docs/brand/inspiration.md`. Later: Settings in sections, folding sidebar and cards, command palette. |
+| v5 | Sky & Mint + accents | Vivid hero, colored icon tiles, tinted cards. All MVP screens designed. |
+| v6 | Sky & Mint, refined + motion | New logo, floating sidebar, banner headers, pill rows, motion, line icons, 8 languages. |
+| **v7 (current)** | **Noir, with Porcelain** | The owner asked for a completely new template with a high-end feel. Dark first, aurora hero, pearl buttons, Manrope. The sky and mint live on in the aurora; violet stays out. |
 
-## 3. Color palette
+## 3. Color palette (Noir)
 
-### Brand and hero
+A part of a page marked `data-tone="noir"` gets these values in both themes: the sidebar, the hero, the wallet cards, the landing page, the login.
+The block is inside `@media screen`, so paper always gets the ink colors of Porcelain.
+
+### Controls
 
 | Token | Value | Use |
 |---|---|---|
-| `--color-primary` | `#2874b5` | Primary buttons, active page number, sparkline (white text on it: 4.9:1) |
-| `--color-primary-hover` / `--color-primary-text` | `#1f639f` | Hover; blue text such as links and the active nav item (5.4:1 on primary-soft) |
-| `--color-primary-soft` | `#e4f0fb` | Active nav item, selected items |
-| `--color-hero-from` → `--color-hero-to` | `#2874b5` → `#1b7f86` | `--gradient-hero` (135°): hero card, logo tile, login panel, the highest chart bar. White text: 4.7:1 or more everywhere. |
-| `--color-hero-text-soft` | white 80% | Large text on the hero only (the `₫` unit) |
-| `--color-hero-decor` | white 12% | The two soft circles on the hero and the login panel |
-| `--gradient-soft` | `#dceefc` → `#e3f6ed` | Pastel sky-to-mint: savings card, empty states |
-| `--gradient-banner` | `#d9ebfb` → `#dff3ec` (115°) | The page header banner (`PageHeader`) |
-| `--color-logo-accent` | `#a9efcf` | The ruled lines of the logo mark |
+| `--gradient-button` | `#ffffff` → `#dfe7e5` | Primary button and the floating + (ink text 15:1) |
+| `--color-primary` / `--color-on-primary` | `#f2f5f4` / `#0a0e10` | Fills: a checked box, the chosen day, the skip link |
+| `--color-primary-text` | `#a4dcf7` (ice) | Links, an active icon, the edge of a field with the focus |
+| `--color-primary-soft` | `#16282f` | Tags, selected rows |
+| `--color-focus-ring` | ice 32% | The 3px ring of the keyboard focus |
+
+### The aurora (the same in both themes)
+
+| Token | Value | Use |
+|---|---|---|
+| `--aurora-emerald` / `--aurora-ice` / `--aurora-warm` | `#2fc79c` / `#4f9ff0` / `#e0c483` | The three lights of `components/Aurora`: blurred, top left, top right, a little warmth at the bottom. They drift slowly; they stand still with reduced motion. |
+| `--color-hero-base` | `#0b1012` | What the lights fall on |
+| `--color-hero-text` / `-soft` | white / white 78% | Text on the hero |
+| `--color-hero-from` → `-to` | `#1f9e86` → `#1e6fa8` | Only the old mocks of the dev style guide |
+| `--logo-gold-*`, `--logo-jade-*` | tip → mid → base, plus `-edge` | The glass coin of the logo: two gold L and two jade L |
+| `--logo-light`, `--logo-halo`, `--logo-glow` | white, gold 30%, `#ffd979` | The light on the glass, around the coin and inside its hole |
+| `--gradient-progress` | `#6fe3bd` → `#7cc4f5` | The thin bar along the top, the 404 |
+| `--texture-grain` | a noise SVG | Over the aurora and the canvas, at 5–9% |
 
 ### Surfaces, text and borders
 
-| Token | Value | Contrast (white / page bg) | Use |
+| Token | Value | Contrast on it | Use |
 |---|---|---|---|
-| `--color-bg` | `#edf3f8` | – | The canvas behind the floating panels |
-| `--color-surface` | `#ffffff` | – | Cards, tables, inputs, sidebar |
-| `--color-surface-muted` | `#f1f5f9` | – | Pill rows of the transaction list, hover states |
-| `--color-skeleton` | `#e6edf4` | – | Loading placeholders (the shimmer runs over it) |
-| `--color-overlay` | navy 45% | – | Behind dialogs |
-| `--color-text` | `#172534` | 15.6 / 14.5 | Main text, headings, big numbers |
-| `--color-text-secondary` | `#4a5868` | 7.3 / 6.8 | Labels, captions, subtitles on the sky band |
-| `--color-text-muted` | `#5b6a7c` | 5.5 / 4.6 | Hints, dates, axis labels – only on white or the canvas |
-| `--color-border` / `--color-border-strong` | `#e3eaf1` / `#c9d5e0` | – | Dividers and card borders / input borders |
+| `--color-bg` | `#07090b` | text 18.4 | The canvas behind the floating panels, with two soft lights (`--ambient-1`, `--ambient-2`) |
+| `--color-surface` | `#0f1316` | text 17.2, muted 6.9 | Cards, sidebar |
+| `--color-surface-raised` | `#151a1e` | text 16.1, muted 6.5 | Dialogs, menus, toasts, tooltips |
+| `--color-surface-muted` | `#171c20` | text 15.8, muted 6.3 | Rows, tracks |
+| `--color-surface-hover` | `#1e252a` | text 14.3, muted 5.7 | A row under the mouse, a chosen tab |
+| `--color-input` | `#0b0e11` | – | The inside of a field: a little deeper than the card |
+| `--color-text` / `-secondary` / `-muted` | `#f4f6f5` / `#bac3c4` / `#949fa1` | – | Main text and numbers / labels / hints, dates, axis labels |
+| `--color-border` / `-strong` | `#20272c` / `#5e6a72` | – | Hairlines / the edge of a field (3:1) |
+| `--sheen-card` | white 2.8% → 0 | – | The light that falls on a card from above |
 
 ### Income and expense
 
-| Token | Value | Use |
-|---|---|---|
-| `--color-income` | `#25a37a` | Chart line, icons, progress bars |
-| `--color-income-text` | `#1e7a52` | Income amounts as text (5.3:1 on white, 4.8:1 on a 10% income tint) |
-| `--color-income-soft` | `#e2f5eb` | Badge background |
-| `--color-expense` | `#ec6559` | Chart line, icons, progress bars |
-| `--color-expense-text` | `#bd3f36` | Expense amounts as text (5.4:1 on white, 4.8:1 on a 10% expense tint) |
-| `--color-expense-soft` | `#fdecea` | Badge background |
-| `--color-danger` | `#bd3f36` | Delete buttons (white text 5.4:1), validation errors |
-
-The income/expense fill pair passes the color-blindness check (deutan ΔE 8.4).
+| Token | Noir | Porcelain | Use |
+|---|---|---|---|
+| `--color-income` | `#4fd1a1` | `#139a6c` | Chart line, icons, progress bars |
+| `--color-income-text` | `#74e0b8` | `#0a7350` | Income amounts as text |
+| `--color-income-soft` | `#0f2a21` | `#e2f4ec` | Badge background |
+| `--color-expense` | `#ff8a78` | `#e2573f` | Chart line, icons, progress bars |
+| `--color-expense-text` | `#ffa494` | `#b5381f` | Expense amounts as text, in the hero |
+| `--color-expense-soft` | `#2e1714` | `#fceae6` | Badge background |
+| `--color-danger` / `--color-on-danger` | `#c23f2d` / white | the same | Delete buttons (5.2:1) |
+| `--color-danger-text` | `#ff9d8c` | `#b5381f` | Validation errors written as text |
 
 ### Accents and tones
 
-Six accent colors reuse the category hues: `--accent-sky` (chart-1), `--accent-coral` (chart-2),
-`--accent-teal` (chart-3), `--accent-sun` (chart-4), `--accent-periwinkle` (chart-5),
-`--accent-mint` (chart-6). Tints are mixed in CSS with `color-mix()`, so each color is defined once:
+Six accent colors reuse the category hues: `--accent-sky` (chart-1), `--accent-coral` (chart-2), `--accent-teal` (chart-3), `--accent-sun` (chart-4),
+`--accent-periwinkle` (chart-5), `--accent-mint` (chart-6). Tints are mixed in CSS with `color-mix()` and follow the theme by themselves:
 
 | Element | Background | Foreground |
 |---|---|---|
-| Icon tile | 15% tone on white | 62% tone + ink (icons: 3.8:1 or more) |
-| Category mark (line icon) | 16% tone on white | 62% tone + ink (icons: 3.8:1 or more) |
-| Category chip | 14% tone on white | `--color-text` |
-| Tinted summary card | 10% tone, border 22% tone | money text color |
-| Alert | 12% tone | icon 62% tone + ink, text `--color-text` |
-
-Card title tiles rotate through the accents: Cash flow = sky, Spending by category = sun,
-This week = mint, Recent transactions = periwinkle, New category = sky.
+| Icon tile, category mark | 15–17% tone on the surface, a 1px inner edge of 20% tone | 70% tone + text color |
+| Category chip | 10% tone, edge 22% tone, a 7px dot in the tone | `--color-text` |
+| Number card (Reports) | 12% tone fading into the surface | money text color |
+| Alert | 12% tone | icon 62% tone + text color |
 
 ### Category colors
 
-Eight presets in a **fixed order**: sky `#4a9fe3`, coral `#f07d62`, teal `#22ada3`,
-apricot `#f19a52`, periwinkle `#7d8ce8`, mint `#3db383`, cornflower `#5d7fd8`, lime `#94c24f`
-(`--chart-1` … `--chart-8`). Checked for color blindness including the donut wrap-around: worst
-neighbor pair ΔE 9.5 (color-blind) / 22.1 (normal vision). Most are below 3:1 on white, so a
-category color is always shown with its name (chip label, legend row) next to its icon tile.
+Eight presets in a **fixed order**: sky `#4a9fe3`, coral `#f07d62`, teal `#22ada3`, apricot `#f19a52`, periwinkle `#7d8ce8`, mint `#3db383`,
+cornflower `#5d7fd8`, lime `#94c24f` (`--chart-1` … `--chart-8`, the same in both themes).
+**These hex values are stored on the categories, wallets and goals of the users: they do not change with a redesign.**
+`validate_palette.js` on the Noir surface `#0f1316`: chroma, color blindness (worst adjacent ΔE 9.5), normal vision (22.1) and contrast (3:1 or more) pass; six
+hues sit above its lightness band, which is expected for colors chosen for white, and which is fine here because a category is always shown with its name and its icon.
 
 ### Category icons
 
-Every category surface (cards, lists, chips, drawer, forms, budgets, reports) shows `CategoryMark`: a line icon
-from lucide-react on a light tint of the category color, in three sizes (`sm` 22px, `md` 32px, `lg` 40px).
-The registry is `client/src/utils/categoryIcons.js` (50 icons in 11 groups; the server keeps the same names).
-The icon is chosen in the category form (`IconPicker`, with "Auto"). Without a chosen icon the client guesses one
-from the name (English and Vietnamese words) and falls back to a tag icon, so a tile never shows a letter.
-Emoji saved by the earlier picker are shown as the matching line icon; nothing is rewritten in the database.
+Every category surface shows `CategoryMark`: a line icon from lucide-react on a tint of the category color, in three sizes (`sm` 22px, `md` 32px, `lg` 42px).
+The registry is `client/src/utils/categoryIcons.js` (50 icons in 11 groups; the server keeps the same names). Without a chosen icon the client guesses one
+from the name, so a tile never shows a letter. Emoji saved by an earlier picker are shown as the matching line icon; nothing is rewritten in the database.
 
 ### Chart helpers
 
-`--chart-bar` `#8fc2ec` (pastel capsules), `--chart-bar-track` `#eef4fa`, `--chart-highlight`
-`#2874b5`, `--chart-grid` `#e3eaf1`, `--chart-axis` `#617082`. `--pattern-track` (pale diagonal stripes)
-is the free part of budget and goal progress bars.
+`--chart-bar` `#33424b` (quiet capsules), `--chart-bar-track` `#171d21`, `--chart-highlight-from` → `-to` `#8ff0cd` → `#7cc4f5` (the capsule that is lit),
+`--chart-grid` `#1d2428`, `--chart-axis` `#949fa1`. `--pattern-track` (diagonal stripes) is the free part of budget and goal progress bars.
 
-## 3b. Dark theme
+## 3b. Porcelain, the light theme
 
-The person picks **Light**, **Dark** or **System** (follows the device) in Settings > Appearance. The result is one
-attribute on `<html>`: `data-theme="light"` or `data-theme="dark"`. The dark values live in `tokens.css` under
-`[data-theme='dark']`; only what must change is listed there, the brand blue, the hero gradient, the category/chart hues
-(`--chart-1` ... `--chart-8`, they are saved in the database) and every size stay as in `:root`. Components never know
-which theme is on: they only use tokens.
+The person picks **Light**, **Dark** or **System** in Settings > Appearance or the user menu, or with the two small buttons in the top bar. The result is one attribute on
+`<html>`: `data-theme="light"` or `data-theme="dark"`. `:root` in `tokens.css` holds Porcelain; Noir replaces only the colors.
 
-- **Before React loads**, a small script in `client/index.html` reads `localStorage['ledgerling.theme']` (and
-  `prefers-color-scheme` for System) and sets `data-theme`, so a dark page never flashes white. A matching
-  `html[data-theme='dark']` background in the same file covers the moment before `tokens.css` arrives.
-- The choice is kept in localStorage and saved on the account (`preferences.theme`), so it follows the person to another
-  device: when someone signs in, the account's theme is applied (`PreferencesSync`).
-- Charts (Recharts) read their colors with `cssVar()` while they render, so each chart component calls `useTheme()` and
-  draws again when the theme changes.
+- **Somebody who never chose gets Noir.** `DEFAULT_THEME` in `utils/theme.js` and the default of `preferences.theme` on the server are both `dark`. An older account that has `system` saved keeps following its device.
+- **In Porcelain the sidebar, the hero and the wallet cards stay dark on purpose.** The look of the app stays the same, on a warm canvas. The landing page and the login are Noir in both themes.
+- **Before React loads**, a small script in `client/index.html` reads `localStorage['ledgerling.theme']` and sets `data-theme`, so a page never flashes in the wrong colors.
+- The choice is kept in localStorage and saved on the account (`preferences.theme`), so it follows the person to another device (`PreferencesSync`).
+- Charts (Recharts) read their colors with `cssVar()` while they render, so each chart component calls `useTheme()` and draws again when the theme changes.
 
-| Token | Light | Dark | Note |
-|---|---|---|---|
-| `--color-bg` / `--color-surface` / `--color-surface-muted` | `#edf3f8` / `#fff` / `#f1f5f9` | `#0f1923` / `#172431` / `#1e2d3c` | Deep navy canvas, slightly lighter panels |
-| `--color-text` / `-secondary` / `-muted` | `#172534` / `#4a5868` / `#5b6a7c` | `#e6edf4` / `#b3c0ce` / `#93a3b5` | 13.3 / 8.5 / 6.1 : 1 on the surface |
-| `--color-border` / `--color-border-strong` | `#e3eaf1` / `#c9d5e0` | `#26384a` / `#4b6279` | Input borders keep 3:1 |
-| `--color-primary-text` / `-soft` | `#1f639f` / `#e4f0fb` | `#7fbdf0` / `#1d3a56` | Buttons keep `--color-primary` (white text 4.9:1) |
-| `--color-income-text` / `-soft` | `#1e7a52` / `#e2f5eb` | `#5fd6ab` / `#163a2f` | `--color-income` fill `#3fc79a` |
-| `--color-expense-text` / `-soft` | `#bd3f36` / `#fdecea` | `#ff9d93` / `#3d2124` | `--color-expense` fill `#f2857a` |
-| `--color-danger-text` (new) | `#bd3f36` | `#ff8a80` | Red written as text or an icon; the red button keeps `--color-danger` (white text 5.4:1) |
-| `--chart-bar` / `--chart-bar-track` / `--chart-grid` / `--chart-axis` | `#8fc2ec` / `#eef4fa` / `#e3eaf1` / `#617082` | `#4a86bb` / `#1e3042` / `#2a3d50` / `#93a3b5` | Axis text 5.9:1 |
-| `--gradient-soft` / `--gradient-banner` | pastel sky to mint | deep blue to deep teal | Banner and empty-state washes |
-
-Tints made with `color-mix(... var(--color-surface))` (icon tiles, alerts, category chips) follow the theme by themselves.
-The two darkest steps of the Reports calendar are kept a little paler in the dark theme so the day numbers keep 4.5:1.
+| Token | Porcelain | Note |
+|---|---|---|
+| `--color-bg` / `--color-surface` / `-muted` / `-hover` | `#f3f3ef` / `#ffffff` / `#f6f6f2` / `#eeeee9` | A warm canvas, white cards |
+| `--color-text` / `-secondary` / `-muted` | `#101517` / `#454f4d` / `#5c6664` | 18.4 / 8.5 / 5.9 : 1 on white, muted 5:1 or more everywhere |
+| `--color-border` / `-strong` | `#e4e4dd` / `#858f8b` | The edge of a field keeps 3:1 on white |
+| `--gradient-button` / `--color-on-primary` | `#2a3235` → `#0e1315` / white | The primary button is ink (13:1 or more) |
+| `--color-primary-text` / `-soft` | `#0b6a63` / `#e3f1ee` | Deep teal, 6.4:1 on white |
+| `--chart-bar` / `-track` / `-grid` / `-axis` | `#a9c5d6` / `#eeeeea` / `#e7e7e1` / `#5c6664` | |
 
 ## 4. Typography
 
-- **Font:** [Be Vietnam Pro](https://fonts.google.com/specimen/Be+Vietnam+Pro) (Google Fonts) 400 / 500 / 600 / 700,
-  loaded in `client/index.html`. Full Vietnamese diacritics. One font for the whole product. It has no Chinese,
-  Japanese or Korean letters, so `:lang(zh-CN)`, `:lang(ja)` and `:lang(ko)` switch `--font-sans` to a stack that adds
-  the system font of that script (`--font-sans-zh` / `-ja` / `-ko`); `<html lang>` follows the chosen language.
-- Sizes: `--font-size-xs` 12 · `sm` 14 (body) · `md` 16 (card titles) · `lg` 20 · `xl` 24 (page titles,
-  stat numbers) · `2xl` 32 · `3xl` 36 (the hero number).
-- Big numbers: bold + `--letter-spacing-tight` (-0.02em); the `₫` unit is 0.55em and secondary.
-- Amounts in lists use `font-variant-numeric: tabular-nums`.
-- Formatting helpers (`client/src/utils/format.js`) use `Intl` with the locale of the chosen language; the unit stays
-  VND and dates stay in Vietnam time: `formatVnd` → `12,450,000 ₫` (English) / `12.450.000 ₫` (Tiếng Việt, Deutsch),
-  `formatSignedVnd` → `+18,500,000 ₫`, `formatCompact` → `13.6M`, `formatPercent` → `86.3%` / `86,3 %`,
-  `formatDate` → `25 Oct 2026` / `2026年10月25日`, `formatDayMonth` → `25 Oct`.
+- **Font: [Manrope](https://fonts.google.com/specimen/Manrope)**, variable 300–800, loaded in `client/index.html`, for the whole app, numbers included. Full Vietnamese.
+- **Headlines of the landing page, the login, the static pages and the 404: [Newsreader](https://fonts.google.com/specimen/Newsreader)** (`--font-display`), weight 400. Never on a number that matters: the hero figure stays in Manrope.
+- Chinese, Japanese and Korean letters come from the system: `:lang(zh-CN)`, `:lang(ja)` and `:lang(ko)` switch both fonts to a stack with the system font of that script; `<html lang>` follows the chosen language.
+- Sizes: `--font-size-xs` 12 · `sm` 14 (body) · `md` 16 (card titles) · `lg` 20 · `xl` 26 (stat numbers) · `2xl` 34 (page titles) · `3xl` 44 · `hero` 40–60 (the one number) · `display` 48–96 (the landing page).
+- Big numbers: weight 300–500, `--letter-spacing-display` (-0.03em), proportional figures; the `₫` is about half the size and softer.
+- Amounts in lists and tables use `font-variant-numeric: tabular-nums`, so they line up.
+- `.eyebrow` (global.css): the small capitals above a number (11px, semibold, +0.09em). Chinese, Japanese and Korean get 12px without the spacing.
+- Formatting helpers (`client/src/utils/format.js`) use `Intl` with the locale of the chosen language; the unit stays VND and dates stay in Vietnam time.
 
 ## 5. Spacing, radius and shadows
 
-- 4px scale: `--space-1` 4 · `2` 8 · `3` 12 · `4` 16 · `5` 24 · `6` 32 · `7` 48 (px).
-- Radius: `--radius-sm` 8 (swatches) · `md` 12 (inputs, tiles, avatars, tooltips) · `lg` 20 (cards,
-  dialogs) · `xl` 24 (sidebar, page banner, drawer) · `full` (buttons, pills, chips, capsules).
-- Shadows use a negative spread, so they stay tight under the element instead of a grey halo:
-  `--shadow-sm` cards at rest · `--shadow-md` hero, hovered cards, tooltips · `--shadow-lg` dialogs, drawer, floating
-  cards · `--shadow-primary` / `--shadow-danger` primary and danger buttons (a lit top edge plus a shadow in their own color).
+- 4px scale: `--space-1` 4 · `2` 8 · `3` 12 · `4` 16 · `5` 24 · `6` 32 · `7` 48 · `8` 80 (px).
+- Radius: `--radius-sm` 10 · `md` 14 (inputs, nav items) · `lg` 24 (cards, tiles of the hero) · `xl` 32 (sidebar, hero, dialogs, drawer) · `full` (buttons, pills, chips).
+- Rows are 18px pills. `--control-height` 42px for buttons and fields; `Button size="sm"` is 32px, in the header of a card.
+- Shadows have a negative spread, so they stay tight under the element; on Noir they also carry a 1px lit top edge (`inset 0 1px 0`): `--shadow-sm` cards · `--shadow-md` hover, FAB · `--shadow-lg` dialogs, drawer, tooltips · `--shadow-primary` / `--shadow-danger` buttons.
 
 ## 5b. Motion
 
-Library: `motion` (`motion/react`). One main curve, `--ease-out` `cubic-bezier(0.22, 0.61, 0.36, 1)` (plus `--ease-pop` `cubic-bezier(0.34, 1.56, 0.64, 1)` for small "pop" moments), and three durations:
-`--duration-fast` 150ms (hover, press), `--duration-base` 220ms (menu pill, cards), `--duration-slow` 320ms (drawer).
-Movements stay within 150–400ms; only the skeleton shimmer repeats while data loads.
+Library: `motion` (`motion/react`). One main curve, `--ease-out` `cubic-bezier(0.22, 0.61, 0.36, 1)` (plus `--ease-pop` for small "pop" moments), and three durations:
+`--duration-fast` 160ms (hover, press), `--duration-base` 240ms (menu pill, cards), `--duration-slow` 380ms (drawer).
 
-- **Page change:** the content fades in and rises 8px (`AppLayout`).
-- **Lists and cards:** a short stagger (`components/Motion/Reveal.jsx`); summary numbers count up (`CountUp.jsx`).
-- **Hover and press:** cards lift 2px; buttons scale to 0.97 (icon buttons 0.92) while pressed.
-- **Menu:** the active pill is measured from the open link and slides between items, so it fits every language.
-- **Charts:** Recharts draws bars and lines in 400ms; skeletons shimmer over `--color-skeleton`.
-- **Dialogs, drawer and toasts:** enter and leave with a fade and a small slide or scale; the transaction drawer
-  slides in from the right (full width on phones).
-- **Lists and calendars:** a `Select` list or a `DatePicker` calendar fades and scales in from its field (180ms);
-  a soft pill slides behind the highlighted option, the check mark of the chosen one pops in, the month grid slides
-  left or right. Checkboxes fill and their check pops in with `--ease-pop` (a small overshoot).
-- **prefers-reduced-motion:** `MotionConfig reducedMotion="user"` in `main.jsx`, `useReducedMotion()` in the
-  components and a rule in `global.css` stop the movement; things then appear at once. An E2E test covers it.
+- **Aurora:** the three lights drift over 26–38 seconds, only `transform`, so it costs almost nothing.
+- **Spotlight:** a soft light follows the mouse over a card (`hooks/useSpotlight.js` tells the card where the mouse is, once per frame; `[data-spot]`). Not on touch screens.
+- **Wallet card:** rises 3px, a shadow in its own color, and a band of light crosses it once.
+- **Page change:** the content fades in and rises 10px (`AppLayout`).
+- **Lists and cards:** a short stagger (`components/Motion/Reveal.jsx`); `onScroll` waits until it scrolls into view (landing page). The numbers of the hero count up (`CountUp.jsx`).
+- **Landing page:** the picture of the app lies back 16° and stands up while the page scrolls (`useScroll` + `useTransform`).
+- **Hover and press:** primary buttons rise 1px, cards 2px; pressing scales to 0.98. The + turns 90° on hover.
+- **Logo:** the coin turns once in 16s and a band of light crosses it every 6s. On hover or keyboard focus it flips once, tilts, opens into its four L, lights up inside and turns fast; nothing jumps when the mouse arrives or leaves. A press tosses it, and it lands with a ring and small square chips (`docs/brand/README.md`).
+- **Menu:** the active pill is measured from the open link and slides between items, so it fits every language. The theme thumb slides too.
+- **Charts:** Recharts draws in 500ms; skeletons shimmer.
+- **Dialogs, drawer and toasts:** enter and leave with a fade and a small slide or scale, over a blurred page.
+- **prefers-reduced-motion:** `MotionConfig reducedMotion="user"` in `main.jsx`, `useReducedMotion()` in the components and a rule in `global.css` stop all of it; things then appear at once.
 
 ## 6. Layout
 
-- **App frame:** a floating white sidebar (248px, `--radius-xl`, `--frame-gap` 12px around it) on the `--color-bg`
-  canvas + the main area (32px padding).
-- **Sidebar:** the logo (`components/Logo/`: the mark + the wordmark drawn as strokes; a link to `/welcome`), the search
-  button of the command palette, nav items with line icons, active item = primary-soft pill + primary-text; at the
-  bottom the language switcher and the fold button, then the account card, which opens the user menu.
-- **Folded sidebar:** the fold button or the `[` key shrink it to `--sidebar-width-collapsed` (72px): only icons, the name
-  of each one in a dark tooltip next to it on hover and keyboard focus. The column width moves in `--duration-base`, off with
-  prefers-reduced-motion. The choice is kept in localStorage (`ledgerling.sidebarCollapsed`). A phone has no sidebar to fold.
-- **User menu** (`components/UserMenu/`): a `Popover` with Profile, Settings, Theme (three round icon buttons), Keyboard
-  shortcuts, Take the tour and Log out. Arrows move the focus, Escape goes back to the card.
-- **Command palette** (`components/CommandPalette/`): Ctrl+K / Cmd+K, or the search button. A text box over a list grouped
-  in Pages, Commands and Transactions (search by note, from 2 letters, 250ms after the last key). Accents do not matter when typing.
-- **Guided tour** (`components/Tour/`, steps in `utils/tour.js`): a native `<dialog>` with a hole in the dark made by the big
-  shadow of a transparent box, and a card next to the element. On a phone the menu opens for the steps inside it. It starts
-  once per browser (`ledgerling.tourSeen`) and comes back from the user menu.
-- **Top progress bar** (`components/TopProgress/`): 3px of the hero gradient along the top edge, after a page change and while
-  requests are on their way, not for anything shorter than 120ms. With reduced motion it is a still bar.
-- **Skip link** (`components/SkipLink/`): the first stop of the Tab key, hidden until it has the focus.
-- **Session expired** (`components/SessionExpiredDialog/`): a 401 shows a dialog over the page; the login comes back to that page.
-- **Logo:** "Ruled L", see `docs/brand/README.md`. The same mark is the favicon and the PWA icons.
-- **Language switcher** (`components/LanguageSwitcher/`): our `Select` (pill variant) closed as a globe + the short code (EN, VI,
-  FR, DE, ES, ZH, JA, KO); only the code in the folded sidebar. The list has each language written in its own language, its
-  code and a tick on the current one, and opens upward when the sidebar has no room below. In the sidebar, in the phone menu
-  and on the public pages. English is the default; the choice is kept in localStorage.
-- **Breadcrumb** (`components/Breadcrumbs/`, trail in `config/breadcrumbs.js`): starts with a Home icon to `/welcome`, then
-  the page and the level below it. On a phone: the Home icon and "‹ the level above".
-- **Back** (`components/BackButton/`): a quiet pill "‹ Back" on a page below another one (a section of Settings, Admin / Users,
-  the transaction drawer) and on About, Privacy and Terms.
-- **Collapsible cards** (`components/CollapsibleCard/`): the large cards of the Dashboard and Reports fold up to their title
-  with a chevron in the corner, one state per card in localStorage. A grid row moves between 1fr and 0fr; the content stays
-  mounted, so a chart does not draw again. Printing opens every card.
-- **Navigation items:** one array, `navItems` in `client/src/config/navItems.js` (`label`, `path`, optional
-  `icon`). Adding a page to the menu is one new line there plus its route in `App.jsx`.
-- **Active page:** primary-soft background, primary-text, semibold, plus a 4px primary bar on the left
-  edge (so it is not shown by color alone). The link also gets `aria-current="page"` from React Router.
-- **Narrow screens (<768px):** the sidebar becomes a sticky **top bar** (`--topbar-height` 56px): logo + name on
-  the left, a round menu button on the right (hamburger, turns into an X when open). The button opens a
-  **panel** under the bar (white, 20px radius, `--shadow-lg`) with the same items and "Log out" after a divider.
-  The panel closes on Escape, on a click outside, or after choosing a link. Implemented in
-  `client/src/components/AppLayout/`.
-- **Page header:** a soft banner (`--gradient-banner`, `--radius-xl`) with title + subtitle on the left and the month
-  picker pill and primary action on the right. It also sets the tab title ("Dashboard · Ledgerling").
-- **Breakpoints:** ≤1100px dashboard stats and the transactions summary cards in 2 columns (balance / net
-  full width), categories form below the list; ≤960px all rows one column; <768px the sidebar turns into
-  the top bar + menu panel; ≤760px summary cards stacked; ≤640px the transactions table becomes a list (a wider
-  table cuts the note short with "…", so the edit and delete buttons always fit); ≤560px 16px padding.
-  No horizontal page scroll at any width (checked from 320px to 1440px).
+- **App frame:** a floating dark sidebar (264px, `--radius-xl`, `--frame-gap` 14px around it) on the canvas, the top bar and the main area beside it (content up to 1520px).
+- **Sidebar** (`data-tone="noir"`): the logo (a link to `/welcome`) with the live dot, the links in three groups with a small title (Money, Planning, Account; `group` in `config/navItems.js`), and at the bottom the language, the fold button and the account card. The links scroll by themselves, so the account always stays on screen; on a low window the group titles give way first.
+- **Top bar** (wide screens): stays at the top while the page scrolls, the page shows through it, blurred. The breadcrumb in a pill on the left; the search button (opens the command palette), `ThemeToggle` and the bell on the right.
+- **Active page:** a glass pill in emerald and ice with a thin bright edge, semibold text, an ice icon. The link also gets `aria-current="page"`.
+- **Folded sidebar:** the fold button or the `[` key shrink it to 72px: only icons, the name of each in a tooltip on hover and keyboard focus. The choice is kept in localStorage. A phone has no sidebar to fold.
+- **Narrow screens (<768px):** one floating bar with the logo, the live dot, the bell, the face of the account and a round menu button. The button opens a panel under the bar with the search, the links, the language, the theme and the account. Escape, a click outside or choosing a link closes it.
+- **Page header** (`components/PageHeader`): the hero. An icon in a large glass tile, an optional small line above the title, the title and subtitle, the actions on the right, and `stats` under them: panes of glass from `HeroStat`, or a page's own. It also sets the tab title.
+- **User menu** (`components/UserMenu/`): Profile, Settings, Theme (three round icon buttons), Keyboard shortcuts, Take the tour and Log out.
+- **Command palette** (`components/CommandPalette/`): Ctrl+K / Cmd+K, or the search button. Pages, Commands and Transactions.
+- **Guided tour** (`components/Tour/`), **top progress bar**, **skip link**, **session expired** dialog, **language switcher**, **breadcrumb**, **back** button, **collapsible cards** (`components/CollapsibleCard/`): as their components describe.
+- **Breakpoints:** ≤1280px the rail of the Dashboard moves under the charts; ≤1100px the numbers of the hero in 2 columns; ≤960px the login in one column; <768px the sidebar turns into the bar + panel; ≤640px the transactions table becomes a list. No horizontal page scroll at any width.
 
 ## 7. Screens
 
-- **Dashboard:** greeting · hero card (total balance, change pill, white sparkline, two soft circles)
-  · income and expense cards (accent tile, number, change, progress bar: % saved / % spent)
-  · Cash flow · Spending by category (donut + rows with colored bars) · This week (big total +
-  capsule chart) · Recent transactions (category mark, note, category · date, signed amount, "View all").
-- **Transactions:** header with month picker · three tinted summary cards (income green, expense
-  coral, net sky) · filter bar (search, All/Income/Expense, category select) · rows as rounded pills on
-  `--color-surface-muted` (category mark + note, category chip, date, signed amount, edit/delete) · pagination.
-  On phones the table becomes a list. A click on a row opens the **details drawer** (`TransactionDrawer`:
-  amount, category, date, note, tags, Edit and Delete; Escape or the X closes it).
-- **Add / edit transaction dialog:** Expense/Income switch (the active side takes the money color),
-  big amount field in the type color, categories as colored chips (one selected, with a check),
-  date and note, Cancel / Save.
-- **Categories:** Expense/Income switch with counts · cards with a 4px stripe in the category color,
-  category mark, edit/delete, transaction count, amount, share bar · "New category" form (name,
-  type, icon picker, 8 color swatches in two rows, live chip preview). The count, amount and share bar come with
-  Transactions; until then a card shows the avatar, the name and the two icon buttons.
-  - **Edit:** the same form card becomes "Edit category" (edit icon tile); the Type switch is locked
-    (the other side fades out) with the hint "Type can't be changed after a category is created.";
-    Cancel / Save changes side by side.
-  - **Delete:** confirmed inside the card: `Delete "Food"?` / `This can't be undone.` + Cancel
-    (secondary, gets the focus) / Delete (danger). No browser confirm and no dialog.
-  - **States:** a centered, muted "Loading categories…" in the list area; an empty state per type
-    ("No expense categories yet" + "New category"); a load error is an error alert + "Try again"; a
-    delete or save error is an error toast with the server's message (e.g. "Category still has
-    transactions", "Category already exists"); a success is a success toast ("Category added",
-    "Category updated", "Category deleted"). Our own checks ("Please enter a name.") stay as an alert in the form.
-- **Settings:** one section at a time, each with its own address (`/settings/profile`, `security`, `appearance`, `preferences`,
-  `notifications`, `app`, `data`, `danger`; the list is `config/settingsSections.js`). From 960px: a sticky column on the left
-  (icon tile, name, one line of text) and the open section on the right; `/settings` opens Profile. Below 960px: `/settings` is
-  the list as cards, a section has the page to itself with "‹ Back" to the list. Danger zone stands apart, with a red border
-  in the menu cards and around its own card. Leaving Profile or Security with unsaved changes asks first
-  (`context/UnsavedChangesContext.jsx`).
-- **About, Privacy, Terms** (`pages/StaticPage.jsx`): one white card of short text, linked from the footer of `/welcome`.
-- **Login (and Register):** gradient panel with headline and two floating mini cards (saved this
-  month, this week's bars) · form with icon inputs (email, password + show button), full-width
-  button, link to the other page. On phones the panel becomes a short banner. Register adds a
-  "Name" field with a `user` icon. The password show button is the `eye` icon and looks selected
-  (primary-soft) while the password is visible. Errors, both our own checks and the server's message,
-  appear in one error alert between the fields and the button; the browser's built-in messages are
-  turned off (`noValidate`) because they follow the browser language. While the stored session is
-  checked on start-up, protected pages show a centered, muted "Loading…".
+- **Dashboard:** the hero with a greeting, the balance as the one big number, "saved X% of income", and income and expense on glass with six small capsules (the last months, this month lit). Below it two columns: Expense by month, Spending by category (ring + rows with bars) and Recent transactions; the rail has Your wallets, Budget alerts, Savings goals and Insights.
+- **Transactions:** the hero with the month picker, Import, Export, Add, and the three totals. A card with the search pill, the filters (category, wallet, sort, from, to), rounded rows (category mark + note, category chip, date, tags, signed amount; edit and delete wait for the mouse), the pager. On phones a list of pills. A click opens the details drawer.
+- **Wallets:** the hero with the total and a thin bar of how it is split. Each wallet is a dark metal card lit in its own color: a glass chip with the type icon, the name, the balance, where it started, money in and out. Below them the transfers; archived wallets last.
+- **Budgets:** the hero with total, spent and left. Cards with the amount, a 10px bar on a striped track, what is left and the percent.
+- **Goals:** the hero with saved and target. Cards with a bar, "to go", the deadline and how much per month, Add money and Withdraw.
+- **Recurring:** a list of pills: category mark, note, amount, frequency, next run, a switch, edit and delete.
+- **Categories:** Expense/Income switch, cards with a soft light in the category color from the corner, the form in a column on the right.
+- **Reports:** tabs in a pill. Monthly: number cards, the daily expense as a line with a fading fill, insights, top categories and tags. Yearly: pairs of capsules. Calendar: a heat map.
+- **Notifications, Settings, Admin:** the hero, then their lists and forms in cards. Settings keeps one section at a time, each with its own address; Danger zone stands apart, with a red border.
+- **Landing page** (`/welcome`, Noir in both themes): a floating glass header; the aurora falling from the top of the page; the headline in Newsreader; Get started (pearl) and Try the demo (glass); the picture of the app in a frame that stands up on scroll; four small facts; a bento grid of six features, each with a small live drawing; the screenshots; three numbered steps; a last invitation on the aurora.
+- **Login and Register** (Noir in both themes): the story on the left, edge to edge on the aurora (the headline in Newsreader, two panes of glass); the form on the right. On phones the story is a short band above the form.
+- **About, Privacy, Terms:** one card of short text with the title in Newsreader. They follow the theme.
 
 ## 8. Components
 
-Buttons (primary, secondary, ghost, danger, disabled, icon buttons) · inputs (with left icon, right
-action, error state) · segmented control and money type switch · badges · chips and avatars ·
-icon tiles · progress bars · alerts (info, success, error) · table · pagination · dialog on the
-overlay · empty state (three soft circles behind an icon + call to action). All of them are shown
-in the **Components** tab; their styles live in `client/src/pages/styleGuide/ui.module.css`.
+The real pages use React components in `client/src/components/`: `Button` (primary / secondary / danger, optional left icon, `size="sm"`), `IconButton`, `TextField`, `Alert`, `Card` + `CardHeader`, `CollapsibleCard`, `PageHeader` + `HeroStats` / `HeroStat`, `Aurora`, `ThemeToggle`, `SegmentedControl`, `EmptyState` (soft lights behind an icon), `MonthPicker` and `Modal` (a native `<dialog>` over the blurred page; Escape, the X and a click outside close it; an element with `data-autofocus` gets the focus).
 
-The real pages use React components in `client/src/components/` that copy their styles from that kit:
-`Button` (primary / secondary / danger, optional left icon), `IconButton`, `TextField`, `Alert`, `Card` +
-`CardHeader`, `PageHeader`, `SegmentedControl` (optional income / expense tone), `EmptyState`, `MonthPicker`
-(previous / next arrows around the month name) and `Modal` (a native `<dialog>` over the dimmed page; Escape, the X
-button and a click outside close it; an element with `data-autofocus` gets the focus). The Transactions page uses
-`Modal` for the add / edit form and for the delete confirmation.
+**Form controls – no browser defaults.** Every list, date, file field and checkbox is drawn by Ledgerling, so it looks the same in every browser and follows the chosen language:
 
-**Form controls – no browser defaults.** Every list, date, file field and checkbox is drawn by Ledgerling, so it
-looks the same in every browser and follows the chosen language:
+- `Popover`: the floating card under a field. It is a browser popover, so it shows in the top layer (above an open dialog, never cut off), opens above the field when there is no room below and closes on a click outside.
+- `Select` (`components/Select/`): a combobox button that looks like an input (`field`) or a pill (`pill`), a list with optional group titles, a sliding highlight, a check on the chosen option. Keyboard: arrows, Home / End, Enter / Space, Escape, typing a letter jumps to an option.
+- `DatePicker` (`components/DatePicker/`): the field shows the day in the user's language; the calendar has month arrows, weekdays from Monday, today with a dot, the chosen day as a pearl circle, and Today / Clear. Full keyboard support.
+- **CSV drop zone** (Import dialog), **checkboxes** (global style in `global.css`: an 18px rounded box that fills with `--color-primary`, a bar for "some selected"), and a search box with its own round ×.
 
-- `Popover`: the floating white card under a field (`--radius-md`, `--shadow-lg`). It is a browser popover, so it
-  shows in the top layer (above an open dialog, never cut off), opens above the field when there is no room below,
-  follows the field on scroll and closes on a click outside.
-- `Select` (`components/Select/`): replaces `<select>`. A combobox button that looks like an input (`field`) or a
-  pill (`pill`), a chevron that turns, a list with optional group titles (Transactions: All categories / Expense /
-  Income), a sliding highlight, a check on the chosen option. Keyboard: arrows, Home / End, Enter / Space, Escape,
-  typing a letter jumps to an option.
-- `DatePicker` (`components/DatePicker/`): replaces `<input type="date">`. The field shows the day in the user's
-  language ("25 Oct 2026"); the calendar has month arrows, weekdays from Monday, today with a dot, the chosen day as a
-  primary circle, days outside `min` / `max` struck through, and Today / Clear (Clear only for optional dates).
-  Keyboard: arrows, Home / End, Page Up / Page Down, Enter, Escape (closes the calendar, not the dialog).
-- **CSV drop zone** (Import dialog): a dashed card with a cloud icon; it turns sky while a file is dragged over it and
-  mint with the file name and size once a good file is read. The real file input stays inside it for the keyboard.
-- **Checkboxes** (global style in `global.css`): an 18px rounded box that fills with `--color-primary`; a bar for
-  "some selected".
-- The search box hides the browser's clear button and shows its own round × while there is text. Scrollbars are
-  thin, in `--color-border-strong`.
+**Toasts** (`components/Toast/` + `context/ToastContext.jsx`): small raised cards in the top-right corner with a tinted icon tile, the message and a close button. Any component calls `const toast = useToast(); toast.success('Transaction added')` or `toast.error(getErrorMessage(err))`. The stack is a popover, so it also shows above an open dialog.
 
-**Toasts** (`components/Toast/` + `context/ToastContext.jsx`): small white cards in the top-right corner
-(full width minus 16px on phones) with a tinted icon tile (income green for success, expense coral for error),
-the message and a close button. They hide by themselves after 3 seconds. Any component calls
-`const toast = useToast(); toast.success('Transaction added')` or `toast.error(getErrorMessage(err))`.
-Used for every add / edit / delete on Categories and Transactions: success messages, and the server's message
-on failure. The stack is a popover, so it also shows above an open dialog.
+## 9. Charts (Recharts)
 
-## 9. Charts (Recharts) – approved (v5)
+Colors are read from the tokens with `cssVar()` because SVG needs real color values. Code: `pages/dashboard/DashboardCharts.jsx`, `pages/reports/ReportCharts.jsx`, `pages/admin/AdminCharts.jsx`.
 
-Code: `client/src/pages/styleGuide/PreviewCharts.jsx`. Colors are read from the tokens with `cssVar()`
-because SVG needs real color values.
-
-- **Cash flow (area chart):** smooth `monotone` lines (2.5px). Only income gets a fading wash
-  (25% → 0%); expense is a line only, so fills never mix into a muddy color. Dashed horizontal grid,
-  round ticks (0 / 6M / 12M…) from `niceTicks()`, legend dots in the card header.
-- **This week (bar chart):** pastel capsules on a light track (max 16px wide). The highest day uses
-  the hero gradient and a small gradient pill with its amount ("650K"). No Y axis; the card shows the
-  total above the chart.
-- **Spending by category (donut):** thin ring (inner radius 79%), rounded segments with 3° gaps,
-  starting at 12 o'clock; total in the middle.
-- **Sparkline (hero):** white line with a white fading wash, no axes, edge to edge.
-- **Hover:** white tooltip card with colored dots and full amounts; lines show a 5px dot with a white ring.
-- Never two y-axes in one chart; text always uses text colors.
+- **Expense by month:** tall capsules (up to 64px wide, 16px corners) on a track, with a small bright dash near the top (`Capsule`). The chosen month is lit in `--chart-highlight-from` → `-to`, the others are quiet. No axis or grid: the amount stands above each capsule.
+- **Spending by category:** a ring (inner radius 74%) of rounded segments with 4° gaps, starting at 12 o'clock; the total in the middle; a ranked list with bars next to it.
+- **Daily expense:** a smooth 2px line with a fading fill (28% → 0%), a solid hairline grid, round ticks (0 / 6M / 12M…) from `niceTicks()`.
+- **Yearly:** pairs of 12px capsules, income and expense, with a legend in the card header.
+- **The small capsules in the hero:** plain HTML, six months, this month lit. Decoration next to the real number.
+- **Hover:** a raised tooltip card with colored dots and full amounts; lines show a 5px dot with a ring in the surface color.
+- Never two y-axes in one chart; text always uses text colors; gridlines are solid, never dashed.
 
 ## 10. Where things live
 
 | File | What it holds |
 |---|---|
-| `client/src/styles/tokens.css` | Every design value (colors, gradients, fonts, spacing, radius, shadows) |
-| `client/src/styles/global.css` | Base page styles (font, background, heading reset) |
+| `client/src/styles/tokens.css` | Every design value: Porcelain in `:root`, Noir in the block below it |
+| `client/src/styles/global.css` | Base page styles, the lights and the grain of the canvas, checkboxes, `.eyebrow` |
 | `client/src/components/` | Shared React components used by the real pages (§8) |
+| `client/src/components/AppLayout/` | The frame: sidebar, top bar, the phone bar |
+| `client/src/components/Aurora/` | The light of the hero |
+| `client/src/hooks/useSpotlight.js` | The light that follows the mouse |
 | `client/src/utils/format.js` | Money, number and date formatting (follows the language) |
 | `client/src/utils/categoryIcons.js` | Category icon registry, emoji mapping and the guess from the name |
-| `client/src/components/Motion/` | `Reveal` (stagger) and `CountUp` |
+| `client/src/components/Motion/` | `Reveal` (stagger, on scroll) and `CountUp` |
 | `client/src/components/Select/`, `DatePicker/`, `Popover/` | The form controls that replace the browser's own |
 | `client/src/i18n/`, `client/src/locales/` | i18next setup and the 8 translation files |
-| `docs/brand/` | Logo concepts, comparison, decision and inspiration notes |
 | `client/src/utils/cssVar.js` | Reads a token in JavaScript (for charts) |
-| `client/src/pages/StyleGuidePage.jsx` | The dev-only page with tabs |
-| `client/src/pages/styleGuide/` | Screen mocks, shared kit (`ui.module.css`), app frame, charts, icons, sample data |
-
-When a real page is built, its markup and styles are taken from the matching mock, and the sample
-data is replaced by API calls.
+| `client/e2e/screenshots.capture.js` | Takes the pictures of the landing page: `npm run screenshots` after a change in the look |
+| `client/scripts/og-image.html` | The picture of a shared link: `npm run og-image` |
+| `docs/brand/` | Logo concepts, comparison, decision and inspiration notes |
+| `client/src/pages/StyleGuidePage.jsx`, `pages/styleGuide/` | The dev-only page with the older mocks |

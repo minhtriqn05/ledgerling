@@ -4,13 +4,14 @@
 // same steps with the same key), and it is also saved on the account (preferences.theme) to follow the person.
 export const THEME_STORAGE_KEY = 'ledgerling.theme';
 export const THEMES = ['light', 'dark', 'system'];
-export const DEFAULT_THEME = 'system';
+// Noir is the look of the app, so somebody who never chose a theme gets it, whatever the device says
+export const DEFAULT_THEME = 'dark';
 
 export function isTheme(value) {
   return THEMES.includes(value);
 }
 
-// The stored choice; 'system' when nothing (or something unknown) is stored or localStorage is not available.
+// The stored choice; the default when nothing (or something unknown) is stored or localStorage is not available.
 export function getStoredTheme() {
   try {
     const stored = localStorage.getItem(THEME_STORAGE_KEY);

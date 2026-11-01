@@ -6,6 +6,7 @@ import QuickAddDialog from './QuickAddDialog.jsx';
 import { getCategories } from '../../api/categories.js';
 import { getTags } from '../../api/tags.js';
 import { deleteTemplate, getTemplates } from '../../api/templates.js';
+import { getWallets } from '../../api/wallets.js';
 import { createTransaction } from '../../api/transactions.js';
 import { fromDateInput, todayInput } from '../../utils/vnDate.js';
 
@@ -14,6 +15,7 @@ const toast = vi.hoisted(() => ({ success: vi.fn(), error: vi.fn() }));
 vi.mock('../../api/categories.js', () => ({ getCategories: vi.fn() }));
 vi.mock('../../api/tags.js', () => ({ getTags: vi.fn() }));
 vi.mock('../../api/templates.js', () => ({ getTemplates: vi.fn(), deleteTemplate: vi.fn() }));
+vi.mock('../../api/wallets.js', () => ({ getWallets: vi.fn() }));
 vi.mock('../../api/transactions.js', () => ({ createTransaction: vi.fn() }));
 vi.mock('../../context/ToastContext.jsx', () => ({ useToast: () => toast }));
 
@@ -64,6 +66,7 @@ beforeEach(() => {
   getCategories.mockResolvedValue(categories);
   getTemplates.mockResolvedValue([]);
   getTags.mockResolvedValue([]);
+  getWallets.mockResolvedValue([]);
   createTransaction.mockResolvedValue({ _id: 'new' });
 });
 
@@ -264,5 +267,71 @@ describe('QuickAddDialog: templates', () => {
 
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Template not found'));
     expect(screen.getByRole('button', { name: /^Morning coffee/ })).toBeInTheDocument();
+  });
+});
+
+describe('QuickAddDialog: the wallet', () => {
+  const wallets = [
+    { _id: 'bank', name: 'Vietcombank', isDefault: false, archived: false },
+    { _id: 'cash', name: 'Cash', isDefault: true, archived: false },
+    { _id: 'old', name: 'Old', isDefault: false, archived: true },
+  ];
+
+  it('has no picker while there are no wallets, and the server then uses the default one', async () => {
+    const { onClose } = await renderReady();
+    expect(screen.queryByLabelText('Wallet')).not.toBeInTheDocument();
+
+    await userEvent.type(quickText(), 'coffee 35k');
+    await userEvent.click(screen.getByRole('button', { name: 'Save transaction' }));
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(createTransaction.mock.calls[0][0]).not.toHaveProperty('walletId');
+  });
+
+  it('starts on the default wallet, and an archived wallet is not offered', async () => {
+    getWallets.mockResolvedValue(wallets);
+    const { onClose } = await renderReady();
+    const picker = await screen.findByLabelText('Wallet');
+    expect(picker).toHaveTextContent('Cash');
+
+    await userEvent.click(picker);
+    expect(screen.getByRole('option', { name: 'Vietcombank' })).toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: 'Old' })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('option', { name: 'Cash' }));
+
+    await userEvent.type(quickText(), 'coffee 35k');
+    await userEvent.click(screen.getByRole('button', { name: 'Save transaction' }));
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(createTransaction).toHaveBeenCalledWith(expect.objectContaining({ walletId: 'cash' }));
+  });
+
+  it('saves in the wallet that was chosen', async () => {
+    getWallets.mockResolvedValue(wallets);
+    const { onClose } = await renderReady();
+    await userEvent.click(await screen.findByLabelText('Wallet'));
+    await userEvent.click(screen.getByRole('option', { name: 'Vietcombank' }));
+
+    await userEvent.type(quickText(), 'coffee 35k');
+    await userEvent.click(screen.getByRole('button', { name: 'Save transaction' }));
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(createTransaction).toHaveBeenCalledWith(expect.objectContaining({ walletId: 'bank' }));
+  });
+
+  it('a template goes to the chosen wallet too', async () => {
+    getWallets.mockResolvedValue(wallets);
+    getTemplates.mockResolvedValue([template]);
+    const { onClose } = await renderReady();
+    await userEvent.click(await screen.findByLabelText('Wallet'));
+    await userEvent.click(screen.getByRole('option', { name: 'Vietcombank' }));
+
+    await userEvent.click(screen.getByRole('button', { name: /^Morning coffee/ }));
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(createTransaction).toHaveBeenCalledWith(expect.objectContaining({ categoryId: 'food', walletId: 'bank' }));
+  });
+
+  it('still works when the wallets cannot be loaded', async () => {
+    getWallets.mockRejectedValue(new Error('offline'));
+    await renderReady();
+    expect(screen.queryByLabelText('Wallet')).not.toBeInTheDocument();
+    expect(chip('Food')).toBeInTheDocument();
   });
 });

@@ -5,7 +5,7 @@ import { formatMonth } from './vnDate.js';
 
 // The icon (components/Icon.jsx) and accent color (--accent-<tone> in tokens.css) of each type
 export const NOTIFICATION_STYLE = {
-  budget_warning: { icon: 'wallet', tone: 'sun' },
+  budget_warning: { icon: 'gauge', tone: 'sun' },
   budget_over: { icon: 'alert', tone: 'coral' },
   goal_completed: { icon: 'target', tone: 'mint' },
   recurring_created: { icon: 'repeat', tone: 'sky' },
@@ -19,7 +19,7 @@ export function styleOf(type) {
 
 // The switches of Notification settings, in the order they are shown. Each one turns off the types listed here.
 export const NOTIFICATION_SWITCHES = [
-  { key: 'budget', icon: 'wallet', types: ['budget_warning', 'budget_over'] },
+  { key: 'budget', icon: 'gauge', types: ['budget_warning', 'budget_over'] },
   { key: 'goals', icon: 'target', types: ['goal_completed'] },
   { key: 'recurring', icon: 'repeat', types: ['recurring_created'] },
   { key: 'weekly', icon: 'reports', types: ['weekly_summary'] },

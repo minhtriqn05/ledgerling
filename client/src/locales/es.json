@@ -56,7 +56,13 @@
     "transactions": "Movimientos",
     "toWelcome": "Ir a la página de inicio",
     "collapseSidebar": "Contraer la barra lateral",
-    "expandSidebar": "Expandir la barra lateral"
+    "expandSidebar": "Expandir la barra lateral",
+    "wallets": "Carteras",
+    "groups": {
+      "money": "Dinero",
+      "planning": "Planificación",
+      "account": "Cuenta"
+    }
   },
   "breadcrumb": {
     "label": "Ruta de navegación",
@@ -200,7 +206,16 @@
     "savingsGoals": "Metas de ahorro",
     "spent": "gastado",
     "spendingByCategory": "Gastos por categoría",
-    "subtitle": "Así va {{month}}."
+    "subtitle": "Así va {{month}}.",
+    "recent": "Transacciones recientes",
+    "recentFailed": "No se pudieron cargar las transacciones recientes.",
+    "savedShare": "{{percent}} de los ingresos ahorrado",
+    "greeting": {
+      "night": "Es tarde, {{name}}",
+      "morning": "Buenos días, {{name}}",
+      "afternoon": "Buenas tardes, {{name}}",
+      "evening": "Buenas noches, {{name}}"
+    }
   },
   "transactions": {
     "add": "Añadir movimiento",
@@ -374,7 +389,10 @@
     "overBy": "Excedido en {{amount}}",
     "percentUsed": "{{percent}} % usado",
     "save": "Guardar presupuesto",
-    "updated": "Presupuesto actualizado"
+    "updated": "Presupuesto actualizado",
+    "totalLimit": "Presupuesto total",
+    "totalSpent": "Gastado",
+    "totalLeft": "Queda por gastar"
   },
   "recurring": {
     "active": "Activa: {{name}}",
@@ -456,7 +474,9 @@
     "withdrawMax": "Puedes retirar como máximo {{amount}}, el importe ahorrado en esta meta.",
     "withdrawMoney": "Retirar dinero",
     "withdrawal": "Retirada",
-    "withdrawn": "Dinero retirado"
+    "withdrawn": "Dinero retirado",
+    "totalSaved": "Ahorrado hasta ahora",
+    "totalTarget": "Todas las metas juntas"
   },
   "reports": {
     "averagePerDay": "Media por día",
@@ -902,7 +922,18 @@
     "footerNote": "UIT · CSBU109.R11.KHBC",
     "github": "Ver en GitHub",
     "opensInNewTab": "(se abre en una pestaña nueva)",
-    "openApp": "Abrir la aplicación"
+    "openApp": "Abrir la aplicación",
+    "trust": {
+      "label": "Qué incluye",
+      "languages": "8 idiomas",
+      "install": "Se instala como una app",
+      "sync": "Sincronización en vivo entre dispositivos",
+      "themes": "Temas Noir y Porcelana"
+    },
+    "closing": {
+      "title": "Tu dinero, por fin tranquilo en un solo lugar.",
+      "text": "Crea una cuenta en menos de un minuto y añade tu primera transacción hoy."
+    }
   },
   "onboarding": {
     "title": "Empieza con Ledgerling",
@@ -994,7 +1025,16 @@
     "USER_NOT_FOUND": "Usuario no encontrado",
     "VALIDATION_ERROR": "Revisa los valores introducidos.",
     "WITHDRAW_TOO_MUCH": "No puedes retirar más que el importe ahorrado",
-    "WRONG_PASSWORD": "La contraseña no es correcta"
+    "WRONG_PASSWORD": "La contraseña no es correcta",
+    "WALLET_NOT_FOUND": "Cartera no encontrada",
+    "WALLET_EXISTS": "Ya tienes una cartera con este nombre",
+    "WALLET_ARCHIVED": "Esta cartera está archivada",
+    "WALLET_IN_USE": "Esta cartera aún tiene transacciones o transferencias. Archívala.",
+    "WALLET_DEFAULT_LOCKED": "La cartera predeterminada no se puede archivar ni eliminar",
+    "WALLET_TYPE_INVALID": "Elige un tipo de cartera",
+    "WALLET_BALANCE_INVALID": "El saldo inicial debe ser 0 o más",
+    "TRANSFER_NOT_FOUND": "Transferencia no encontrada",
+    "TRANSFER_SAME_WALLET": "Elige dos carteras diferentes"
   },
   "live": {
     "live": "En directo",
@@ -1126,6 +1166,67 @@
         "title": "Sin garantía",
         "text": "El servicio es gratuito y no ofrece ninguna garantía. No da consejos financieros, y sus cifras son tan buenas como lo que introduces."
       }
+    }
+  },
+  "wallets": {
+    "wallet": "Cartera",
+    "all": "Todas las carteras",
+    "yours": "Tus carteras",
+    "subtitle": "Dónde está tu dinero ahora mismo.",
+    "totalAll": "Todas las carteras juntas",
+    "count_one": "{{count}} cartera",
+    "count_other": "{{count}} carteras",
+    "loading": "Cargando carteras…",
+    "loadFailed": "No se pudieron cargar las carteras.",
+    "new": "Nueva cartera",
+    "edit": "Editar cartera",
+    "save": "Guardar cartera",
+    "added": "Cartera añadida",
+    "updated": "Cartera actualizada",
+    "deleted": "Cartera eliminada",
+    "archived": "Cartera archivada",
+    "restored": "Cartera de nuevo en uso",
+    "archiveName": "Archivar {{name}}",
+    "restoreName": "Volver a usar {{name}}",
+    "type": {
+      "label": "Tipo",
+      "cash": "Efectivo",
+      "bank": "Banco",
+      "ewallet": "Monedero digital"
+    },
+    "namePlaceholder": "p. ej. Vietcombank",
+    "initialBalance": "Saldo inicial",
+    "initialHint": "El dinero de esta cartera antes de tu primera transacción aquí.",
+    "defaultBadge": "Predeterminada",
+    "defaultHint": "Una transacción sin cartera llega aquí. Esta cartera no se puede archivar ni eliminar.",
+    "archivedTitle": "Archivadas",
+    "archivedHint": "Conservan su saldo y no reciben nuevas transacciones ni transferencias.",
+    "moneyIn": "Entra",
+    "moneyOut": "Sale",
+    "startedWith": "Inicio: {{amount}}",
+    "deleteQuestion": "¿Eliminar esta cartera?",
+    "deleteText": "No se puede deshacer. Una cartera con transacciones o transferencias no se puede eliminar: archívala.",
+    "transfer": {
+      "open": "Transferir dinero",
+      "title": "Transferir dinero",
+      "from": "Desde",
+      "to": "Hacia",
+      "save": "Transferir",
+      "done": "Dinero transferido",
+      "chooseTwo": "Elige dos carteras diferentes.",
+      "needTwo": "Necesitas al menos dos carteras para transferir dinero.",
+      "notCounted": "Una transferencia no es ingreso ni gasto: tus totales, presupuestos e informes no cambian.",
+      "history": "Transferencias",
+      "historySubtitle": "Las más recientes primero",
+      "empty": "Aún no hay transferencias.",
+      "loading": "Cargando transferencias…",
+      "loadFailed": "No se pudieron cargar las transferencias.",
+      "count_one": "{{count}} transferencia",
+      "count_other": "{{count}} transferencias",
+      "deleteName": "Eliminar la transferencia de {{from}} a {{to}}",
+      "deleteQuestion": "¿Eliminar esta transferencia?",
+      "deleteText": "El dinero vuelve a {{from}}.",
+      "deleted": "Transferencia eliminada"
     }
   }
 }

@@ -1,7 +1,7 @@
 import {
   ResponsiveContainer,
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   BarChart,
   Bar,
   XAxis,
@@ -19,13 +19,13 @@ import { formatMonth, formatMonthShort } from '../../utils/vnDate.js';
 import { ChartTooltip, niceTicks } from '../dashboard/DashboardCharts.jsx';
 import styles from './ReportCharts.module.css';
 
-// The two charts of the Reports page, in the approved style of docs/ui-style.md §9:
-// smooth lines, dashed horizontal grid, round axis steps, white tooltip card, capsule bars.
+// The two charts of the Reports page, in the style of docs/ui-style.md §9:
+// a smooth line with a fading fill, a hairline horizontal grid, round axis steps, a tooltip card, capsule bars.
 // Recharts draws SVG, which needs real color values, so colors are read from tokens.css with cssVar().
 
 const axisTick = () => ({ fill: cssVar('--chart-axis'), fontSize: cssVar('--font-size-xs') });
 
-// Expense of every day of one month as a smooth line.
+// Expense of every day of one month as a smooth line over a soft fill.
 // dailyExpense: [{ date: 'YYYY-MM-DD', total }], one entry per day (the monthly report sends them all).
 export function DailyExpenseChart({ dailyExpense, month }) {
   useTheme(); // the colors below are read from the CSS variables, so draw again when the theme changes
@@ -43,8 +43,14 @@ export function DailyExpenseChart({ dailyExpense, month }) {
   return (
     <div className={styles.chart} role="img" aria-label={t('reports.dailyChartLabel', { month: formatMonth(month) })}>
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data} margin={{ top: 8, right: 12, bottom: 0, left: 0 }}>
-          <CartesianGrid vertical={false} stroke={grid} strokeDasharray="4 6" />
+        <AreaChart data={data} margin={{ top: 8, right: 12, bottom: 0, left: 0 }}>
+          <defs>
+            <linearGradient id="report-daily-fill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={color} stopOpacity={0.28} />
+              <stop offset="100%" stopColor={color} stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid vertical={false} stroke={grid} />
           <XAxis dataKey="day" axisLine={false} tickLine={false} tickMargin={10} interval={4} tick={axisTick()} />
           <YAxis
             axisLine={false}
@@ -62,19 +68,20 @@ export function DailyExpenseChart({ dailyExpense, month }) {
               <ChartTooltip active={active} payload={payload} label={payload?.[0]?.payload.fullLabel} />
             )}
           />
-          <Line
+          <Area
             type="monotone"
             dataKey="expense"
             name={t('common.expense')}
             isAnimationActive={animate}
-            animationDuration={400}
+            animationDuration={500}
             animationEasing="ease-out"
             stroke={color}
-            strokeWidth={2.5}
+            strokeWidth={2}
+            fill="url(#report-daily-fill)"
             dot={false}
             activeDot={{ r: 5, stroke: cssVar('--color-surface'), strokeWidth: 2, fill: color }}
           />
-        </LineChart>
+        </AreaChart>
       </ResponsiveContainer>
     </div>
   );
@@ -93,7 +100,7 @@ export function YearlyChart({ months, year }) {
     <div className={styles.chart} role="img" aria-label={t('reports.yearlyChartLabel', { year })}>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 8, right: 12, bottom: 0, left: 0 }} barCategoryGap="25%" barGap={3}>
-          <CartesianGrid vertical={false} stroke={cssVar('--chart-grid')} strokeDasharray="4 6" />
+          <CartesianGrid vertical={false} stroke={cssVar('--chart-grid')} />
           {/* All 12 months when they fit; on a phone every other label is skipped instead of overlapping */}
           <XAxis
             dataKey="label"
@@ -123,20 +130,20 @@ export function YearlyChart({ months, year }) {
             dataKey="income"
             name={t('common.income')}
             fill={cssVar('--color-income')}
-            maxBarSize={10}
+            maxBarSize={12}
             radius={999}
             isAnimationActive={animate}
-            animationDuration={400}
+            animationDuration={500}
             animationEasing="ease-out"
           />
           <Bar
             dataKey="expense"
             name={t('common.expense')}
             fill={cssVar('--color-expense')}
-            maxBarSize={10}
+            maxBarSize={12}
             radius={999}
             isAnimationActive={animate}
-            animationDuration={400}
+            animationDuration={500}
             animationEasing="ease-out"
           />
         </BarChart>

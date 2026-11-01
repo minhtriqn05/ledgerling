@@ -1,20 +1,39 @@
 .card {
+  position: relative;
   display: flex;
   flex-direction: column;
   min-width: 0;
   padding: var(--space-5);
-  background: var(--color-surface);
+  background: var(--sheen-card), var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
 }
 
+/* The soft light that follows the mouse (hooks/useSpotlight.js sets --spot-x and --spot-y). It never catches a click. */
+.card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(380px circle at var(--spot-x, 50%) var(--spot-y, 0%), var(--spotlight), transparent 70%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-base) var(--ease-out);
+}
+
+.card:hover::after {
+  opacity: 1;
+}
+
 /* Rises a little on hover. Only for cards that stand for one thing (a category, a budget, a goal). */
 .lift {
-  transition: transform var(--duration-base) var(--ease-out), box-shadow var(--duration-base) var(--ease-out);
+  transition: transform var(--duration-base) var(--ease-out), box-shadow var(--duration-base) var(--ease-out),
+    border-color var(--duration-base) var(--ease-out);
 }
 
 .lift:hover {
+  border-color: color-mix(in srgb, var(--color-text) 16%, var(--color-border));
   box-shadow: var(--shadow-md);
   transform: translateY(-2px);
 }
@@ -27,7 +46,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-2) var(--space-3);
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-5);
 }
 
 .heading {
@@ -37,16 +56,17 @@
   min-width: 0;
 }
 
-/* Icon on a soft tint of --tone (icons mix 62% of the tone with ink: 3.8:1 or more). */
+/* Icon on a soft tint of --tone, with a thin edge in the same tone */
 .tile {
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-md);
+  width: 38px;
+  height: 38px;
+  border-radius: 13px;
   background: color-mix(in srgb, var(--tone) 15%, var(--color-surface));
-  color: color-mix(in srgb, var(--tone) 62%, var(--color-text));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone) 22%, transparent);
+  color: color-mix(in srgb, var(--tone) 70%, var(--color-text));
 }
 
 .title {
@@ -60,10 +80,20 @@
   color: var(--color-text-muted);
 }
 
+@media (max-width: 767px) {
+  .card {
+    padding: var(--space-4);
+  }
+}
+
 /* A card is never cut in two between pages when printing */
 @media print {
   .card {
     box-shadow: none;
     break-inside: avoid;
+  }
+
+  .card::after {
+    display: none;
   }
 }

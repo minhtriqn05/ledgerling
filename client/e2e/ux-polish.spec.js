@@ -646,7 +646,8 @@ test.describe('the small helpers', () => {
     const requestStarted = new Promise((resolve) => {
       reached = resolve;
     });
-    await page.route('**/api/goals*', async (route) => {
+    // Only the API: "**/api/goals*" would also catch the file src/api/goals.js of the dev server
+    await page.route((url) => url.pathname === '/api/goals', async (route) => {
       reached();
       await gate;
       await route.continue();

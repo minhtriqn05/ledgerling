@@ -11,7 +11,7 @@ import styles from './TransactionDrawer.module.css';
 // The details of one transaction, opened by a click on its row. onEdit and onDelete do what the row buttons do.
 export default function TransactionDrawer({ transaction, onEdit, onDelete, onClose }) {
   const { t } = useTranslation();
-  const { category, type, amount, note, date, tags = [], recurringRuleId } = transaction;
+  const { category, wallet, type, amount, note, date, tags = [], recurringRuleId } = transaction;
 
   return (
     <Drawer
@@ -39,6 +39,12 @@ export default function TransactionDrawer({ transaction, onEdit, onDelete, onClo
           <dt>{t('common.type')}</dt>
           <dd>{t(`common.${type}`)}</dd>
         </div>
+        {wallet && (
+          <div>
+            <dt>{t('wallets.wallet')}</dt>
+            <dd>{wallet.name}</dd>
+          </div>
+        )}
         <div>
           <dt>{t('common.date')}</dt>
           <dd>{formatDate(date)}</dd>

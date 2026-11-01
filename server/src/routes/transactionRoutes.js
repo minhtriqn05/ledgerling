@@ -84,6 +84,13 @@ router.use(requireAuth);
  *           type: string
  *           example: 6720b1b2c3d4e5f601234568
  *       - in: query
+ *         name: walletId
+ *         required: false
+ *         description: Only transactions of this wallet. The default wallet also has the transactions saved before wallets existed.
+ *         schema:
+ *           type: string
+ *           example: 6720f1b2c3d4e5f601234601
+ *       - in: query
  *         name: tag
  *         required: false
  *         description: Only transactions that have this tag (one tag; upper case is converted to lower case)
@@ -178,7 +185,7 @@ router.use(requireAuth);
  *           Invalid filter: "Use either month or from/to, not both", "Month must be in YYYY-MM format",
  *           "From must be a date in YYYY-MM-DD format", "To must be a date in YYYY-MM-DD format",
  *           "From must be before or equal to to", "Type must be income or expense", "Category id is invalid",
- *           "Each tag must be 1-20 letters, digits or hyphens",
+ *           "Wallet id is invalid", "Each tag must be 1-20 letters, digits or hyphens",
  *           "Search must be a string", "Search must be at most 100 characters",
  *           "Sort must be one of date, -date, amount, -amount", "Page must be a whole number from 1",
  *           "Limit must be a whole number from 1 to 100"
@@ -191,6 +198,16 @@ router.use(requireAuth);
  *               message: Use either month or from/to, not both
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
+ *       404:
+ *         description: The wallet of the filter does not exist or belongs to another user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Wallet not found
+ *               code: WALLET_NOT_FOUND
  */
 router.get("/", validateListTransactions, list);
 
@@ -247,6 +264,13 @@ router.get("/", validateListTransactions, list);
  *         schema:
  *           type: string
  *           example: 6720b1b2c3d4e5f601234568
+ *       - in: query
+ *         name: walletId
+ *         required: false
+ *         description: Only transactions of this wallet
+ *         schema:
+ *           type: string
+ *           example: 6720f1b2c3d4e5f601234601
  *       - in: query
  *         name: tag
  *         required: false
@@ -323,6 +347,10 @@ router.get("/export", validateExportTransactions, exportCsv);
  *                 type: string
  *                 description: Id of one of your categories (GET /categories)
  *                 example: 6720b1b2c3d4e5f601234568
+ *               walletId:
+ *                 type: string
+ *                 description: Id of one of your wallets (GET /wallets). Every new transaction is saved with a wallet; when this is left out, the default Cash wallet is used.
+ *                 example: 6720f1b2c3d4e5f601234601
  *               amount:
  *                 type: number
  *                 exclusiveMinimum: true
@@ -376,7 +404,7 @@ router.get("/export", validateExportTransactions, exportCsv);
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  *       404:
- *         description: Category not found (it does not exist or belongs to another user)
+ *         description: Category or wallet not found (it does not exist or belongs to another user)
  *         content:
  *           application/json:
  *             schema:
@@ -384,6 +412,16 @@ router.get("/export", validateExportTransactions, exportCsv);
  *             example:
  *               success: false
  *               message: Category not found
+ *       409:
+ *         description: The wallet is archived (WALLET_ARCHIVED)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Wallet is archived
+ *               code: WALLET_ARCHIVED
  */
 router.post("/", validateCreateTransaction, create);
 
@@ -697,6 +735,10 @@ router.get("/:id", validateTransactionId, getOne);
  *               categoryId:
  *                 type: string
  *                 example: 6720b1b2c3d4e5f601234568
+ *               walletId:
+ *                 type: string
+ *                 description: Moves the transaction to another of your wallets (not an archived one)
+ *                 example: 6720f1b2c3d4e5f601234601
  *               amount:
  *                 type: number
  *                 exclusiveMinimum: true

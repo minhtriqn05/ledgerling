@@ -95,6 +95,7 @@ describe('UserMenu', () => {
   });
 
   it('switches the theme and stays open', async () => {
+    localStorage.setItem('ledgerling.theme', 'system');
     const user = userEvent.setup();
     renderMenu();
     await user.click(trigger());

@@ -4,11 +4,14 @@
   grid-template-columns: minmax(0, 1fr) 150px 90px 120px 48px auto;
   align-items: center;
   gap: var(--space-4);
-  padding: var(--space-3) 0;
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4);
+  border-radius: 18px;
+  background: var(--color-surface-muted);
+  transition: background var(--duration-fast) var(--ease-out);
 }
 
-.row + .row {
-  border-top: 1px solid var(--color-border);
+.row:hover {
+  background: var(--color-surface-hover);
 }
 
 .main {
@@ -56,7 +59,7 @@
 }
 
 .expense {
-  color: var(--color-expense-text);
+  color: var(--color-text);
 }
 
 .frequency {
@@ -91,6 +94,7 @@
   border-radius: var(--radius-full);
   background: var(--color-border-strong);
   cursor: pointer;
+  transition: background var(--duration-base) var(--ease-out);
 }
 
 .switch[aria-checked='true'] {
@@ -114,8 +118,9 @@
   width: 18px;
   height: 18px;
   border-radius: var(--radius-full);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-sm);
+  background: var(--color-hero-text);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  transition: left var(--duration-base) var(--ease-out);
 }
 
 .switch[aria-checked='true'] .knob {

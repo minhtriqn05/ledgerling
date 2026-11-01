@@ -259,7 +259,9 @@ describe("notifications: goals and recurring rules", () => {
       .set(auth(user.token))
       .send({ categoryId: user.bills._id, amount: 100000, frequency: "weekly", startDate: addDays(todayInVietnam(), -15) });
 
-    const first = await api().get("/api/transactions").set(auth(user.token));
+    // The whole range and not the default current month: early in a month these days belong to the month before
+    const range = `from=${addDays(todayInVietnam(), -15)}&to=${todayInVietnam()}`;
+    const first = await api().get(`/api/transactions?${range}`).set(auth(user.token));
     expect(first.body.data).toHaveLength(3);
     await api().get("/api/transactions").set(auth(user.token)); // nothing is due any more
 

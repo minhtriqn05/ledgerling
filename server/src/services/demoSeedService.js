@@ -7,10 +7,13 @@ import RecurringRule from "../models/RecurringRule.js";
 import Goal from "../models/Goal.js";
 import TransactionTemplate from "../models/TransactionTemplate.js";
 import Notification from "../models/Notification.js";
+import Wallet from "../models/Wallet.js";
+import Transfer from "../models/Transfer.js";
 import { DEMO_AVATAR, DEMO_EMAIL, DEMO_NAME } from "../utils/demo.js";
 import { addDays, currentMonth, dayNoon, shiftMonth, todayInVietnam } from "../utils/month.js";
 import { processDueRules } from "./recurringService.js";
 import { ensureWeeklySummary, notifyBudgetThresholds } from "./notificationService.js";
+import { ensureDefaultWallet } from "./walletService.js";
 
 // Fills the demo account (demo@example.com) with believable data for the landing page's "Try the demo" button.
 // Only the demo user's own documents are deleted and made again; nobody else's data is touched.
@@ -18,7 +21,7 @@ import { ensureWeeklySummary, notifyBudgetThresholds } from "./notificationServi
 // so two runs on the same day give the same data.
 
 const SALT_ROUNDS = 10;
-const OWNED_MODELS = [Transaction, Budget, RecurringRule, Goal, TransactionTemplate, Notification, Category];
+const OWNED_MODELS = [Transaction, Budget, RecurringRule, Goal, TransactionTemplate, Notification, Category, Wallet, Transfer];
 // About 90 transactions in the current month and the two before it, the rules' Rent and Salary included
 const TARGET_TRANSACTIONS = 90;
 const RANDOM_SEED = 2026;
@@ -152,7 +155,7 @@ async function resetUser(password) {
         avatar: DEMO_AVATAR,
         role: "user",
         status: "active",
-        "preferences.theme": "system",
+        "preferences.theme": "dark",
         "preferences.weekStartsOn": "monday",
         "preferences.notifications": { budget: true, goals: true, recurring: true, weekly: true },
       },
@@ -181,12 +184,26 @@ export async function seedDemo({ password }) {
   const byName = new Map(categories.map((category) => [category.name, category]));
   const typeOf = (name) => byName.get(name).type;
 
+  // Wallets: every transaction below goes to Cash, the default wallet, like the rules' transactions.
+  const cash = await ensureDefaultWallet(userId);
+  cash.initialBalance = 2000000;
+  await cash.save();
+  const [bank, ewallet] = await Wallet.insertMany([
+    { userId, name: "Vietcombank", type: "bank", color: "#4A9FE3", initialBalance: 15000000 },
+    { userId, name: "MoMo", type: "ewallet", color: "#7D8CE8", initialBalance: 500000 },
+  ]);
+  await Transfer.insertMany([
+    { userId, fromWalletId: bank._id, toWalletId: cash._id, amount: 3000000, note: "ATM withdrawal", date: dayNoon(addDays(today, -12)) },
+    { userId, fromWalletId: cash._id, toWalletId: ewallet._id, amount: 400000, note: "Top up MoMo", date: dayNoon(addDays(today, -4)) },
+  ]);
+
   // Transactions
   const planned = buildTransactions(months, today, createRandom(RANDOM_SEED));
   await Transaction.insertMany(
     planned.map((item) => ({
       userId,
       categoryId: byName.get(item.category)._id,
+      walletId: cash._id,
       type: typeOf(item.category),
       amount: item.amount,
       currency: "VND",
@@ -261,5 +278,7 @@ export async function seedDemo({ password }) {
     goals: await count(Goal),
     templates: await count(TransactionTemplate),
     notifications: await count(Notification),
+    wallets: await count(Wallet),
+    transfers: await count(Transfer),
   };
 }

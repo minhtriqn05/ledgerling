@@ -1,26 +1,68 @@
-/* A soft banner: title on the left, actions on the right; on narrow screens the actions wrap below the title. */
+/* The hero of the page. The parts inside sit above the aurora (z-index), which fills the header. */
 .header {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-5) var(--space-6);
+  border: 1px solid var(--color-hero-line);
+  border-radius: var(--radius-xl);
+  background: var(--color-hero-base);
+  color: var(--color-text);
+  box-shadow: 0 30px 60px -40px rgba(4, 14, 16, 0.9);
+}
+
+.top,
+.stats {
+  position: relative;
+  z-index: 1;
+}
+
+/* Title on the left, actions on the right; on narrow screens the actions wrap below the title. */
+.top {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
-  padding: var(--space-5);
-  border-radius: var(--radius-xl);
-  background: var(--gradient-banner);
 }
 
-@media print {
-  .header {
-    padding: 0;
-    background: none;
-  }
+.heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 0;
 }
 
-/* Secondary (not muted) text: it sits on the banner, where muted would be too light. */
+/* A piece of frosted glass: lit from above, with a thin bright edge */
+.tile {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 20px;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.04) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 14px 28px -14px rgba(0, 0, 0, 0.7);
+  color: var(--color-hero-text);
+}
+
+.titles {
+  min-width: 0;
+}
+
+.eyebrow {
+  margin: 0 0 var(--space-1);
+  color: var(--color-hero-text-soft);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
 .subtitle {
   margin: var(--space-1) 0 0;
-  color: var(--color-text-secondary);
+  color: var(--color-hero-text-soft);
+  font-size: var(--font-size-sm);
 }
 
 .actions {
@@ -28,4 +70,41 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-3);
+}
+
+@media (max-width: 767px) {
+  .header {
+    gap: var(--space-4);
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+  }
+
+  .tile {
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+  }
+
+  .actions {
+    width: 100%;
+  }
+}
+
+@media print {
+  .header {
+    padding: 0;
+    border: none;
+    background: none;
+    box-shadow: none;
+  }
+
+  .tile,
+  .actions {
+    display: none;
+  }
+
+  .subtitle,
+  .eyebrow {
+    color: var(--color-text-secondary);
+  }
 }

@@ -13,7 +13,7 @@ Socket.IO runs on the same server and port as the API (`http://localhost:4000`, 
 
 | Event (server to client) | Payload | When |
 | --- | --- | --- |
-| `data:changed` | `{ resource }` | After any write that succeeded. `resource`: `transactions`, `categories`, `budgets`, `recurring`, `goals`, `templates` or `notifications`. Also when a recurring rule created transactions during a read (`transactions` and `recurring`), and when a notification was created (`notifications`). |
+| `data:changed` | `{ resource }` | After any write that succeeded. `resource`: `transactions`, `categories`, `budgets`, `recurring`, `goals`, `templates`, `wallets` (a wallet or a transfer) or `notifications`. Also when a recurring rule created transactions during a read (`transactions` and `recurring`), and when a notification was created (`notifications`). |
 | `notification:new` | `{ id, type }` | A new notification was created. |
 
 The events hold no user data: a client that hears one asks the normal API again.
@@ -75,11 +75,11 @@ When the place that throws an error names no specific code, the status gives a d
 
 | Status | Codes |
 |--------|-------|
-| 400 | `VALIDATION_ERROR`, `INVALID_JSON`, `NAME_REQUIRED`, `NAME_TOO_LONG`, `EMAIL_INVALID`, `PASSWORD_REQUIRED`, `PASSWORD_TOO_SHORT`, `PASSWORD_TOO_LONG`, `CURRENT_PASSWORD_REQUIRED`, `NEW_PASSWORD_TOO_SHORT`, `PASSWORD_UNCHANGED`, `WRONG_PASSWORD`, `TYPE_INVALID`, `TYPE_LOCKED`, `COLOR_INVALID`, `ICON_INVALID`, `CATEGORY_REQUIRED`, `AMOUNT_INVALID`, `CURRENCY_INVALID`, `NOTE_TOO_LONG`, `DATE_INVALID`, `TAG_INVALID`, `TOO_MANY_TAGS`, `MONTH_INVALID`, `BUDGET_EXPENSE_ONLY`, `END_BEFORE_START`, `TARGET_INVALID`, `DEADLINE_IN_PAST`, `WITHDRAW_TOO_MUCH`, `DEPOSIT_IN_USE`, `IMPORT_TOO_MANY_ROWS`, `STATUS_INVALID`, `INVALID_INPUT`, `INVALID_AVATAR`, `INVALID_AVATAR_IMAGE` |
+| 400 | `VALIDATION_ERROR`, `INVALID_JSON`, `NAME_REQUIRED`, `NAME_TOO_LONG`, `EMAIL_INVALID`, `PASSWORD_REQUIRED`, `PASSWORD_TOO_SHORT`, `PASSWORD_TOO_LONG`, `CURRENT_PASSWORD_REQUIRED`, `NEW_PASSWORD_TOO_SHORT`, `PASSWORD_UNCHANGED`, `WRONG_PASSWORD`, `TYPE_INVALID`, `TYPE_LOCKED`, `COLOR_INVALID`, `ICON_INVALID`, `CATEGORY_REQUIRED`, `AMOUNT_INVALID`, `CURRENCY_INVALID`, `NOTE_TOO_LONG`, `DATE_INVALID`, `TAG_INVALID`, `TOO_MANY_TAGS`, `MONTH_INVALID`, `BUDGET_EXPENSE_ONLY`, `END_BEFORE_START`, `TARGET_INVALID`, `DEADLINE_IN_PAST`, `WITHDRAW_TOO_MUCH`, `DEPOSIT_IN_USE`, `IMPORT_TOO_MANY_ROWS`, `STATUS_INVALID`, `INVALID_INPUT`, `INVALID_AVATAR`, `INVALID_AVATAR_IMAGE`, `WALLET_TYPE_INVALID`, `WALLET_BALANCE_INVALID`, `TRANSFER_SAME_WALLET` |
 | 401 | `TOKEN_MISSING`, `TOKEN_INVALID`, `INVALID_CREDENTIALS` |
 | 403 | `FORBIDDEN`, `ACCOUNT_DISABLED`, `CANNOT_DISABLE_SELF`, `CANNOT_DISABLE_ADMIN`, `DEMO_READ_ONLY` |
-| 404 | `USER_NOT_FOUND`, `ROUTE_NOT_FOUND`, `CATEGORY_NOT_FOUND`, `TRANSACTION_NOT_FOUND`, `BUDGET_NOT_FOUND`, `RULE_NOT_FOUND`, `GOAL_NOT_FOUND`, `CONTRIBUTION_NOT_FOUND`, `TEMPLATE_NOT_FOUND`, `NOTIFICATION_NOT_FOUND` |
-| 409 | `EMAIL_TAKEN`, `CATEGORY_EXISTS`, `CATEGORY_IN_USE`, `CATEGORY_HAS_RULES`, `BUDGET_EXISTS`, `DUPLICATE_VALUE` |
+| 404 | `USER_NOT_FOUND`, `ROUTE_NOT_FOUND`, `CATEGORY_NOT_FOUND`, `TRANSACTION_NOT_FOUND`, `BUDGET_NOT_FOUND`, `RULE_NOT_FOUND`, `GOAL_NOT_FOUND`, `CONTRIBUTION_NOT_FOUND`, `TEMPLATE_NOT_FOUND`, `NOTIFICATION_NOT_FOUND`, `WALLET_NOT_FOUND`, `TRANSFER_NOT_FOUND` |
+| 409 | `EMAIL_TAKEN`, `CATEGORY_EXISTS`, `CATEGORY_IN_USE`, `CATEGORY_HAS_RULES`, `BUDGET_EXISTS`, `WALLET_EXISTS`, `WALLET_ARCHIVED`, `WALLET_IN_USE`, `WALLET_DEFAULT_LOCKED`, `DUPLICATE_VALUE` |
 | 413 | `PAYLOAD_TOO_LARGE` |
 | 429 | `RATE_LIMITED` |
 | 500 | `INTERNAL_ERROR` |
@@ -183,6 +183,14 @@ The tables below list the `message` of each endpoint; the matching code is in th
 | 60 | POST | `/api/auth/demo` | No | Sign in to the shared demo account (the "Try the demo" button) |
 | 61 | PATCH | `/api/users/me/avatar` | Yes | Choose a ready-made avatar or upload my own photo |
 | 62 | DELETE | `/api/users/me/avatar` | Yes | Remove my avatar (the app shows the first letter of my name again) |
+| 63 | GET | `/api/wallets` | Yes | List my wallets with their balances (the first call creates the default Cash wallet) |
+| 64 | POST | `/api/wallets` | Yes | Create a wallet |
+| 65 | GET | `/api/wallets/:id` | Yes | Get one of my wallets with its balance |
+| 66 | PATCH | `/api/wallets/:id` | Yes | Update a wallet, or archive it and bring it back |
+| 67 | DELETE | `/api/wallets/:id` | Yes | Delete a wallet without a history |
+| 68 | GET | `/api/transfers` | Yes | List my transfers, newest first, one page (`?walletId=&page=&limit=`) |
+| 69 | POST | `/api/transfers` | Yes | Move money between two of my wallets |
+| 70 | DELETE | `/api/transfers/:id` | Yes | Delete a transfer (the money goes back) |
 
 Every protected route (Auth = Yes) can also return **401** (`"Not authorized, token missing"` /
 `"Not authorized, invalid token"`) and every route can return **500** (`"Internal server error"`).
@@ -297,7 +305,7 @@ Auth: yes. No body.
     "role": "user",
     "status": "active",
     "preferences": {
-      "theme": "system",
+      "theme": "dark",
       "weekStartsOn": "monday",
       "notifications": { "budget": true, "goals": true, "recurring": true, "weekly": true }
     },
@@ -419,11 +427,12 @@ When the delete succeeds, the budgets of the category (every month) and its tran
 
 ## Transactions
 
-Transaction object (category populated for display):
+Transaction object (category and wallet populated for display):
 ```json
 {
   "_id": "6720c1b2c3d4e5f601234569",
   "category": { "_id": "6720b1b2c3d4e5f601234568", "name": "Food", "color": "#FF7043" },
+  "wallet": { "_id": "6720f1b2c3d4e5f601234601", "name": "Cash", "type": "cash", "color": "#3DB383", "archived": false },
   "type": "expense",
   "amount": 45000,
   "currency": "VND",
@@ -434,7 +443,10 @@ Transaction object (category populated for display):
   "updatedAt": "2026-10-27T05:31:00.000Z"
 }
 ```
-(Stored as `categoryId` in MongoDB, returned as `category` via `populate`.)
+(Stored as `categoryId` and `walletId` in MongoDB, returned as `category` and `wallet` via `populate`.)
+
+Every new transaction is stored with a `walletId`. A transaction saved before wallets existed has none: it counts in the
+default Cash wallet, the answers show that wallet, and the document is not changed.
 
 ### 10. GET /api/transactions
 Auth: yes.
@@ -448,6 +460,7 @@ Auth: yes.
 | `to` | `2026-10-31` | `YYYY-MM-DD`, last day included (until 00:00 +07:00 of the next day) |
 | `type` | `expense` | `income` \| `expense` |
 | `categoryId` | `6720b1b2...` | |
+| `walletId` | `6720f1b2...` | only transactions of this wallet; the default wallet also has the ones saved before wallets existed. Another user's wallet: 404 `WALLET_NOT_FOUND` |
 | `tag` | `work` | only transactions that have this tag; one tag, upper case is converted to lower case |
 | `q` | `lunch` | search in `note`, ignores upper / lower case; trimmed, empty is ignored, max 100 characters |
 | `sort` | `-amount` | `date`, `-date` (default), `amount`, `-amount` (`-` = descending) |
@@ -504,6 +517,8 @@ Required: `categoryId`, `amount`. `type` is not sent: the server copies it from 
 | 400 | `"Category id is invalid"`, `"Amount must be greater than 0"`, `"Currency must be a 3-letter ISO code"`, `"Note must be a string"`, `"Note must be at most 200 characters"`, `"Date is invalid, use ISO 8601 like 2026-10-27T12:30:00+07:00"`, `"Tags must be an array"`, `"Each tag must be 1-20 letters, digits or hyphens"`, `"A transaction can have at most 5 tags"` |
 | 404 | `"Category not found"` |
 
+`walletId` is optional: one of your wallets (not an archived one, 409 `WALLET_ARCHIVED`; another user's: 404 `WALLET_NOT_FOUND`). Left out, the transaction goes to the default Cash wallet, so every new transaction has a wallet.
+
 ### 12. GET /api/transactions/:id
 Auth: yes.
 
@@ -530,6 +545,8 @@ If `categoryId` changes, `type` is copied again from the new category.
 | 400 | `"Nothing to update"` + same validation messages as create |
 | 404 | `"Transaction not found"`, `"Category not found"` |
 | 409 | `"Duplicate value"` (the new date is already used by another transaction of the same recurring rule) |
+
+`walletId` moves the transaction to another of your wallets (not an archived one). Keeping an archived wallet is fine.
 
 ### 14. DELETE /api/transactions/:id
 Auth: yes.
@@ -999,6 +1016,100 @@ Auth: yes. Takes a contribution back: deleting a deposit lowers `savedAmount`, d
 
 ---
 
+## Wallets
+
+A wallet is a place where money is: cash, a bank account or an e-wallet. Every user has one **default wallet** (`isDefault: true`,
+named Cash). It is made the first time it is needed, so an account from before wallets existed gets one too.
+
+Wallet object:
+```json
+{
+  "_id": "6720f1b2c3d4e5f601234601",
+  "name": "Vietcombank",
+  "type": "bank",
+  "color": "#4A9FE3",
+  "initialBalance": 5000000,
+  "archived": false,
+  "isDefault": false,
+  "income": 18000000,
+  "expense": 7500000,
+  "transfersIn": 0,
+  "transfersOut": 3000000,
+  "balance": 12500000,
+  "createdAt": "2026-11-01T03:00:00.000Z",
+  "updatedAt": "2026-11-01T03:00:00.000Z"
+}
+```
+
+### How the balance is worked out
+`balance = initialBalance + income − expense + transfersIn − transfersOut`, over all time. Nothing is stored: every read adds it up.
+
+- Only VND transactions count, like the stats, so 10 USD is never added as 10 VND.
+- A transaction without a `walletId` counts in the default wallet: `$group` uses `{ $ifNull: ["$walletId", <default wallet id>] }`.
+- A recurring rule and a CSV import put their transactions in the default wallet.
+- A wallet may go below 0.
+
+### 63. GET /api/wallets
+Auth: yes. Wallets in use first, the default one at the top, then oldest first. **200** – `data` is an array of wallets.
+
+### 64. POST /api/wallets
+Auth: yes.
+```json
+{ "name": "Vietcombank", "type": "bank", "color": "#4A9FE3", "initialBalance": 5000000 }
+```
+- `name`: 1–30 characters, unique per user (ignores upper / lower case).
+- `type`: `cash`, `bank` or `ewallet`. `color`: hex like `#4A9FE3`. `initialBalance`: optional, a number from 0, default 0.
+
+**201** – `data` is the wallet. **Errors**: 400 `NAME_REQUIRED`, `NAME_TOO_LONG`, `WALLET_TYPE_INVALID`, `COLOR_INVALID`, `WALLET_BALANCE_INVALID`; 409 `WALLET_EXISTS`.
+
+### 65. GET /api/wallets/:id
+Auth: yes. **200** – `data` is the wallet. **Errors**: 404 `WALLET_NOT_FOUND` (does not exist, malformed id, or another user's).
+
+### 66. PATCH /api/wallets/:id
+Auth: yes. Any of `name`, `type`, `color`, `initialBalance`, `archived` (at least one). An archived wallet keeps its balance and still counts in
+the total, but takes no new transactions or transfers. A transaction already in it can still be edited.
+
+**200** – `data` is the wallet. **Errors**: 400 as above and `"Nothing to update"`; 404 `WALLET_NOT_FOUND`; 409 `WALLET_EXISTS`, `WALLET_DEFAULT_LOCKED` (archiving the default wallet).
+
+### 67. DELETE /api/wallets/:id
+Auth: yes. **200** – `data` is `{ "_id": "..." }`. **Errors**: 404 `WALLET_NOT_FOUND`; 409 `WALLET_IN_USE` (it has transactions or transfers: archive it instead), `WALLET_DEFAULT_LOCKED`.
+
+## Transfers
+
+A transfer moves money between two wallets of one user. It lives in its own collection and is **not** a transaction, so income, expense,
+budgets, reports, insights and notifications never see it. Only the wallet balances read it.
+
+Transfer object:
+```json
+{
+  "_id": "6720f1b2c3d4e5f601234700",
+  "from": { "_id": "6720f1b2c3d4e5f601234601", "name": "Vietcombank", "type": "bank", "color": "#4A9FE3", "archived": false },
+  "to": { "_id": "6720f1b2c3d4e5f601234602", "name": "Cash", "type": "cash", "color": "#3DB383", "archived": false },
+  "amount": 300000,
+  "note": "ATM withdrawal",
+  "date": "2026-10-27T05:30:00.000Z",
+  "createdAt": "2026-10-27T05:31:00.000Z",
+  "updatedAt": "2026-10-27T05:31:00.000Z"
+}
+```
+
+### 68. GET /api/transfers
+Auth: yes. Query (all optional): `walletId` (from or to this wallet), `page` (default 1), `limit` (1–100, default 20). Newest first.
+
+**200** – `data` is one page, `meta` is `{ page, limit, total, totalPages }`. **Errors**: 400 (a malformed wallet id, page or limit); 404 `WALLET_NOT_FOUND`.
+
+### 69. POST /api/transfers
+Auth: yes.
+```json
+{ "fromWalletId": "6720f1b2c3d4e5f601234601", "toWalletId": "6720f1b2c3d4e5f601234602", "amount": 300000, "date": "2026-10-27T12:30:00+07:00", "note": "ATM withdrawal" }
+```
+`date` (ISO 8601, now by default) and `note` (up to 200 characters) are optional.
+
+**201** – `data` is the transfer. **Errors**: 400 `TRANSFER_SAME_WALLET`, `AMOUNT_INVALID`, `DATE_INVALID`, `NOTE_TOO_LONG` or a malformed wallet id; 404 `WALLET_NOT_FOUND`; 409 `WALLET_ARCHIVED`.
+
+### 70. DELETE /api/transfers/:id
+Auth: yes. The money goes back, because a balance is always worked out from what exists. **200** – `data` is `{ "_id": "..." }`. **Errors**: 404 `TRANSFER_NOT_FOUND`.
+
 ## Reports and insights
 
 Read-only routes for the Reports page and the Dashboard card. Like `GET /transactions`, each one first creates the
@@ -1303,7 +1414,7 @@ Auth: yes. **200** – `{ "success": true, "data": { "_id": "..." } }`. **Errors
 
 ### 51. PATCH /api/users/me/preferences
 Auth: yes. Changes only the fields that are sent; the others keep their value. At least one field. An account made before
-these fields existed counts as theme `system`, week on `monday`, no language and all notification switches on.
+these fields existed counts as theme `dark`, week on `monday`, no language and all notification switches on.
 
 **Body** (any of them)
 ```json
@@ -1369,7 +1480,9 @@ show their category as `category: { _id, name, type }`.
     "budgets": [],
     "recurringRules": [],
     "goals": [],
-    "templates": []
+    "templates": [],
+    "wallets": [],
+    "transfers": []
   }
 }
 ```

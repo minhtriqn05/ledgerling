@@ -6,73 +6,283 @@
   },
   "auth": {
     "type": "bearer",
-    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
   },
   "variable": [
-    { "key": "baseUrl", "value": "http://localhost:4000/api" },
-    { "key": "token", "value": "" },
-    { "key": "name", "value": "Minh Tri" },
-    { "key": "email", "value": "tri@example.com" },
-    { "key": "password", "value": "secret123" },
-    { "key": "email2", "value": "other@example.com" },
-    { "key": "token2", "value": "" },
-    { "key": "categoryName", "value": "" },
-    { "key": "categoryNameUpper", "value": "" },
-    { "key": "categoryId", "value": "" },
-    { "key": "txCategoryName", "value": "" },
-    { "key": "txCategoryId", "value": "" },
-    { "key": "incomeCategoryId", "value": "" },
-    { "key": "otherCategoryId", "value": "" },
-    { "key": "transactionId", "value": "" },
-    { "key": "monthEndId", "value": "" },
-    { "key": "octFirstId", "value": "" },
-    { "key": "novFirstId", "value": "" },
-    { "key": "octCount", "value": "" },
-    { "key": "statsCategoryName", "value": "" },
-    { "key": "statsCategoryId", "value": "" },
-    { "key": "statsIncomeCategoryId", "value": "" },
-    { "key": "statsIncomeId", "value": "" },
-    { "key": "statsMarFirstId", "value": "" },
-    { "key": "statsJanId", "value": "" },
-    { "key": "statsAprFirstId", "value": "" },
-    { "key": "statsUsdId", "value": "" },
-    { "key": "budgetCategoryName", "value": "" },
-    { "key": "budgetCategoryId", "value": "" },
-    { "key": "budgetIncomeCategoryId", "value": "" },
-    { "key": "budgetOtherCategoryId", "value": "" },
-    { "key": "budgetSecondCategoryName", "value": "" },
-    { "key": "budgetSecondCategoryId", "value": "" },
-    { "key": "budgetId", "value": "" },
-    { "key": "budgetSecondId", "value": "" },
-    { "key": "budgetTx1Id", "value": "" },
-    { "key": "budgetTx2Id", "value": "" },
-    { "key": "budgetTx3Id", "value": "" },
-    { "key": "budgetTx4Id", "value": "" },
-    { "key": "tagCategoryId", "value": "" },
-    { "key": "tagCategoryName", "value": "" },
-    { "key": "tagTransactionId", "value": "" },
-    { "key": "tagPlainId", "value": "" },
-    { "key": "tagImportedId", "value": "" },
-    { "key": "tagOtherId", "value": "" },
-    { "key": "tagBigBody", "value": "" },
-    { "key": "recurringCategoryName", "value": "" },
-    { "key": "recurringCategoryId", "value": "" },
-    { "key": "recurringStart", "value": "" },
-    { "key": "recurringMonth", "value": "" },
-    { "key": "recurringRuleId", "value": "" },
-    { "key": "recurringTransactionId", "value": "" },
-    { "key": "goalId", "value": "" },
-    { "key": "goalContributionId", "value": "" },
-    { "key": "goalDeadline", "value": "" },
-    { "key": "goalToday", "value": "" },
-    { "key": "quickCategoryId", "value": "" },
-    { "key": "quickCategory2Id", "value": "" },
-    { "key": "quickIconCategoryId", "value": "" },
-    { "key": "templateId", "value": "" },
-    { "key": "bulkTx1Id", "value": "" },
-    { "key": "bulkTx2Id", "value": "" },
-    { "key": "notificationId", "value": "" },
-    { "key": "notificationGoalId", "value": "" }
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:4000/api"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "name",
+      "value": "Minh Tri"
+    },
+    {
+      "key": "email",
+      "value": "tri@example.com"
+    },
+    {
+      "key": "password",
+      "value": "secret123"
+    },
+    {
+      "key": "email2",
+      "value": "other@example.com"
+    },
+    {
+      "key": "token2",
+      "value": ""
+    },
+    {
+      "key": "categoryName",
+      "value": ""
+    },
+    {
+      "key": "categoryNameUpper",
+      "value": ""
+    },
+    {
+      "key": "categoryId",
+      "value": ""
+    },
+    {
+      "key": "txCategoryName",
+      "value": ""
+    },
+    {
+      "key": "txCategoryId",
+      "value": ""
+    },
+    {
+      "key": "incomeCategoryId",
+      "value": ""
+    },
+    {
+      "key": "otherCategoryId",
+      "value": ""
+    },
+    {
+      "key": "transactionId",
+      "value": ""
+    },
+    {
+      "key": "monthEndId",
+      "value": ""
+    },
+    {
+      "key": "octFirstId",
+      "value": ""
+    },
+    {
+      "key": "novFirstId",
+      "value": ""
+    },
+    {
+      "key": "octCount",
+      "value": ""
+    },
+    {
+      "key": "statsCategoryName",
+      "value": ""
+    },
+    {
+      "key": "statsCategoryId",
+      "value": ""
+    },
+    {
+      "key": "statsIncomeCategoryId",
+      "value": ""
+    },
+    {
+      "key": "statsIncomeId",
+      "value": ""
+    },
+    {
+      "key": "statsMarFirstId",
+      "value": ""
+    },
+    {
+      "key": "statsJanId",
+      "value": ""
+    },
+    {
+      "key": "statsAprFirstId",
+      "value": ""
+    },
+    {
+      "key": "statsUsdId",
+      "value": ""
+    },
+    {
+      "key": "budgetCategoryName",
+      "value": ""
+    },
+    {
+      "key": "budgetCategoryId",
+      "value": ""
+    },
+    {
+      "key": "budgetIncomeCategoryId",
+      "value": ""
+    },
+    {
+      "key": "budgetOtherCategoryId",
+      "value": ""
+    },
+    {
+      "key": "budgetSecondCategoryName",
+      "value": ""
+    },
+    {
+      "key": "budgetSecondCategoryId",
+      "value": ""
+    },
+    {
+      "key": "budgetId",
+      "value": ""
+    },
+    {
+      "key": "budgetSecondId",
+      "value": ""
+    },
+    {
+      "key": "budgetTx1Id",
+      "value": ""
+    },
+    {
+      "key": "budgetTx2Id",
+      "value": ""
+    },
+    {
+      "key": "budgetTx3Id",
+      "value": ""
+    },
+    {
+      "key": "budgetTx4Id",
+      "value": ""
+    },
+    {
+      "key": "tagCategoryId",
+      "value": ""
+    },
+    {
+      "key": "tagCategoryName",
+      "value": ""
+    },
+    {
+      "key": "tagTransactionId",
+      "value": ""
+    },
+    {
+      "key": "tagPlainId",
+      "value": ""
+    },
+    {
+      "key": "tagImportedId",
+      "value": ""
+    },
+    {
+      "key": "tagOtherId",
+      "value": ""
+    },
+    {
+      "key": "tagBigBody",
+      "value": ""
+    },
+    {
+      "key": "recurringCategoryName",
+      "value": ""
+    },
+    {
+      "key": "recurringCategoryId",
+      "value": ""
+    },
+    {
+      "key": "recurringStart",
+      "value": ""
+    },
+    {
+      "key": "recurringMonth",
+      "value": ""
+    },
+    {
+      "key": "recurringRuleId",
+      "value": ""
+    },
+    {
+      "key": "recurringTransactionId",
+      "value": ""
+    },
+    {
+      "key": "goalId",
+      "value": ""
+    },
+    {
+      "key": "goalContributionId",
+      "value": ""
+    },
+    {
+      "key": "goalDeadline",
+      "value": ""
+    },
+    {
+      "key": "goalToday",
+      "value": ""
+    },
+    {
+      "key": "quickCategoryId",
+      "value": ""
+    },
+    {
+      "key": "quickCategory2Id",
+      "value": ""
+    },
+    {
+      "key": "quickIconCategoryId",
+      "value": ""
+    },
+    {
+      "key": "templateId",
+      "value": ""
+    },
+    {
+      "key": "bulkTx1Id",
+      "value": ""
+    },
+    {
+      "key": "bulkTx2Id",
+      "value": ""
+    },
+    {
+      "key": "notificationId",
+      "value": ""
+    },
+    {
+      "key": "notificationGoalId",
+      "value": ""
+    },
+    {
+      "key": "walletCashId",
+      "value": ""
+    },
+    {
+      "key": "walletBankId",
+      "value": ""
+    },
+    {
+      "key": "transferId",
+      "value": ""
+    }
   ],
   "item": [
     {
@@ -103,18 +313,34 @@
             }
           ],
           "request": {
-            "auth": { "type": "noauth" },
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"{{name}}\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
-              "options": { "raw": { "language": "json" } }
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
             "url": {
               "raw": "{{baseUrl}}/auth/register",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "register"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
             },
             "description": "Creates an account. 201 returns { token, user } and the test script saves the token. 409 if the email is already registered."
           }
@@ -139,18 +365,34 @@
             }
           ],
           "request": {
-            "auth": { "type": "noauth" },
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
-              "options": { "raw": { "language": "json" } }
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
             "url": {
               "raw": "{{baseUrl}}/auth/login",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "login"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
             },
             "description": "Logs in. 200 returns { token, user } and the test script saves the token. 401 for a wrong email or password."
           }
@@ -181,8 +423,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/auth/me",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "me"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
             },
             "description": "Current user. Uses the collection's Bearer {{token}}, so run Register or Login first."
           }
@@ -207,13 +454,20 @@
             }
           ],
           "request": {
-            "auth": { "type": "noauth" },
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/auth/me",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "me"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
             },
             "description": "Same endpoint without a token: expect 401."
           }
@@ -262,8 +516,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/register",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "register"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
             },
             "description": "Creates a second account (email2). Only needed once; 409 afterwards is fine."
           }
@@ -307,8 +566,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/login",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "login"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
             },
             "description": "Saves the second user's token into {{token2}}."
           }
@@ -339,8 +603,12 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/categories",
-              "host": ["{{baseUrl}}"],
-              "path": ["categories"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories"
+              ]
             },
             "description": "My categories, sorted by type then name. A new account starts with 7 default categories."
           }
@@ -369,8 +637,12 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/categories?type=expense",
-              "host": ["{{baseUrl}}"],
-              "path": ["categories"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories"
+              ],
               "query": [
                 {
                   "key": "type",
@@ -405,8 +677,12 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/categories?type=other",
-              "host": ["{{baseUrl}}"],
-              "path": ["categories"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories"
+              ],
               "query": [
                 {
                   "key": "type",
@@ -444,8 +720,12 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/categories",
-              "host": ["{{baseUrl}}"],
-              "path": ["categories"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories"
+              ]
             },
             "description": "No Authorization header: expect 401."
           }
@@ -500,8 +780,12 @@
             },
             "url": {
               "raw": "{{baseUrl}}/categories",
-              "host": ["{{baseUrl}}"],
-              "path": ["categories"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories"
+              ]
             },
             "description": "Creates a category and saves its id into {{categoryId}} for the requests below."
           }
@@ -544,8 +828,12 @@
             },
             "url": {
               "raw": "{{baseUrl}}/categories",
-              "host": ["{{baseUrl}}"],
-              "path": ["categories"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories"
+              ]
             },
             "description": "Same name and type as the one just created: expect 409. Run it after 'Create category'."
           }
@@ -597,8 +885,12 @@
             },
             "url": {
               "raw": "{{baseUrl}}/categories",
-              "host": ["{{baseUrl}}"],
-              "path": ["categories"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories"
+              ]
             },
             "description": "Same name in capitals: names are compared case-insensitively, so expect 409."
           }
@@ -641,8 +933,12 @@
             },
             "url": {
               "raw": "{{baseUrl}}/categories",
-              "host": ["{{baseUrl}}"],
-              "path": ["categories"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories"
+              ]
             },
             "description": "Color must look like #RRGGBB: expect 400."
           }
@@ -685,8 +981,12 @@
             },
             "url": {
               "raw": "{{baseUrl}}/categories",
-              "host": ["{{baseUrl}}"],
-              "path": ["categories"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories"
+              ]
             },
             "description": "Type must be income or expense: expect 400."
           }
@@ -729,8 +1029,12 @@
             },
             "url": {
               "raw": "{{baseUrl}}/categories",
-              "host": ["{{baseUrl}}"],
-              "path": ["categories"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories"
+              ]
             },
             "description": "Missing name: expect 400."
           }
@@ -776,8 +1080,12 @@
             },
             "url": {
               "raw": "{{baseUrl}}/categories",
-              "host": ["{{baseUrl}}"],
-              "path": ["categories"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories"
+              ]
             },
             "description": "No Authorization header: expect 401."
           }
@@ -806,8 +1114,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/categories/{{categoryId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["categories", "{{categoryId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories",
+                "{{categoryId}}"
+              ]
             },
             "description": "One of my categories. Run 'Create category' first."
           }
@@ -846,8 +1159,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/categories/{{categoryId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["categories", "{{categoryId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories",
+                "{{categoryId}}"
+              ]
             },
             "description": "The second user asks for the first user's category: expect 404, as if it did not exist."
           }
@@ -876,8 +1194,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/categories/abc",
-              "host": ["{{baseUrl}}"],
-              "path": ["categories", "abc"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories",
+                "abc"
+              ]
             },
             "description": "A malformed id: expect 404 (not 500)."
           }
@@ -920,8 +1243,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/categories/{{categoryId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["categories", "{{categoryId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories",
+                "{{categoryId}}"
+              ]
             },
             "description": "PATCH sends only the fields to change (name and/or color)."
           }
@@ -964,8 +1292,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/categories/{{categoryId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["categories", "{{categoryId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories",
+                "{{categoryId}}"
+              ]
             },
             "description": "Expect 400."
           }
@@ -1008,8 +1341,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/categories/{{categoryId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["categories", "{{categoryId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories",
+                "{{categoryId}}"
+              ]
             },
             "description": "type is locked: expect 400."
           }
@@ -1052,8 +1390,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/categories/{{categoryId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["categories", "{{categoryId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories",
+                "{{categoryId}}"
+              ]
             },
             "description": "Expect 400."
           }
@@ -1096,8 +1439,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/categories/{{categoryId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["categories", "{{categoryId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories",
+                "{{categoryId}}"
+              ]
             },
             "description": "Every new account has an expense category named Food (compared case-insensitively): expect 409."
           }
@@ -1150,8 +1498,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/categories/{{categoryId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["categories", "{{categoryId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories",
+                "{{categoryId}}"
+              ]
             },
             "description": "The second user tries to edit the first user's category: expect 404."
           }
@@ -1190,8 +1543,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/categories/{{categoryId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["categories", "{{categoryId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories",
+                "{{categoryId}}"
+              ]
             },
             "description": "The second user tries to delete the first user's category: expect 404."
           }
@@ -1220,8 +1578,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/categories/{{categoryId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["categories", "{{categoryId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories",
+                "{{categoryId}}"
+              ]
             },
             "description": "Deletes the category created above."
           }
@@ -1250,8 +1613,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/categories/{{categoryId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["categories", "{{categoryId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories",
+                "{{categoryId}}"
+              ]
             },
             "description": "The category is gone: expect 404."
           }
@@ -13164,6 +13532,587 @@
             },
             "auth": {
               "type": "noauth"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Wallets",
+      "item": [
+        {
+          "name": "List wallets (every user has Cash)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const cash = pm.response.json().data.find((wallet) => wallet.isDefault);",
+                  "pm.collectionVariables.set('walletCashId', cash._id);",
+                  "pm.test('The default wallet is there', function () {",
+                  "  pm.expect(cash.type).to.eql('cash');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/wallets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "wallets"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create wallet",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "const data = pm.response.json().data;",
+                  "pm.collectionVariables.set('walletBankId', data._id);",
+                  "pm.test('The balance starts at the starting balance', function () {",
+                  "  pm.expect(data.balance).to.eql(1000000);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/wallets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "wallets"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Vietcombank {{$randomInt}}\",\n  \"type\": \"bank\",\n  \"color\": \"#4A9FE3\",\n  \"initialBalance\": 1000000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Create wallet: invalid type (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Code', function () {",
+                  "  pm.expect(pm.response.json().code).to.eql('WALLET_TYPE_INVALID');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/wallets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "wallets"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Gold\",\n  \"type\": \"gold\",\n  \"color\": \"#4A9FE3\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Update wallet",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/wallets/{{walletBankId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "wallets",
+                "{{walletBankId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"color\": \"#22ADA3\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Transfer money",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.collectionVariables.set('transferId', pm.response.json().data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/transfers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transfers"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fromWalletId\": \"{{walletBankId}}\",\n  \"toWalletId\": \"{{walletCashId}}\",\n  \"amount\": 300000,\n  \"note\": \"ATM\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Transfer: the same wallet twice (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Code', function () {",
+                  "  pm.expect(pm.response.json().code).to.eql('TRANSFER_SAME_WALLET');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/transfers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transfers"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fromWalletId\": \"{{walletBankId}}\",\n  \"toWalletId\": \"{{walletBankId}}\",\n  \"amount\": 1000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "The balance changed",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('300,000 went out', function () {",
+                  "  pm.expect(pm.response.json().data.balance).to.eql(700000);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/wallets/{{walletBankId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "wallets",
+                "{{walletBankId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete the wallet: it has a history (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 409', function () {",
+                  "  pm.response.to.have.status(409);",
+                  "});",
+                  "pm.test('Code', function () {",
+                  "  pm.expect(pm.response.json().code).to.eql('WALLET_IN_USE');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/wallets/{{walletBankId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "wallets",
+                "{{walletBankId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete the default wallet (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 409', function () {",
+                  "  pm.response.to.have.status(409);",
+                  "});",
+                  "pm.test('Code', function () {",
+                  "  pm.expect(pm.response.json().code).to.eql('WALLET_DEFAULT_LOCKED');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/wallets/{{walletCashId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "wallets",
+                "{{walletCashId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List transfers",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transfers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transfers"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete the transfer: the money goes back",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transfers/{{transferId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transfers",
+                "{{transferId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "The money is back",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Balance', function () {",
+                  "  pm.expect(pm.response.json().data.balance).to.eql(1000000);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/wallets/{{walletBankId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "wallets",
+                "{{walletBankId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Archive the wallet",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/wallets/{{walletBankId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "wallets",
+                "{{walletBankId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"archived\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "An archived wallet takes no transfer (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 409', function () {",
+                  "  pm.response.to.have.status(409);",
+                  "});",
+                  "pm.test('Code', function () {",
+                  "  pm.expect(pm.response.json().code).to.eql('WALLET_ARCHIVED');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/transfers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transfers"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fromWalletId\": \"{{walletCashId}}\",\n  \"toWalletId\": \"{{walletBankId}}\",\n  \"amount\": 1000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete wallet: another user or nothing there (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Code', function () {",
+                  "  pm.expect(pm.response.json().code).to.eql('WALLET_NOT_FOUND');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/wallets/000000000000000000000000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "wallets",
+                "000000000000000000000000"
+              ]
             }
           }
         }

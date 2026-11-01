@@ -58,7 +58,7 @@ export default function AdminPage() {
 
   return (
     <div className={styles.page}>
-      <PageHeader title={t('nav.admin')} subtitle={t('admin.subtitle')} />
+      <PageHeader icon="shield" title={t('nav.admin')} subtitle={t('admin.subtitle')} />
       {renderStats()}
       <Card>
         <CardHeader icon="user" tone="periwinkle" title={t('admin.users.title')} subtitle={t('admin.users.pageText')}>

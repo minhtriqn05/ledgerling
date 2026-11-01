@@ -7,13 +7,15 @@ import RecurringRule from "../models/RecurringRule.js";
 import Goal from "../models/Goal.js";
 import TransactionTemplate from "../models/TransactionTemplate.js";
 import Notification from "../models/Notification.js";
+import Wallet from "../models/Wallet.js";
+import Transfer from "../models/Transfer.js";
 import { signToken } from "./authService.js";
 import { httpError } from "../utils/httpError.js";
 
 const SALT_ROUNDS = 10;
 
 // Every model that has a userId. Deleting an account must empty all of them.
-const OWNED_MODELS = [Transaction, Budget, RecurringRule, Goal, TransactionTemplate, Notification, Category];
+const OWNED_MODELS = [Transaction, Budget, RecurringRule, Goal, TransactionTemplate, Notification, Category, Wallet, Transfer];
 
 // A valid token can outlive its account (e.g. the user was deleted)
 function invalidToken() {
@@ -80,13 +82,15 @@ export async function exportData(userId) {
 
   // categoryId is populated so the file is readable on its own; the toJSON of each model renames it to "category"
   const withCategory = (query) => query.populate("categoryId", "name type");
-  const [categories, transactions, budgets, recurringRules, goals, templates] = await Promise.all([
+  const [categories, transactions, budgets, recurringRules, goals, templates, wallets, transfers] = await Promise.all([
     Category.find({ userId }).sort({ type: 1, name: 1 }),
-    withCategory(Transaction.find({ userId }).sort({ date: -1, _id: -1 })),
+    withCategory(Transaction.find({ userId }).sort({ date: -1, _id: -1 })).populate("walletId", "name type"),
     withCategory(Budget.find({ userId }).sort({ month: -1 })),
     withCategory(RecurringRule.find({ userId }).sort({ nextRunDate: 1 })),
     Goal.find({ userId }).sort({ createdAt: 1 }),
     withCategory(TransactionTemplate.find({ userId }).sort({ name: 1 })),
+    Wallet.find({ userId }).sort({ createdAt: 1 }),
+    Transfer.find({ userId }).sort({ date: -1, _id: -1 }).populate("fromWalletId", "name type").populate("toWalletId", "name type"),
   ]);
 
   return {
@@ -98,6 +102,8 @@ export async function exportData(userId) {
     recurringRules,
     goals,
     templates,
+    wallets,
+    transfers,
   };
 }
 

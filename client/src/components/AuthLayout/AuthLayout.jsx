@@ -1,16 +1,17 @@
 import { Suspense } from 'react';
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { Link, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { formatSignedVnd, formatVnd } from '../../utils/format.js';
+import Aurora from '../Aurora/Aurora.jsx';
 import Icon from '../Icon.jsx';
 import LoadingState from '../LoadingState/LoadingState.jsx';
 import LanguageSwitcher from '../LanguageSwitcher/LanguageSwitcher.jsx';
 import Logo from '../Logo/Logo.jsx';
 import styles from './AuthLayout.module.css';
 
-// Layout for the Login and Register pages: a gradient panel on the left, the page's form on the right.
-// The form itself is rendered by <Outlet />. Design: LoginPreview in pages/styleGuide.
+// Layout for the Login and Register pages: the softly lit story on the left, the page's form on the right.
+// The form itself is rendered by <Outlet />. It is Noir in both themes (data-tone), like the landing page it comes from.
 
 const weekBars = [30, 62, 22, 44, 100, 54, 34]; // bar heights in % of the tallest day
 
@@ -26,49 +27,48 @@ export default function AuthLayout() {
   }
 
   return (
-    <main className={styles.page}>
-      <div className={styles.frame}>
-        <section className={styles.visual}>
-          <div className={styles.brand}>
-            <Logo size={36} inverse />
-          </div>
+    <main className={styles.page} data-tone="noir">
+      <section className={styles.visual}>
+        <Aurora className={styles.aurora} />
+        <Link to="/welcome" className={styles.brand}>
+          <Logo size={36} />
+        </Link>
 
-          <div className={styles.pitch}>
-            <p className={styles.headline}>{t('auth.pitchHeadline')}</p>
-            <p className={styles.lead}>{t('auth.pitchLead')}</p>
-          </div>
+        <div className={styles.pitch}>
+          <p className={styles.headline}>{t('auth.pitchHeadline')}</p>
+          <p className={styles.lead}>{t('auth.pitchLead')}</p>
+        </div>
 
-          {/* Decoration only: two small cards that hint at what the app shows. */}
-          <div className={styles.floating} aria-hidden="true">
-            <div className={`${styles.floatCard} ${styles.floatSaved}`}>
-              <span className={styles.tile}>
-                <Icon name="sprout" size={18} />
-              </span>
-              <div>
-                <span className={styles.floatLabel}>{t('auth.savedThisMonth')}</span>
-                <strong className={styles.income}>{formatSignedVnd(7900000, 'income')}</strong>
-              </div>
-            </div>
-
-            <div className={`${styles.floatCard} ${styles.floatWeek}`}>
-              <span className={styles.floatLabel}>{t('auth.thisWeek')}</span>
-              <strong>{formatVnd(1855000)}</strong>
-              <div className={styles.miniBars}>
-                {weekBars.map((height, index) => (
-                  <span key={index} className={height === 100 ? styles.miniPeak : ''} style={{ height: `${height}%` }} />
-                ))}
-              </div>
+        {/* Decoration only: two small panes of glass that hint at what the app shows. */}
+        <div className={styles.floating} aria-hidden="true">
+          <div className={`${styles.floatCard} ${styles.floatSaved}`}>
+            <span className={styles.tile}>
+              <Icon name="sprout" size={18} />
+            </span>
+            <div>
+              <span className={styles.floatLabel}>{t('auth.savedThisMonth')}</span>
+              <strong className={styles.income}>{formatSignedVnd(7900000, 'income')}</strong>
             </div>
           </div>
-        </section>
 
-        <section className={styles.formSide}>
-          <LanguageSwitcher className={styles.language} />
-          <Suspense fallback={<LoadingState />}>
-            <Outlet />
-          </Suspense>
-        </section>
-      </div>
+          <div className={`${styles.floatCard} ${styles.floatWeek}`}>
+            <span className={styles.floatLabel}>{t('auth.thisWeek')}</span>
+            <strong>{formatVnd(1855000)}</strong>
+            <div className={styles.miniBars}>
+              {weekBars.map((height, index) => (
+                <span key={index} className={height === 100 ? styles.miniPeak : ''} style={{ height: `${height}%` }} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className={styles.formSide}>
+        <LanguageSwitcher className={styles.language} />
+        <Suspense fallback={<LoadingState />}>
+          <Outlet />
+        </Suspense>
+      </section>
     </main>
   );
 }

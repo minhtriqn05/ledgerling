@@ -19,7 +19,7 @@
 }
 
 .box:focus-within {
-  border-color: var(--color-primary);
+  border-color: var(--color-primary-text);
   box-shadow: 0 0 0 3px var(--color-focus-ring);
 }
 
@@ -99,7 +99,7 @@
 }
 
 .suggestion:hover {
-  border-color: var(--color-primary);
+  border-color: var(--color-primary-text);
   color: var(--color-primary-text);
 }
 

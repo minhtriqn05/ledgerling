@@ -7,6 +7,7 @@ import { getTags } from '../../api/tags.js';
 import { getErrorMessage } from '../../api/axios.js';
 import { useToast } from '../../context/ToastContext.jsx';
 import { formatNumber } from '../../utils/format.js';
+import { defaultWalletId, selectableWallets } from '../../utils/wallets.js';
 import { fromDateInput, toDateInput, todayInput } from '../../utils/vnDate.js';
 import Modal from '../../components/Modal/Modal.jsx';
 import SegmentedControl from '../../components/SegmentedControl/SegmentedControl.jsx';
@@ -15,14 +16,16 @@ import Alert from '../../components/Alert/Alert.jsx';
 import TagInput from '../../components/TagInput/TagInput.jsx';
 import Icon from '../../components/Icon.jsx';
 import CategoryMark from '../../components/CategoryMark/CategoryMark.jsx';
+import Select from '../../components/Select/Select.jsx';
 import styles from './TransactionFormDialog.module.css';
 import DatePicker from '../../components/DatePicker/DatePicker.jsx';
 
 // "Add transaction" dialog, or "Edit transaction" when `transaction` is given.
 // The page mounts it only while it is open, so the fields start from the props each time.
-// categories: all the user's categories. onSaved(transaction) receives the transaction returned by the API.
+// categories: all the user's categories. wallets: all the user's wallets; while there are none the picker is left out and the
+// server uses the default wallet. onSaved(transaction) receives the transaction returned by the API.
 // onDelete (edit only) adds a Delete button; the page then shows the delete confirmation.
-export default function TransactionFormDialog({ transaction, categories, onSaved, onClose, onDelete }) {
+export default function TransactionFormDialog({ transaction, categories, wallets = [], onSaved, onClose, onDelete }) {
   const { t } = useTranslation();
   const typeOptions = [
     { value: 'expense', label: t('common.expense'), tone: 'expense' },
@@ -34,6 +37,9 @@ export default function TransactionFormDialog({ transaction, categories, onSaved
   const [type, setType] = useState(transaction?.type ?? 'expense');
   const [amount, setAmount] = useState(transaction ? String(transaction.amount) : ''); // digits only
   const [categoryId, setCategoryId] = useState(transaction?.category._id ?? '');
+  // What the user chose. Until then: the wallet of the transaction, or the default one (the list can arrive later than the dialog).
+  const [chosenWallet, setChosenWallet] = useState(null);
+  const walletId = chosenWallet ?? transaction?.wallet?._id ?? defaultWalletId(wallets);
   const [date, setDate] = useState(initialDate);
   const [note, setNote] = useState(transaction?.note ?? '');
   const [tags, setTags] = useState(transaction?.tags ?? []);
@@ -80,6 +86,7 @@ export default function TransactionFormDialog({ transaction, categories, onSaved
     if (!date) return setError(t('form.pickDate'));
 
     const data = { categoryId, amount: Number(amount), note: note.trim(), tags };
+    if (walletId) data.walletId = walletId;
 
     setError('');
     setSaving(true);
@@ -165,6 +172,21 @@ export default function TransactionFormDialog({ transaction, categories, onSaved
             </div>
           )}
         </fieldset>
+
+        {wallets.length > 0 && (
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="transaction-wallet">
+              {t('wallets.wallet')}
+            </label>
+            <Select
+              id="transaction-wallet"
+              value={walletId}
+              options={selectableWallets(wallets, transaction?.wallet?._id).map((wallet) => ({ value: wallet._id, label: wallet.name }))}
+              onChange={setChosenWallet}
+              disabled={saving}
+            />
+          </div>
+        )}
 
         <div className={styles.row}>
           <div className={styles.field}>

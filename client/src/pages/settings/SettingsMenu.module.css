@@ -1,7 +1,7 @@
-/* A white panel that stays in view while a long section scrolls */
+/* A panel that stays in view while a long section scrolls, under the top bar */
 .menu {
   position: sticky;
-  top: var(--frame-gap);
+  top: calc(var(--topbar-height) + var(--frame-gap) + var(--space-2));
   padding: var(--space-2);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
@@ -40,6 +40,12 @@
   background: var(--color-surface-muted);
 }
 
+@media (max-width: 767px) {
+  .menu {
+    top: var(--space-2);
+  }
+}
+
 .link:focus-visible {
   outline: none;
   box-shadow: 0 0 0 3px var(--color-focus-ring);
@@ -47,11 +53,8 @@
 
 .active,
 .active:hover {
-  background: var(--gradient-banner);
-}
-
-.active .label {
-  color: var(--color-primary-text);
+  background: var(--color-surface-hover);
+  box-shadow: inset 0 0 0 1px var(--color-border);
 }
 
 .tile {
