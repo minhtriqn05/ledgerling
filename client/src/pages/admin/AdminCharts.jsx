@@ -38,7 +38,7 @@ export default function CountLineChart({ data, name, color, ariaLabel }) {
     <div className={styles.chart} role="img" aria-label={ariaLabel}>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ top: 8, right: 12, bottom: 0, left: 0 }}>
-          <CartesianGrid vertical={false} stroke={grid} strokeDasharray="4 6" />
+          <CartesianGrid vertical={false} stroke={grid} />
           <XAxis dataKey="label" axisLine={false} tickLine={false} tickMargin={10} minTickGap={24} tick={axisTick()} />
           <YAxis
             axisLine={false}

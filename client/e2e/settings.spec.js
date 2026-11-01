@@ -84,31 +84,32 @@ test('a new name shows in the menu at once, and after a reload', async ({ page }
   await expect(page.getByTestId('account-name')).toHaveText('Brand New Name');
 });
 
-test('dark mode is applied at once, kept after F5, and follows the account to another device', async ({ page }, testInfo) => {
+test('a new account is dark; another theme is applied at once, kept after F5, and follows the account to another device', async ({ page }, testInfo) => {
   const email = await register(page, testInfo, 'theme');
   const html = page.locator('html');
   await page.goto('/settings/appearance');
-  await expect(page.getByRole('radio', { name: 'System' })).toHaveAttribute('aria-checked', 'true');
-
-  // Dark: the page changes colors at once
-  const lightBackground = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-  await page.getByRole('radio', { name: 'Dark' }).click();
   await expect(html).toHaveAttribute('data-theme', 'dark');
   await expect(page.getByRole('radio', { name: 'Dark' })).toHaveAttribute('aria-checked', 'true');
+
+  // Light: the page changes colors at once
   const darkBackground = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-  expect(darkBackground).not.toBe(lightBackground);
-  expect(await page.evaluate(() => localStorage.getItem('ledgerling.theme'))).toBe('dark');
-  await expect.poll(async () => (await myPreferences(page)).theme).toBe('dark');
+  await page.getByRole('radio', { name: 'Light' }).click();
+  await expect(html).toHaveAttribute('data-theme', 'light');
+  await expect(page.getByRole('radio', { name: 'Light' })).toHaveAttribute('aria-checked', 'true');
+  const lightBackground = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+  expect(lightBackground).not.toBe(darkBackground);
+  expect(await page.evaluate(() => localStorage.getItem('ledgerling.theme'))).toBe('light');
+  await expect.poll(async () => (await myPreferences(page)).theme).toBe('light');
 
-  // F5: still dark, and the Dark option is still the chosen one
+  // F5: still light, and the Light option is still the chosen one
   await page.reload();
-  await expect(html).toHaveAttribute('data-theme', 'dark');
-  expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe(darkBackground);
-  await expect(page.getByRole('radio', { name: 'Dark' })).toHaveAttribute('aria-checked', 'true');
+  await expect(html).toHaveAttribute('data-theme', 'light');
+  expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe(lightBackground);
+  await expect(page.getByRole('radio', { name: 'Light' })).toHaveAttribute('aria-checked', 'true');
 
-  // The charts are read in the dark theme too: the Reports page opens without an error
+  // The charts are read in the light theme too: the Reports page opens without an error
   await page.goto('/reports?tab=yearly');
-  await expect(html).toHaveAttribute('data-theme', 'dark');
+  await expect(html).toHaveAttribute('data-theme', 'light');
   await expect(page.getByRole('heading', { name: 'Reports', level: 1 })).toBeVisible();
 
   // Another device has no theme in localStorage: after signing in it gets the one saved on the account
@@ -117,23 +118,40 @@ test('dark mode is applied at once, kept after F5, and follows the account to an
   await page.getByRole('menuitem', { name: 'Log out' }).click();
   await page.evaluate(() => localStorage.removeItem('ledgerling.theme'));
   await page.reload();
-  await expect(html).toHaveAttribute('data-theme', 'light');
+  await expect(html).toHaveAttribute('data-theme', 'dark');
   await page.getByLabel('Email').fill(email);
   await page.getByLabel('Password', { exact: true }).fill(PASSWORD);
   await page.getByRole('button', { name: 'Log in' }).click();
   // The login sends the person back to the page they were on (Reports)
   await expect(page.getByRole('heading', { name: 'Reports', level: 1 })).toBeVisible();
-  await expect(html).toHaveAttribute('data-theme', 'dark');
-
-  // Back to light
-  await page.goto('/settings/appearance');
-  await page.getByRole('radio', { name: 'Light' }).click();
   await expect(html).toHaveAttribute('data-theme', 'light');
+
+  // Back to dark
+  await page.goto('/settings/appearance');
+  await page.getByRole('radio', { name: 'Dark' }).click();
+  await expect(html).toHaveAttribute('data-theme', 'dark');
+});
+
+test('the two small buttons in the top bar change the theme and save it on the account', async ({ page }, testInfo) => {
+  await register(page, testInfo, 'toggle');
+  const html = page.locator('html');
+  await openMenuIfNeeded(page);
+
+  const theme = page.getByRole('group', { name: 'Theme' }).filter({ has: page.getByRole('button', { name: 'Light' }) });
+  await expect(theme.getByRole('button', { name: 'Dark' })).toHaveAttribute('aria-pressed', 'true');
+
+  await theme.getByRole('button', { name: 'Light' }).click();
+  await expect(html).toHaveAttribute('data-theme', 'light');
+  await expect(theme.getByRole('button', { name: 'Light' })).toHaveAttribute('aria-pressed', 'true');
+  await expect.poll(async () => (await myPreferences(page)).theme).toBe('light');
 });
 
 test('system theme follows the device', async ({ page }, testInfo) => {
   await page.emulateMedia({ colorScheme: 'dark' });
   await register(page, testInfo, 'system');
+  await page.goto('/settings/appearance');
+  await page.getByRole('radio', { name: 'System' }).click();
+  await expect(page.getByRole('radio', { name: 'System' })).toHaveAttribute('aria-checked', 'true');
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
 
   await page.emulateMedia({ colorScheme: 'light' });

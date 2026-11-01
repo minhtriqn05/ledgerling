@@ -1,15 +1,243 @@
 .logo {
+  /* All the mouse changes is these five values, further down. The parts of the coin only read them. */
+  --logo-open: 0;        /* how far each L moves out, in units of the 64 x 64 box */
+  --logo-cruise: paused; /* the fast turn */
+  --logo-flip: 0deg;     /* the turn around the upright axis */
+  --logo-tilt: 0deg;
+  --logo-lit: 0;         /* the light inside the hole, from 0 to 1 */
+
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
 }
 
-.logo svg {
-  display: block;
+/* The box stands still, so the mouse never falls off a moving part. It looks at the coin from a distance of 5 sizes. */
+.mark {
+  --logo-depth: calc(var(--logo-size) * 0.035); /* half the thickness of the coin */
+
+  position: relative;
   flex-shrink: 0;
+  width: var(--logo-size);
+  height: var(--logo-size);
+  perspective: calc(var(--logo-size) * 5);
+  animation: arrive 900ms var(--ease-out) backwards;
+}
+
+@keyframes arrive {
+  from {
+    opacity: 0;
+    transform: rotate(-140deg) scale(0.5);
+  }
+}
+
+/* The soft light around the coin. It is a ring, so the hole keeps showing the page behind it. */
+.halo {
+  position: absolute;
+  inset: -26%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, transparent 42%, var(--logo-halo) 62%, transparent 100%);
+  opacity: calc(0.45 + var(--logo-lit) * 0.55);
+  pointer-events: none;
+  transition: opacity var(--duration-slow) var(--ease-out);
+}
+
+.toss,
+.tilt,
+.drift,
+.cruise {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+
+/* A press: up with three turns around the level axis, down, one small bounce, like a coin tossed from the thumb.
+   The last third only waits for the chips to fly out. Logo.jsx ends the toss when this animation ends. */
+.mark[data-tossing] .toss {
+  animation: toss 1400ms linear;
+}
+
+@keyframes toss {
+  0% {
+    transform: translateY(0) rotateX(0deg) scale(1);
+    animation-timing-function: cubic-bezier(0.18, 0.72, 0.36, 1);
+  }
+
+  27% {
+    transform: translateY(calc(var(--logo-size) * -0.62)) rotateX(540deg) scale(1.14);
+    animation-timing-function: cubic-bezier(0.64, 0, 0.82, 0.42);
+  }
+
+  52% {
+    transform: translateY(0) rotateX(1080deg) scale(1);
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1);
+  }
+
+  59% {
+    transform: translateY(calc(var(--logo-size) * -0.09)) rotateX(1080deg) scale(1);
+    animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4);
+  }
+
+  66%,
+  100% {
+    transform: translateY(0) rotateX(1080deg) scale(1);
+  }
+}
+
+/* The mouse: one flip around the upright axis that slows down at the end, and a tilt towards the light. */
+.tilt {
+  transform: rotateY(var(--logo-flip)) rotateX(var(--logo-tilt)) rotateY(calc(var(--logo-tilt) * -1));
+  transition: transform 1200ms cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+
+/* Never stops: one turn in 16 seconds. */
+.drift {
+  animation: turn 16s linear infinite;
+}
+
+/* Paused until the mouse is there. Pausing keeps the angle, so the speed changes without a jump. */
+.cruise {
+  animation: turn 3s linear infinite;
+  animation-play-state: var(--logo-cruise);
+}
+
+@keyframes turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* The light that comes on inside the hole. */
+.glow {
+  position: absolute;
+  inset: 18%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--logo-light) 0%, var(--logo-glow) 36%, transparent 100%);
+  opacity: var(--logo-lit);
+  transition: opacity var(--duration-slow) var(--ease-out);
+}
+
+/* The three plates: the front, the back (turned around, so a flip shows the coin again) and a darker one between them. */
+.front,
+.edge,
+.back {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.front {
+  transform: translateZ(var(--logo-depth));
+}
+
+.back {
+  transform: rotateY(180deg) translateZ(var(--logo-depth));
+}
+
+/* Each L slides out along its own diagonal, so the coin opens without losing its balance. */
+.piece {
+  opacity: 0.94;
+  transform: translate(calc(var(--logo-open) * -1px), calc(var(--logo-open) * -1px));
+  transition: transform 560ms var(--ease-pop);
+}
+
+/* A band of light crosses the coin every few seconds. It would show in the gaps of an open coin, so it waits then. */
+.sheen {
+  opacity: calc(1 - var(--logo-lit));
+  animation: sheen 6s ease-in-out infinite;
+}
+
+@keyframes sheen {
+  0%,
+  70% {
+    transform: translateX(-22px);
+  }
+
+  100% {
+    transform: translateX(72px);
+  }
+}
+
+/* A phone has no mouse, and it would keep this state after a tap. The keyboard counts as the mouse. */
+@media (hover: hover) {
+  .logo:hover,
+  :focus-visible > .logo {
+    --logo-open: 2.8;
+    --logo-cruise: running;
+    --logo-flip: 360deg;
+    --logo-tilt: 15deg;
+    --logo-lit: 1;
+  }
+}
+
+.burst {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* The first ring comes with the press, the second one with the landing. */
+.ring {
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid var(--logo-gold-tip);
+  border-radius: 50%;
+  opacity: 0;
+  animation: ring 700ms var(--ease-out);
+}
+
+.ring + .ring {
+  border-color: var(--logo-jade-tip);
+  animation-delay: 730ms;
+}
+
+@keyframes ring {
+  from {
+    opacity: 0.9;
+    transform: scale(0.8);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(1.75);
+  }
+}
+
+/* Small squares, like the hole of the coin, in the eight directions of its mirror lines. */
+.shard {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(var(--logo-size) * 0.1);
+  height: calc(var(--logo-size) * 0.1);
+  margin: calc(var(--logo-size) * -0.05);
+  border-radius: 22%;
+  background: var(--logo-gold-mid);
+  opacity: 0;
+  animation: shard 640ms var(--ease-out) 730ms;
+}
+
+.shard:nth-child(even) {
+  background: var(--logo-jade-mid);
+}
+
+@keyframes shard {
+  from {
+    opacity: 1;
+    transform: rotate(var(--shard)) translateY(calc(var(--logo-size) * -0.46)) rotate(0deg) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: rotate(var(--shard)) translateY(calc(var(--logo-size) * -1.02)) rotate(135deg) scale(0.35);
+  }
 }
 
 /* The tails of the g reach below the x-height, so the word sits a little lower to look centered. */
 .word {
+  display: block;
+  flex-shrink: 0;
   margin-top: 3px;
 }

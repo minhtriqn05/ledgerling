@@ -1,15 +1,20 @@
+/* A quiet pill in the top bar */
 .nav {
-  margin-bottom: var(--space-3);
+  min-width: 0;
   font-size: var(--font-size-sm);
 }
 
 .list {
-  display: flex;
+  display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-1);
+  min-height: var(--control-height);
   margin: 0;
-  padding: 0;
+  padding: var(--space-1) var(--space-4) var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
   list-style: none;
 }
 
@@ -28,8 +33,7 @@
 }
 
 .link:hover {
-  color: var(--color-primary-text);
-  text-decoration: underline;
+  color: var(--color-text);
 }
 
 .link:focus-visible {
@@ -68,6 +72,15 @@
 /* A phone: the Home icon, then the level above as "‹ Reports". The current level stays in the page for screen readers
    (it has aria-current), it is only hidden from the eye. A page right below Home shows "Home › Transactions" as it is. */
 @media (max-width: 767px) {
+  .nav {
+    margin-bottom: var(--space-3);
+  }
+
+  .list {
+    min-height: 36px;
+    padding-block: 0;
+  }
+
   .item {
     display: none;
   }

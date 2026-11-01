@@ -11,15 +11,15 @@
 .table {
   width: 100%;
   border-collapse: separate;
-  border-spacing: 0 var(--space-1);
+  border-spacing: 0 var(--space-2);
 }
 
 .table th {
-  padding: var(--space-2) var(--space-4);
+  padding: 0 var(--space-4);
   color: var(--color-text-muted);
-  font-size: var(--font-size-xs);
+  font-size: 0.6875rem;
   font-weight: var(--font-weight-semibold);
-  letter-spacing: 0.04em;
+  letter-spacing: var(--letter-spacing-label);
   text-align: left;
   text-transform: uppercase;
   white-space: nowrap;
@@ -34,11 +34,11 @@
 }
 
 .table td:first-child {
-  border-radius: var(--radius-md) 0 0 var(--radius-md);
+  border-radius: 18px 0 0 18px;
 }
 
 .table td:last-child {
-  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  border-radius: 0 18px 18px 0;
 }
 
 /* A click anywhere on a row opens its details. */
@@ -47,19 +47,27 @@
 }
 
 .table tbody tr:hover td {
-  background: color-mix(in srgb, var(--color-primary) 9%, var(--color-surface));
+  background: var(--color-surface-hover);
 }
 
-/* The note is a button, so the details also open from the keyboard. It looks like plain text. */
+.noteCell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+/* The note is a button, so the details also open from the keyboard. It looks like plain text, the first thing to read in the row. */
 .noteButton {
-  display: block;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   overflow: hidden;
   padding: var(--space-1) 0;
   border: none;
   border-radius: var(--radius-sm);
   background: transparent;
   color: inherit;
+  font-weight: var(--font-weight-semibold);
   text-align: left;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -87,6 +95,7 @@
 
 .muted {
   color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
 }
 
 .srOnly {
@@ -104,26 +113,46 @@
 .rowActions {
   display: inline-flex;
   gap: var(--space-1);
+  transition: opacity var(--duration-fast) var(--ease-out);
 }
 
-/* ---------- Category chip with its colored dot ---------- */
+/* With a mouse the edit and delete buttons wait for the row, so the list stays quiet. The keyboard finds them too. */
+@media (hover: hover) {
+  .rowActions {
+    opacity: 0.25;
+  }
+
+  .table tbody tr:hover .rowActions,
+  .rowActions:focus-within {
+    opacity: 1;
+  }
+}
+
+/* ---------- Category: a dot in its color and the name ---------- */
 .chip {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  padding: 3px var(--space-3) 3px 3px;
+  padding: 3px var(--space-3) 3px var(--space-2);
+  border: 1px solid color-mix(in srgb, var(--tone) 22%, transparent);
   border-radius: var(--radius-full);
-  background: color-mix(in srgb, var(--tone) 14%, var(--color-surface));
+  background: color-mix(in srgb, var(--tone) 10%, transparent);
   color: var(--color-text);
+  font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
   white-space: nowrap;
 }
 
-.chip > span[data-testid='category-mark'] {
+.chipDot {
+  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
   border-radius: var(--radius-full);
+  background: var(--tone);
 }
 
 /* ---------- Money: always carries + / − too, so color is never the only signal ---------- */
+/* A list is mostly expenses: they stay in the text color, so income stands out and the page is never a wall of red. */
 .amount {
   font-weight: var(--font-weight-semibold);
   font-variant-numeric: tabular-nums;
@@ -135,7 +164,7 @@
 }
 
 .expense {
-  color: var(--color-expense-text);
+  color: var(--color-text);
 }
 
 /* ---------- Phone list (replaces the table on small screens) ---------- */
@@ -144,13 +173,18 @@
 }
 
 .mobileItems {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.mobileItems > li + li {
-  border-top: 1px solid var(--color-border);
+.mobileItems > li {
+  padding: 0 var(--space-3);
+  border-radius: 18px;
+  background: var(--color-surface-muted);
 }
 
 /* Checkbox + the row button side by side. */
@@ -169,8 +203,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-2) 0 var(--space-3);
-  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-2) var(--space-3) var(--space-3);
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
@@ -200,10 +233,6 @@
 /* A selected row is tinted, so it is clear which ones the bulk action will change. */
 .table tbody tr.selectedRow td {
   background: var(--color-primary-soft);
-}
-
-.mobileItems > li {
-  border-radius: var(--radius-md);
 }
 
 .mobileItems > li.selectedRow {
@@ -295,7 +324,7 @@
 }
 
 .tag:hover {
-  border-color: var(--color-primary);
+  border-color: var(--color-primary-text);
 }
 
 .tag:focus-visible {
@@ -303,13 +332,13 @@
   box-shadow: 0 0 0 3px var(--color-focus-ring);
 }
 
-/* On the phone list the tags sit under the row, in line with the text (avatar 40px + gap) */
+/* On the phone list the tags sit under the row, in line with the text (mark 42px + gap) */
 .mobileTags {
   display: flex;
-  padding: 0 0 var(--space-3) calc(40px + var(--space-3));
+  padding: 0 0 var(--space-3) calc(42px + var(--space-3));
 }
 
 /* ... plus the checkbox (18px) and its gap */
 .mobileTagsSelectable {
-  padding-left: calc(18px + var(--space-3) + 40px + var(--space-3));
+  padding-left: calc(18px + var(--space-3) + 42px + var(--space-3));
 }

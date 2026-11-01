@@ -74,7 +74,7 @@ export default function ReportsPage() {
 
   return (
     <div className={styles.page}>
-      <PageHeader title={t('nav.reports')} subtitle={t(`reports.subtitle.${tab}`, { month: formatMonth(month), year })}>
+      <PageHeader icon="reports" title={t('nav.reports')} subtitle={t(`reports.subtitle.${tab}`, { month: formatMonth(month), year })}>
         <div className={styles.noPrint}>
           {tab === 'yearly' ? (
             <YearPicker year={year} onChange={(nextYear) => changePeriod({ year: nextYear })} />

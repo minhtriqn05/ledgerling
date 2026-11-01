@@ -249,6 +249,53 @@ const paths = {
       <path d="m9 12 2 2 4-4" />
     </>
   ),
+  gauge: (
+    <>
+      <path d="m12 14 4-4" />
+      <path d="M3.3 19a10 10 0 1 1 17.4 0" />
+    </>
+  ),
+  transfer: (
+    <>
+      <path d="M8 3 4 7l4 4" />
+      <path d="M4 7h16" />
+      <path d="m16 21 4-4-4-4" />
+      <path d="M20 17H4" />
+    </>
+  ),
+  archive: (
+    <>
+      <rect x="3" y="4" width="18" height="4" rx="1" />
+      <path d="M5 8v11a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8" />
+      <path d="M10 12h4" />
+    </>
+  ),
+  banknote: (
+    <>
+      <rect x="2" y="6" width="20" height="12" rx="2" />
+      <circle cx="12" cy="12" r="2.5" />
+      <path d="M6 12h.01M18 12h.01" />
+    </>
+  ),
+  bank: (
+    <>
+      <path d="M3 21h18" />
+      <path d="M6 17v-6M10 17v-6M14 17v-6M18 17v-6" />
+      <path d="m12 3 9 5H3z" />
+    </>
+  ),
+  smartphone: (
+    <>
+      <rect x="6" y="2" width="12" height="20" rx="3" />
+      <path d="M11 18h2" />
+    </>
+  ),
+  arrowRight: (
+    <>
+      <path d="M5 12h14" />
+      <path d="m13 6 6 6-6 6" />
+    </>
+  ),
 };
 
 export default function Icon({ name, size = 20 }) {

@@ -56,7 +56,13 @@
     "transactions": "取引",
     "toWelcome": "トップページへ",
     "collapseSidebar": "サイドバーを折りたたむ",
-    "expandSidebar": "サイドバーを広げる"
+    "expandSidebar": "サイドバーを広げる",
+    "wallets": "ウォレット",
+    "groups": {
+      "money": "お金",
+      "planning": "プラン",
+      "account": "アカウント"
+    }
   },
   "breadcrumb": {
     "label": "パンくずリスト",
@@ -200,7 +206,16 @@
     "savingsGoals": "貯蓄目標",
     "spent": "支出",
     "spendingByCategory": "カテゴリ別の支出",
-    "subtitle": "{{month}} の状況です。"
+    "subtitle": "{{month}} の状況です。",
+    "recent": "最近の取引",
+    "recentFailed": "最近の取引を読み込めませんでした。",
+    "savedShare": "収入の {{percent}} を貯蓄",
+    "greeting": {
+      "night": "夜遅くまでお疲れさまです、{{name}}さん",
+      "morning": "おはようございます、{{name}}さん",
+      "afternoon": "こんにちは、{{name}}さん",
+      "evening": "こんばんは、{{name}}さん"
+    }
   },
   "transactions": {
     "add": "取引を追加",
@@ -374,7 +389,10 @@
     "overBy": "{{amount}} 超過",
     "percentUsed": "{{percent}}% 使用",
     "save": "予算を保存",
-    "updated": "予算を更新しました"
+    "updated": "予算を更新しました",
+    "totalLimit": "予算の合計",
+    "totalSpent": "使った金額",
+    "totalLeft": "残り"
   },
   "recurring": {
     "active": "有効：{{name}}",
@@ -456,7 +474,9 @@
     "withdrawMax": "出金できるのは最大 {{amount}}（この目標の貯蓄額）です。",
     "withdrawMoney": "出金",
     "withdrawal": "出金",
-    "withdrawn": "出金しました"
+    "withdrawn": "出金しました",
+    "totalSaved": "これまでの貯蓄",
+    "totalTarget": "すべての目標の合計"
   },
   "reports": {
     "averagePerDay": "1 日あたりの平均",
@@ -902,7 +922,18 @@
     "footerNote": "UIT · CSBU109.R11.KHBC",
     "github": "GitHub で見る",
     "opensInNewTab": "（新しいタブで開きます）",
-    "openApp": "アプリを開く"
+    "openApp": "アプリを開く",
+    "trust": {
+      "label": "含まれるもの",
+      "languages": "8 言語",
+      "install": "アプリとしてインストール可能",
+      "sync": "デバイス間でリアルタイム同期",
+      "themes": "Noir と Porcelain のテーマ"
+    },
+    "closing": {
+      "title": "あなたのお金を、ようやく落ち着いてひとつの場所に。",
+      "text": "1 分もかからずアカウントを作成して、今日最初の取引を追加しましょう。"
+    }
   },
   "onboarding": {
     "title": "Ledgerling をはじめよう",
@@ -994,7 +1025,16 @@
     "USER_NOT_FOUND": "ユーザーが見つかりません",
     "VALIDATION_ERROR": "入力内容を確認してください。",
     "WITHDRAW_TOO_MUCH": "貯蓄額を超えて出金することはできません",
-    "WRONG_PASSWORD": "パスワードが正しくありません"
+    "WRONG_PASSWORD": "パスワードが正しくありません",
+    "WALLET_NOT_FOUND": "ウォレットが見つかりません",
+    "WALLET_EXISTS": "同じ名前のウォレットがすでにあります",
+    "WALLET_ARCHIVED": "このウォレットはアーカイブ済みです",
+    "WALLET_IN_USE": "このウォレットには取引または振替があります。アーカイブしてください。",
+    "WALLET_DEFAULT_LOCKED": "デフォルトのウォレットはアーカイブも削除もできません",
+    "WALLET_TYPE_INVALID": "ウォレットの種類を選んでください",
+    "WALLET_BALANCE_INVALID": "開始残高は 0 以上にしてください",
+    "TRANSFER_NOT_FOUND": "振替が見つかりません",
+    "TRANSFER_SAME_WALLET": "異なる 2 つのウォレットを選んでください"
   },
   "live": {
     "live": "ライブ",
@@ -1126,6 +1166,67 @@
         "title": "保証なし",
         "text": "本サービスは無料で、いかなる保証もありません。金融上の助言は行いません。表示される数字の正確さは入力内容によります。"
       }
+    }
+  },
+  "wallets": {
+    "wallet": "ウォレット",
+    "all": "すべてのウォレット",
+    "yours": "あなたのウォレット",
+    "subtitle": "お金が今どこにあるか。",
+    "totalAll": "全ウォレットの合計",
+    "count_one": "{{count}} 個のウォレット",
+    "count_other": "{{count}} 個のウォレット",
+    "loading": "ウォレットを読み込み中…",
+    "loadFailed": "ウォレットを読み込めませんでした。",
+    "new": "新しいウォレット",
+    "edit": "ウォレットを編集",
+    "save": "ウォレットを保存",
+    "added": "ウォレットを追加しました",
+    "updated": "ウォレットを更新しました",
+    "deleted": "ウォレットを削除しました",
+    "archived": "ウォレットをアーカイブしました",
+    "restored": "ウォレットを再び使えるようにしました",
+    "archiveName": "{{name}} をアーカイブ",
+    "restoreName": "{{name}} を再び使う",
+    "type": {
+      "label": "種類",
+      "cash": "現金",
+      "bank": "銀行",
+      "ewallet": "電子マネー"
+    },
+    "namePlaceholder": "例: Vietcombank",
+    "initialBalance": "開始残高",
+    "initialHint": "このウォレットで最初の取引をする前にあったお金です。",
+    "defaultBadge": "デフォルト",
+    "defaultHint": "ウォレットを指定しない取引はここに入ります。このウォレットはアーカイブも削除もできません。",
+    "archivedTitle": "アーカイブ済み",
+    "archivedHint": "残高はそのままで、新しい取引や振替は受け付けません。",
+    "moneyIn": "入金",
+    "moneyOut": "出金",
+    "startedWith": "開始 {{amount}}",
+    "deleteQuestion": "このウォレットを削除しますか？",
+    "deleteText": "元に戻せません。取引や振替があるウォレットは削除できないので、アーカイブしてください。",
+    "transfer": {
+      "open": "お金を移動",
+      "title": "お金を移動",
+      "from": "移動元",
+      "to": "移動先",
+      "save": "移動する",
+      "done": "お金を移動しました",
+      "chooseTwo": "異なる 2 つのウォレットを選んでください。",
+      "needTwo": "お金を移動するにはウォレットが 2 つ以上必要です。",
+      "notCounted": "振替は収入でも支出でもありません。合計、予算、レポートは変わりません。",
+      "history": "振替",
+      "historySubtitle": "新しい順",
+      "empty": "振替はまだありません。",
+      "loading": "振替を読み込み中…",
+      "loadFailed": "振替を読み込めませんでした。",
+      "count_one": "{{count}} 件の振替",
+      "count_other": "{{count}} 件の振替",
+      "deleteName": "{{from}} から {{to}} への振替を削除",
+      "deleteQuestion": "この振替を削除しますか？",
+      "deleteText": "お金は {{from}} に戻ります。",
+      "deleted": "振替を削除しました"
     }
   }
 }

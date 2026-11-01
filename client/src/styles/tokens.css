@@ -1,63 +1,101 @@
 /*
- * Design tokens for Ledgerling ("Sky & Mint").
+ * Design tokens for Ledgerling ("Noir", with "Porcelain" as its light theme).
  * Every color, font, radius, shadow and spacing value lives here.
  * Components use var(--token-name) and never hardcode these values.
  * The decisions behind each value are documented in docs/ui-style.md.
+ *
+ * :root holds the sizes and Porcelain. Noir (the block further down) replaces only the colors.
  */
 :root {
   color-scheme: light;
 
-  /* ---------- Brand (clear sky blue) ---------- */
-  --color-primary: #2874b5;       /* primary buttons, links, sparkline */
-  --color-primary-hover: #1f639f;
-  --color-primary-text: #1f639f;  /* blue text: links, active nav item */
-  --color-primary-soft: #e4f0fb;  /* pastel sky: active nav, selected items */
+  /* ---------- Brand: controls are ink on Porcelain, pearl on Noir. Color belongs to the data and the hero. ---------- */
+  --color-primary: #111618;       /* primary buttons, checked boxes, the chosen day */
+  --color-primary-hover: #262d30;
+  --color-primary-text: #0b6a63;  /* links, the active item: deep teal */
+  --color-primary-soft: #e3f1ee;  /* selected items */
   --color-on-primary: #ffffff;
+  --color-on-danger: #ffffff;
+  --gradient-button: linear-gradient(180deg, #2a3235 0%, #0e1315 100%);
+  --gradient-button-hover: linear-gradient(180deg, #363f42 0%, #171d1f 100%);
 
-  /* ---------- Hero: vivid sky-to-teal, one per screen ---------- */
-  --color-hero-from: var(--color-primary);
-  --color-hero-to: #1b7f86;
-  --gradient-hero: linear-gradient(135deg, var(--color-hero-from) 0%, var(--color-hero-to) 100%);
-  --color-hero-text: #ffffff;                       /* 4.7:1 or more on the whole gradient */
-  --color-hero-text-soft: rgba(255, 255, 255, 0.8); /* large text only, e.g. the ₫ unit */
-  --color-hero-decor: rgba(255, 255, 255, 0.12);    /* decorative circles */
+  /* ---------- The aurora of the hero: emerald, ice and a little warmth. It is the same in both themes. ---------- */
+  --color-hero-from: #1f9e86;     /* only the old mocks of the dev style guide */
+  --color-hero-to: #1e6fa8;
+  --color-hero-base: #0b1012;
+  --gradient-hero:
+    radial-gradient(60% 120% at 10% -10%, rgba(45, 190, 150, 0.46) 0%, rgba(45, 190, 150, 0) 70%),
+    radial-gradient(55% 110% at 90% -20%, rgba(70, 150, 235, 0.46) 0%, rgba(70, 150, 235, 0) 70%),
+    radial-gradient(50% 90% at 60% 120%, rgba(226, 196, 130, 0.16) 0%, rgba(226, 196, 130, 0) 70%),
+    linear-gradient(180deg, #0f1719 0%, #0b1012 100%);
+  --color-hero-text: #ffffff;
+  --color-hero-text-soft: rgba(255, 255, 255, 0.78);
+  --color-hero-decor: rgba(255, 255, 255, 0.1);
+  --color-hero-line: rgba(255, 255, 255, 0.14);
+  --aurora-emerald: #2fc79c;
+  --aurora-ice: #4f9ff0;
+  --aurora-warm: #e0c483;
+  --gradient-progress: linear-gradient(90deg, #6fe3bd 0%, #7cc4f5 100%); /* the thin bar along the top */
+
+  /* ---------- The glass coin of the logo: two gold L and two jade L, the same in both themes ---------- */
+  --logo-gold-tip: #ffe7ad;       /* from the round edge of an L ... */
+  --logo-gold-mid: #f6c766;
+  --logo-gold-base: #e39f33;      /* ... to the corner at the hole */
+  --logo-gold-edge: #c98a2c;      /* the side of the coin, seen in a flip */
+  --logo-jade-tip: #b6f9e2;
+  --logo-jade-mid: #46d8ae;
+  --logo-jade-base: #0ea582;
+  --logo-jade-edge: #0b8a6c;
+  --logo-light: #ffffff;          /* the light on the glass */
+  --logo-halo: rgba(246, 199, 102, 0.3); /* behind the coin */
+  --logo-glow: #ffd979;           /* inside the hole, under the mouse */
+
+  /* A fine grain over large soft areas: it stops the gradients from banding and gives them a physical feel */
+  --texture-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --grain-opacity: 0.05;
 
   /* ---------- Soft washes ---------- */
-  --gradient-soft: linear-gradient(135deg, #dceefc 0%, #e3f6ed 100%); /* pastel sky to mint */
-  --gradient-banner: linear-gradient(115deg, #d9ebfb 0%, #dff3ec 100%); /* the page header banner */
-  --color-logo-accent: #a9efcf;   /* the ruled lines of the logo */
+  --gradient-soft: linear-gradient(135deg, #e6f2f6 0%, #e6f4ec 100%);
+  --gradient-banner: var(--gradient-soft); /* only the old mocks of the dev style guide */
+  --ambient-1: rgba(47, 199, 156, 0.07);  /* the light behind the panels, fixed to the window */
+  --ambient-2: rgba(79, 159, 240, 0.07);
 
   /* ---------- Surfaces ---------- */
-  --color-bg: #edf3f8;            /* the canvas: a little deeper, so white panels stand out */
-  --color-surface: #ffffff;       /* cards, tables, inputs, sidebar */
-  --color-surface-muted: #f1f5f9; /* table rows, hover states */
-  --color-skeleton: #e6edf4;      /* loading placeholders: a tint, so the shimmer shows on white cards */
-  --color-overlay: rgba(23, 37, 52, 0.45); /* behind dialogs */
+  --color-bg: #f3f3ef;            /* the canvas: warm porcelain */
+  --color-surface: #ffffff;       /* cards, tables */
+  --color-surface-raised: #ffffff; /* dialogs, menus */
+  --color-surface-muted: #f6f6f2; /* rows, hover states */
+  --color-surface-hover: #eeeee9; /* a row under the mouse */
+  --color-input: #ffffff;         /* the inside of a field */
+  --color-skeleton: #e9e9e3;      /* loading placeholders */
+  --color-overlay: rgba(16, 21, 23, 0.5); /* behind dialogs */
+  --sheen-card: none;             /* the light that falls on a card from above */
+  --spotlight: rgba(16, 21, 23, 0.035); /* the soft light that follows the mouse over a card */
 
   /* ---------- Text ---------- */
-  --color-text: #172534;          /* deep navy ink */
-  --color-text-secondary: #4a5868;
-  --color-text-muted: #5b6a7c;    /* hints, dates, axis labels (on white or the canvas: 4.6:1 or more) */
+  --color-text: #101517;          /* ink */
+  --color-text-secondary: #454f4d;
+  --color-text-muted: #5c6664;    /* 5:1 or more on every surface */
 
   /* ---------- Borders ---------- */
-  --color-border: #e3eaf1;
-  --color-border-strong: #c9d5e0; /* input borders */
-  --color-focus-ring: rgba(40, 116, 181, 0.25);
+  --color-border: #e4e4dd;        /* hairlines */
+  --color-border-strong: #858f8b; /* the edge of a field: 3:1 on white */
+  --color-focus-ring: rgba(11, 106, 99, 0.28);
 
   /* ---------- Money: income / expense ---------- */
   /* Fill = chart lines, icons, bars. Text = amounts written in text. */
-  --color-income: #25a37a;        /* fresh green */
-  --color-income-text: #1e7a52;
-  --color-income-soft: #e2f5eb;
-  --color-expense: #ec6559;       /* soft coral */
-  --color-expense-text: #bd3f36;
-  --color-expense-soft: #fdecea;
+  --color-income: #139a6c;
+  --color-income-text: #0a7350;
+  --color-income-soft: #e2f4ec;
+  --color-expense: #e2573f;
+  --color-expense-text: #b5381f;
+  --color-expense-soft: #fceae6;
 
   /* ---------- Feedback ---------- */
-  --color-danger: #bd3f36;        /* delete buttons, error messages */
-  --color-danger-hover: #a3362e;
-  --color-danger-text: #bd3f36;   /* error messages and icons written on a light surface */
-  --color-danger-soft: #fdecea;
+  --color-danger: #c23f2d;        /* delete buttons: white text 5.2:1 */
+  --color-danger-hover: #a83423;
+  --color-danger-text: #b5381f;   /* error messages and icons */
+  --color-danger-soft: #fceae6;
 
   /* ---------- Accents: icon tiles, tinted cards, illustrations ---------- */
   /* Same hues as the category colors; soft tints are mixed in CSS with color-mix(). */
@@ -69,7 +107,7 @@
   --accent-mint: var(--chart-6);
 
   /* ---------- Chart ---------- */
-  /* Default category colors, in this fixed order (checked for color blindness). */
+  /* The category presets, in this fixed order. These hex values are stored on the categories of the users: keep them. */
   --chart-1: #4a9fe3; /* sky */
   --chart-2: #f07d62; /* coral */
   --chart-3: #22ada3; /* teal */
@@ -78,38 +116,47 @@
   --chart-6: #3db383; /* mint */
   --chart-7: #5d7fd8; /* cornflower */
   --chart-8: #94c24f; /* lime */
-  /* Single-series bar charts: pastel capsules on a light track, one bar highlighted. */
-  --chart-bar: #8fc2ec;
-  --chart-bar-track: #eef4fa;
+  /* One series: quiet capsules on a track, the chosen one in the aurora */
+  --chart-bar: #a9c5d6;
+  --chart-bar-track: #eeeeea;
+  --chart-highlight-from: #1f9e86;
+  --chart-highlight-to: #1e6fa8;
   /* The free part of a progress bar: pale diagonal stripes */
-  --pattern-track: repeating-linear-gradient(135deg, #e3edf6 0 4px, #f2f7fb 4px 8px);
-  --chart-highlight: #2874b5;
-  --chart-grid: #e3eaf1;
-  --chart-axis: #617082;
+  --pattern-track: repeating-linear-gradient(135deg, #e6e6e0 0 4px, #f3f3ef 4px 8px);
+  --chart-highlight: #0b6a63;
+  --chart-grid: #e7e7e1;
+  --chart-axis: #5c6664;
 
   /* ---------- Typography ---------- */
-  --font-sans: 'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  /* Be Vietnam Pro has no Chinese, Japanese or Korean letters: those come from the system, picked by <html lang>. */
-  --font-sans-zh: 'Be Vietnam Pro', 'PingFang SC', 'Microsoft YaHei UI', 'Noto Sans SC', system-ui, sans-serif;
-  --font-sans-ja: 'Be Vietnam Pro', 'Hiragino Sans', 'Yu Gothic UI', 'Noto Sans JP', system-ui, sans-serif;
-  --font-sans-ko: 'Be Vietnam Pro', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', system-ui, sans-serif;
+  --font-sans: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* Only the big headlines of the landing page and the login */
+  --font-display: 'Newsreader', 'Iowan Old Style', Georgia, serif;
+  /* These fonts have no Chinese, Japanese or Korean letters: those come from the system, picked by <html lang>. */
+  --font-sans-zh: 'Manrope', 'PingFang SC', 'Microsoft YaHei UI', 'Noto Sans SC', system-ui, sans-serif;
+  --font-sans-ja: 'Manrope', 'Hiragino Sans', 'Yu Gothic UI', 'Noto Sans JP', system-ui, sans-serif;
+  --font-sans-ko: 'Manrope', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', system-ui, sans-serif;
 
   --font-size-xs: 0.75rem;   /* 12px: captions, table header, axis labels */
   --font-size-sm: 0.875rem;  /* 14px: body text, inputs, table rows */
   --font-size-md: 1rem;      /* 16px: card titles */
   --font-size-lg: 1.25rem;   /* 20px: section titles, card amounts */
-  --font-size-xl: 1.5rem;    /* 24px: page titles, stat card numbers */
-  --font-size-2xl: 2rem;     /* 32px: large headings */
-  --font-size-3xl: 2.25rem;  /* 36px: the hero number */
+  --font-size-xl: 1.625rem;  /* 26px: stat numbers */
+  --font-size-2xl: 2.125rem; /* 34px: page titles */
+  --font-size-3xl: 2.75rem;  /* 44px: large headings */
+  --font-size-hero: clamp(2.5rem, 1.7rem + 2.4vw, 3.75rem); /* the one number a page leads with */
+  --font-size-display: clamp(3rem, 1.6rem + 5vw, 6rem);     /* the headline of the landing page */
 
+  --font-weight-light: 300;
   --font-weight-regular: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
 
-  --line-height-tight: 1.2;
-  --line-height-normal: 1.5;
-  --letter-spacing-tight: -0.02em; /* big numbers and titles */
+  --line-height-tight: 1.15;
+  --line-height-normal: 1.55;
+  --letter-spacing-tight: -0.012em;   /* titles */
+  --letter-spacing-display: -0.03em;  /* big numbers and headlines */
+  --letter-spacing-label: 0.09em;     /* the small capitals of a label */
 
   /* ---------- Spacing (4px scale) ---------- */
   --space-1: 0.25rem; /* 4px */
@@ -119,103 +166,122 @@
   --space-5: 1.5rem;  /* 24px */
   --space-6: 2rem;    /* 32px */
   --space-7: 3rem;    /* 48px */
+  --space-8: 5rem;    /* 80px: between the sections of the landing page */
 
   /* ---------- Radius ---------- */
-  --radius-sm: 8px;     /* swatches, small badges */
-  --radius-md: 12px;    /* inputs, nav items, tiles, avatars, tooltips */
-  --radius-lg: 20px;    /* cards, tables, chart panels, dialogs */
-  --radius-xl: 24px;    /* the sidebar, page banner, drawer */
+  --radius-sm: 10px;    /* swatches, small badges */
+  --radius-md: 14px;    /* inputs, nav items, tiles, tooltips */
+  --radius-lg: 24px;    /* cards, chart panels, dialogs */
+  --radius-xl: 32px;    /* the sidebar, the hero, the drawer */
   --radius-full: 999px; /* buttons, pills, chips, chart capsules */
 
-  /* ---------- Shadows (navy tint, very soft) ---------- */
+  /* ---------- Shadows ---------- */
   /* A negative spread keeps a shadow tight under the element, without a grey halo. */
-  --shadow-sm: 0 1px 2px rgba(23, 37, 52, 0.04), 0 4px 12px -4px rgba(23, 37, 52, 0.06);
-  --shadow-md: 0 12px 28px -10px rgba(23, 37, 52, 0.18);
-  --shadow-lg: 0 24px 60px -20px rgba(23, 37, 52, 0.36); /* dialogs, floating cards */
-  /* A lit top edge, and a shadow in the button's own color */
-  --shadow-primary: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 8px 18px -8px rgba(40, 116, 181, 0.6);
-  --shadow-danger: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 8px 18px -8px rgba(189, 63, 54, 0.55);
+  --shadow-sm: 0 1px 1px rgba(16, 21, 23, 0.03), 0 14px 32px -24px rgba(16, 21, 23, 0.22);
+  --shadow-md: 0 22px 44px -26px rgba(16, 21, 23, 0.32);
+  --shadow-lg: 0 40px 90px -36px rgba(16, 21, 23, 0.45), 0 0 0 1px rgba(16, 21, 23, 0.04); /* dialogs, floating cards */
+  --shadow-primary: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 12px 24px -12px rgba(16, 21, 23, 0.55);
+  --shadow-danger: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 10px 22px -10px rgba(194, 63, 45, 0.6);
 
   /* ---------- Motion ---------- */
-  /* Every animation lasts 150–400ms and uses this curve. All of it stops with prefers-reduced-motion (global.css). */
+  /* Everything uses this curve. All of it stops with prefers-reduced-motion (global.css). */
   --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
   --ease-pop: cubic-bezier(0.34, 1.56, 0.64, 1); /* a small overshoot: check marks, a chosen day */
-  --duration-fast: 150ms;  /* hover, press */
-  --duration-base: 220ms;  /* the sliding menu pill, cards */
-  --duration-slow: 320ms;  /* the drawer */
+  --duration-fast: 160ms;  /* hover, press */
+  --duration-base: 240ms;  /* the sliding menu pill, cards */
+  --duration-slow: 380ms;  /* the drawer */
 
   /* ---------- Layout ---------- */
-  --sidebar-width: 248px;
+  --sidebar-width: 264px;
   --sidebar-width-collapsed: 72px; /* only the icons */
-  --frame-gap: 12px;      /* around the floating sidebar */
-  --topbar-height: 56px;  /* top bar with the menu button on narrow screens */
-  --content-max-width: 1200px;
-  --control-height: 40px; /* buttons and inputs share one height */
+  --frame-gap: 14px;      /* around the floating sidebar */
+  --topbar-height: 60px;  /* the bar at the top of the page */
+  --content-max-width: 1520px;
+  --control-height: 42px; /* buttons and inputs share one height */
 }
 
 /*
- * Dark theme. The script in index.html (and utils/theme.js) puts data-theme="dark" on <html> when the person chose
- * Dark, or chose System and the device is dark. Only the values that must change are listed here: the brand blue,
- * the hero gradient, the category/chart hues and every size stay as in :root.
- * Contrast (checked with the WCAG formula): text 13.3:1, secondary 8.5:1, muted 6.1:1 on the surface; blue, green,
- * coral and red text 6.9:1 or more on the surface; white on the brand blue 4.9:1.
+ * Noir: the dark theme, and the look of any part marked data-tone="noir" in both themes (the sidebar, the hero).
+ * The script in index.html (and utils/theme.js) puts data-theme="dark" on <html>. Screen only: paper always gets the ink colors above.
+ * Contrast (checked with the WCAG formula): text 14:1 or more, secondary 8.6:1, muted 5.7:1 on every surface;
+ * blue, green, coral and red text 7.7:1 or more; ink on the pearl button 15:1.
  */
-[data-theme='dark'] {
-  color-scheme: dark;
+@media screen {
+  [data-theme='dark'],
+  [data-tone='noir'] {
+    color-scheme: dark;
 
-  --color-primary-text: #7fbdf0;
-  --color-primary-soft: #1d3a56;
+    --color-primary: #f2f5f4;
+    --color-primary-hover: #ffffff;
+    --color-primary-text: #a4dcf7;  /* ice */
+    --color-primary-soft: #16282f;
+    --color-on-primary: #0a0e10;
+    --gradient-button: linear-gradient(180deg, #ffffff 0%, #dfe7e5 100%);
+    --gradient-button-hover: linear-gradient(180deg, #ffffff 0%, #eef3f1 100%);
 
-  --gradient-soft: linear-gradient(135deg, #1a3550 0%, #1b3d3a 100%);
-  --gradient-banner: linear-gradient(115deg, #1a3552 0%, #1a3b40 100%);
+    --gradient-soft: linear-gradient(135deg, #14262c 0%, #12281f 100%);
+    --ambient-1: rgba(47, 199, 156, 0.075);
+    --ambient-2: rgba(79, 159, 240, 0.075);
+    --grain-opacity: 0.06;
 
-  --color-bg: #0f1923;
-  --color-surface: #172431;
-  --color-surface-muted: #1e2d3c;
-  --color-skeleton: #243546;
-  --color-overlay: rgba(4, 9, 14, 0.62);
+    --color-bg: #07090b;
+    --color-surface: #0f1316;
+    --color-surface-raised: #151a1e;
+    --color-surface-muted: #171c20;
+    --color-surface-hover: #1e252a;
+    --color-input: #0b0e11;
+    --color-skeleton: #1b2125;
+    --color-overlay: rgba(3, 5, 6, 0.72);
+    --sheen-card: linear-gradient(180deg, rgba(255, 255, 255, 0.028) 0%, rgba(255, 255, 255, 0) 42%);
+    --spotlight: rgba(255, 255, 255, 0.055);
 
-  --color-text: #e6edf4;
-  --color-text-secondary: #b3c0ce;
-  --color-text-muted: #93a3b5;
+    --color-text: #f4f6f5;
+    --color-text-secondary: #bac3c4;
+    --color-text-muted: #949fa1;
 
-  --color-border: #26384a;
-  --color-border-strong: #4b6279; /* input borders: 3:1 or more on the surface */
-  --color-focus-ring: rgba(110, 176, 235, 0.4);
+    --color-border: #20272c;
+    --color-border-strong: #5e6a72; /* the edge of a field: 3:1 or more on the surfaces it sits on */
+    --color-focus-ring: rgba(164, 220, 247, 0.32);
 
-  --color-income: #3fc79a;
-  --color-income-text: #5fd6ab;
-  --color-income-soft: #163a2f;
-  --color-expense: #f2857a;
-  --color-expense-text: #ff9d93;
-  --color-expense-soft: #3d2124;
+    --color-income: #4fd1a1;
+    --color-income-text: #74e0b8;
+    --color-income-soft: #0f2a21;
+    --color-expense: #ff8a78;
+    --color-expense-text: #ffa494;
+    --color-expense-soft: #2e1714;
 
-  /* The red button keeps its fill (white text 5.4:1); red written as text gets a lighter red */
-  --color-danger-text: #ff8a80;
-  --color-danger-soft: #3d2124;
+    /* The red button keeps its fill; red written as text gets a lighter red */
+    --color-danger-text: #ff9d8c;
+    --color-danger-soft: #2e1714;
 
-  --chart-bar: #4a86bb;
-  --chart-bar-track: #1e3042;
-  --pattern-track: repeating-linear-gradient(135deg, #243a50 0 4px, #1c2e40 4px 8px);
-  --chart-highlight: #6db3ec;
-  --chart-grid: #2a3d50;
-  --chart-axis: #93a3b5;
+    --chart-bar: #33424b;
+    --chart-bar-track: #171d21;
+    --chart-highlight-from: #8ff0cd;
+    --chart-highlight-to: #7cc4f5;
+    --pattern-track: repeating-linear-gradient(135deg, #1f272c 0 4px, #161b1f 4px 8px);
+    --chart-highlight: #a4dcf7;
+    --chart-grid: #1d2428;
+    --chart-axis: #949fa1;
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 12px -4px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 12px 28px -10px rgba(0, 0, 0, 0.6);
-  --shadow-lg: 0 24px 60px -20px rgba(0, 0, 0, 0.7);
-  --shadow-primary: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 8px 18px -8px rgba(40, 116, 181, 0.7);
-  --shadow-danger: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 8px 18px -8px rgba(189, 63, 54, 0.7);
+    --shadow-sm: inset 0 1px 0 rgba(255, 255, 255, 0.045), 0 1px 2px rgba(0, 0, 0, 0.5), 0 18px 40px -28px rgba(0, 0, 0, 0.9);
+    --shadow-md: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 24px 48px -24px rgba(0, 0, 0, 0.85);
+    --shadow-lg: inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 40px 90px -30px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    --shadow-primary: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 10px 30px -12px rgba(190, 240, 225, 0.42);
+    --shadow-danger: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 10px 26px -12px rgba(194, 63, 45, 0.7);
+  }
 }
 
 :lang(zh-CN) {
   --font-sans: var(--font-sans-zh);
+  --font-display: var(--font-sans-zh);
 }
 
 :lang(ja) {
   --font-sans: var(--font-sans-ja);
+  --font-display: var(--font-sans-ja);
 }
 
 :lang(ko) {
   --font-sans: var(--font-sans-ko);
+  --font-display: var(--font-sans-ko);
 }

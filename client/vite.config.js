@@ -29,8 +29,8 @@ export default defineConfig(({ mode }) => {
           name: 'Ledgerling',
           short_name: 'Ledgerling',
           description: 'Personal expense tracker',
-          theme_color: '#2874b5',
-          background_color: '#f4f7fa',
+          theme_color: '#07090b',
+          background_color: '#07090b',
           display: 'standalone',
           start_url: '/',
           icons: [

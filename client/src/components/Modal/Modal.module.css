@@ -10,6 +10,8 @@
   padding: var(--space-4);
   border: none;
   background: var(--color-overlay);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+  backdrop-filter: blur(10px) saturate(120%);
   color: var(--color-text);
   overflow-y: auto;
 }
@@ -25,10 +27,11 @@
   flex-direction: column;
   gap: var(--space-4);
   width: 100%;
-  max-width: 500px;
-  padding: var(--space-5);
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
+  max-width: 520px;
+  padding: var(--space-5) var(--space-6) var(--space-6);
+  background: var(--sheen-card), var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow-lg);
 }
 
@@ -44,6 +47,13 @@
 }
 
 .title {
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
+}
+
+@media (max-width: 560px) {
+  .panel {
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+  }
 }

@@ -5,9 +5,10 @@
   gap: var(--space-3);
   min-width: 0;
   padding: var(--space-5);
-  border: 1px solid color-mix(in srgb, var(--tone) 22%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, var(--tone) 20%, var(--color-border));
   border-radius: var(--radius-lg);
-  background: color-mix(in srgb, var(--tone) 10%, var(--color-surface));
+  background: linear-gradient(160deg, color-mix(in srgb, var(--tone) 12%, var(--color-surface)) 0%, var(--color-surface) 70%);
+  box-shadow: var(--shadow-sm);
   transition: transform var(--duration-base) var(--ease-out), box-shadow var(--duration-base) var(--ease-out);
 }
 
@@ -46,9 +47,8 @@
   width: 40px;
   height: 40px;
   border-radius: var(--radius-md);
-  background: var(--color-surface);
-  color: color-mix(in srgb, var(--tone) 62%, var(--color-text));
-  box-shadow: var(--shadow-sm);
+  background: color-mix(in srgb, var(--tone) 18%, var(--color-surface));
+  color: color-mix(in srgb, var(--tone) 70%, var(--color-text));
 }
 
 .balance .tile {
@@ -77,10 +77,9 @@
 .value {
   color: var(--money);
   font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-medium);
   line-height: var(--line-height-tight);
-  letter-spacing: var(--letter-spacing-tight);
-  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--letter-spacing-display);
   white-space: nowrap;
 }
 

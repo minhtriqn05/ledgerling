@@ -6,8 +6,10 @@ import { getCategories } from '../api/categories.js';
 import { getBudgets, copyBudgets, deleteBudget } from '../api/budgets.js';
 import { getErrorMessage } from '../api/axios.js';
 import { useToast } from '../context/ToastContext.jsx';
+import { formatVnd } from '../utils/format.js';
 import { currentMonth, formatMonth, shiftMonth } from '../utils/vnDate.js';
 import PageHeader from '../components/PageHeader/PageHeader.jsx';
+import { HeroStat, HeroStats } from '../components/PageHeader/HeroStat.jsx';
 import MonthPicker from '../components/MonthPicker/MonthPicker.jsx';
 import Button from '../components/Button/Button.jsx';
 import EmptyState from '../components/EmptyState/EmptyState.jsx';
@@ -149,6 +151,8 @@ export default function BudgetsPage() {
   // Only expense categories without a budget in this month can get a new one.
   const budgeted = new Set(budgets.map((b) => b.category._id));
   const availableCategories = categories.filter((c) => c.type === 'expense' && !budgeted.has(c._id));
+  const totalLimit = budgets.reduce((sum, b) => sum + b.amount, 0);
+  const totalSpent = budgets.reduce((sum, b) => sum + b.spent, 0);
 
   // The page shows one of four states: loading, error, empty or the grid.
   function renderContent() {
@@ -158,7 +162,7 @@ export default function BudgetsPage() {
     if (budgets.length === 0) {
       return (
         <EmptyState
-          icon="wallet"
+          icon="gauge"
           title={t('budgets.noneInMonth', { month: formatMonth(month) })}
           text={t('budgets.emptyText')}
         >
@@ -188,8 +192,23 @@ export default function BudgetsPage() {
   return (
     <div className={styles.page}>
       <PageHeader
+        icon="gauge"
         title={t('nav.budgets')}
         subtitle={ready ? `${formatMonth(month)} · ${t('budgets.count', { count: budgets.length })}` : formatMonth(month)}
+        stats={
+          ready && budgets.length > 0 ? (
+            <HeroStats label={t('common.totalsFor', { period: formatMonth(month) })}>
+              <HeroStat icon="gauge" label={t('budgets.totalLimit')} value={formatVnd(totalLimit)} />
+              <HeroStat tone="expense" icon="arrowUpRight" label={t('budgets.totalSpent')} value={formatVnd(totalSpent)} />
+              <HeroStat
+                tone={totalLimit < totalSpent ? 'expense' : 'income'}
+                icon={totalLimit < totalSpent ? 'alert' : 'check'}
+                label={t('budgets.totalLeft')}
+                value={formatVnd(totalLimit - totalSpent)}
+              />
+            </HeroStats>
+          ) : null
+        }
       >
         <MonthPicker month={month} onChange={changeMonth} />
         <Button needsNetwork icon="plus" onClick={() => setDialog({ budget: null })} disabled={!ready}>

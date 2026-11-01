@@ -1,6 +1,6 @@
 # Ledgerling
 
-A personal expense tracker: income and expenses, budgets, recurring transactions, savings goals, reports, tags, notifications, real-time sync, an admin page and a PWA that works offline.
+A personal expense tracker: income and expenses, wallets and transfers, budgets, recurring transactions, savings goals, reports, tags, notifications, real-time sync, an admin page and a PWA that works offline.
 
 **Course project** of the course *Phát triển ứng dụng web và cơ sở dữ liệu* (Web application and database development),
 class **CSBU109.R11.KHBC**, UIT (University of Information Technology, VNU-HCM). Solo project: backend and frontend by one student.

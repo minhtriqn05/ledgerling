@@ -6,7 +6,7 @@
   flex-shrink: 0;
   width: var(--control-height);
   height: var(--control-height);
-  border: 1px solid var(--color-border-strong);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-full);
   background: var(--color-surface);
   color: var(--color-text);
@@ -16,6 +16,7 @@
 
 .bell:hover,
 .bellOpen {
+  border-color: var(--color-border-strong);
   background: var(--color-surface-muted);
 }
 
@@ -32,12 +33,12 @@
    darker coral (--color-expense-text). */
 .badge {
   position: absolute;
-  top: -5px;
-  right: -5px;
+  top: -4px;
+  right: -4px;
   min-width: 20px;
   height: 20px;
   padding: 0 5px;
-  border: 2px solid var(--color-surface);
+  border: 2px solid var(--color-bg);
   border-radius: var(--radius-full);
   background: var(--color-expense-text);
   color: var(--color-on-primary);

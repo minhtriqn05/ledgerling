@@ -56,8 +56,7 @@ function SelectAll({ label, checked, indeterminate, onChange }) {
   );
 }
 
-// The month's transactions: a table on wide screens, a simple list on phones (≤640px, see the css).
-// Design: TransactionsPreview in pages/styleGuide.
+// The month's transactions: a table of rounded rows on wide screens, a simple list on phones (≤640px, see the css).
 // A click on a row (or a tap on the phone list) calls onOpen(transaction), which opens the details drawer.
 // Without onOpen (old callers) the row opens the edit dialog.
 // onTagClick(tag) is called when a tag chip is clicked.
@@ -90,9 +89,9 @@ export default function TransactionList({
           <thead>
             <tr>
               {selectable && <th className={styles.checkCell}>{selectAll}</th>}
-              <th>{t('common.date')}</th>
-              <th>{t('common.category')}</th>
               <th>{t('common.note')}</th>
+              <th>{t('common.category')}</th>
+              <th>{t('common.date')}</th>
               <th>{t('common.tags')}</th>
               <th className={styles.alignRight}>{t('common.amount')}</th>
               <th className={styles.alignRight}>
@@ -124,25 +123,28 @@ export default function TransactionList({
                     />
                   </td>
                 )}
-                <td className={styles.muted}>{formatDateDMY(item.date)}</td>
+                {/* The note is a real button too, so the details also open from the keyboard */}
+                <td className={styles.note}>
+                  <span className={styles.noteCell}>
+                    <CategoryMark category={item.category} size="lg" />
+                    <button
+                      type="button"
+                      className={styles.noteButton}
+                      aria-label={t('transactions.openDetails', { name: item.note || item.category.name })}
+                      onClick={() => open(item)}
+                    >
+                      {item.note || <span className={styles.muted}>—</span>}
+                    </button>
+                  </span>
+                </td>
                 <td>
                   <span className={styles.chip} style={{ '--tone': item.category.color }}>
-                    <CategoryMark category={item.category} />
+                    <i className={styles.chipDot} aria-hidden="true" />
                     {item.category.name}
                   </span>
                   {item.recurringRuleId && <RecurringLabel />}
                 </td>
-                {/* The note is a real button too, so the details also open from the keyboard */}
-                <td className={styles.note}>
-                  <button
-                    type="button"
-                    className={styles.noteButton}
-                    aria-label={t('transactions.openDetails', { name: item.note || item.category.name })}
-                    onClick={() => open(item)}
-                  >
-                    {item.note || <span className={styles.muted}>—</span>}
-                  </button>
-                </td>
+                <td className={styles.muted}>{formatDateDMY(item.date)}</td>
                 <td>
                   <span className={styles.tags}>
                     <TagChips tags={item.tags} onTagClick={onTagClick} />

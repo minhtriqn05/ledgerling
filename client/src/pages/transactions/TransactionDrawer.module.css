@@ -22,10 +22,9 @@
 .amount {
   color: var(--money);
   font-size: var(--font-size-2xl);
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-medium);
   line-height: var(--line-height-tight);
-  letter-spacing: var(--letter-spacing-tight);
-  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--letter-spacing-display);
   overflow-wrap: anywhere;
 }
 

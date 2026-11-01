@@ -4,8 +4,9 @@
   display: inline-grid;
   place-items: center;
   flex-shrink: 0;
-  background: color-mix(in srgb, var(--tone) 16%, var(--color-surface));
-  color: color-mix(in srgb, var(--tone) 62%, var(--color-text));
+  background: color-mix(in srgb, var(--tone) 17%, var(--color-surface));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone) 20%, transparent);
+  color: color-mix(in srgb, var(--tone) 70%, var(--color-text));
   line-height: 1;
 }
 
@@ -19,13 +20,13 @@
 .md {
   width: 32px;
   height: 32px;
-  border-radius: var(--radius-sm);
+  border-radius: 11px;
   font-size: var(--font-size-md);
 }
 
 .lg {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: var(--radius-md);
   font-size: var(--font-size-lg);
 }

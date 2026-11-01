@@ -4,7 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { getGoals } from '../api/goals.js';
 import { getErrorMessage } from '../api/axios.js';
 import { useToast } from '../context/ToastContext.jsx';
+import { formatVnd } from '../utils/format.js';
 import PageHeader from '../components/PageHeader/PageHeader.jsx';
+import { HeroStat, HeroStats } from '../components/PageHeader/HeroStat.jsx';
 import Button from '../components/Button/Button.jsx';
 import EmptyState from '../components/EmptyState/EmptyState.jsx';
 import LoadingState from '../components/LoadingState/LoadingState.jsx';
@@ -89,6 +91,8 @@ export default function GoalsPage() {
 
   const ready = !loading && !loadError;
   const completedCount = goals.filter((g) => g.completed).length;
+  const totalSaved = goals.reduce((sum, g) => sum + g.savedAmount, 0);
+  const totalTarget = goals.reduce((sum, g) => sum + g.targetAmount, 0);
 
   // The page shows one of four states: loading, error, empty or the grid.
   function renderContent() {
@@ -130,11 +134,20 @@ export default function GoalsPage() {
   return (
     <div className={styles.page}>
       <PageHeader
+        icon="target"
         title={t('nav.goals')}
         subtitle={
           ready
             ? `${t('goals.count', { count: goals.length })} · ${t('goals.completedCount', { count: completedCount })}`
             : undefined
+        }
+        stats={
+          ready && goals.length > 0 ? (
+            <HeroStats label={t('nav.goals')}>
+              <HeroStat tone="income" icon="sprout" label={t('goals.totalSaved')} value={formatVnd(totalSaved)} />
+              <HeroStat icon="target" label={t('goals.totalTarget')} value={formatVnd(totalTarget)} />
+            </HeroStats>
+          ) : null
         }
       >
         <Button needsNetwork icon="plus" onClick={() => setDialog({ form: null })} disabled={!ready}>

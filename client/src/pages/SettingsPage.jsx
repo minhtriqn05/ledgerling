@@ -62,6 +62,7 @@ export default function SettingsPage() {
   return (
     <div className={styles.page}>
       <PageHeader
+        icon="settings"
         title={t('nav.settings')}
         subtitle={t('settings.subtitle')}
         documentTitle={section ? t(settingsLabelKey(section.id)) : undefined}

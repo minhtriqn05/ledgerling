@@ -61,3 +61,8 @@ export function toDateInput(date) {
 export function fromDateInput(day) {
   return `${day}T12:00:00+07:00`;
 }
+
+// The hour of the day in Vietnam (0-23), whatever the clock of the device says. `now` is only given by tests.
+export function vietnamHour(now = new Date()) {
+  return new Date(now.getTime() + 7 * 60 * 60 * 1000).getUTCHours();
+}

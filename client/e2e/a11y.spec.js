@@ -63,6 +63,8 @@ test.describe('signed-in pages (demo account)', () => {
     { name: 'Dashboard', path: '/', heading: 'Dashboard' },
     { name: 'Transactions', path: '/transactions', heading: 'Transactions' },
     { name: 'Budgets', path: '/budgets', heading: 'Budgets' },
+    { name: 'Wallets', path: '/wallets', heading: 'Wallets' },
+    { name: 'Goals', path: '/goals', heading: 'Goals' },
     { name: 'Reports', path: '/reports', heading: 'Reports' },
     { name: 'Settings', path: '/settings', heading: 'Settings' },
     { name: 'Settings > Appearance', path: '/settings/appearance', heading: 'Settings' },
@@ -73,6 +75,10 @@ test.describe('signed-in pages (demo account)', () => {
       await signInAsDemo(page);
       await page.goto(path);
       await expect(page.getByRole('heading', { name: heading, level: 1 })).toBeVisible();
+      await expectNoSeriousViolations(page);
+
+      // The same page in Porcelain. Only this browser tab changes: the demo account is shared.
+      await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'light'));
       await expectNoSeriousViolations(page);
     });
   }

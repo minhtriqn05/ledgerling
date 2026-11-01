@@ -3,6 +3,7 @@ import Category from "../models/Category.js";
 import { httpError } from "../utils/httpError.js";
 import { buildCsv } from "../utils/csv.js";
 import { notifyBudgetThresholds } from "./notificationService.js";
+import { ensureDefaultWallet, findOwnedWallet, findUsableWallet } from "./walletService.js";
 import {
   currentMonth,
   dayStart,
@@ -13,6 +14,21 @@ import {
 
 // Shows the category's name and color instead of just its id
 const CATEGORY_FIELDS = "name color icon";
+// The same for the wallet
+const WALLET_FIELDS = "name type color archived";
+const RELATIONS = [
+  { path: "categoryId", select: CATEGORY_FIELDS },
+  { path: "walletId", select: WALLET_FIELDS },
+];
+
+// A transaction saved before wallets existed has no walletId and counts in the default wallet, so the answer says that too.
+// Only the answer changes, the document stays as it is. Transactions that have a wallet are returned untouched.
+async function withDefaultWallet(userId, transactions) {
+  if (transactions.every((t) => t.walletId)) return transactions;
+  const { _id, name, type, color, archived } = await ensureDefaultWallet(userId);
+  const wallet = { _id, name, type, color, archived };
+  return transactions.map((t) => (t.walletId ? t : { ...t.toJSON(), wallet }));
+}
 
 // The category must belong to the same user, otherwise it looks like it does not exist (404)
 async function findOwnedCategory(userId, categoryId) {
@@ -48,8 +64,13 @@ function dateFilter({ month, from, to }) {
 }
 
 // The MongoDB filter shared by the list and the export. userId always comes from the token.
-function buildFilter(userId, { type, categoryId, q, tag, ...range }) {
+// A wallet of another user is a 404. The default wallet also has the transactions without a walletId ($in with null finds them).
+async function buildFilter(userId, { type, categoryId, walletId, q, tag, ...range }) {
   const filter = { userId, date: dateFilter(range) };
+  if (walletId) {
+    const wallet = await findOwnedWallet(userId, walletId);
+    filter.walletId = wallet.isDefault ? { $in: [wallet._id, null] } : wallet._id;
+  }
   if (type) filter.type = type;
   if (categoryId) filter.categoryId = categoryId;
   if (tag) filter.tags = tag; // matches when the tag is one of the transaction's tags
@@ -60,7 +81,7 @@ function buildFilter(userId, { type, categoryId, q, tag, ...range }) {
 // query = req.listQuery, already checked and with defaults (see validateListTransactions)
 export async function listTransactions(userId, query) {
   const { sort, page, limit } = query;
-  const filter = buildFilter(userId, query);
+  const filter = await buildFilter(userId, query);
 
   // One query for the page, one for the total; they run at the same time
   const [items, total] = await Promise.all([
@@ -68,11 +89,11 @@ export async function listTransactions(userId, query) {
       .sort(SORTS[sort])
       .skip((page - 1) * limit)
       .limit(limit)
-      .populate("categoryId", CATEGORY_FIELDS),
+      .populate(RELATIONS),
     Transaction.countDocuments(filter),
   ]);
 
-  return { items, meta: { page, limit, total, totalPages: Math.ceil(total / limit) } };
+  return { items: await withDefaultWallet(userId, items), meta: { page, limit, total, totalPages: Math.ceil(total / limit) } };
 }
 
 // A file bigger than this is cut off (the newest / first rows of the chosen sort are kept)
@@ -82,7 +103,7 @@ const CSV_HEADER = ["Date", "Type", "Category", "Amount", "Currency", "Note", "T
 
 // Same filters and sort as the list, but no paging. Returns { filename, csv }.
 export async function exportTransactions(userId, query) {
-  const transactions = await Transaction.find(buildFilter(userId, query))
+  const transactions = await Transaction.find(await buildFilter(userId, query))
     .sort(SORTS[query.sort])
     .limit(EXPORT_MAX_ROWS)
     .populate("categoryId", CATEGORY_FIELDS)
@@ -109,25 +130,25 @@ export async function exportTransactions(userId, query) {
 
 // Filtering by userId as well means another user's transaction looks like it does not exist (404)
 async function findOwned(userId, id) {
-  const transaction = await Transaction.findOne({ _id: id, userId }).populate(
-    "categoryId",
-    CATEGORY_FIELDS
-  );
+  const transaction = await Transaction.findOne({ _id: id, userId }).populate(RELATIONS);
   if (!transaction) throw httpError(404, "Transaction not found", "TRANSACTION_NOT_FOUND");
   return transaction;
 }
 
 export async function getTransaction(userId, id) {
-  return findOwned(userId, id);
+  const [transaction] = await withDefaultWallet(userId, [await findOwned(userId, id)]);
+  return transaction;
 }
 
 export async function createTransaction(userId, data) {
   const category = await findOwnedCategory(userId, data.categoryId);
+  // Every new transaction gets a wallet: the chosen one, or the default wallet when the request names none
+  const wallet = data.walletId ? await findUsableWallet(userId, data.walletId) : await ensureDefaultWallet(userId);
 
   // type is copied from the category so it can never disagree with it
-  const transaction = await Transaction.create({ ...data, userId, type: category.type });
+  const transaction = await Transaction.create({ ...data, userId, type: category.type, walletId: wallet._id });
   await notifyBudgetThresholds(userId, transaction);
-  return transaction.populate("categoryId", CATEGORY_FIELDS);
+  return transaction.populate(RELATIONS);
 }
 
 export async function updateTransaction(userId, id, changes) {
@@ -137,12 +158,19 @@ export async function updateTransaction(userId, id, changes) {
     const category = await findOwnedCategory(userId, changes.categoryId);
     transaction.type = category.type;
   }
+  // Moving to another wallet needs one that takes new money. Keeping an archived wallet is fine, so the
+  // note of an old transaction can still be edited.
+  if (changes.walletId !== undefined && changes.walletId !== String(transaction.walletId?._id)) {
+    await findUsableWallet(userId, changes.walletId);
+  }
 
   transaction.set(changes);
   await transaction.save();
   await notifyBudgetThresholds(userId, transaction);
-  // populate again: the category may have changed
-  return transaction.populate("categoryId", CATEGORY_FIELDS);
+  // populate again: the category or the wallet may have changed
+  await transaction.populate(RELATIONS);
+  const [updated] = await withDefaultWallet(userId, [transaction]);
+  return updated;
 }
 
 export async function deleteTransaction(userId, id) {
@@ -158,6 +186,8 @@ export async function importTransactions(userId, rows, errors) {
   const categories = await Category.find({ userId }).select("name type").lean();
   const byNameAndType = new Map(categories.map((c) => [`${c.type}:${c.name.toLowerCase()}`, c]));
 
+  // A CSV file does not name a wallet, so the rows go to the default wallet
+  const wallet = rows.length > 0 ? await ensureDefaultWallet(userId) : null;
   const docs = [];
   const allErrors = [...errors];
   for (const { row, categoryName, ...data } of rows) {
@@ -171,7 +201,7 @@ export async function importTransactions(userId, rows, errors) {
       });
       continue;
     }
-    docs.push({ ...data, userId, categoryId: category._id });
+    docs.push({ ...data, userId, categoryId: category._id, walletId: wallet._id });
   }
 
   if (docs.length > 0) await Transaction.insertMany(docs);

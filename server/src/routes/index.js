@@ -10,6 +10,8 @@ import goalRoutes from "./goalRoutes.js";
 import reportRoutes from "./reportRoutes.js";
 import insightRoutes from "./insightRoutes.js";
 import templateRoutes from "./templateRoutes.js";
+import walletRoutes from "./walletRoutes.js";
+import transferRoutes from "./transferRoutes.js";
 import notificationRoutes from "./notificationRoutes.js";
 import userRoutes from "./userRoutes.js";
 import adminRoutes from "./adminRoutes.js";
@@ -29,6 +31,9 @@ router.use("/goals", liveChanges("goals"), goalRoutes);
 router.use("/reports", reportRoutes);
 router.use("/insights", insightRoutes);
 router.use("/templates", liveChanges("templates"), templateRoutes);
+router.use("/wallets", liveChanges("wallets"), walletRoutes);
+// A transfer only changes wallet balances, so the other devices hear "wallets"
+router.use("/transfers", liveChanges("wallets"), transferRoutes);
 router.use("/notifications", liveChanges("notifications"), notificationRoutes);
 router.use("/users", userRoutes);
 router.use("/admin", adminRoutes);

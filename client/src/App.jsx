@@ -20,6 +20,7 @@ const CategoriesPage = lazy(() => import('./pages/CategoriesPage.jsx'));
 const BudgetsPage = lazy(() => import('./pages/BudgetsPage.jsx'));
 const RecurringPage = lazy(() => import('./pages/RecurringPage.jsx'));
 const GoalsPage = lazy(() => import('./pages/GoalsPage.jsx'));
+const WalletsPage = lazy(() => import('./pages/WalletsPage.jsx'));
 const ReportsPage = lazy(() => import('./pages/ReportsPage.jsx'));
 const NotificationsPage = lazy(() => import('./pages/NotificationsPage.jsx'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage.jsx'));
@@ -67,6 +68,7 @@ export default function App() {
               <Route path="/budgets" element={<BudgetsPage />} />
               <Route path="/recurring" element={<RecurringPage />} />
               <Route path="/goals" element={<GoalsPage />} />
+              <Route path="/wallets" element={<WalletsPage />} />
               <Route path="/reports" element={<ReportsPage />} />
               <Route path="/notifications" element={<NotificationsPage />} />
               {/* /settings/profile, /settings/security...: the page reads the section from the address */}

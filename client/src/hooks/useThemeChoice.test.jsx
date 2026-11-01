@@ -13,8 +13,10 @@ vi.mock('../context/ToastContext.jsx', () => ({ useToast: () => toast }));
 
 const setup = () => renderHook(() => useThemeChoice(), { wrapper: ThemeProvider });
 
+// These tests start from the choice "system", on a light test browser (see src/test/setup.js)
 beforeEach(() => {
   localStorage.clear();
+  localStorage.setItem('ledgerling.theme', 'system');
   document.documentElement.removeAttribute('data-theme');
   updatePreferences.mockReset();
   updateUser.mockReset();

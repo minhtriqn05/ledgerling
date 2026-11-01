@@ -17,6 +17,7 @@ import QuickAddButton from '../QuickAdd/QuickAddButton.jsx';
 import QuickAddDialog from '../QuickAdd/QuickAddDialog.jsx';
 import ShortcutsDialog from '../QuickAdd/ShortcutsDialog.jsx';
 import SessionExpiredDialog from '../SessionExpiredDialog/SessionExpiredDialog.jsx';
+import ThemeToggle from '../ThemeToggle/ThemeToggle.jsx';
 import Tour from '../Tour/Tour.jsx';
 import UserMenu from '../UserMenu/UserMenu.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
@@ -25,14 +26,16 @@ import { NotificationsProvider } from '../../context/NotificationsContext.jsx';
 import { SocketProvider } from '../../context/SocketContext.jsx';
 import { useCommandKey, useHotkeys } from '../../hooks/useHotkeys.js';
 import { NARROW_SCREEN, useMediaQuery } from '../../hooks/useMediaQuery.js';
+import { useSpotlight } from '../../hooks/useSpotlight.js';
 import { useStoredBoolean } from '../../hooks/useStoredBoolean.js';
 import { useTour } from '../../hooks/useTour.js';
-import { navItems } from '../../config/navItems.js';
+import { navGroups, navItems } from '../../config/navItems.js';
 import styles from './AppLayout.module.css';
 
 const SIDEBAR_KEY = 'ledgerling.sidebarCollapsed';
 
-// Shared layout for signed-in pages: a sidebar on wide screens, a top bar with a menu button below 768px.
+// Shared layout for signed-in pages. On wide screens: a dark floating sidebar on the left, and a top bar over the page with
+// the breadcrumb, the search, the theme and the bell. Below 768px: one floating bar with the logo, the bell and a menu button.
 // The page itself is rendered by <Outlet />. The menu items come from config/navItems.js.
 // It also holds what every signed-in page shares: the "+" button / N key (Quick add), the shortcuts / and ? and [,
 // the command palette (Ctrl+K), the guided tour and the "Session expired" dialog.
@@ -74,6 +77,8 @@ function Layout() {
   const navRef = useRef(null);
   // The sliding pill behind the open page's link. Measured from the link, so it fits any language and screen.
   const [indicator, setIndicator] = useState(null);
+
+  useSpotlight();
 
   useLayoutEffect(() => {
     function measure() {
@@ -141,75 +146,89 @@ function Layout() {
     if (narrow) setMenuOpen(false);
   }
 
+  function openPalette() {
+    setMenuOpen(false);
+    setPaletteOpen(true);
+  }
+
+  const visibleItems = navItems.filter((item) => !item.adminOnly || user?.role === 'admin');
+
+  // Opens the command palette; it looks like a quiet search box. In the top bar on a wide screen, in the menu on a phone.
+  const searchButton = (
+    <button type="button" className={styles.searchButton} onClick={openPalette}>
+      <Icon name="search" size={18} />
+      <span className={styles.searchLabel}>{t('commandPalette.open')}</span>
+      <kbd className={styles.searchKey} aria-hidden="true">
+        {/Mac|iPhone|iPad/.test(navigator.platform) ? '⌘K' : 'Ctrl K'}
+      </kbd>
+    </button>
+  );
+
   return (
     <div className={`${styles.layout} ${collapsed ? styles.collapsed : ''}`} data-sidebar={collapsed ? 'collapsed' : 'open'}>
-      <aside className={styles.sidebar} ref={sidebarRef}>
+      <aside className={styles.sidebar} ref={sidebarRef} data-tone="noir">
         <div className={styles.bar}>
           <div className={styles.brand}>
             {/* The way back to the landing page, also for somebody who is signed in */}
             <Link to="/welcome" className={styles.logoLink} title={t('nav.toWelcome')} data-testid="sidebar-logo">
-              <Logo size={32} showName={!collapsed} />
+              <Logo size={34} showName={!collapsed} />
             </Link>
             <LiveStatus />
           </div>
 
-          <div className={styles.barActions}>
-            <NotificationBell />
-            {/* The top bar of a phone: the face of the account, a shortcut to the profile */}
-            {user && (
-              <NavLink to="/settings" className={styles.barAvatar} aria-label={t('avatar.openProfile')} data-testid="bar-avatar">
-                <Avatar name={user.name} avatar={user.avatar} />
-              </NavLink>
-            )}
-
-            {/* Only visible on narrow screens */}
-            <button
-              type="button"
-              className={styles.menuButton}
-              aria-label={menuOpen ? t('nav.closeMenu') : t('nav.openMenu')}
-              aria-expanded={menuOpen}
-              aria-controls="main-menu"
-              onClick={() => setMenuOpen((open) => !open)}
-            >
-              <Icon name={menuOpen ? 'x' : 'menu'} />
-            </button>
-          </div>
+          {/* The top bar of a phone: the bell, the face of the account and the menu button */}
+          {narrow && (
+            <div className={styles.barActions}>
+              <NotificationBell />
+              {user && (
+                <NavLink to="/settings" className={styles.barAvatar} aria-label={t('avatar.openProfile')} data-testid="bar-avatar">
+                  <Avatar name={user.name} avatar={user.avatar} />
+                </NavLink>
+              )}
+              <button
+                type="button"
+                className={styles.menuButton}
+                aria-label={menuOpen ? t('nav.closeMenu') : t('nav.openMenu')}
+                aria-expanded={menuOpen}
+                aria-controls="main-menu"
+                onClick={() => setMenuOpen((open) => !open)}
+              >
+                <Icon name={menuOpen ? 'x' : 'menu'} />
+              </button>
+            </div>
+          )}
         </div>
 
         {/* A column inside the sidebar on wide screens, a dropdown panel on narrow ones */}
         <div id="main-menu" className={`${styles.panel} ${menuOpen ? styles.panelOpen : ''}`}>
-          <button
-            type="button"
-            className={`${styles.navItem} ${styles.searchButton}`}
-            data-tooltip={t('commandPalette.open')}
-            onClick={() => {
-              setMenuOpen(false);
-              setPaletteOpen(true);
-            }}
-          >
-            <Icon name="search" />
-            <span className={styles.navLabel}>{t('commandPalette.open')}</span>
-            <kbd className={styles.searchKey} aria-hidden="true">
-              {/Mac|iPhone|iPad/.test(navigator.platform) ? '⌘K' : 'Ctrl K'}
-            </kbd>
-          </button>
+          {narrow && searchButton}
 
           <nav className={styles.nav} ref={navRef} aria-label={t('nav.main')}>
             {indicator && <span className={styles.indicator} style={{ top: indicator.top, height: indicator.height }} aria-hidden="true" />}
-            {navItems.filter((item) => !item.adminOnly || user?.role === 'admin').map((item) => (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                end={item.path === '/'}
-                className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navActive : ''}`}
-                data-tooltip={t(item.labelKey)}
-                data-tour={`nav:${item.path}`}
-                onClick={() => setMenuOpen(false)}
-              >
-                {item.icon && <Icon name={item.icon} />}
-                <span className={styles.navLabel}>{t(item.labelKey)}</span>
-              </NavLink>
-            ))}
+            {navGroups.map((group) => {
+              const items = visibleItems.filter((item) => item.group === group);
+              return (
+                <div key={group} role="group" aria-label={t(`nav.groups.${group}`)} className={styles.navGroup}>
+                  <span className={`eyebrow ${styles.groupLabel}`} aria-hidden="true">
+                    {t(`nav.groups.${group}`)}
+                  </span>
+                  {items.map((item) => (
+                    <NavLink
+                      key={item.path}
+                      to={item.path}
+                      end={item.path === '/'}
+                      className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navActive : ''}`}
+                      data-tooltip={t(item.labelKey)}
+                      data-tour={`nav:${item.path}`}
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      {item.icon && <Icon name={item.icon} />}
+                      <span className={styles.navLabel}>{t(item.labelKey)}</span>
+                    </NavLink>
+                  ))}
+                </div>
+              );
+            })}
           </nav>
 
           <div className={styles.panelFooter}>
@@ -227,6 +246,7 @@ function Layout() {
               >
                 <Icon name={collapsed ? 'chevronsRight' : 'chevronsLeft'} size={18} />
               </button>
+              {narrow && <ThemeToggle />}
             </div>
             {user && (
               <UserMenu
@@ -242,16 +262,26 @@ function Layout() {
       </aside>
 
       <div className={styles.body}>
+        {!narrow && (
+          <header className={styles.topbar}>
+            {/* "Home / Reports / Monthly", made from the address (config/breadcrumbs.js) */}
+            <Breadcrumbs />
+            <div className={styles.topbarActions}>
+              {searchButton}
+              <ThemeToggle />
+              <NotificationBell />
+            </div>
+          </header>
+        )}
         <main className={styles.main}>
           <OfflineBanner />
-          {/* "Home / Reports / Monthly", made from the address (config/breadcrumbs.js) */}
-          <Breadcrumbs />
-          {/* A short fade and an 8px slide when another page opens. No exit animation: the new page is there at once. */}
+          {narrow && <Breadcrumbs />}
+          {/* A short fade and a slide when another page opens. No exit animation: the new page is there at once. */}
           <motion.div
             key={pageKeyOf(location.pathname)}
-            initial={reduced ? false : { opacity: 0, y: 8 }}
+            initial={reduced ? false : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.22, ease: [0.22, 0.61, 0.36, 1] }}
+            transition={{ duration: 0.28, ease: [0.22, 0.61, 0.36, 1] }}
           >
             {/* The page is downloaded the first time it opens (see App.jsx); the sidebar stays on screen meanwhile */}
             <Suspense fallback={<LoadingState spacious />}>

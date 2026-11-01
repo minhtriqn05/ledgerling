@@ -6,6 +6,7 @@ import {
   fromDateInput,
   shiftMonth,
   toDateInput,
+  vietnamHour,
   todayInput,
 } from './vnDate.js';
 
@@ -26,6 +27,15 @@ describe('today and this month in Vietnam', () => {
     vi.setSystemTime(new Date('2026-10-31T16:59:00Z')); // 23:59 on 31 Oct in Vietnam
     expect(todayInput()).toBe('2026-10-31');
     expect(currentMonth()).toBe('2026-10');
+  });
+});
+
+describe('vietnamHour', () => {
+  it('is the hour in Vietnam, whatever the clock of the device says', () => {
+    expect(vietnamHour(new Date('2026-10-27T01:30:00.000Z'))).toBe(8);
+    expect(vietnamHour(new Date('2026-10-27T20:00:00.000Z'))).toBe(3); // already the next day there
+    expect(vietnamHour(new Date('2026-10-27T16:59:00.000Z'))).toBe(23);
+    expect(vietnamHour(new Date('2026-10-27T17:00:00.000Z'))).toBe(0);
   });
 });
 

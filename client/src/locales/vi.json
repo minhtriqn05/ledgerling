@@ -56,7 +56,13 @@
     "transactions": "Giao dịch",
     "toWelcome": "Về trang giới thiệu",
     "collapseSidebar": "Thu gọn thanh bên",
-    "expandSidebar": "Mở rộng thanh bên"
+    "expandSidebar": "Mở rộng thanh bên",
+    "wallets": "Ví",
+    "groups": {
+      "money": "Dòng tiền",
+      "planning": "Kế hoạch",
+      "account": "Tài khoản"
+    }
   },
   "breadcrumb": {
     "label": "Đường dẫn trang",
@@ -200,7 +206,16 @@
     "savingsGoals": "Mục tiêu tiết kiệm",
     "spent": "đã chi",
     "spendingByCategory": "Chi tiêu theo danh mục",
-    "subtitle": "Tình hình tài chính của bạn trong {{month}}."
+    "subtitle": "Tình hình tài chính của bạn trong {{month}}.",
+    "recent": "Giao dịch gần đây",
+    "recentFailed": "Không tải được giao dịch gần đây.",
+    "savedShare": "Đã tiết kiệm {{percent}} thu nhập",
+    "greeting": {
+      "night": "Khuya rồi, {{name}}",
+      "morning": "Chào buổi sáng, {{name}}",
+      "afternoon": "Chào buổi chiều, {{name}}",
+      "evening": "Chào buổi tối, {{name}}"
+    }
   },
   "transactions": {
     "add": "Thêm giao dịch",
@@ -374,7 +389,10 @@
     "overBy": "Vượt {{amount}}",
     "percentUsed": "Đã dùng {{percent}}%",
     "save": "Lưu ngân sách",
-    "updated": "Đã cập nhật ngân sách"
+    "updated": "Đã cập nhật ngân sách",
+    "totalLimit": "Tổng ngân sách",
+    "totalSpent": "Đã chi",
+    "totalLeft": "Còn lại"
   },
   "recurring": {
     "active": "Đang bật: {{name}}",
@@ -456,7 +474,9 @@
     "withdrawMax": "Bạn chỉ có thể rút tối đa {{amount}}, là số tiền đã để dành cho mục tiêu này.",
     "withdrawMoney": "Rút tiền",
     "withdrawal": "Rút ra",
-    "withdrawn": "Đã rút tiền"
+    "withdrawn": "Đã rút tiền",
+    "totalSaved": "Đã để dành",
+    "totalTarget": "Tổng các mục tiêu"
   },
   "reports": {
     "averagePerDay": "Trung bình mỗi ngày",
@@ -902,7 +922,18 @@
     "footerNote": "UIT · CSBU109.R11.KHBC",
     "github": "Xem trên GitHub",
     "opensInNewTab": "(mở trong tab mới)",
-    "openApp": "Mở ứng dụng"
+    "openApp": "Mở ứng dụng",
+    "trust": {
+      "label": "Đi kèm với ứng dụng",
+      "languages": "8 ngôn ngữ",
+      "install": "Cài như một ứng dụng",
+      "sync": "Đồng bộ tức thì giữa các thiết bị",
+      "themes": "Giao diện Noir và Porcelain"
+    },
+    "closing": {
+      "title": "Tiền của bạn, cuối cùng cũng gọn trong một nơi.",
+      "text": "Tạo tài khoản trong chưa đầy một phút và thêm giao dịch đầu tiên ngay hôm nay."
+    }
   },
   "onboarding": {
     "title": "Bắt đầu với Ledgerling",
@@ -994,7 +1025,16 @@
     "USER_NOT_FOUND": "Không tìm thấy người dùng",
     "VALIDATION_ERROR": "Vui lòng kiểm tra lại thông tin đã nhập.",
     "WITHDRAW_TOO_MUCH": "Không thể rút nhiều hơn số tiền đã để dành",
-    "WRONG_PASSWORD": "Mật khẩu không đúng"
+    "WRONG_PASSWORD": "Mật khẩu không đúng",
+    "WALLET_NOT_FOUND": "Không tìm thấy ví",
+    "WALLET_EXISTS": "Bạn đã có ví mang tên này",
+    "WALLET_ARCHIVED": "Ví này đã được lưu trữ",
+    "WALLET_IN_USE": "Ví này vẫn còn giao dịch hoặc chuyển tiền. Hãy lưu trữ ví.",
+    "WALLET_DEFAULT_LOCKED": "Không thể lưu trữ hoặc xóa ví mặc định",
+    "WALLET_TYPE_INVALID": "Hãy chọn loại ví",
+    "WALLET_BALANCE_INVALID": "Số dư ban đầu phải từ 0 trở lên",
+    "TRANSFER_NOT_FOUND": "Không tìm thấy lần chuyển tiền",
+    "TRANSFER_SAME_WALLET": "Hãy chọn hai ví khác nhau"
   },
   "live": {
     "live": "Trực tuyến",
@@ -1126,6 +1166,67 @@
         "title": "Không bảo đảm",
         "text": "Dịch vụ miễn phí và không kèm bất kỳ bảo đảm nào. Ứng dụng không đưa ra lời khuyên tài chính, và các con số chỉ chính xác theo những gì bạn nhập."
       }
+    }
+  },
+  "wallets": {
+    "wallet": "Ví",
+    "all": "Tất cả ví",
+    "yours": "Ví của bạn",
+    "subtitle": "Tiền của bạn đang nằm ở đâu.",
+    "totalAll": "Tổng số dư mọi ví",
+    "count_one": "{{count}} ví",
+    "count_other": "{{count}} ví",
+    "loading": "Đang tải ví…",
+    "loadFailed": "Không tải được danh sách ví.",
+    "new": "Ví mới",
+    "edit": "Sửa ví",
+    "save": "Lưu ví",
+    "added": "Đã thêm ví",
+    "updated": "Đã cập nhật ví",
+    "deleted": "Đã xóa ví",
+    "archived": "Đã lưu trữ ví",
+    "restored": "Đã dùng lại ví",
+    "archiveName": "Lưu trữ {{name}}",
+    "restoreName": "Dùng lại {{name}}",
+    "type": {
+      "label": "Loại",
+      "cash": "Tiền mặt",
+      "bank": "Ngân hàng",
+      "ewallet": "Ví điện tử"
+    },
+    "namePlaceholder": "Ví dụ: Vietcombank",
+    "initialBalance": "Số dư ban đầu",
+    "initialHint": "Số tiền trong ví này trước giao dịch đầu tiên của bạn.",
+    "defaultBadge": "Mặc định",
+    "defaultHint": "Giao dịch không chọn ví sẽ vào đây. Ví này không thể lưu trữ hoặc xóa.",
+    "archivedTitle": "Đã lưu trữ",
+    "archivedHint": "Các ví này giữ nguyên số dư và không nhận giao dịch hay chuyển tiền mới.",
+    "moneyIn": "Vào",
+    "moneyOut": "Ra",
+    "startedWith": "Ban đầu {{amount}}",
+    "deleteQuestion": "Xóa ví này?",
+    "deleteText": "Không thể hoàn tác. Ví đã có giao dịch hoặc chuyển tiền thì không xóa được: hãy lưu trữ ví.",
+    "transfer": {
+      "open": "Chuyển tiền",
+      "title": "Chuyển tiền",
+      "from": "Từ ví",
+      "to": "Đến ví",
+      "save": "Chuyển",
+      "done": "Đã chuyển tiền",
+      "chooseTwo": "Hãy chọn hai ví khác nhau.",
+      "needTwo": "Bạn cần ít nhất hai ví để chuyển tiền.",
+      "notCounted": "Chuyển tiền không phải thu hay chi: tổng thu chi, ngân sách và báo cáo vẫn giữ nguyên.",
+      "history": "Lịch sử chuyển tiền",
+      "historySubtitle": "Mới nhất trước",
+      "empty": "Chưa có lần chuyển tiền nào.",
+      "loading": "Đang tải lịch sử chuyển tiền…",
+      "loadFailed": "Không tải được lịch sử chuyển tiền.",
+      "count_one": "{{count}} lần chuyển",
+      "count_other": "{{count}} lần chuyển",
+      "deleteName": "Xóa lần chuyển từ {{from}} đến {{to}}",
+      "deleteQuestion": "Xóa lần chuyển tiền này?",
+      "deleteText": "Tiền sẽ trở về {{from}}.",
+      "deleted": "Đã xóa lần chuyển tiền"
     }
   }
 }

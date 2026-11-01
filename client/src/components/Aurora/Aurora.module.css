@@ -1,0 +1,82 @@
+.aurora {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  overflow: hidden;
+  border-radius: inherit;
+  background: var(--color-hero-base);
+  pointer-events: none;
+}
+
+/* The grain: it keeps the gradients from showing bands */
+.aurora::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--texture-grain);
+  opacity: 0.09;
+  mix-blend-mode: overlay;
+}
+
+.blob {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  filter: blur(64px);
+  will-change: transform;
+  animation: drift 26s ease-in-out infinite alternate;
+}
+
+.emerald {
+  top: -170px;
+  left: -4%;
+  width: 46%;
+  height: 280px;
+  background: var(--aurora-emerald);
+  opacity: 0.46;
+}
+
+.ice {
+  top: -190px;
+  right: -2%;
+  width: 46%;
+  height: 290px;
+  background: var(--aurora-ice);
+  opacity: 0.42;
+  animation-duration: 32s;
+  animation-direction: alternate-reverse;
+}
+
+.warm {
+  right: 22%;
+  bottom: -190px;
+  width: 40%;
+  height: 260px;
+  background: var(--aurora-warm);
+  opacity: 0.14;
+  animation-duration: 38s;
+}
+
+/* A phone has little width: the lights take more of it */
+@media (max-width: 767px) {
+  .emerald,
+  .ice {
+    width: 72%;
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: translate3d(-4%, -3%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(6%, 7%, 0) scale(1.12);
+  }
+}
+
+@media print {
+  .aurora {
+    display: none;
+  }
+}

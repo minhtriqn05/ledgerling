@@ -58,7 +58,7 @@
 .zoom input {
   flex: 1;
   min-width: 0;
-  accent-color: var(--color-primary);
+  accent-color: var(--color-primary-text);
 }
 
 .actions {

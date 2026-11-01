@@ -8,10 +8,39 @@ body {
   margin: 0;
   font-family: var(--font-sans);
   font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
   line-height: var(--line-height-normal);
   color: var(--color-text);
   background: var(--color-bg);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-synthesis: none;
+}
+
+/* Two soft lights behind everything, fixed to the window, and a fine grain over them: the canvas is never a flat color.
+   pointer-events: none, so they can never catch a click. */
+@media screen {
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(52vw 42vh at 8% -6%, var(--ambient-1) 0%, transparent 72%),
+      radial-gradient(46vw 44vh at 96% 4%, var(--ambient-2) 0%, transparent 72%);
+    pointer-events: none;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-image: var(--texture-grain);
+    opacity: var(--grain-opacity);
+    pointer-events: none;
+  }
 }
 
 h1,
@@ -21,6 +50,11 @@ h4 {
   margin: 0;
   line-height: var(--line-height-tight);
   font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-primary-text) 32%, transparent);
 }
 
 /* Turns off every CSS animation and transition for people who asked for less motion.
@@ -61,7 +95,7 @@ input[type='checkbox'] {
   margin: 0;
   border: 1.5px solid var(--color-border-strong);
   border-radius: calc(var(--radius-sm) * 0.75);
-  background: var(--color-surface);
+  background: var(--color-input);
   cursor: pointer;
   transition:
     background var(--duration-fast) var(--ease-out),
@@ -80,9 +114,9 @@ input[type='checkbox']::before {
   transition: transform var(--duration-base) var(--ease-pop);
 }
 
-input[type='checkbox']:hover:not(:disabled) {
+input[type='checkbox']:hover:not(:disabled):not(:checked) {
   border-color: var(--color-primary);
-  background: var(--color-primary-soft);
+  background: var(--color-surface-hover);
 }
 
 input[type='checkbox']:active:not(:disabled) {
@@ -117,5 +151,21 @@ input[type='checkbox']:disabled {
 /* ---------- Scrollbars: thin and soft, in the page colors ---------- */
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--color-border-strong) transparent;
+  scrollbar-color: color-mix(in srgb, var(--color-text) 22%, transparent) transparent;
+}
+
+/* ---------- A small label above a number: "BALANCE THIS MONTH" ---------- */
+/* Letter case changes nothing for a screen reader; Chinese, Japanese and Korean have no capitals and need no extra spacing. */
+.eyebrow {
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-label);
+  text-transform: uppercase;
+}
+
+:lang(zh-CN) .eyebrow,
+:lang(ja) .eyebrow,
+:lang(ko) .eyebrow {
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.02em;
 }

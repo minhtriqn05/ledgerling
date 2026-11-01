@@ -56,7 +56,13 @@
     "transactions": "Transactions",
     "toWelcome": "Aller à la page d’accueil",
     "collapseSidebar": "Réduire la barre latérale",
-    "expandSidebar": "Agrandir la barre latérale"
+    "expandSidebar": "Agrandir la barre latérale",
+    "wallets": "Portefeuilles",
+    "groups": {
+      "money": "Argent",
+      "planning": "Planification",
+      "account": "Compte"
+    }
   },
   "breadcrumb": {
     "label": "Fil d’Ariane",
@@ -200,7 +206,16 @@
     "savingsGoals": "Objectifs d'épargne",
     "spent": "dépensés",
     "spendingByCategory": "Dépenses par catégorie",
-    "subtitle": "Voici où en est {{month}}."
+    "subtitle": "Voici où en est {{month}}.",
+    "recent": "Transactions récentes",
+    "recentFailed": "Impossible de charger les transactions récentes.",
+    "savedShare": "{{percent}} des revenus épargnés",
+    "greeting": {
+      "night": "Encore debout, {{name}}",
+      "morning": "Bonjour, {{name}}",
+      "afternoon": "Bon après-midi, {{name}}",
+      "evening": "Bonsoir, {{name}}"
+    }
   },
   "transactions": {
     "add": "Ajouter une transaction",
@@ -374,7 +389,10 @@
     "overBy": "Dépassement de {{amount}}",
     "percentUsed": "{{percent}} % utilisés",
     "save": "Enregistrer le budget",
-    "updated": "Budget modifié"
+    "updated": "Budget modifié",
+    "totalLimit": "Budget total",
+    "totalSpent": "Dépensé",
+    "totalLeft": "Reste à dépenser"
   },
   "recurring": {
     "active": "Active : {{name}}",
@@ -456,7 +474,9 @@
     "withdrawMax": "Vous pouvez retirer au maximum {{amount}}, soit le montant épargné pour cet objectif.",
     "withdrawMoney": "Retirer de l'argent",
     "withdrawal": "Retrait",
-    "withdrawn": "Argent retiré"
+    "withdrawn": "Argent retiré",
+    "totalSaved": "Épargné jusqu’ici",
+    "totalTarget": "Tous les objectifs réunis"
   },
   "reports": {
     "averagePerDay": "Moyenne par jour",
@@ -902,7 +922,18 @@
     "footerNote": "UIT · CSBU109.R11.KHBC",
     "github": "Voir sur GitHub",
     "opensInNewTab": "(s’ouvre dans un nouvel onglet)",
-    "openApp": "Ouvrir l’application"
+    "openApp": "Ouvrir l’application",
+    "trust": {
+      "label": "Ce qui est inclus",
+      "languages": "8 langues",
+      "install": "S’installe comme une application",
+      "sync": "Synchronisation en direct entre appareils",
+      "themes": "Thèmes Noir et Porcelaine"
+    },
+    "closing": {
+      "title": "Votre argent, enfin au calme au même endroit.",
+      "text": "Créez un compte en moins d’une minute et ajoutez votre première transaction dès aujourd’hui."
+    }
   },
   "onboarding": {
     "title": "Prenez en main Ledgerling",
@@ -994,7 +1025,16 @@
     "USER_NOT_FOUND": "Utilisateur introuvable",
     "VALIDATION_ERROR": "Veuillez vérifier les valeurs saisies.",
     "WITHDRAW_TOO_MUCH": "Vous ne pouvez pas retirer plus que le montant épargné",
-    "WRONG_PASSWORD": "Le mot de passe est incorrect"
+    "WRONG_PASSWORD": "Le mot de passe est incorrect",
+    "WALLET_NOT_FOUND": "Portefeuille introuvable",
+    "WALLET_EXISTS": "Vous avez déjà un portefeuille à ce nom",
+    "WALLET_ARCHIVED": "Ce portefeuille est archivé",
+    "WALLET_IN_USE": "Ce portefeuille a encore des transactions ou des transferts. Archivez-le.",
+    "WALLET_DEFAULT_LOCKED": "Le portefeuille par défaut ne peut être ni archivé ni supprimé",
+    "WALLET_TYPE_INVALID": "Choisissez un type de portefeuille",
+    "WALLET_BALANCE_INVALID": "Le solde de départ doit être de 0 ou plus",
+    "TRANSFER_NOT_FOUND": "Transfert introuvable",
+    "TRANSFER_SAME_WALLET": "Choisissez deux portefeuilles différents"
   },
   "live": {
     "live": "En direct",
@@ -1126,6 +1166,67 @@
         "title": "Aucune garantie",
         "text": "Le service est gratuit et fourni sans aucune garantie. Il ne donne pas de conseils financiers, et ses chiffres valent ce que valent vos saisies."
       }
+    }
+  },
+  "wallets": {
+    "wallet": "Portefeuille",
+    "all": "Tous les portefeuilles",
+    "yours": "Vos portefeuilles",
+    "subtitle": "Où se trouve votre argent en ce moment.",
+    "totalAll": "Tous les portefeuilles réunis",
+    "count_one": "{{count}} portefeuille",
+    "count_other": "{{count}} portefeuilles",
+    "loading": "Chargement des portefeuilles…",
+    "loadFailed": "Impossible de charger les portefeuilles.",
+    "new": "Nouveau portefeuille",
+    "edit": "Modifier le portefeuille",
+    "save": "Enregistrer le portefeuille",
+    "added": "Portefeuille ajouté",
+    "updated": "Portefeuille mis à jour",
+    "deleted": "Portefeuille supprimé",
+    "archived": "Portefeuille archivé",
+    "restored": "Portefeuille de nouveau utilisé",
+    "archiveName": "Archiver {{name}}",
+    "restoreName": "Réutiliser {{name}}",
+    "type": {
+      "label": "Type",
+      "cash": "Espèces",
+      "bank": "Banque",
+      "ewallet": "Portefeuille mobile"
+    },
+    "namePlaceholder": "p. ex. Vietcombank",
+    "initialBalance": "Solde de départ",
+    "initialHint": "L’argent de ce portefeuille avant votre première transaction ici.",
+    "defaultBadge": "Par défaut",
+    "defaultHint": "Une transaction sans portefeuille arrive ici. Ce portefeuille ne peut être ni archivé ni supprimé.",
+    "archivedTitle": "Archivés",
+    "archivedHint": "Ils gardent leur solde et ne reçoivent plus de transactions ni de transferts.",
+    "moneyIn": "Entrées",
+    "moneyOut": "Sorties",
+    "startedWith": "Départ : {{amount}}",
+    "deleteQuestion": "Supprimer ce portefeuille ?",
+    "deleteText": "Action irréversible. Un portefeuille avec des transactions ou des transferts ne peut pas être supprimé : archivez-le.",
+    "transfer": {
+      "open": "Transférer de l’argent",
+      "title": "Transférer de l’argent",
+      "from": "De",
+      "to": "Vers",
+      "save": "Transférer",
+      "done": "Argent transféré",
+      "chooseTwo": "Choisissez deux portefeuilles différents.",
+      "needTwo": "Il faut au moins deux portefeuilles pour transférer de l’argent.",
+      "notCounted": "Un transfert n’est ni un revenu ni une dépense : vos totaux, budgets et rapports ne changent pas.",
+      "history": "Transferts",
+      "historySubtitle": "Les plus récents d’abord",
+      "empty": "Aucun transfert pour le moment.",
+      "loading": "Chargement des transferts…",
+      "loadFailed": "Impossible de charger les transferts.",
+      "count_one": "{{count}} transfert",
+      "count_other": "{{count}} transferts",
+      "deleteName": "Supprimer le transfert de {{from}} vers {{to}}",
+      "deleteQuestion": "Supprimer ce transfert ?",
+      "deleteText": "L’argent retourne vers {{from}}.",
+      "deleted": "Transfert supprimé"
     }
   }
 }

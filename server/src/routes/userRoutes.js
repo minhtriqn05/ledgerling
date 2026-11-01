@@ -362,6 +362,14 @@ router.patch("/me/preferences", validatePreferences, updatePreferences);
  *                       type: array
  *                       items:
  *                         type: object
+ *                     wallets:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/Wallet'
+ *                     transfers:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/Transfer'
  *                     templates:
  *                       type: array
  *                       items:

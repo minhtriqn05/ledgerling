@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema(
     // A "disabled" account cannot log in; disabling also raises tokenVersion so the tokens it already has stop working
     status: { type: String, enum: ["active", "disabled"], default: "active" },
     preferences: {
-      theme: { type: String, enum: ["light", "dark", "system"], default: "system" },
+      theme: { type: String, enum: ["light", "dark", "system"], default: "dark" },
       weekStartsOn: { type: String, enum: ["monday", "sunday"], default: "monday" },
       // No default: until the user picks one, each device keeps the language it already has
       language: { type: String, enum: LANGUAGE_CODES },

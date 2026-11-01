@@ -29,6 +29,8 @@ const options = {
       { name: "Auth", description: "Register, log in and read the current user" },
       { name: "Categories", description: "Income and expense categories of the signed-in user" },
       { name: "Transactions", description: "Income and expense records of the signed-in user" },
+      { name: "Wallets", description: "Cash, bank and e-wallet accounts of the signed-in user, with their balances" },
+      { name: "Transfers", description: "Money moved between two wallets. Not income or expense: stats, budgets, reports and insights do not see it." },
       { name: "Stats", description: "Numbers for the dashboard charts" },
       { name: "Budgets", description: "Monthly spending limits per expense category of the signed-in user" },
       { name: "Tags", description: "Tags the signed-in user put on transactions" },
@@ -161,7 +163,7 @@ const options = {
             preferences: {
               type: "object",
               properties: {
-                theme: { type: "string", enum: ["light", "dark", "system"], example: "system" },
+                theme: { type: "string", enum: ["light", "dark", "system"], example: "dark" },
                 weekStartsOn: { type: "string", enum: ["monday", "sunday"], example: "monday" },
                 language: { type: "string", enum: ["en", "vi", "fr", "de", "es", "zh-CN", "ja", "ko"], description: "Absent until the user picks one", example: "vi" },
                 notifications: {
@@ -263,10 +265,53 @@ const options = {
             updatedAt: { type: "string", format: "date-time", example: "2026-10-27T03:05:00.000Z" },
           },
         },
+        Wallet: {
+          type: "object",
+          properties: {
+            _id: { type: "string", example: "6720f1b2c3d4e5f601234601" },
+            name: { type: "string", example: "Vietcombank" },
+            type: { type: "string", enum: ["cash", "bank", "ewallet"], example: "bank" },
+            color: { type: "string", example: "#4A9FE3" },
+            initialBalance: { type: "number", example: 5000000 },
+            archived: { type: "boolean", example: false },
+            isDefault: { type: "boolean", description: "The Cash wallet every user has. It cannot be deleted or archived.", example: false },
+            income: { type: "number", description: "All income in this wallet (VND)", example: 18000000 },
+            expense: { type: "number", description: "All expenses in this wallet (VND)", example: 7500000 },
+            transfersIn: { type: "number", example: 0 },
+            transfersOut: { type: "number", example: 3000000 },
+            balance: { type: "number", description: "initialBalance + income - expense + transfersIn - transfersOut", example: 12500000 },
+            createdAt: { type: "string", format: "date-time" },
+            updatedAt: { type: "string", format: "date-time" },
+          },
+        },
+        WalletSummary: {
+          type: "object",
+          properties: {
+            _id: { type: "string", example: "6720f1b2c3d4e5f601234601" },
+            name: { type: "string", example: "Cash" },
+            type: { type: "string", enum: ["cash", "bank", "ewallet"], example: "cash" },
+            color: { type: "string", example: "#3DB383" },
+            archived: { type: "boolean", example: false },
+          },
+        },
+        Transfer: {
+          type: "object",
+          properties: {
+            _id: { type: "string", example: "6720f1b2c3d4e5f601234700" },
+            from: { $ref: "#/components/schemas/WalletSummary" },
+            to: { $ref: "#/components/schemas/WalletSummary" },
+            amount: { type: "number", example: 300000 },
+            note: { type: "string", example: "ATM withdrawal" },
+            date: { type: "string", format: "date-time", example: "2026-10-27T05:30:00.000Z" },
+            createdAt: { type: "string", format: "date-time" },
+            updatedAt: { type: "string", format: "date-time" },
+          },
+        },
         Transaction: {
           type: "object",
           properties: {
             _id: { type: "string", example: "6720c1b2c3d4e5f601234569" },
+            wallet: { $ref: "#/components/schemas/WalletSummary" },
             category: {
               type: "object",
               properties: {

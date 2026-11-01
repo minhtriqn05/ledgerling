@@ -18,6 +18,12 @@ function checkCategoryId(value) {
   return categoryId;
 }
 
+function checkWalletId(value) {
+  const walletId = text(value).trim();
+  if (!OBJECT_ID_REGEX.test(walletId)) throw httpError(400, "Wallet id is invalid");
+  return walletId;
+}
+
 function checkAmount(value) {
   if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) {
     throw httpError(400, "Amount must be greater than 0", "AMOUNT_INVALID");
@@ -77,7 +83,8 @@ export function validateCreateTransaction(req, res, next) {
     categoryId: checkCategoryId(body.categoryId),
     amount: checkAmount(body.amount),
   };
-  // Optional fields: when left out, the model defaults apply (VND, empty note, now)
+  // Optional fields: when left out, the service uses the default wallet and the model defaults apply (VND, empty note, now)
+  if (body.walletId !== undefined) data.walletId = checkWalletId(body.walletId);
   if (body.currency !== undefined) data.currency = checkCurrency(body.currency);
   if (body.note !== undefined) data.note = checkNote(body.note);
   if (body.date !== undefined) data.date = checkDate(body.date);
@@ -92,6 +99,7 @@ export function validateUpdateTransaction(req, res, next) {
   const changes = {};
 
   if (body.categoryId !== undefined) changes.categoryId = checkCategoryId(body.categoryId);
+  if (body.walletId !== undefined) changes.walletId = checkWalletId(body.walletId);
   if (body.amount !== undefined) changes.amount = checkAmount(body.amount);
   if (body.currency !== undefined) changes.currency = checkCurrency(body.currency);
   if (body.note !== undefined) changes.note = checkNote(body.note);
@@ -149,7 +157,7 @@ function checkLimit(value) {
 // Checks the filters that GET /transactions and GET /transactions/export share (everything but page and limit)
 // and returns them cleaned, with the sort default.
 function readFilters(query) {
-  const { month, from, to, type, categoryId, q, sort, tag } = query;
+  const { month, from, to, type, categoryId, walletId, q, sort, tag } = query;
 
   if (month !== undefined && (from !== undefined || to !== undefined)) {
     throw httpError(400, "Use either month or from/to, not both");
@@ -162,6 +170,9 @@ function readFilters(query) {
   }
   if (categoryId !== undefined && (typeof categoryId !== "string" || !OBJECT_ID_REGEX.test(categoryId))) {
     throw httpError(400, "Category id is invalid");
+  }
+  if (walletId !== undefined && (typeof walletId !== "string" || !OBJECT_ID_REGEX.test(walletId))) {
+    throw httpError(400, "Wallet id is invalid");
   }
   if (sort !== undefined && !SORTS.includes(sort)) {
     throw httpError(400, `Sort must be one of ${SORTS.join(", ")}`);
@@ -177,6 +188,7 @@ function readFilters(query) {
   }
   if (type !== undefined) listQuery.type = type;
   if (categoryId !== undefined) listQuery.categoryId = categoryId;
+  if (walletId !== undefined) listQuery.walletId = walletId;
   if (tag !== undefined) listQuery.tag = checkTag(tag);
   // An empty search (?q= or only spaces) is ignored
   if (q !== undefined) {

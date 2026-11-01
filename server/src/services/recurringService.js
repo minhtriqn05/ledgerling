@@ -6,6 +6,7 @@ import { dayNoon, nextDayStart, todayInVietnam, vietnamDay } from "../utils/mont
 import { firstRunDayFrom, nextRunDay } from "../utils/recurrence.js";
 import { notifyRecurringCreated } from "./notificationService.js";
 import { emitDataChanged } from "./realtimeService.js";
+import { ensureDefaultWallet } from "./walletService.js";
 
 // Shows the category's name and color instead of just its id
 const CATEGORY_FIELDS = "name color icon type";
@@ -28,11 +29,12 @@ async function findOwned(userId, id) {
 
 // Creates the transaction of the rule's next run and returns its id, or null when another request already created it:
 // the unique index on recurringRuleId + date refuses the second one, which is exactly what we want.
-async function createRunTransaction(rule) {
+async function createRunTransaction(rule, walletId) {
   try {
     const transaction = await Transaction.create({
       userId: rule.userId,
       categoryId: rule.categoryId._id,
+      walletId,
       type: rule.categoryId.type, // copied from the category, like a normal transaction
       amount: rule.amount,
       note: rule.note,
@@ -48,7 +50,7 @@ async function createRunTransaction(rule) {
 
 // Runs one rule until it has nothing due. `before` is the start of tomorrow in Vietnam time.
 // Returns the ids of the transactions this call created.
-async function runRule(firstRule, before) {
+async function runRule(firstRule, before, walletId) {
   let rule = firstRule;
   const created = [];
 
@@ -57,7 +59,7 @@ async function runRule(firstRule, before) {
     const isPastEnd = rule.endDate && rule.nextRunDate > rule.endDate;
     if (!isDue || isPastEnd || !rule.categoryId) break;
 
-    const id = await createRunTransaction(rule);
+    const id = await createRunTransaction(rule, walletId);
     if (id) created.push(id);
 
     const next = nextRunDay(rule.frequency, vietnamDay(rule.startDate), vietnamDay(rule.nextRunDate));
@@ -85,9 +87,12 @@ export async function processDueRules(userId) {
     CATEGORY_FIELDS
   );
 
+  // A rule does not name a wallet, so what it creates goes to the default wallet.
+  // Only looked up when a rule is due: this runs on most page loads.
+  const wallet = rules.length > 0 ? await ensureDefaultWallet(userId) : null;
   const created = [];
   for (const rule of rules) {
-    created.push(...(await runRule(rule, before)));
+    created.push(...(await runRule(rule, before, wallet._id)));
   }
   // One notification for the whole pass, not one per transaction
   await notifyRecurringCreated(userId, created);

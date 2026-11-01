@@ -82,7 +82,7 @@ export default function BudgetAlerts({ month }) {
       title={t('dashboard.budgetAlerts')}
       subtitle={formatMonth(month)}
       actions={
-        <Button variant="secondary" onClick={() => navigate('/budgets')}>
+        <Button variant="secondary" size="sm" onClick={() => navigate('/budgets')}>
           {t('dashboard.manageBudgets')}
         </Button>
       }

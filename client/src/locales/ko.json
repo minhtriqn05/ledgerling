@@ -56,7 +56,13 @@
     "transactions": "거래 내역",
     "toWelcome": "소개 페이지로 이동",
     "collapseSidebar": "사이드바 접기",
-    "expandSidebar": "사이드바 펼치기"
+    "expandSidebar": "사이드바 펼치기",
+    "wallets": "지갑",
+    "groups": {
+      "money": "자금",
+      "planning": "계획",
+      "account": "계정"
+    }
   },
   "breadcrumb": {
     "label": "이동 경로",
@@ -200,7 +206,16 @@
     "savingsGoals": "저축 목표",
     "spent": "지출",
     "spendingByCategory": "카테고리별 지출",
-    "subtitle": "{{month}} 현황입니다."
+    "subtitle": "{{month}} 현황입니다.",
+    "recent": "최근 거래",
+    "recentFailed": "최근 거래를 불러오지 못했습니다.",
+    "savedShare": "수입의 {{percent}} 저축",
+    "greeting": {
+      "night": "늦은 시간이네요, {{name}}님",
+      "morning": "좋은 아침이에요, {{name}}님",
+      "afternoon": "좋은 오후예요, {{name}}님",
+      "evening": "좋은 저녁이에요, {{name}}님"
+    }
   },
   "transactions": {
     "add": "거래 추가",
@@ -374,7 +389,10 @@
     "overBy": "{{amount}} 초과",
     "percentUsed": "{{percent}}% 사용",
     "save": "예산 저장",
-    "updated": "예산을 수정했습니다"
+    "updated": "예산을 수정했습니다",
+    "totalLimit": "총 예산",
+    "totalSpent": "지출",
+    "totalLeft": "남은 금액"
   },
   "recurring": {
     "active": "활성: {{name}}",
@@ -456,7 +474,9 @@
     "withdrawMax": "최대 {{amount}}까지 출금할 수 있습니다. 이 목표의 저축액입니다.",
     "withdrawMoney": "출금",
     "withdrawal": "출금",
-    "withdrawn": "출금했습니다"
+    "withdrawn": "출금했습니다",
+    "totalSaved": "지금까지 모은 돈",
+    "totalTarget": "모든 목표 합계"
   },
   "reports": {
     "averagePerDay": "일평균",
@@ -902,7 +922,18 @@
     "footerNote": "UIT · CSBU109.R11.KHBC",
     "github": "GitHub에서 보기",
     "opensInNewTab": "(새 탭에서 열림)",
-    "openApp": "앱 열기"
+    "openApp": "앱 열기",
+    "trust": {
+      "label": "함께 제공되는 기능",
+      "languages": "8개 언어",
+      "install": "앱으로 설치 가능",
+      "sync": "기기 간 실시간 동기화",
+      "themes": "Noir와 Porcelain 테마"
+    },
+    "closing": {
+      "title": "내 돈을, 드디어 차분하게 한곳에서.",
+      "text": "1분도 안 걸려 계정을 만들고 오늘 첫 거래를 추가해 보세요."
+    }
   },
   "onboarding": {
     "title": "Ledgerling 시작하기",
@@ -994,7 +1025,16 @@
     "USER_NOT_FOUND": "사용자를 찾을 수 없습니다",
     "VALIDATION_ERROR": "입력한 내용을 확인하세요.",
     "WITHDRAW_TOO_MUCH": "저축액보다 많이 출금할 수 없습니다",
-    "WRONG_PASSWORD": "비밀번호가 올바르지 않습니다"
+    "WRONG_PASSWORD": "비밀번호가 올바르지 않습니다",
+    "WALLET_NOT_FOUND": "지갑을 찾을 수 없습니다",
+    "WALLET_EXISTS": "같은 이름의 지갑이 이미 있습니다",
+    "WALLET_ARCHIVED": "이 지갑은 보관되어 있습니다",
+    "WALLET_IN_USE": "이 지갑에는 아직 거래나 이체가 있습니다. 보관하세요.",
+    "WALLET_DEFAULT_LOCKED": "기본 지갑은 보관하거나 삭제할 수 없습니다",
+    "WALLET_TYPE_INVALID": "지갑 종류를 고르세요",
+    "WALLET_BALANCE_INVALID": "시작 잔액은 0 이상이어야 합니다",
+    "TRANSFER_NOT_FOUND": "이체를 찾을 수 없습니다",
+    "TRANSFER_SAME_WALLET": "서로 다른 지갑 두 개를 고르세요"
   },
   "live": {
     "live": "실시간",
@@ -1126,6 +1166,67 @@
         "title": "보증 없음",
         "text": "이 서비스는 무료이며 어떠한 보증도 하지 않습니다. 금융 조언을 제공하지 않으며, 표시되는 숫자의 정확성은 입력한 내용에 달려 있습니다."
       }
+    }
+  },
+  "wallets": {
+    "wallet": "지갑",
+    "all": "모든 지갑",
+    "yours": "내 지갑",
+    "subtitle": "지금 내 돈이 어디에 있는지 보여 줍니다.",
+    "totalAll": "모든 지갑 합계",
+    "count_one": "지갑 {{count}}개",
+    "count_other": "지갑 {{count}}개",
+    "loading": "지갑을 불러오는 중…",
+    "loadFailed": "지갑을 불러오지 못했습니다.",
+    "new": "새 지갑",
+    "edit": "지갑 수정",
+    "save": "지갑 저장",
+    "added": "지갑을 추가했습니다",
+    "updated": "지갑을 수정했습니다",
+    "deleted": "지갑을 삭제했습니다",
+    "archived": "지갑을 보관했습니다",
+    "restored": "지갑을 다시 사용합니다",
+    "archiveName": "{{name}} 보관",
+    "restoreName": "{{name}} 다시 사용",
+    "type": {
+      "label": "종류",
+      "cash": "현금",
+      "bank": "은행",
+      "ewallet": "전자 지갑"
+    },
+    "namePlaceholder": "예: Vietcombank",
+    "initialBalance": "시작 잔액",
+    "initialHint": "이 지갑에서 첫 거래를 하기 전에 있던 돈입니다.",
+    "defaultBadge": "기본",
+    "defaultHint": "지갑을 지정하지 않은 거래는 여기에 들어갑니다. 이 지갑은 보관하거나 삭제할 수 없습니다.",
+    "archivedTitle": "보관됨",
+    "archivedHint": "잔액은 그대로이고 새 거래나 이체를 받지 않습니다.",
+    "moneyIn": "입금",
+    "moneyOut": "출금",
+    "startedWith": "시작 {{amount}}",
+    "deleteQuestion": "이 지갑을 삭제할까요?",
+    "deleteText": "되돌릴 수 없습니다. 거래나 이체가 있는 지갑은 삭제할 수 없으니 보관하세요.",
+    "transfer": {
+      "open": "돈 옮기기",
+      "title": "돈 옮기기",
+      "from": "보내는 지갑",
+      "to": "받는 지갑",
+      "save": "옮기기",
+      "done": "돈을 옮겼습니다",
+      "chooseTwo": "서로 다른 지갑 두 개를 고르세요.",
+      "needTwo": "돈을 옮기려면 지갑이 두 개 이상 필요합니다.",
+      "notCounted": "이체는 수입이나 지출이 아닙니다. 합계, 예산, 보고서는 그대로입니다.",
+      "history": "이체 내역",
+      "historySubtitle": "최신순",
+      "empty": "아직 이체가 없습니다.",
+      "loading": "이체 내역을 불러오는 중…",
+      "loadFailed": "이체 내역을 불러오지 못했습니다.",
+      "count_one": "이체 {{count}}건",
+      "count_other": "이체 {{count}}건",
+      "deleteName": "{{from}}에서 {{to}}(으)로의 이체 삭제",
+      "deleteQuestion": "이 이체를 삭제할까요?",
+      "deleteText": "돈이 {{from}}(으)로 돌아갑니다.",
+      "deleted": "이체를 삭제했습니다"
     }
   }
 }

@@ -28,8 +28,8 @@ describe('resolveTheme', () => {
 });
 
 describe('stored theme', () => {
-  it('is system until a choice is stored', () => {
-    expect(getStoredTheme()).toBe('system');
+  it('is dark until a choice is stored', () => {
+    expect(getStoredTheme()).toBe('dark');
   });
 
   it('gives back what was stored', () => {
@@ -40,7 +40,7 @@ describe('stored theme', () => {
 
   it('ignores a value that is not a theme', () => {
     localStorage.setItem(THEME_STORAGE_KEY, 'purple');
-    expect(getStoredTheme()).toBe('system');
+    expect(getStoredTheme()).toBe('dark');
     expect(isTheme('purple')).toBe(false);
     expect(isTheme('light')).toBe(true);
   });
@@ -52,7 +52,7 @@ describe('stored theme', () => {
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
       throw new Error('blocked');
     });
-    expect(getStoredTheme()).toBe('system');
+    expect(getStoredTheme()).toBe('dark');
     expect(() => storeTheme('dark')).not.toThrow();
   });
 });

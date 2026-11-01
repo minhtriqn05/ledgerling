@@ -98,7 +98,7 @@ export default function SavingsGoals() {
       title={t('dashboard.savingsGoals')}
       subtitle={t('dashboard.dueFirst')}
       actions={
-        <Button variant="secondary" onClick={() => navigate('/goals')}>
+        <Button variant="secondary" size="sm" onClick={() => navigate('/goals')}>
           {t('common.viewAll')}
         </Button>
       }

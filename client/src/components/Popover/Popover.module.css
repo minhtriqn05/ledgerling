@@ -1,4 +1,4 @@
-/* A white floating card. The browser gives a popover its own position, border and colors; they are reset here. */
+/* A floating card. The browser gives a popover its own position, border and colors; they are reset here. */
 .panel {
   position: fixed;
   inset: auto;
@@ -7,7 +7,7 @@
   overflow: auto;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: var(--color-surface);
+  background: var(--color-surface-raised);
   color: var(--color-text);
   box-shadow: var(--shadow-lg);
   overscroll-behavior: contain;
