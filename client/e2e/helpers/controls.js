@@ -3,10 +3,13 @@ import { expect } from '@playwright/test';
 // Helpers for the form controls Ledgerling draws itself (components/Select and components/DatePicker).
 // They are used like a person would: open, then click.
 
-// Opens a Select (a combobox) and clicks the option with this visible name.
+// Opens a Select (a combobox) and clicks the option with this visible name, in the list of this combobox only
+// (aria-controls): the list of another Select may still be on screen while it plays its closing animation.
 export async function chooseOption(combobox, name) {
   await combobox.click();
-  await combobox.page().getByRole('option', { name, exact: true }).click();
+  await expect(combobox).toHaveAttribute('aria-controls', /.+/);
+  const listId = await combobox.getAttribute('aria-controls');
+  await combobox.page().locator(`[id="${listId}"]`).getByRole('option', { name, exact: true }).click();
   await expect(combobox).toHaveAttribute('aria-expanded', 'false');
 }
 

@@ -103,7 +103,9 @@ export async function processDueRules(userId) {
   }
 }
 
+// Processes first, so the page never shows a "next run" date that has already passed
 export async function listRules(userId) {
+  await processDueRules(userId);
   return RecurringRule.find({ userId })
     .sort({ active: -1, nextRunDate: 1, _id: 1 })
     .populate("categoryId", CATEGORY_FIELDS);

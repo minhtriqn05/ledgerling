@@ -72,6 +72,8 @@ export default function RecurringPage() {
     toast.success(t('recurring.deleted'));
     setDialog(null);
     setRules((list) => list.filter((r) => r._id !== rule._id));
+    // A list that was still on its way (a live refresh) holds the deleted rule: this drops that answer and asks again
+    setReloadKey((key) => key + 1);
   }
 
   async function handleToggle(rule) {

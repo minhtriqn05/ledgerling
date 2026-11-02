@@ -4,6 +4,7 @@ import {
   formatMonth,
   formatMonthShort,
   fromDateInput,
+  isAppDay,
   shiftMonth,
   toDateInput,
   vietnamHour,
@@ -64,5 +65,20 @@ describe('date inputs', () => {
     expect(fromDateInput('2026-10-28')).toBe('2026-10-28T12:00:00+07:00');
     // Round trip: the same day comes back
     expect(toDateInput(fromDateInput('2026-10-28'))).toBe('2026-10-28');
+  });
+});
+
+describe('isAppDay', () => {
+  it('accepts a real day from 1970 to 2100, the leap day of a leap year included', () => {
+    expect(isAppDay('2026-10-31')).toBe(true);
+    expect(isAppDay('2028-02-29')).toBe(true);
+    expect(isAppDay('1970-01-01')).toBe(true);
+    expect(isAppDay('2100-12-31')).toBe(true);
+  });
+
+  it('refuses days that do not exist, years the API refuses and other shapes', () => {
+    for (const text of ['2026-02-30', '2025-02-29', '2026-04-31', '1969-12-31', '2101-01-01', '2026-1-5', '', null, undefined]) {
+      expect(isAppDay(text)).toBe(false);
+    }
   });
 });

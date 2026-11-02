@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { getSummary } from '../api/stats.js';
 import { getErrorMessage } from '../api/axios.js';
 import { useAuth } from '../context/AuthContext.jsx';
-import { formatCompact, formatNumber, formatPercent, formatVnd } from '../utils/format.js';
+import { formatCompact, formatNumber, formatPercent } from '../utils/format.js';
 import { currentMonth, formatMonth, formatMonthShort, vietnamHour } from '../utils/vnDate.js';
 import PageHeader from '../components/PageHeader/PageHeader.jsx';
 import MonthPicker from '../components/MonthPicker/MonthPicker.jsx';

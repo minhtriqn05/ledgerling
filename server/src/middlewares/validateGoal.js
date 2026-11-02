@@ -1,45 +1,13 @@
 import { httpError } from "../utils/httpError.js";
-import { isValidDay, todayInVietnam } from "../utils/month.js";
+import { todayInVietnam } from "../utils/month.js";
+import { checkColor, checkDay, checkName, checkNote, isWholeAmount, validIdParam } from "../utils/validation.js";
 
-const OBJECT_ID_REGEX = /^[0-9a-fA-F]{24}$/;
-const COLOR_REGEX = /^#[0-9A-Fa-f]{6}$/;
-// The amount boxes of the client hold 12 digits, so this is the biggest number they can send
-const MAX_AMOUNT = 999_999_999_999;
-
-// Anything that is not a string counts as empty
-function text(value) {
-  return typeof value === "string" ? value : "";
-}
-
-// Each helper checks one field and returns the cleaned value, or throws a 400.
-function checkName(value) {
-  const name = text(value).trim();
-  if (!name) throw httpError(400, "Name is required", "NAME_REQUIRED");
-  if (name.length > 60) throw httpError(400, "Name must be at most 60 characters", "NAME_TOO_LONG");
-  return name;
-}
+const NAME_MAX = 60;
 
 // Whole VND only: no decimals means $inc adds up exactly, however many requests arrive at the same time
-function isWholeAmount(value) {
-  return Number.isSafeInteger(value) && Math.abs(value) <= MAX_AMOUNT;
-}
-
 function checkTargetAmount(value) {
   if (!isWholeAmount(value) || value <= 0) {
     throw httpError(400, "Target amount must be a whole number greater than 0", "TARGET_INVALID");
-  }
-  return value;
-}
-
-function checkColor(value) {
-  const color = text(value).trim();
-  if (!COLOR_REGEX.test(color)) throw httpError(400, "Color must be a hex code like #FF7043", "COLOR_INVALID");
-  return color;
-}
-
-function checkDay(value, field) {
-  if (typeof value !== "string" || !isValidDay(value)) {
-    throw httpError(400, `${field} must be a date in YYYY-MM-DD format`, "DATE_INVALID");
   }
   return value;
 }
@@ -59,7 +27,7 @@ function checkDeadline(value, mustBeFuture) {
 // and savedAmount changes only through the contribution routes.
 function goalFields(body, mustBeFuture) {
   return {
-    name: checkName(body.name),
+    name: checkName(body.name, NAME_MAX),
     targetAmount: checkTargetAmount(body.targetAmount),
     deadline: checkDeadline(body.deadline, mustBeFuture),
     color: checkColor(body.color),
@@ -84,26 +52,12 @@ export function validateContribution(req, res, next) {
     throw httpError(400, "Amount must be a whole number other than 0", "AMOUNT_INVALID");
   }
 
-  let note = "";
-  if (body.note !== undefined && body.note !== null) {
-    if (typeof body.note !== "string") throw httpError(400, "Note must be a string");
-    note = body.note.trim();
-    if (note.length > 200) throw httpError(400, "Note must be at most 200 characters", "NOTE_TOO_LONG");
-  }
-
+  const note = body.note === undefined || body.note === null ? "" : checkNote(body.note);
   // A missing date means today; the service fills it in
   const hasDate = body.date !== undefined && body.date !== null && body.date !== "";
   req.body = { amount: body.amount, note, date: hasDate ? checkDay(body.date, "Date") : null };
   next();
 }
 
-// A malformed id can never match anything, so answer 404 instead of letting Mongoose throw a CastError.
-export function validateGoalId(req, res, next) {
-  if (!OBJECT_ID_REGEX.test(req.params.id)) throw httpError(404, "Goal not found", "GOAL_NOT_FOUND");
-  next();
-}
-
-export function validateContributionId(req, res, next) {
-  if (!OBJECT_ID_REGEX.test(req.params.contributionId)) throw httpError(404, "Contribution not found", "CONTRIBUTION_NOT_FOUND");
-  next();
-}
+export const validateGoalId = validIdParam("id", "Goal not found", "GOAL_NOT_FOUND");
+export const validateContributionId = validIdParam("contributionId", "Contribution not found", "CONTRIBUTION_NOT_FOUND");

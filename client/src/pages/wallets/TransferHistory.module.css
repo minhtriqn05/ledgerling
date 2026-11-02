@@ -4,7 +4,9 @@
   font-size: var(--font-size-sm);
 }
 
+/* The rows read the width of this list (not of the window) to choose their layout, see the @container below */
 .list {
+  container-type: inline-size;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
@@ -78,7 +80,8 @@
   gap: var(--space-3);
 }
 
-@media (max-width: 640px) {
+/* Little room (a phone, or a tablet next to the sidebar): the date and the note go on their own line */
+@container (max-width: 640px) {
   .row {
     grid-template-columns: minmax(0, 1fr) auto;
     gap: var(--space-1) var(--space-2);

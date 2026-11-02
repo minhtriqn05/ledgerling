@@ -7,6 +7,7 @@
   --logo-lit: 0;         /* the light inside the hole, from 0 to 1 */
 
   display: inline-flex;
+  min-width: 0; /* lets the name shrink (see .word) */
   align-items: center;
   gap: var(--space-2);
 }
@@ -236,8 +237,12 @@
 }
 
 /* The tails of the g reach below the x-height, so the word sits a little lower to look centered. */
+/* The name may get a little smaller when its row is short of room (a phone header in a long language),
+   instead of pushing the buttons next to it out of the screen. It keeps its proportions (viewBox). */
 .word {
   display: block;
-  flex-shrink: 0;
+  flex-shrink: 1;
+  min-width: 0;
+  height: auto;
   margin-top: 3px;
 }

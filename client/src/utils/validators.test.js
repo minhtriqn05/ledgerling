@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isValidEmail, passwordChangeProblem } from './validators.js';
+import { MAX_AMOUNT, isValidEmail, isWholeAmount, passwordChangeProblem } from './validators.js';
 
 describe('isValidEmail', () => {
   it('accepts an address and ignores spaces around it', () => {
@@ -32,5 +32,19 @@ describe('passwordChangeProblem', () => {
 
   it('wants the two new passwords to be the same', () => {
     expect(passwordChangeProblem({ ...ok, confirm: 'a-better-on' })).toBe('settings.password.mismatch');
+  });
+});
+
+describe('isWholeAmount', () => {
+  it('accepts whole VND from 1 to the 12-digit maximum', () => {
+    expect(isWholeAmount(1)).toBe(true);
+    expect(isWholeAmount(35000)).toBe(true);
+    expect(isWholeAmount(MAX_AMOUNT)).toBe(true);
+  });
+
+  it('refuses 0, negative amounts, decimals, too many digits and anything that is not a number', () => {
+    for (const value of [0, -5, 35000.5, MAX_AMOUNT + 1, Number.NaN, Infinity, '35000', null]) {
+      expect(isWholeAmount(value)).toBe(false);
+    }
   });
 });

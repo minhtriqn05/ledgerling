@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import Category from "../models/Category.js";
 import Transaction from "../models/Transaction.js";
+import { processDueRules } from "./recurringService.js";
 import {
   VIETNAM_TIMEZONE,
   currentMonth,
@@ -99,7 +100,9 @@ export async function loadMonthlyReport(userId, { month, currency, today }) {
     else entry.previousTotal = row.total;
     byCategory.set(id, entry);
   }
-  const categoryDocs = await Category.find({ _id: { $in: [...byCategory.values()].map((c) => c.categoryId) } }).lean();
+  const categoryDocs = await Category.find({ _id: { $in: [...byCategory.values()].map((c) => c.categoryId) }, userId: owner })
+    .select("name color icon")
+    .lean();
   const docById = new Map(categoryDocs.map((c) => [String(c._id), c]));
 
   const categories = [...byCategory.values()]
@@ -166,13 +169,16 @@ export async function loadMonthlyReport(userId, { month, currency, today }) {
   return { report, categories };
 }
 
+// GET /reports/monthly. Like every report, it first creates the recurring transactions that are due, so the numbers include them.
 export async function getMonthlyReport(userId, { month = currentMonth(), currency = "VND" }) {
+  await processDueRules(userId);
   const { report } = await loadMonthlyReport(userId, { month, currency });
   return report;
 }
 
 // Income and expense of the 12 months of a year, the year's totals and the month with the most spending
 export async function getYearlyReport(userId, { year = currentYear(), currency = "VND" }) {
+  await processDueRules(userId);
   const { from, to } = yearRange(year);
   const rows = await Transaction.aggregate([
     { $match: { userId: toObjectId(userId), currency, date: { $gte: from, $lt: to } } },

@@ -1,31 +1,14 @@
 import { httpError } from "../utils/httpError.js";
 import { MONTH_REGEX } from "../utils/month.js";
-
-const OBJECT_ID_REGEX = /^[0-9a-fA-F]{24}$/;
-
-// Anything that is not a string counts as empty
-function text(value) {
-  return typeof value === "string" ? value : "";
-}
+import { checkAmount, checkId, text, validIdParam } from "../utils/validation.js";
 
 // Each helper checks one field and returns the cleaned value, or throws a 400.
-function checkCategoryId(value) {
-  const categoryId = text(value).trim();
-  if (!OBJECT_ID_REGEX.test(categoryId)) throw httpError(400, "Category id is invalid");
-  return categoryId;
-}
+const checkCategoryId = (value) => checkId(value, "Category id is invalid");
 
 function checkMonth(value, label = "Month") {
   const month = text(value).trim();
   if (!MONTH_REGEX.test(month)) throw httpError(400, `${label} must be in YYYY-MM format`, "MONTH_INVALID");
   return month;
-}
-
-function checkAmount(value) {
-  if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) {
-    throw httpError(400, "Amount must be greater than 0", "AMOUNT_INVALID");
-  }
-  return value;
 }
 
 // On success, req.body is replaced by only the fields we expect, cleaned.
@@ -65,11 +48,7 @@ export function validateUpdateBudget(req, res, next) {
   next();
 }
 
-// A malformed id can never match anything, so answer 404 instead of letting Mongoose throw a CastError.
-export function validateBudgetId(req, res, next) {
-  if (!OBJECT_ID_REGEX.test(req.params.id)) throw httpError(404, "Budget not found", "BUDGET_NOT_FOUND");
-  next();
-}
+export const validateBudgetId = validIdParam("id", "Budget not found", "BUDGET_NOT_FOUND");
 
 // The optional ?month= filter. Only checked when it is present.
 export function validateListBudgets(req, res, next) {

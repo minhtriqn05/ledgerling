@@ -2,10 +2,11 @@ import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import { API_CACHE } from './src/utils/apiCache.js';
+import { siteAddress } from './scripts/siteAddress.js';
 
 // index.html holds its address-dependent tags (Open Graph, Twitter card, canonical link) with __SITE_URL__ in them,
-// because those tags need the full address of the site. This plugin writes the real address in at build time.
-// Set VITE_SITE_URL (Vercel > Settings > Environment Variables) to the real link; the default below is a stand-in.
+// because those tags need the full address of the site. This plugin writes the real address in at build time
+// (scripts/siteAddress.js: VITE_SITE_URL, else the production address Vercel gives the build, else the live app).
 function siteUrl(address) {
   return {
     name: 'ledgerling-site-url',
@@ -15,7 +16,7 @@ function siteUrl(address) {
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_');
-  const address = (env.VITE_SITE_URL || 'https://ledgerling.vercel.app').replace(/\/+$/, '');
+  const address = siteAddress({ ...process.env, ...env });
 
   return {
     plugins: [
@@ -24,6 +25,8 @@ export default defineConfig(({ mode }) => {
       VitePWA({
         // New deploys are downloaded in the background and activated automatically
         registerType: 'autoUpdate',
+        // The small script that registers the service worker waits for the page (defer), so it never holds back the first paint
+        injectRegister: 'script-defer',
         includeAssets: ['favicon.svg', 'favicon.ico', 'apple-touch-icon.png'],
         manifest: {
           name: 'Ledgerling',
@@ -54,6 +57,10 @@ export default defineConfig(({ mode }) => {
         // 5 seconds (offline, or the free server is still waking up) the saved copy is used.
         // The copies are deleted on logout and when another account signs in (utils/apiCache.js).
         workbox: {
+          // A new deploy takes over at once (autoUpdate). Written here because the plugin only sets them by itself
+          // when injectRegister is left on 'auto'.
+          skipWaiting: true,
+          clientsClaim: true,
           navigateFallbackDenylist: [/^\/api/],
           runtimeCaching: [
             {

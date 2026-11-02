@@ -1,6 +1,7 @@
 import { httpError } from "../utils/httpError.js";
 import { LANGUAGE_CODES } from "../utils/languages.js";
 import { AVATAR_MIME_TYPES, MAX_AVATAR_BYTES, isPresetAvatarId } from "../utils/avatars.js";
+import { checkName, text } from "../utils/validation.js";
 
 const NOTIFICATION_SWITCHES = ["budget", "goals", "recurring", "weekly"];
 const THEMES = ["light", "dark", "system"];
@@ -9,11 +10,6 @@ const PREFERENCE_FIELDS = ["notifications", "theme", "weekStartsOn", "language"]
 
 function isPlainObject(value) {
   return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-// Anything that is not a string counts as empty
-function text(value) {
-  return typeof value === "string" ? value : "";
 }
 
 function validateNotifications(value) {
@@ -62,13 +58,7 @@ export function validatePreferences(req, res, next) {
 
 // PATCH /users/me: for now only the name
 export function validateProfile(req, res, next) {
-  const body = req.body ?? {};
-  const name = text(body.name).trim();
-
-  if (!name) throw httpError(400, "Name is required", "NAME_REQUIRED");
-  if (name.length > 50) throw httpError(400, "Name must be at most 50 characters", "NAME_TOO_LONG");
-
-  req.body = { name };
+  req.body = { name: checkName((req.body ?? {}).name, 50) };
   next();
 }
 

@@ -9,7 +9,12 @@
     "start:e2e": "node src/e2e.js",
     "make-admin": "node src/scripts/make-admin.js",
     "seed": "node src/seed.js",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint . --max-warnings=0"
+  },
+  "engines": {
+    "node": "24.x"
   },
   "keywords": [],
   "author": "",
@@ -30,6 +35,9 @@
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@vitest/coverage-v8": "^5.0.5",
+    "eslint": "^10.14.0",
     "mongodb-memory-server": "^11.3.0",
     "nodemon": "^3.1.14",
     "socket.io-client": "^4.8.4",

@@ -59,29 +59,31 @@ describe("POST /api/transactions/bulk-delete", () => {
     expect(res.body.data.deleted).toBe(1);
   });
 
-  it("never deletes another user's transactions (they are skipped, not an error)", async () => {
+  it("answers 404 and deletes nothing at all when one id is another user's (all or nothing)", async () => {
     const mine = await seed(owner.token, food, 1);
     const theirs = await seed(other.token, otherFood, 2);
 
     const res = await bulkDelete(owner.token, { ids: [...mine, ...theirs] });
-    expect(res.status).toBe(200);
-    expect(res.body.data.deleted).toBe(1);
+    expect(res.status).toBe(404);
+    expect(res.body).toEqual({ success: false, message: "Transaction not found", code: "TRANSACTION_NOT_FOUND" });
 
     for (const id of theirs) expect((await getOne(other.token, id)).status).toBe(200);
+    expect((await getOne(owner.token, mine[0])).status).toBe(200);
   });
 
-  it("deletes nothing and answers 200 with 0 when no id is mine", async () => {
+  it("answers the same 404 when no id is mine, so it never tells whether another user's id exists", async () => {
     const theirs = await seed(other.token, otherFood, 1);
     const res = await bulkDelete(owner.token, { ids: theirs });
-    expect(res.status).toBe(200);
-    expect(res.body.data.deleted).toBe(0);
+    const unknown = await bulkDelete(owner.token, { ids: fakeIds(1) });
+    expect(res.status).toBe(404);
+    expect(unknown.body).toEqual(res.body);
     expect((await getOne(other.token, theirs[0])).status).toBe(200);
   });
 
-  it("accepts exactly 200 ids and refuses 201 (400)", async () => {
+  it("accepts exactly 200 ids (they are looked up: none is mine, so 404) and refuses 201 (400)", async () => {
     const ok = await bulkDelete(owner.token, { ids: fakeIds(200) });
-    expect(ok.status).toBe(200);
-    expect(ok.body.data.deleted).toBe(0);
+    expect(ok.status).toBe(404);
+    expect(ok.body.code).toBe("TRANSACTION_NOT_FOUND");
 
     const tooMany = await bulkDelete(owner.token, { ids: fakeIds(201) });
     expect(tooMany.status).toBe(400);
@@ -144,18 +146,19 @@ describe("PATCH /api/transactions/bulk-category", () => {
     expect(res.body.data.updated).toBe(0);
   });
 
-  it("never changes another user's transactions", async () => {
+  it("answers 404 and changes nothing at all when one id is another user's (all or nothing)", async () => {
     const mine = await seed(owner.token, food, 1);
     const theirs = await seed(other.token, otherFood, 2);
 
     const res = await bulkCategory(owner.token, { ids: [...mine, ...theirs], categoryId: transport._id });
-    expect(res.status).toBe(200);
-    expect(res.body.data.updated).toBe(1);
+    expect(res.status).toBe(404);
+    expect(res.body.code).toBe("TRANSACTION_NOT_FOUND");
 
     for (const id of theirs) {
       const t = await getOne(other.token, id);
       expect(t.body.data.category._id).toBe(otherFood._id);
     }
+    expect((await getOne(owner.token, mine[0])).body.data.category._id).toBe(food._id);
   });
 
   it("answers 404 and changes nothing when the category belongs to another user", async () => {

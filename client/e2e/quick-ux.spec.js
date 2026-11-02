@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { dateField } from './helpers/controls.js';
+import { isPhone } from './helpers/device.js';
 
 // The API Playwright starts (see playwright.config.js). Used to put data in quickly, so each test only
 // clicks through the part it is about.
@@ -63,7 +64,7 @@ const rows = (page) => page.locator('table, ul').filter({ visible: true });
 // Deletes one row with its own delete control: the trash button in the table, or (on a phone, where a tap opens
 // the details drawer) the Delete button of the drawer.
 async function deleteRow(page, testInfo, note) {
-  if (testInfo.project.name === 'mobile') {
+  if (isPhone(testInfo)) {
     await visibleNotes(page, note).click();
     const drawer = page.getByRole('dialog', { name: 'Transaction details' });
     await drawer.getByRole('button', { name: 'Delete', exact: true }).click();
@@ -102,9 +103,7 @@ test('the N key opens Quick add, "coffee 35k #work" is understood and the open p
   await expect(rows(page).getByTestId('category-mark').locator('svg').first()).toBeVisible();
 });
 
-test('the + button opens Quick add on any page; "salary 15tr yesterday" picks an income category and the day', async ({
-  page,
-}, testInfo) => {
+test('the + button opens Quick add on any page; "salary 15tr yesterday" picks an income category and the day', { tag: '@smoke' }, async ({ page }, testInfo) => {
   await register(page, testInfo, 'fab');
 
   // The Dashboard has the button too
@@ -143,7 +142,7 @@ test('Quick add: the default categories show their icons, and a field edited by 
   await expect(dialog.getByLabel('Amount')).toHaveValue('50,000');
 });
 
-test('a template chip saves a transaction in one click; "Save as template" makes the chip', async ({ page }, testInfo) => {
+test('a template chip saves a transaction in one click; "Save as template" makes the chip', { tag: '@smoke' }, async ({ page }, testInfo) => {
   await register(page, testInfo, 'templates');
   await seedTemplate(page, { name: 'Morning coffee', category: 'Food', amount: 35000, note: 'Coffee run' });
   await page.goto('/transactions');
@@ -204,7 +203,7 @@ test('a category icon picked in the form shows on its card and in the lists', as
   await expect(dialog.getByRole('button', { name: 'Gym' }).getByTestId('category-mark').locator('svg')).toBeVisible();
 });
 
-test('tick rows, change their category, then delete the ticked ones after confirming', async ({ page }, testInfo) => {
+test('tick rows, change their category, then delete the ticked ones after confirming', { tag: '@smoke' }, async ({ page }, testInfo) => {
   await register(page, testInfo, 'bulk');
   await seed(page, [
     { category: 'Food', amount: 10000, note: 'Lunch' },
@@ -267,7 +266,7 @@ async function categoryIdOf(page, name) {
   return categories.find((c) => c.name === name)._id;
 }
 
-test('delete a row, then Undo brings it back and it is never deleted', async ({ page }, testInfo) => {
+test('delete a row, then Undo brings it back and it is never deleted', { tag: '@smoke' }, async ({ page }, testInfo) => {
   test.setTimeout(60000);
   await register(page, testInfo, 'undo');
   await seed(page, [

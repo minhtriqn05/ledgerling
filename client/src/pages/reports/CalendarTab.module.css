@@ -8,8 +8,9 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* 7 columns, Monday first. Week day names, then the day cells. */
+/* 7 columns, Monday first. Week day names, then the day cells. The cells read its width (container). */
 .grid {
+  container-type: inline-size;
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: var(--space-2);
@@ -70,9 +71,9 @@
   text-overflow: ellipsis;
 }
 
-/* On a phone a cell is about 40px wide: "980.000" does not fit, so the amount is left out.
-   The cell keeps its shade, its day number and its accessible name, which still has the amount. */
-@media (max-width: 560px) {
+/* Below about 64px a cell has no room for "5,7 Mio." (a phone, or a tablet next to the sidebar), so the amount is
+   left out. The cell keeps its shade and its day number; its description (aria-describedby) still says the amount. */
+@container (max-width: 520px) {
   .dayAmount {
     display: none;
   }

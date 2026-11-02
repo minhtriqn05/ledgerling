@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { isPhone } from './helpers/device.js';
 
 // Breadcrumbs: every signed-in page has one, made from the route configuration, and it starts with a Home icon that leads to
 // the landing page. On a phone the icon and the level above are shown ("Home ‹ Reports"); the links that are visible are the
@@ -17,10 +18,9 @@ async function register(page, testInfo, label) {
   await expect(page.getByRole('heading', { name: 'Dashboard', level: 1 })).toBeVisible();
 }
 
-const isPhone = (testInfo) => testInfo.project.name === 'mobile';
 const crumbs = (page) => page.getByRole('navigation', { name: 'Breadcrumb' });
 
-test('every page has a breadcrumb that starts at Home and ends with the current page', async ({ page }, testInfo) => {
+test('every page has a breadcrumb that starts at Home and ends with the current page', { tag: '@smoke' }, async ({ page }, testInfo) => {
   await register(page, testInfo, 'every');
 
   for (const path of PAGES) {

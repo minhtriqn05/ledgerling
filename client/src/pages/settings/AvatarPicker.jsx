@@ -75,7 +75,7 @@ export default function AvatarPicker() {
     try {
       updateUser(await setAvatar({ type: 'upload', value: dataUrl }));
     } catch (err) {
-      throw new Error(getErrorMessage(err));
+      throw new Error(getErrorMessage(err), { cause: err });
     }
     setFile(null);
     toast.success(t('avatar.saved'));

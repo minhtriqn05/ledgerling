@@ -2,7 +2,9 @@ import Transaction from "../models/Transaction.js";
 import Category from "../models/Category.js";
 import { httpError } from "../utils/httpError.js";
 import { buildCsv } from "../utils/csv.js";
+import { escapeRegex } from "../utils/regex.js";
 import { notifyBudgetThresholds } from "./notificationService.js";
+import { processDueRules } from "./recurringService.js";
 import { ensureDefaultWallet, findOwnedWallet, findUsableWallet } from "./walletService.js";
 import {
   currentMonth,
@@ -46,11 +48,6 @@ const SORTS = {
   amount: { amount: 1, date: -1, _id: -1 },
 };
 
-// "(" or "." typed in the search box must be matched as plain text, not as regex syntax
-function escapeRegex(text) {
-  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
 // from / to (whole days, Vietnam time) replace the month; with none of them, the current month is used
 function dateFilter({ month, from, to }) {
   if (!from && !to) {
@@ -64,7 +61,8 @@ function dateFilter({ month, from, to }) {
 }
 
 // The MongoDB filter shared by the list and the export. userId always comes from the token.
-// A wallet of another user is a 404. The default wallet also has the transactions without a walletId ($in with null finds them).
+// A wallet or a category of another user is a 404. The default wallet also has the transactions without a walletId
+// ($in with null finds them).
 async function buildFilter(userId, { type, categoryId, walletId, q, tag, ...range }) {
   const filter = { userId, date: dateFilter(range) };
   if (walletId) {
@@ -72,14 +70,16 @@ async function buildFilter(userId, { type, categoryId, walletId, q, tag, ...rang
     filter.walletId = wallet.isDefault ? { $in: [wallet._id, null] } : wallet._id;
   }
   if (type) filter.type = type;
-  if (categoryId) filter.categoryId = categoryId;
+  if (categoryId) filter.categoryId = (await findOwnedCategory(userId, categoryId))._id;
   if (tag) filter.tags = tag; // matches when the tag is one of the transaction's tags
   if (q) filter.note = { $regex: escapeRegex(q), $options: "i" };
   return filter;
 }
 
-// query = req.listQuery, already checked and with defaults (see validateListTransactions)
+// query = req.listQuery, already checked and with defaults (see validateListTransactions).
+// The recurring transactions that are due are created first, so they are in the list.
 export async function listTransactions(userId, query) {
+  await processDueRules(userId);
   const { sort, page, limit } = query;
   const filter = await buildFilter(userId, query);
 
@@ -209,9 +209,17 @@ export async function importTransactions(userId, rows, errors) {
   return { imported: docs.length, failed: allErrors.length, errors: allErrors };
 }
 
-// Deletes the listed transactions that belong to the user. Ids of other users (or that do not exist) are skipped
-// without an error, so the answer never tells whether such an id exists. Returns how many were deleted.
+// A bulk action is all or nothing: when one of the ids is not a transaction of the user (another user's, or one
+// that does not exist), the answer is a 404 and nothing changes. Both cases get the same answer, so it never tells
+// whether another user's id exists. `ids` has no duplicates (the request validation removed them).
+async function assertAllOwned(userId, ids) {
+  const owned = await Transaction.countDocuments({ _id: { $in: ids }, userId });
+  if (owned !== ids.length) throw httpError(404, "Transaction not found", "TRANSACTION_NOT_FOUND");
+}
+
+// Deletes the listed transactions of the user. Returns how many were deleted.
 export async function bulkDeleteTransactions(userId, ids) {
+  await assertAllOwned(userId, ids);
   const result = await Transaction.deleteMany({ _id: { $in: ids }, userId });
   return { deleted: result.deletedCount };
 }
@@ -221,6 +229,7 @@ export async function bulkDeleteTransactions(userId, ids) {
 // which also keeps its updatedAt.
 export async function bulkChangeCategory(userId, ids, categoryId) {
   const category = await findOwnedCategory(userId, categoryId);
+  await assertAllOwned(userId, ids);
   const result = await Transaction.updateMany(
     { _id: { $in: ids }, userId, categoryId: { $ne: category._id } },
     { $set: { categoryId: category._id, type: category.type } }

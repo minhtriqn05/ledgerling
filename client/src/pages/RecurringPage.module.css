@@ -4,7 +4,9 @@
   gap: var(--space-5);
 }
 
+/* The rows read the width of this list, not of the window, to choose their layout (RuleRow.module.css) */
 .list {
+  container-type: inline-size;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);

@@ -16,7 +16,7 @@ async function tryTheDemo(page) {
   await expect(page.getByRole('heading', { name: 'Dashboard', level: 1 })).toBeVisible();
 }
 
-test('a visitor who opens the site sees the landing page', async ({ page }) => {
+test('a visitor who opens the site sees the landing page', { tag: '@smoke' }, async ({ page }) => {
   await page.goto('/');
 
   await expect(page).toHaveURL(/\/welcome$/);
@@ -66,7 +66,7 @@ test('the page follows the language that is chosen', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Dùng thử bản demo' })).toBeVisible();
 });
 
-test('Try the demo says the server is starting, then opens the Dashboard with data', async ({ page }) => {
+test('Try the demo says the server is starting, then opens the Dashboard with data', { tag: '@smoke' }, async ({ page }) => {
   // The free Render server needs up to a minute to wake up: a slow answer shows the waiting text
   await page.route('**/api/auth/demo', async (route) => {
     await new Promise((resolve) => setTimeout(resolve, 1500));

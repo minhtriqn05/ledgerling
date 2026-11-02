@@ -66,10 +66,23 @@
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!--
+      The web fonts load without holding back the first paint: the page is drawn with the system font (the fallbacks of
+      --font-sans in tokens.css) and switches when the fonts arrive (display=swap). media="print" makes the browser fetch
+      the stylesheet without waiting for it; onload turns it on.
+    -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&family=Newsreader:opsz,wght@6..72,300..500&display=swap"
       rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&family=Newsreader:opsz,wght@6..72,300..500&display=swap"
+      media="print"
+      onload="this.media = 'all'"
     />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&family=Newsreader:opsz,wght@6..72,300..500&display=swap"
+      />
+    </noscript>
   </head>
   <body>
     <div id="root"></div>

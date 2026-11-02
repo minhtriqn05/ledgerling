@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import api from '../api/axios.js';
+import { getMe, login as loginRequest, loginDemo, register as registerRequest } from '../api/auth.js';
 import { clearApiCache } from '../utils/apiCache.js';
 import { SESSION_EXPIRED_EVENT } from '../utils/sessionEvents.js';
 
@@ -36,10 +36,9 @@ export function AuthProvider({ children }) {
     if (!localStorage.getItem('token')) return;
 
     let cancelled = false; // StrictMode runs effects twice in dev; ignore the first run's answer
-    api
-      .get('/auth/me')
-      .then((response) => {
-        if (!cancelled) setUser(response.data.data);
+    getMe()
+      .then((me) => {
+        if (!cancelled) setUser(me);
       })
       .catch((error) => {
         // Invalid, expired or unknown token: forget it. No answer at all (offline, server asleep) says nothing about the token.
@@ -91,20 +90,17 @@ export function AuthProvider({ children }) {
 
   // login and register throw when the API answers with an error, so the page can show the message.
   async function login(email, password) {
-    const response = await api.post('/auth/login', { email, password });
-    saveSession(response.data.data);
+    saveSession(await loginRequest({ email, password }));
   }
 
   // "Try the demo": the API signs in to the shared demo account (503 when it has not been seeded on that server).
   // The first call can take a minute while the free Render server wakes up, so no timeout is set.
   async function loginAsDemo() {
-    const response = await api.post('/auth/demo');
-    saveSession(response.data.data);
+    saveSession(await loginDemo());
   }
 
   async function register(name, email, password) {
-    const response = await api.post('/auth/register', { name, email, password });
-    saveSession(response.data.data);
+    saveSession(await registerRequest({ name, email, password }));
   }
 
   // updateUser puts a fresh copy of the user in place (e.g. after the settings changed), without touching the token.

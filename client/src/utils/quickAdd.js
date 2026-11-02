@@ -1,10 +1,10 @@
 // Reads a line typed in "Quick add" like "coffee 35k #work" or "salary 15tr yesterday".
 // Nothing here talks to the server: it is plain text in, a plain object out (see quickAdd.test.js).
+import { MAX_AMOUNT } from './validators.js';
 import { todayInput } from './vnDate.js';
 
 const MAX_TAGS = 5;
 const TAG_REGEX = /^[a-z0-9-]{1,20}$/;
-const MAX_AMOUNT = 999_999_999_999; // the form allows 12 digits
 
 // ----- Amount -----
 // 35k, 1.2tr, 1,2tr, 2m, 35.000, 1,500,000, 35000đ ...

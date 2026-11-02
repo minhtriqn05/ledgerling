@@ -36,9 +36,11 @@ function rateLimitWanted() {
 export function createApp({ rateLimit = rateLimitWanted() } = {}) {
   const app = express();
 
-  // Render puts one proxy in front of the server. Without this, every request would look like it comes from the
-  // proxy and all users would share one rate limit.
-  app.set("trust proxy", 1);
+  // Render puts two proxies in front of the server: Cloudflare, then Render's own. X-Forwarded-For arrives as
+  // "visitor, cloudflare-edge" (the edge changes between requests), so the visitor is the second address from the right.
+  // With 1, req.ip would be the Cloudflare edge and unrelated visitors would share one rate limit counter.
+  // An address a visitor writes into the header himself stays further left, so it is never used.
+  app.set("trust proxy", 2);
   // Query strings stay flat: ?a[b]=c is not turned into an object
   app.set("query parser", "simple");
 

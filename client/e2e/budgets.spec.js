@@ -57,7 +57,7 @@ function progressOf(page, categoryName) {
   return { track, fill: track.locator('span') };
 }
 
-test('set a limit → spend past 80% and 100% → the bar and the Dashboard alert change', async ({ page }, testInfo) => {
+test('set a limit → spend past 80% and 100% → the bar and the Dashboard alert change', { tag: '@smoke' }, async ({ page }, testInfo) => {
   test.setTimeout(120000);
   await register(page, testInfo, 'limit');
 

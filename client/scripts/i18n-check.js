@@ -31,8 +31,7 @@ function sourceFiles(dir, out = []) {
   for (const name of readdirSync(dir)) {
     const path = join(dir, name);
     if (statSync(path).isDirectory()) {
-      // The style guide is a dev-only page and stays in English
-      if (name !== 'styleGuide' && name !== 'locales') sourceFiles(path, out);
+      if (name !== 'locales') sourceFiles(path, out);
     } else if (/\.jsx?$/.test(name) && !/\.test\.jsx?$/.test(name)) {
       out.push(path);
     }

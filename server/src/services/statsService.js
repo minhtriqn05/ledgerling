@@ -1,13 +1,16 @@
 import mongoose from "mongoose";
 import Transaction from "../models/Transaction.js";
 import { currentMonth, monthRange, shiftMonth, VIETNAM_TIMEZONE } from "../utils/month.js";
+import { processDueRules } from "./recurringService.js";
 
 // The chart shows the chosen month and the 5 months before it
 const CHART_MONTHS = 6;
 
 // Everything the dashboard needs for one month, computed by MongoDB with 3 aggregation pipelines.
 // Only transactions in one currency are summed, so 10 USD is never added as 10 VND.
+// The recurring transactions that are due are created first, so the numbers include them.
 export async function getSummary(userId, { month = currentMonth(), currency = "VND" }) {
+  await processDueRules(userId);
   // Unlike find(), aggregate() does not cast types: the id from the token is a string and must
   // become an ObjectId, otherwise $match finds nothing
   const owner = new mongoose.Types.ObjectId(userId);

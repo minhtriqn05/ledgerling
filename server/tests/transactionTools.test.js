@@ -157,13 +157,13 @@ describe("GET /api/transactions/export with tags", () => {
     await add("b", []);
 
     const all = await api().get("/api/transactions/export?month=2026-08&sort=date").set(auth(exporter.token));
-    const lines = all.text.replace(/^﻿/, "").trim().split("\r\n");
+    const lines = all.text.replace(/^\uFEFF/, "").trim().split("\r\n");
     expect(lines[0]).toBe("Date,Type,Category,Amount,Currency,Note,Tags");
     expect(lines[1]).toBe("2026-08-05 09:00,expense,Food,7000,VND,a,work;trip");
     expect(lines[2]).toBe("2026-08-05 09:00,expense,Food,7000,VND,b,");
 
     const filtered = await api().get("/api/transactions/export?month=2026-08&tag=trip").set(auth(exporter.token));
-    expect(filtered.text.replace(/^﻿/, "").trim().split("\r\n")).toHaveLength(2);
+    expect(filtered.text.replace(/^\uFEFF/, "").trim().split("\r\n")).toHaveLength(2);
 
     const bad = await api().get("/api/transactions/export?tag=no%20good").set(auth(exporter.token));
     expect(bad.status).toBe(400);
@@ -178,7 +178,7 @@ describe("GET /api/transactions/export with tags", () => {
     }
     const res = await api().get("/api/transactions/export?month=2026-07").set(auth(exporter.token));
 
-    expect(res.text.startsWith("﻿")).toBe(true);
+    expect(res.text.startsWith("\uFEFF")).toBe(true);
     expect(res.headers["content-disposition"]).toBe('attachment; filename="ledgerling-2026-07.csv"');
     expect(res.text).toContain('"say ""hi"", ok"');
     expect(res.text).toContain('"two\nlines"');
@@ -352,7 +352,7 @@ describe("POST /api/transactions/import", () => {
 
     const file = await api().get("/api/transactions/export?month=2026-06&sort=date").set(auth(exporter.token));
     // A minimal CSV reader is enough here: the notes have no commas or quotes
-    const [header, ...lines] = file.text.replace(/^﻿/, "").trim().split("\r\n");
+    const [header, ...lines] = file.text.replace(/^\uFEFF/, "").trim().split("\r\n");
     const columns = header.split(",");
     const rows = lines.map((line) => {
       const cells = line.split(",");

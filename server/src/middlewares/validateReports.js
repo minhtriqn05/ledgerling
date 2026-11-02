@@ -1,10 +1,9 @@
 import { httpError } from "../utils/httpError.js";
 import { MONTH_REGEX } from "../utils/month.js";
+import { MAX_YEAR, MIN_YEAR } from "../utils/validation.js";
 import { CURRENCY_REGEX } from "./validateStats.js";
 
 const YEAR_REGEX = /^\d{4}$/;
-const MIN_YEAR = 1970;
-const MAX_YEAR = 2100;
 
 function checkCurrency(currency) {
   if (currency !== undefined && (typeof currency !== "string" || !CURRENCY_REGEX.test(currency))) {

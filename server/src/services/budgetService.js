@@ -4,6 +4,7 @@ import Category from "../models/Category.js";
 import Transaction from "../models/Transaction.js";
 import { httpError } from "../utils/httpError.js";
 import { currentMonth, monthRange } from "../utils/month.js";
+import { processDueRules } from "./recurringService.js";
 
 // Shows the category's name and color instead of just its id
 const CATEGORY_FIELDS = "name color icon";
@@ -73,7 +74,14 @@ export async function findBudgetProgress(userId, categoryId, month) {
   return budget ? progressOf(userId, budget) : null;
 }
 
+// GET /budgets: the recurring transactions that are due are created first, so "spent" includes them
 export async function listBudgets(userId, { month = currentMonth() }) {
+  await processDueRules(userId);
+  return budgetsOfMonth(userId, month);
+}
+
+// The budgets of a month with their progress, sorted by category name. The insights use it after their own processDueRules.
+export async function budgetsOfMonth(userId, month) {
   const budgets = await Budget.find({ userId, month }).populate("categoryId", CATEGORY_FIELDS);
   if (budgets.length === 0) return [];
 

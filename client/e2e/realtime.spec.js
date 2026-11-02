@@ -36,7 +36,7 @@ function today() {
   return new Date().toISOString();
 }
 
-test('a transaction added in browser 1 appears in browser 2 without a reload, and the dashboard follows', async ({ browser, request, baseURL }, testInfo) => {
+test('a transaction added in browser 1 appears in browser 2 without a reload, and the dashboard follows', { tag: '@smoke' }, async ({ browser, request, baseURL }, testInfo) => {
   const account = await newAccount(request);
   const options = { baseURL, ...testInfo.project.use };
   const first = await openDevice(browser, account, '/transactions', options);

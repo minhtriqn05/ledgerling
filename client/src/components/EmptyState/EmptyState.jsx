@@ -4,7 +4,8 @@ import styles from './EmptyState.module.css';
 
 // Shown instead of a list that has nothing in it yet: three soft circles behind an icon,
 // a title, a short text and (optional) an action button passed as children.
-export default function EmptyState({ icon, title, text, children }) {
+// titleAs: the heading level of the title; h2 under the title of a page, h1 when it is the whole page (FullPageMessage).
+export default function EmptyState({ icon, title, text, titleAs: Title = 'h2', children }) {
   return (
     <Card className={styles.empty}>
       <div className={styles.art} aria-hidden="true">
@@ -15,7 +16,7 @@ export default function EmptyState({ icon, title, text, children }) {
           <Icon name={icon} size={26} />
         </span>
       </div>
-      <h2 className={styles.title}>{title}</h2>
+      <Title className={styles.title}>{title}</Title>
       <p className={styles.text}>{text}</p>
       {children}
     </Card>

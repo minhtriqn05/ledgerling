@@ -35,7 +35,7 @@ const loginStatus = async (page, { email, password }) =>
 const meStatus = async (page, token) =>
   (await page.request.get(`${API_URL}/auth/me`, { headers: { Authorization: `Bearer ${token}` } })).status();
 
-test('an admin sees the statistics, finds a user and disables and enables the account', async ({ page, browser }, testInfo) => {
+test('an admin sees the statistics, finds a user and disables and enables the account', { tag: '@smoke' }, async ({ page, browser, baseURL }, testInfo) => {
   const target = await newUser(page, testInfo, 'target');
   await logIn(page, ADMIN);
 
@@ -91,7 +91,7 @@ test('an admin sees the statistics, finds a user and disables and enables the ac
   // And the person sees why on the login page
   const stranger = await browser.newContext();
   const loginPage = await stranger.newPage();
-  await loginPage.goto('http://localhost:5174/login');
+  await loginPage.goto(`${baseURL}/login`);
   await loginPage.getByLabel('Email').fill(target.email);
   await loginPage.getByLabel('Password', { exact: true }).fill(target.password);
   await loginPage.getByRole('button', { name: 'Log in' }).click();

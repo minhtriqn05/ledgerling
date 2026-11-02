@@ -1,56 +1,31 @@
 import { httpError } from "../utils/httpError.js";
-import { MONTH_REGEX, isValidDay } from "../utils/month.js";
+import { MONTH_REGEX } from "../utils/month.js";
+import {
+  OBJECT_ID_REGEX,
+  checkAmount,
+  checkDay,
+  checkId,
+  checkIsoDate,
+  checkNote,
+  isAppDay,
+  isObjectId,
+  readLimit,
+  readPage,
+  text,
+  validIdParam,
+} from "../utils/validation.js";
 
 const TYPES = ["income", "expense"];
-const OBJECT_ID_REGEX = /^[0-9a-fA-F]{24}$/;
 const CURRENCY_REGEX = /^[A-Z]{3}$/;
-const ISO_DATE_REGEX = /^\d{4}-\d{2}-\d{2}/;
-
-// Anything that is not a string counts as empty
-function text(value) {
-  return typeof value === "string" ? value : "";
-}
 
 // Each helper checks one field and returns the cleaned value, or throws a 400.
-function checkCategoryId(value) {
-  const categoryId = text(value).trim();
-  if (!OBJECT_ID_REGEX.test(categoryId)) throw httpError(400, "Category id is invalid");
-  return categoryId;
-}
-
-function checkWalletId(value) {
-  const walletId = text(value).trim();
-  if (!OBJECT_ID_REGEX.test(walletId)) throw httpError(400, "Wallet id is invalid");
-  return walletId;
-}
-
-function checkAmount(value) {
-  if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) {
-    throw httpError(400, "Amount must be greater than 0", "AMOUNT_INVALID");
-  }
-  return value;
-}
+const checkCategoryId = (value) => checkId(value, "Category id is invalid");
+const checkWalletId = (value) => checkId(value, "Wallet id is invalid");
 
 function checkCurrency(value) {
   const currency = text(value).trim().toUpperCase();
   if (!CURRENCY_REGEX.test(currency)) throw httpError(400, "Currency must be a 3-letter ISO code", "CURRENCY_INVALID");
   return currency;
-}
-
-function checkNote(value) {
-  if (typeof value !== "string") throw httpError(400, "Note must be a string");
-  const note = value.trim();
-  if (note.length > 200) throw httpError(400, "Note must be at most 200 characters", "NOTE_TOO_LONG");
-  return note;
-}
-
-// Must start like an ISO 8601 date (YYYY-MM-DD...), because new Date() alone accepts things like "1"
-function checkDate(value) {
-  const date = typeof value === "string" && ISO_DATE_REGEX.test(value) ? new Date(value) : null;
-  if (!date || Number.isNaN(date.getTime())) {
-    throw httpError(400, "Date is invalid, use ISO 8601 like 2026-10-27T12:30:00+07:00", "DATE_INVALID");
-  }
-  return date;
 }
 
 // ----- Tags -----
@@ -87,7 +62,7 @@ export function validateCreateTransaction(req, res, next) {
   if (body.walletId !== undefined) data.walletId = checkWalletId(body.walletId);
   if (body.currency !== undefined) data.currency = checkCurrency(body.currency);
   if (body.note !== undefined) data.note = checkNote(body.note);
-  if (body.date !== undefined) data.date = checkDate(body.date);
+  if (body.date !== undefined) data.date = checkIsoDate(body.date);
   if (body.tags !== undefined) data.tags = checkTags(body.tags);
 
   req.body = data;
@@ -103,7 +78,7 @@ export function validateUpdateTransaction(req, res, next) {
   if (body.amount !== undefined) changes.amount = checkAmount(body.amount);
   if (body.currency !== undefined) changes.currency = checkCurrency(body.currency);
   if (body.note !== undefined) changes.note = checkNote(body.note);
-  if (body.date !== undefined) changes.date = checkDate(body.date);
+  if (body.date !== undefined) changes.date = checkIsoDate(body.date);
   if (body.tags !== undefined) changes.tags = checkTags(body.tags);
 
   if (Object.keys(changes).length === 0) throw httpError(400, "Nothing to update");
@@ -112,11 +87,7 @@ export function validateUpdateTransaction(req, res, next) {
   next();
 }
 
-// A malformed id can never match anything, so answer 404 instead of letting Mongoose throw a CastError.
-export function validateTransactionId(req, res, next) {
-  if (!OBJECT_ID_REGEX.test(req.params.id)) throw httpError(404, "Transaction not found", "TRANSACTION_NOT_FOUND");
-  next();
-}
+export const validateTransactionId = validIdParam("id", "Transaction not found", "TRANSACTION_NOT_FOUND");
 
 // ----- GET /transactions query -----
 // A query value is a string, or an array when the same key is sent twice (?q=a&q=b), which we refuse.
@@ -124,34 +95,12 @@ export function validateTransactionId(req, res, next) {
 const SORTS = ["date", "-date", "amount", "-amount"];
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 100;
-const WHOLE_NUMBER_REGEX = /^\d+$/;
-
-function checkDay(value, field) {
-  if (typeof value !== "string" || !isValidDay(value)) {
-    throw httpError(400, `${field} must be a date in YYYY-MM-DD format`, "DATE_INVALID");
-  }
-  return value;
-}
 
 function checkSearch(value) {
   if (typeof value !== "string") throw httpError(400, "Search must be a string");
   const q = value.trim();
   if (q.length > 100) throw httpError(400, "Search must be at most 100 characters");
   return q;
-}
-
-function checkPage(value) {
-  const page = typeof value === "string" && WHOLE_NUMBER_REGEX.test(value) ? Number(value) : 0;
-  if (page < 1) throw httpError(400, "Page must be a whole number from 1");
-  return page;
-}
-
-function checkLimit(value) {
-  const limit = typeof value === "string" && WHOLE_NUMBER_REGEX.test(value) ? Number(value) : 0;
-  if (limit < 1 || limit > MAX_LIMIT) {
-    throw httpError(400, `Limit must be a whole number from 1 to ${MAX_LIMIT}`);
-  }
-  return limit;
 }
 
 // Checks the filters that GET /transactions and GET /transactions/export share (everything but page and limit)
@@ -168,12 +117,8 @@ function readFilters(query) {
   if (type !== undefined && !TYPES.includes(type)) {
     throw httpError(400, "Type must be income or expense", "TYPE_INVALID");
   }
-  if (categoryId !== undefined && (typeof categoryId !== "string" || !OBJECT_ID_REGEX.test(categoryId))) {
-    throw httpError(400, "Category id is invalid");
-  }
-  if (walletId !== undefined && (typeof walletId !== "string" || !OBJECT_ID_REGEX.test(walletId))) {
-    throw httpError(400, "Wallet id is invalid");
-  }
+  if (categoryId !== undefined && !isObjectId(categoryId)) throw httpError(400, "Category id is invalid");
+  if (walletId !== undefined && !isObjectId(walletId)) throw httpError(400, "Wallet id is invalid");
   if (sort !== undefined && !SORTS.includes(sort)) {
     throw httpError(400, `Sort must be one of ${SORTS.join(", ")}`);
   }
@@ -202,10 +147,9 @@ function readFilters(query) {
 // Every filter is optional. On success the cleaned values, with their defaults, are put in req.listQuery
 // (Express 5 does not let us replace req.query).
 export function validateListTransactions(req, res, next) {
-  const { page, limit } = req.query;
   const listQuery = readFilters(req.query);
-  listQuery.page = page === undefined ? 1 : checkPage(page);
-  listQuery.limit = limit === undefined ? DEFAULT_LIMIT : checkLimit(limit);
+  listQuery.page = readPage(req.query.page);
+  listQuery.limit = readLimit(req.query.limit, DEFAULT_LIMIT, MAX_LIMIT);
 
   req.listQuery = listQuery;
   next();
@@ -232,10 +176,10 @@ function checkImportDate(value) {
   const trimmed = typeof value === "string" ? value.trim() : value;
   const match = typeof trimmed === "string" ? IMPORT_DATE_REGEX.exec(trimmed) : null;
   // Not the export format: it must be a full ISO 8601 date, like when creating one
-  if (!match) return checkDate(trimmed);
+  if (!match) return checkIsoDate(trimmed);
 
   const [, day, hour = "00", minute = "00", second = "00"] = match;
-  if (!isValidDay(day) || Number(hour) > 23 || Number(minute) > 59 || Number(second) > 59) {
+  if (!isAppDay(day) || Number(hour) > 23 || Number(minute) > 59 || Number(second) > 59) {
     throw httpError(400, "Date is invalid, use YYYY-MM-DD HH:mm or ISO 8601", "DATE_INVALID");
   }
   return new Date(`${day}T${hour}:${minute}:${second}+07:00`);
@@ -288,12 +232,13 @@ export function validateImportTransactions(req, res, next) {
 
 export const MAX_BULK_IDS = 200;
 
-// The body has `ids`: an array of 1 to 200 transaction ids. Duplicates are removed.
-// A malformed id is a 400 here (unlike /transactions/:id, where it is a 404): it is part of the body, not the address.
+// The body has `ids`: an array of 1 to 200 transaction ids. Duplicates are removed (in lower case: an ObjectId is
+// the same in either case). A malformed id is a 400 here (unlike /transactions/:id, where it is a 404): it is part of
+// the body, not the address.
 function checkIds(value) {
   if (!Array.isArray(value) || value.length === 0) throw httpError(400, "Ids must be a non-empty array");
   if (value.length > MAX_BULK_IDS) throw httpError(400, `You can change at most ${MAX_BULK_IDS} transactions at a time`);
-  const ids = value.map((id) => text(id).trim());
+  const ids = value.map((id) => text(id).trim().toLowerCase());
   if (!ids.every((id) => OBJECT_ID_REGEX.test(id))) throw httpError(400, "Every id must be a valid transaction id");
   return [...new Set(ids)];
 }

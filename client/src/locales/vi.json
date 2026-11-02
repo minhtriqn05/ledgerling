@@ -958,7 +958,7 @@
   },
   "errors": {
     "ACCOUNT_DISABLED": "Tài khoản này đã bị khoá",
-    "AMOUNT_INVALID": "Số tiền phải lớn hơn 0",
+    "AMOUNT_INVALID": "Số tiền phải là số nguyên (VND), từ 1 đến 999.999.999.999",
     "BUDGET_EXISTS": "Danh mục này đã có ngân sách trong tháng",
     "BUDGET_EXPENSE_ONLY": "Ngân sách chỉ dành cho danh mục chi tiêu",
     "BUDGET_NOT_FOUND": "Không tìm thấy ngân sách",
@@ -1032,9 +1032,10 @@
     "WALLET_IN_USE": "Ví này vẫn còn giao dịch hoặc chuyển tiền. Hãy lưu trữ ví.",
     "WALLET_DEFAULT_LOCKED": "Không thể lưu trữ hoặc xóa ví mặc định",
     "WALLET_TYPE_INVALID": "Hãy chọn loại ví",
-    "WALLET_BALANCE_INVALID": "Số dư ban đầu phải từ 0 trở lên",
+    "WALLET_BALANCE_INVALID": "Số dư ban đầu phải là số nguyên (VND), từ 0 trở lên",
     "TRANSFER_NOT_FOUND": "Không tìm thấy lần chuyển tiền",
-    "TRANSFER_SAME_WALLET": "Hãy chọn hai ví khác nhau"
+    "TRANSFER_SAME_WALLET": "Hãy chọn hai ví khác nhau",
+    "REQUEST_ERROR": "Không xử lý được yêu cầu. Vui lòng thử lại."
   },
   "live": {
     "live": "Trực tuyến",

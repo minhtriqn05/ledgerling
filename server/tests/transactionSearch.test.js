@@ -67,7 +67,7 @@ describe("GET /api/transactions/export", () => {
     expect(res.headers["content-type"]).toContain("text/csv");
     expect(res.headers["content-disposition"]).toBe('attachment; filename="ledgerling-2026-10.csv"');
 
-    const lines = res.text.replace(/^﻿/, "").trim().split("\r\n");
+    const lines = res.text.replace(/^\uFEFF/, "").trim().split("\r\n");
     expect(lines[0]).toBe("Date,Type,Category,Amount,Currency,Note,Tags");
     expect(lines[1]).toBe("2026-10-02 08:00,expense,Food,35000,VND,Coffee (large),");
     expect(lines).toHaveLength(5);

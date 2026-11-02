@@ -8,12 +8,21 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "lint": "eslint . --max-warnings=0",
     "test": "vitest run",
-    "test:e2e": "playwright test",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "npm run test:e2e:chromium && npm run test:e2e:smoke",
+    "test:e2e:chromium": "playwright test --project=desktop --project=mobile",
+    "test:e2e:smoke": "playwright test --project=firefox --project=webkit",
+    "test:e2e:live": "playwright test -c playwright.live.config.js",
     "generate-pwa-assets": "pwa-assets-generator",
     "i18n:check": "node scripts/i18n-check.js",
     "og-image": "node scripts/capture-og.mjs",
-    "screenshots": "playwright test -c playwright.screenshots.config.js"
+    "screenshots": "playwright test -c playwright.screenshots.config.js --grep \"landing page pictures\"",
+    "screenshots:docs": "playwright test -c playwright.screenshots.config.js docs-screenshots"
+  },
+  "engines": {
+    "node": "24.x"
   },
   "dependencies": {
     "axios": "^1.21.0",
@@ -31,12 +40,15 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
+    "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.64.1",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.8",
     "@vite-pwa/assets-generator": "^2.0.0",
     "@vitejs/plugin-react": "^6.1.2",
+    "@vitest/coverage-v8": "^5.0.5",
+    "eslint": "^10.14.0",
     "jsdom": "^30.1.3",
     "vite": "^8.3.5",
     "vite-plugin-pwa": "^2.0.0",

@@ -52,6 +52,7 @@ router.use(requireAuth);
  *             example:
  *               success: false
  *               message: Type must be income or expense
+ *               code: TYPE_INVALID
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
@@ -115,6 +116,7 @@ router.get("/", validateListCategories, list);
  *             example:
  *               success: false
  *               message: Color must be a hex code like #FF7043
+ *               code: COLOR_INVALID
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  *       409:
@@ -126,6 +128,7 @@ router.get("/", validateListCategories, list);
  *             example:
  *               success: false
  *               message: Category already exists
+ *               code: CATEGORY_EXISTS
  */
 router.post("/", validateCreateCategory, create);
 
@@ -167,6 +170,7 @@ router.post("/", validateCreateCategory, create);
  *             example:
  *               success: false
  *               message: Category not found
+ *               code: CATEGORY_NOT_FOUND
  */
 router.get("/:id", validateCategoryId, getOne);
 
@@ -227,6 +231,7 @@ router.get("/:id", validateCategoryId, getOne);
  *             example:
  *               success: false
  *               message: Type cannot be changed
+ *               code: TYPE_LOCKED
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  *       404:
@@ -238,6 +243,7 @@ router.get("/:id", validateCategoryId, getOne);
  *             example:
  *               success: false
  *               message: Category not found
+ *               code: CATEGORY_NOT_FOUND
  *       409:
  *         description: Category already exists (same name and type for this user, case-insensitive)
  *         content:
@@ -247,6 +253,7 @@ router.get("/:id", validateCategoryId, getOne);
  *             example:
  *               success: false
  *               message: Category already exists
+ *               code: CATEGORY_EXISTS
  */
 router.patch("/:id", validateCategoryId, validateUpdateCategory, update);
 
@@ -293,6 +300,7 @@ router.patch("/:id", validateCategoryId, validateUpdateCategory, update);
  *             example:
  *               success: false
  *               message: Category not found
+ *               code: CATEGORY_NOT_FOUND
  *       409:
  *         description: The category is still used by at least one transaction. Move or delete those transactions first.
  *         content:
@@ -302,6 +310,7 @@ router.patch("/:id", validateCategoryId, validateUpdateCategory, update);
  *             example:
  *               success: false
  *               message: Category still has transactions
+ *               code: CATEGORY_IN_USE
  */
 router.delete("/:id", validateCategoryId, remove);
 

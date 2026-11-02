@@ -16,6 +16,7 @@ import notificationRoutes from "./notificationRoutes.js";
 import userRoutes from "./userRoutes.js";
 import adminRoutes from "./adminRoutes.js";
 import { liveChanges } from "../middlewares/liveChanges.js";
+import { health } from "../controllers/healthController.js";
 
 const router = Router();
 
@@ -42,7 +43,10 @@ router.use("/admin", adminRoutes);
  * @openapi
  * /health:
  *   get:
- *     summary: Check that the API is running
+ *     summary: Check that the API is running, and which build answers
+ *     description: |
+ *       `version` is the Git commit Render deployed (`RENDER_GIT_COMMIT`), or the time this server started when it runs
+ *       outside Render. Never rate-limited.
  *     tags: [Health]
  *     responses:
  *       200:
@@ -55,11 +59,16 @@ router.use("/admin", adminRoutes);
  *                 success:
  *                   type: boolean
  *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     version:
+ *                       type: string
  *             example:
  *               success: true
+ *               data:
+ *                 version: 1ca2479a1b2c3d4e5f60718293a4b5c6d7e8f901
  */
-router.get("/health", (req, res) => {
-  res.status(200).json({ success: true });
-});
+router.get("/health", health);
 
 export default router;

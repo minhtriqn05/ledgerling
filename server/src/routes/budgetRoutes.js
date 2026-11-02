@@ -88,6 +88,7 @@ router.use(requireAuth);
  *             example:
  *               success: false
  *               message: Month must be in YYYY-MM format
+ *               code: MONTH_INVALID
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
@@ -118,10 +119,10 @@ router.get("/", validateListBudgets, list);
  *                 pattern: '^\d{4}-(0[1-9]|1[0-2])$'
  *                 example: "2026-10"
  *               amount:
- *                 type: number
- *                 description: Spending limit in VND
- *                 exclusiveMinimum: true
- *                 minimum: 0
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 999999999999
+ *                 description: Spending limit in whole VND, 1 to 999,999,999,999
  *                 example: 5000000
  *     responses:
  *       201:
@@ -145,6 +146,7 @@ router.get("/", validateListBudgets, list);
  *             example:
  *               success: false
  *               message: Budgets are only for expense categories
+ *               code: BUDGET_EXPENSE_ONLY
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  *       404:
@@ -156,6 +158,7 @@ router.get("/", validateListBudgets, list);
  *             example:
  *               success: false
  *               message: Category not found
+ *               code: CATEGORY_NOT_FOUND
  *       409:
  *         description: This category already has a budget for this month
  *         content:
@@ -165,6 +168,7 @@ router.get("/", validateListBudgets, list);
  *             example:
  *               success: false
  *               message: Budget already exists for this category and month
+ *               code: BUDGET_EXISTS
  */
 router.post("/", validateCreateBudget, create);
 
@@ -222,6 +226,7 @@ router.post("/", validateCreateBudget, create);
  *             example:
  *               success: false
  *               message: From month and to month must be different
+ *               code: VALIDATION_ERROR
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
@@ -250,9 +255,10 @@ router.post("/copy", validateCopyBudgets, copy);
  *             required: [amount]
  *             properties:
  *               amount:
- *                 type: number
- *                 exclusiveMinimum: true
- *                 minimum: 0
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 999999999999
+ *                 description: whole VND, 1 to 999,999,999,999
  *                 example: 6000000
  *     responses:
  *       200:
@@ -276,6 +282,7 @@ router.post("/copy", validateCopyBudgets, copy);
  *             example:
  *               success: false
  *               message: Only the amount can be changed
+ *               code: VALIDATION_ERROR
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  *       404:
@@ -287,6 +294,7 @@ router.post("/copy", validateCopyBudgets, copy);
  *             example:
  *               success: false
  *               message: Budget not found
+ *               code: BUDGET_NOT_FOUND
  */
 router.patch("/:id", validateBudgetId, validateUpdateBudget, update);
 
@@ -332,6 +340,7 @@ router.patch("/:id", validateBudgetId, validateUpdateBudget, update);
  *             example:
  *               success: false
  *               message: Budget not found
+ *               code: BUDGET_NOT_FOUND
  */
 router.delete("/:id", validateBudgetId, remove);
 

@@ -14,9 +14,11 @@ function normalizeError(err) {
   if (err.type === "entity.too.large") {
     return { status: 413, message: "Request body is too large", code: "PAYLOAD_TOO_LARGE" };
   }
-  // Mongoose schema validation failed
+  // Mongoose schema validation failed. Its message names the model, the paths and the values: useful while developing,
+  // internal in production (the request validation normally refuses bad input before the schema is reached).
   if (err.name === "ValidationError") {
-    return { status: 400, message: err.message, code: "VALIDATION_ERROR" };
+    const message = process.env.NODE_ENV === "production" ? "Invalid input" : err.message;
+    return { status: 400, message, code: "VALIDATION_ERROR" };
   }
   // Mongoose cast failed, e.g. an invalid ObjectId in the URL
   if (err.name === "CastError") {
@@ -38,9 +40,8 @@ function normalizeError(err) {
   };
 }
 
-// Express recognises an error handler by its 4 parameters
-// eslint-disable-next-line no-unused-vars
-export function errorHandler(err, req, res, next) {
+// Express recognises an error handler by its 4 parameters, so the unused last one stays (as _next)
+export function errorHandler(err, req, res, _next) {
   const { status, message, code } = normalizeError(err);
   if (status >= 500 && status !== 503) console.error(err);
   res.status(status).json({ success: false, message, code });

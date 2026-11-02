@@ -1,8 +1,9 @@
 import { expect, test } from '@playwright/test';
 
-// Phase 22: offline use. The service worker only exists in the build, so these tests open `vite preview` on port 5175.
+// Phase 22: offline use. The tests run on the build (vite preview), where the service worker exists; the other test files
+// block it (playwright.config.js), these ones let it run.
 
-test.use({ baseURL: 'http://localhost:5175' });
+test.use({ serviceWorkers: 'allow' });
 
 // Signs in to the demo account, then loads the page once more through the service worker, which saves the answers
 async function loadThroughServiceWorker(page, path = '/') {
@@ -20,7 +21,7 @@ const apiCacheEntries = (page) =>
     return (await cache.keys()).map((request) => new URL(request.url).pathname);
   });
 
-test('offline, the dashboard that was loaded is still there, with the banner and locked buttons', async ({ page, context }) => {
+test('offline, the dashboard that was loaded is still there, with the banner and locked buttons', { tag: '@smoke' }, async ({ page, context }) => {
   // No count-up animation, so the number can be read right away
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await loadThroughServiceWorker(page);

@@ -1,5 +1,11 @@
 /* --tone (the category color) is set inline from the API data. */
 
+/* Both layouts sit in this box. Its own width (not the window's) decides which one shows, because the sidebar
+   takes part of the window: see "Responsive" below. */
+.list {
+  container-type: inline-size;
+}
+
 /* ---------- Table ---------- */
 /* position: relative keeps the hidden "Actions" label inside the scroll area. */
 .tableWrap {
@@ -279,7 +285,9 @@
 }
 
 /* ---------- Responsive ---------- */
-@media (max-width: 640px) {
+/* With less room than this the other columns squeeze the note (the text people read first) down to its icon,
+   so the cards show instead: on a phone, and on a tablet or a small laptop next to the sidebar. */
+@container (max-width: 860px) {
   .tableWrap {
     display: none;
   }

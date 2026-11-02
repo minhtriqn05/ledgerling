@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getMonthlyReport } from '../../api/reports.js';
@@ -23,11 +24,19 @@ export default function CalendarTab({ month, weekStartsOn }) {
   const weekStart = weekStartsOn ?? preferredWeekStart;
   const { data: report, loading, error, reload, refresh } = useLoad(() => getMonthlyReport(month), [month]);
   useLiveRefresh(['transactions', 'categories'], refresh);
+  // The ids of the sentences that describe each day (aria-describedby)
+  const describedBy = useId();
 
   if (loading) return <LoadingState skeleton="cards">{t('reports.loadingCalendar')}</LoadingState>;
   if (error) return <ErrorState message={error} onRetry={reload} />;
 
   const { cells } = buildCalendar(month, report.dailyExpense, weekStart);
+  const days = cells.filter(Boolean);
+  // The whole sentence of a day, read after its name (the day number and the short amount that are on screen)
+  const sentence = (cell) =>
+    cell.total > 0
+      ? t('reports.daySpent', { day: formatLongDay(cell.date), amount: formatVnd(cell.total) })
+      : t('reports.dayNoSpending', { day: formatLongDay(cell.date) });
 
   return (
     <CollapsibleCard
@@ -57,11 +66,7 @@ export default function CalendarTab({ month, weekStartsOn }) {
               key={cell.date}
               type="button"
               className={`${styles.day} ${styles[`level${cell.level}`]}`}
-              aria-label={
-                cell.total > 0
-                  ? t('reports.daySpent', { day: formatLongDay(cell.date), amount: formatVnd(cell.total) })
-                  : t('reports.dayNoSpending', { day: formatLongDay(cell.date) })
-              }
+              aria-describedby={`${describedBy}-${cell.day}`}
               onClick={() => navigate(dayTransactionsPath(cell.date))}
             >
               <span className={styles.dayNumber}>{cell.day}</span>
@@ -69,6 +74,15 @@ export default function CalendarTab({ month, weekStartsOn }) {
             </button>
           )
         )}
+      </div>
+      {/* The name of a day button is what it shows ("10", "1M"), so a person using voice control can say it;
+          the full sentence is its description. Outside the grid, so the grid holds only the days. */}
+      <div hidden>
+        {days.map((cell) => (
+          <span key={cell.date} id={`${describedBy}-${cell.day}`}>
+            {sentence(cell)}
+          </span>
+        ))}
       </div>
 
       <div className={styles.legend} aria-hidden="true">

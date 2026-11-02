@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AnimatePresence } from 'motion/react';
 import { useTranslation } from 'react-i18next';
@@ -51,6 +51,9 @@ export default function BudgetsPage() {
   const [dialog, setDialog] = useState(null);
   const [copying, setCopying] = useState(false);
   const toast = useToast();
+  // Counts the changes this page makes to the list itself. A list asked for before one of them can arrive after it,
+  // without it: that answer is not used, and the list is asked for again.
+  const localChanges = useRef(0);
 
   // The categories fill the "Add budget" dialog. They load once.
   useEffect(() => {
@@ -73,9 +76,14 @@ export default function BudgetsPage() {
   // The budgets reload whenever the month changes.
   useEffect(() => {
     let cancelled = false;
+    const changesBefore = localChanges.current;
     getBudgets(month)
       .then((data) => {
         if (cancelled) return;
+        if (localChanges.current !== changesBefore) {
+          setReloadKey((key) => key + 1);
+          return;
+        }
         setBudgets(data);
         setLoadError('');
       })
@@ -114,6 +122,7 @@ export default function BudgetsPage() {
   function handleSaved(saved) {
     toast.success(dialog.budget ? t('budgets.updated') : t('budgets.added'));
     setDialog(null);
+    localChanges.current += 1;
     setBudgets((list) => sortByCategory([...list.filter((b) => b._id !== saved._id), saved]));
   }
 
@@ -141,6 +150,7 @@ export default function BudgetsPage() {
     try {
       await deleteBudget(budget._id);
       toast.success(t('budgets.deleted'));
+      localChanges.current += 1;
       setBudgets((list) => list.filter((b) => b._id !== budget._id));
     } catch (err) {
       toast.error(getErrorMessage(err));

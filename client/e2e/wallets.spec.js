@@ -56,7 +56,7 @@ async function moveMoney(page, { from, to, amount, note }) {
   await expect(dialog).toBeHidden();
 }
 
-test('create a wallet → move money → the balances change, and income and expense stay the same', async ({ page }, testInfo) => {
+test('create a wallet → move money → the balances change, and income and expense stay the same', { tag: '@smoke' }, async ({ page }, testInfo) => {
   test.setTimeout(90000);
   await register(page, testInfo, 'flow');
 

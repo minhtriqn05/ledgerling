@@ -13,7 +13,7 @@ import { UNDO_MS, useUndoDelete } from '../hooks/useUndoDelete.js';
 import { categoryLabel } from '../utils/emoji.js';
 import { formatDate, formatSignedVnd, formatVnd } from '../utils/format.js';
 import { downloadFile } from '../utils/downloadFile.js';
-import { currentMonth, formatMonth, fromDateInput, toDateInput } from '../utils/vnDate.js';
+import { currentMonth, formatMonth, fromDateInput, isAppDay, toDateInput } from '../utils/vnDate.js';
 import PageHeader from '../components/PageHeader/PageHeader.jsx';
 import { HeroStat, HeroStats } from '../components/PageHeader/HeroStat.jsx';
 import MonthPicker from '../components/MonthPicker/MonthPicker.jsx';
@@ -21,6 +21,7 @@ import Card from '../components/Card/Card.jsx';
 import Button from '../components/Button/Button.jsx';
 import EmptyState from '../components/EmptyState/EmptyState.jsx';
 import LoadingState from '../components/LoadingState/LoadingState.jsx';
+import Skeleton from '../components/Skeleton/Skeleton.jsx';
 import ErrorState from '../components/ErrorState/ErrorState.jsx';
 import Icon from '../components/Icon.jsx';
 import Select from '../components/Select/Select.jsx';
@@ -52,16 +53,8 @@ const SORT_OPTIONS = [
 const DEFAULT_SORT = '-date';
 
 const MONTH_REGEX = /^\d{4}-(0[1-9]|1[0-2])$/;
-const DAY_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 const OBJECT_ID_REGEX = /^[0-9a-f]{24}$/i;
 const TAG_REGEX = /^[a-z0-9-]{1,20}$/;
-
-// "2026-02-30" has the right shape but is not a real day (Date.UTC quietly turns it into March 2nd)
-function isRealDay(text) {
-  if (!DAY_REGEX.test(text ?? '')) return false;
-  const [year, month, day] = text.split('-').map(Number);
-  return new Date(Date.UTC(year, month - 1, day)).toISOString().slice(0, 10) === text;
-}
 
 // Every filter lives in the URL (?month=2026-10&category=...&wallet=...&tag=work&q=coffee&sort=-amount&from=...&to=...&page=2),
 // so F5 or a shared link shows the same list. A value that is missing or hand-edited into nonsense falls back to its
@@ -72,8 +65,8 @@ function readFilters(searchParams) {
   const wallet = searchParams.get('wallet');
   const tag = (searchParams.get('tag') ?? '').toLowerCase();
   const sort = searchParams.get('sort');
-  let from = isRealDay(searchParams.get('from')) ? searchParams.get('from') : '';
-  let to = isRealDay(searchParams.get('to')) ? searchParams.get('to') : '';
+  let from = isAppDay(searchParams.get('from')) ? searchParams.get('from') : '';
+  let to = isAppDay(searchParams.get('to')) ? searchParams.get('to') : '';
   // A range that ends before it starts is dropped
   if (from && to && from > to) {
     from = '';
@@ -294,7 +287,7 @@ export default function TransactionsPage() {
         if (!cancelled) setSummary(data);
       })
       .catch(() => {
-        if (!cancelled) setSummary(null);
+        if (!cancelled) setSummary({ month, failed: true });
       });
     return () => {
       cancelled = true;
@@ -457,7 +450,12 @@ export default function TransactionsPage() {
 
   const ready = !loading && !loadError;
   // The summary of another month (still loading) must not be shown under this month's name
-  const showTotals = ready && !hasRange && summary?.month === month;
+  const summaryOfMonth = summary?.month === month ? summary : null;
+  const showTotals = ready && !hasRange && Boolean(summaryOfMonth) && !summaryOfMonth.failed;
+  // While the totals are on their way the hero keeps their place, so the filters and the list below never jump down
+  // when they arrive. A summary that could not be read hides them instead.
+  const totalsPending = !hasRange && !loadError && !showTotals && !summaryOfMonth?.failed;
+  const totalValue = (format) => (showTotals ? format() : <Skeleton width="8ch" height="calc(1em * var(--line-height-tight))" />);
   const total = Math.max((meta?.total ?? 0) - hiddenCount, 0);
 
   // The card shows one of four states: loading, error, empty or the list.
@@ -544,12 +542,12 @@ export default function TransactionsPage() {
         title={t('nav.transactions')}
         subtitle={ready ? `${period} · ${t('transactions.count', { count: total })}` : period}
         stats={
-          showTotals ? (
+          showTotals || totalsPending ? (
             <>
               <HeroStats label={t('common.totalsFor', { period: formatMonth(month) })}>
-                <HeroStat tone="income" icon="arrowDownLeft" label={t('common.income')} value={formatSignedVnd(summary.totalIncome, 'income')} />
-                <HeroStat tone="expense" icon="arrowUpRight" label={t('common.expense')} value={formatSignedVnd(summary.totalExpense, 'expense')} />
-                <HeroStat icon="wallet" label={t('transactions.net')} value={formatVnd(summary.balance)} />
+                <HeroStat tone="income" icon="arrowDownLeft" label={t('common.income')} value={totalValue(() => formatSignedVnd(summary.totalIncome, 'income'))} />
+                <HeroStat tone="expense" icon="arrowUpRight" label={t('common.expense')} value={totalValue(() => formatSignedVnd(summary.totalExpense, 'expense'))} />
+                <HeroStat icon="wallet" label={t('transactions.net')} value={totalValue(() => formatVnd(summary.balance))} />
               </HeroStats>
               <p className={styles.summaryNote}>{t('transactions.totalsNote', { month: formatMonth(month) })}</p>
             </>
@@ -615,20 +613,19 @@ export default function TransactionsPage() {
               onChange={(value) => updateFilters({ category: value })}
             />
           </div>
-          {wallets.length > 0 && (
-            <div className={styles.field}>
-              <label className={styles.filterLabel} htmlFor="filter-wallet">
-                {t('wallets.wallet')}
-              </label>
-              <Select
-                id="filter-wallet"
-                className={styles.select}
-                value={walletId}
-                options={walletOptions}
-                onChange={(value) => updateFilters({ wallet: value })}
-              />
-            </div>
-          )}
+          {/* Always there (every account has its Cash wallet), so the filters do not move when the wallets arrive */}
+          <div className={styles.field}>
+            <label className={styles.filterLabel} htmlFor="filter-wallet">
+              {t('wallets.wallet')}
+            </label>
+            <Select
+              id="filter-wallet"
+              className={styles.select}
+              value={walletId}
+              options={walletOptions}
+              onChange={(value) => updateFilters({ wallet: value })}
+            />
+          </div>
           <div className={styles.field}>
             <label className={styles.filterLabel} htmlFor="filter-sort">
               {t('transactions.sortLabel')}

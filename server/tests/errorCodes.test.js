@@ -13,13 +13,13 @@ describe("error codes", () => {
   it("EMAIL_TAKEN for an email that is already registered", async () => {
     const res = await api().post("/api/auth/register").send({ name: "A", email: user.email, password: "secret123" });
     expect(res.status).toBe(409);
-    expect(res.body).toEqual({ success: false, message: "Email is already registered", code: "EMAIL_TAKEN", code: expect.any(String) });
+    expect(res.body).toEqual({ success: false, message: "Email is already registered", code: "EMAIL_TAKEN" });
   });
 
   it("INVALID_CREDENTIALS for a wrong password", async () => {
     const res = await api().post("/api/auth/login").send({ email: user.email, password: "wrong-password" });
     expect(res.status).toBe(401);
-    expect(res.body).toEqual({ success: false, message: "Invalid email or password", code: "INVALID_CREDENTIALS", code: expect.any(String) });
+    expect(res.body).toEqual({ success: false, message: "Invalid email or password", code: "INVALID_CREDENTIALS" });
   });
 
   it("TOKEN_MISSING without a token and TOKEN_INVALID with a bad one", async () => {

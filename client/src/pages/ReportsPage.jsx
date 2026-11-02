@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { currentMonth, formatMonth } from '../utils/vnDate.js';
+import { MAX_YEAR, MIN_YEAR, currentMonth, formatMonth } from '../utils/vnDate.js';
 import PageHeader from '../components/PageHeader/PageHeader.jsx';
 import MonthPicker from '../components/MonthPicker/MonthPicker.jsx';
 import YearPicker from '../components/YearPicker/YearPicker.jsx';
@@ -35,7 +35,7 @@ function readParams(searchParams) {
     tab: TABS.some((t) => t.id === tab) ? tab : 'monthly',
     month: validMonth,
     // Without a year the Yearly tab shows the year of the chosen month
-    year: YEAR_REGEX.test(year ?? '') && year >= 1970 && year <= 2100 ? year : validMonth.slice(0, 4),
+    year: YEAR_REGEX.test(year ?? '') && year >= MIN_YEAR && year <= MAX_YEAR ? year : validMonth.slice(0, 4),
   };
 }
 

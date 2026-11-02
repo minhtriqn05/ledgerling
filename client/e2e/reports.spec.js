@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { isPhone } from './helpers/device.js';
 
 // The API started by playwright.config.js (in-memory database)
 const API_URL = 'http://localhost:4100/api';
@@ -65,9 +66,7 @@ const OCTOBER = [
   { category: 'Transport', amount: 50000, date: '2025-10-31T23:30:00+07:00', note: 'Taxi late' },
 ];
 
-test('open Reports, switch the three tabs, click a day in the calendar and land on that day in Transactions', async ({
-  page,
-}, testInfo) => {
+test('open Reports, switch the three tabs, click a day in the calendar and land on that day in Transactions', { tag: '@smoke' }, async ({ page }, testInfo) => {
   test.setTimeout(90000);
   await register(page, testInfo, 'tabs');
   await seed(page, OCTOBER);
@@ -101,7 +100,7 @@ test('open Reports, switch the three tabs, click a day in the calendar and land 
   const foodRow = page.getByRole('row').filter({ has: page.getByRole('rowheader', { name: 'Food' }) });
   await expect(foodRow.getByText(/^1,000,000\s₫$/)).toBeVisible();
   // The Share column is left out on a phone to make room
-  if (testInfo.project.name === 'desktop') await expect(foodRow.getByText('95.2%')).toBeVisible();
+  if (!isPhone(testInfo)) await expect(foodRow.getByText('95.2%')).toBeVisible();
   else await expect(foodRow.getByText('95.2%')).toBeHidden();
   await expect(page.getByRole('heading', { name: 'Insights' })).toBeVisible();
   await expect(page.getByRole('link', { name: /Your largest expense was 1,000,000\s₫ on Food \(10 Oct\)/ })).toBeVisible();
@@ -129,12 +128,14 @@ test('open Reports, switch the three tabs, click a day in the calendar and land 
   // 1 Oct 2025 is a Wednesday, so Mon and Tue come before it; the grid starts on Monday
   const weekdayNames = await page.locator('[aria-label="Calendar of October 2025"] > span[aria-hidden="true"]').allTextContents();
   expect(weekdayNames.slice(0, 7)).toEqual(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']);
-  // 31 days, each one a button
-  await expect(page.getByRole('button', { name: /^\d+ October 2025:/ })).toHaveCount(31);
-  await expect(page.getByRole('button', { name: /^1 October 2025: no spending/ })).toBeVisible();
+  // 31 days, each one a button: its name is what it shows, the whole sentence is its description
+  const days = page.getByRole('group', { name: 'Calendar of October 2025' }).getByRole('button');
+  await expect(days).toHaveCount(31);
+  await expect(days.nth(0)).toHaveAccessibleDescription(/^1 October 2025: no spending/);
 
   // 5. A click on a day opens Transactions filtered to exactly that day
-  await page.getByRole('button', { name: /^10 October 2025: spent 1,000,000\s₫/ }).click();
+  await expect(days.nth(9)).toHaveAccessibleDescription(/^10 October 2025: spent 1,000,000\s₫/);
+  await days.nth(9).click();
   await expect(page).toHaveURL(/\/transactions\?from=2025-10-10&to=2025-10-10$/);
   await expect(page.getByRole('heading', { name: 'Transactions', level: 1 })).toBeVisible();
   await expect(page.getByText('1 transaction', { exact: true })).toBeVisible();
@@ -144,7 +145,8 @@ test('open Reports, switch the three tabs, click a day in the calendar and land 
 
   // 6. The 23:30 expense on the last day of the month is on 31 October, not on 1 November
   await page.goto('/reports?tab=calendar&month=2025-10');
-  await page.getByRole('button', { name: /^31 October 2025: spent 50,000\s₫/ }).click();
+  await expect(days.nth(30)).toHaveAccessibleDescription(/^31 October 2025: spent 50,000\s₫/);
+  await days.nth(30).click();
   await expect(page).toHaveURL(/from=2025-10-31&to=2025-10-31/);
   await expect(page.getByText('Taxi late').filter({ visible: true })).toBeVisible();
   await expect(page.getByText('1 transaction', { exact: true })).toBeVisible();

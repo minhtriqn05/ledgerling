@@ -33,6 +33,8 @@ transactionSchema.index({ userId: 1, categoryId: 1, date: -1 });
 transactionSchema.index({ userId: 1, walletId: 1, date: -1 });
 // Speeds up the tag filter and the tag list (one entry per tag of each transaction)
 transactionSchema.index({ userId: 1, tags: 1 });
+// The Admin page: transactions added per day and the users active in the last 7 days
+transactionSchema.index({ createdAt: 1 });
 // A rule never creates two transactions for the same date, even when requests run at the same time.
 // Partial: transactions without a rule are not in this index, so they can share a date.
 transactionSchema.index(

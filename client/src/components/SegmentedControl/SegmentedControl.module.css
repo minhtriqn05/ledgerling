@@ -55,7 +55,7 @@
   background: var(--color-surface-hover);
   color: var(--color-text);
   font-weight: var(--font-weight-semibold);
-  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-text) 10%, transparent), 0 6px 14px -8px rgba(0, 0, 0, 0.5);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-text) 10%, transparent), 0 6px 14px -8px color-mix(in srgb, var(--glass-shade) 50%, transparent);
 }
 
 /* Income / expense switch: the selected side takes the money color. */

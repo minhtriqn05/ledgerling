@@ -138,6 +138,7 @@ router.use(requireAuth);
  *             example:
  *               success: false
  *               message: Currency must be a 3-letter ISO code
+ *               code: CURRENCY_INVALID
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */

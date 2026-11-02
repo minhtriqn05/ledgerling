@@ -35,7 +35,7 @@ async function register(page, testInfo, label) {
 // on phones are both in the page: only the one on screen counts.
 const recurringLabels = (page) => page.locator('main').getByText('Recurring', { exact: true }).filter({ visible: true });
 
-test('create a rule that started last month → its transactions appear with the Recurring label', async ({ page }, testInfo) => {
+test('create a rule that started last month → its transactions appear with the Recurring label', { tag: '@smoke' }, async ({ page }, testInfo) => {
   test.setTimeout(90000);
   await register(page, testInfo, 'rule');
 

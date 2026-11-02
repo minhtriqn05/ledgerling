@@ -54,12 +54,12 @@ erDiagram
         ObjectId categoryId FK
         ObjectId walletId FK "set on every new transaction; older ones have none and count in the default wallet"
         string type "income | expense, copied from category"
-        number amount "greater than 0"
+        number amount "whole VND, 1 to 999,999,999,999"
         string currency "ISO code, default VND"
         string note
         string_array tags "up to 5, lowercase, each 1-20 of a-z 0-9 -"
         ObjectId recurringRuleId FK "optional, only on transactions created by a rule"
-        date date
+        date date "a real day of the years 1970-2100"
         date createdAt
         date updatedAt
     }
@@ -69,7 +69,7 @@ erDiagram
         ObjectId userId FK
         ObjectId categoryId FK "expense categories only"
         string month "YYYY-MM, Vietnam time"
-        number amount "greater than 0, VND"
+        number amount "whole VND, 1 to 999,999,999,999"
         date createdAt
         date updatedAt
     }
@@ -78,7 +78,7 @@ erDiagram
         ObjectId _id PK
         ObjectId userId FK
         ObjectId categoryId FK
-        number amount "greater than 0, VND"
+        number amount "whole VND, 1 to 999,999,999,999"
         string note
         string frequency "weekly | monthly"
         date startDate "noon Vietnam time"
@@ -93,7 +93,7 @@ erDiagram
         ObjectId _id PK
         ObjectId userId FK
         string name "1-60 characters"
-        number targetAmount "greater than 0, whole VND"
+        number targetAmount "whole VND, 1 to 999,999,999,999"
         number savedAmount "default 0, never below 0"
         date deadline "optional, noon Vietnam time"
         string color "hex, e.g. #4A9FE3"
@@ -106,7 +106,7 @@ erDiagram
         ObjectId userId FK
         ObjectId categoryId FK
         string name "1-40 characters"
-        number amount "greater than 0, VND"
+        number amount "whole VND, 1 to 999,999,999,999"
         string note "up to 200 characters"
         date createdAt
         date updatedAt
@@ -132,7 +132,7 @@ erDiagram
         string name "1-30 characters, unique per user, ignores case"
         string type "cash | bank | ewallet"
         string color "hex, e.g. #4A9FE3"
-        number initialBalance "0 or more, VND, default 0"
+        number initialBalance "whole VND, 0 to 999,999,999,999, default 0"
         boolean archived "default false"
         boolean isDefault "the Cash wallet, one per user; only the server sets it"
         date createdAt
@@ -144,7 +144,7 @@ erDiagram
         ObjectId userId FK
         ObjectId fromWalletId FK
         ObjectId toWalletId FK
-        number amount "greater than 0, VND"
+        number amount "whole VND, 1 to 999,999,999,999"
         string note "up to 200 characters"
         date date
         date createdAt
@@ -198,3 +198,39 @@ erDiagram
 - One User has many Transfers (`Transfer.userId`). A transfer is a separate collection and not a transaction, so stats, budgets, reports and insights can never count it.
 - Indexes: on Transaction `(userId, walletId, date -1)` for the wallet filter; on Transfer `(userId, date -1)` for the history, `(userId, fromWalletId)` and `(userId, toWalletId)` for the balances and the check before a wallet is deleted.
 - Deleting a User deletes every document with that `userId`: Category, Transaction, Budget, RecurringRule, Goal, TransactionTemplate, Notification, Wallet and Transfer.
+- Every amount is a whole number of VND (the API refuses decimals and more than 12 digits, `AMOUNT_INVALID`), so sums stay exact.
+
+## Indexes
+
+Every list and every check of the API reads through one of these (`server/tests/indexes.test.js` checks the main
+queries with `explain()`). Mongoose builds them when the server connects; one that cannot be built is named in the log
+(`logIndexErrors` in `server/src/config/db.js`) and the server keeps running.
+
+| Collection | Index | Used by |
+|------------|-------|---------|
+| users | `email` unique | register, login |
+| users | `(createdAt -1, _id -1)` | the account list of the Admin page, newest first |
+| categories | `(userId, type, name)` unique, ignoring case | the name check of a new category |
+| categories | `userId` | the list |
+| transactions | `(userId, date -1)` | the list, the month filter, stats, reports, insights |
+| transactions | `(userId, categoryId, date -1)` | the category filter, budgets, the check before a category is deleted |
+| transactions | `(userId, walletId, date -1)` | the wallet filter and the balances |
+| transactions | `(userId, tags)` | the tag filter and the tag list |
+| transactions | `userId`, `categoryId` | counting and deleting the transactions of a user or a category |
+| transactions | `createdAt` | the Admin statistics (transactions per day) |
+| transactions | `(recurringRuleId, date)` unique, only when `recurringRuleId` is set | one transaction per rule and date |
+| budgets | `(userId, categoryId, month)` unique | one budget per category and month |
+| budgets | `(userId, month)` | the budgets of a month |
+| budgets | `userId` | deleting the budgets of a user |
+| recurringrules | `(userId, active, nextRunDate)` | the rules that are due |
+| recurringrules | `(userId, categoryId)` | the check before a category is deleted |
+| goals | `userId` | the list |
+| transactiontemplates | `userId`, `categoryId` | the list, deleting the templates of a category |
+| notifications | `(userId, dedupeKey)` unique | one notification per event |
+| notifications | `(userId, read, createdAt -1)` | the unread filter and count |
+| notifications | `(userId, createdAt -1)` | the list |
+| wallets | `(userId, name)` unique, ignoring case | the name check |
+| wallets | `userId` | the list |
+| wallets | `(userId, isDefault)` unique, only when `isDefault` is true | one default wallet per user |
+| transfers | `(userId, date -1)` | the history |
+| transfers | `(userId, fromWalletId)` and `(userId, toWalletId)` | the balances, the check before a wallet is deleted |

@@ -90,6 +90,7 @@ router.get("/", list);
  *             example:
  *               success: false
  *               message: Deadline must be after today
+ *               code: DEADLINE_IN_PAST
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
@@ -134,6 +135,7 @@ router.post("/", validateGoalCreate, create);
  *             example:
  *               success: false
  *               message: Goal not found
+ *               code: GOAL_NOT_FOUND
  */
 router.get("/:id", validateGoalId, getOne);
 
@@ -182,6 +184,7 @@ router.get("/:id", validateGoalId, getOne);
  *             example:
  *               success: false
  *               message: Name is required
+ *               code: NAME_REQUIRED
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  *       404:
@@ -193,6 +196,7 @@ router.get("/:id", validateGoalId, getOne);
  *             example:
  *               success: false
  *               message: Goal not found
+ *               code: GOAL_NOT_FOUND
  */
 router.put("/:id", validateGoalId, validateGoalUpdate, update);
 
@@ -238,6 +242,7 @@ router.put("/:id", validateGoalId, validateGoalUpdate, update);
  *             example:
  *               success: false
  *               message: Goal not found
+ *               code: GOAL_NOT_FOUND
  */
 router.delete("/:id", validateGoalId, remove);
 
@@ -287,6 +292,7 @@ router.delete("/:id", validateGoalId, remove);
  *             example:
  *               success: false
  *               message: You cannot withdraw more than the saved amount
+ *               code: WITHDRAW_TOO_MUCH
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  *       404:
@@ -298,6 +304,7 @@ router.delete("/:id", validateGoalId, remove);
  *             example:
  *               success: false
  *               message: Goal not found
+ *               code: GOAL_NOT_FOUND
  */
 router.post("/:id/contributions", validateGoalId, validateContribution, addContribution);
 
@@ -345,6 +352,7 @@ router.post("/:id/contributions", validateGoalId, validateContribution, addContr
  *             example:
  *               success: false
  *               message: Deleting this deposit would make the saved amount negative
+ *               code: DEPOSIT_IN_USE
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  *       404:
@@ -356,6 +364,7 @@ router.post("/:id/contributions", validateGoalId, validateContribution, addContr
  *             example:
  *               success: false
  *               message: Contribution not found
+ *               code: CONTRIBUTION_NOT_FOUND
  */
 router.delete("/:id/contributions/:contributionId", validateGoalId, validateContributionId, removeContribution);
 

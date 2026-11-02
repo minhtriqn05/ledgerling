@@ -4,15 +4,11 @@
   gap: var(--space-5);
 }
 
-.stats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-4);
-}
-
+.stats,
 .facts {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  /* As many cards side by side as fit (3, 2 or 1): the room left next to the sidebar decides, not the window */
+  grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
   gap: var(--space-4);
 }
 
@@ -146,13 +142,6 @@
   /* On a phone the table keeps the three columns that matter: category, spent and the change */
   .table .hideSmall {
     display: none;
-  }
-}
-
-@media (max-width: 760px) {
-  .stats,
-  .facts {
-    grid-template-columns: minmax(0, 1fr);
   }
 }
 

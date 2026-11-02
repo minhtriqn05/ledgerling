@@ -79,3 +79,9 @@
     min-height: 240px;
   }
 }
+
+/* The small light line at the top of a tall bar */
+.capsuleMark {
+  fill: var(--glass-light);
+  fill-opacity: 0.5;
+}

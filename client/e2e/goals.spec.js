@@ -63,7 +63,7 @@ async function moveMoney(page, name, { mode, amount, note }) {
   await expect(dialog).toBeHidden();
 }
 
-test('create a goal → add money → the progress grows → saving the rest shows Completed', async ({ page }, testInfo) => {
+test('create a goal → add money → the progress grows → saving the rest shows Completed', { tag: '@smoke' }, async ({ page }, testInfo) => {
   test.setTimeout(90000);
   await register(page, testInfo, 'flow');
 

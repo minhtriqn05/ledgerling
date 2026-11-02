@@ -309,6 +309,7 @@ router.delete("/me/avatar", blockDemo, deleteAvatar);
  *             example:
  *               success: false
  *               message: Theme must be one of light, dark, system
+ *               code: VALIDATION_ERROR
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */

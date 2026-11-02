@@ -5,7 +5,7 @@ import { getErrorMessage } from '../../api/axios.js';
 import { useToast } from '../../context/ToastContext.jsx';
 import Modal from '../../components/Modal/Modal.jsx';
 import Button from '../../components/Button/Button.jsx';
-import styles from './DeleteTransactionDialog.module.css';
+import styles from '../../components/Modal/ConfirmDelete.module.css';
 
 // "Are you sure?" before the ticked transactions are deleted. There is no Undo for this one, so it asks first.
 // ids: the ids of the ticked rows. onDeleted(count) runs after the API said OK.

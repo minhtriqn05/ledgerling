@@ -1,5 +1,7 @@
 import Papa from 'papaparse';
 import i18n from '../i18n/index.js';
+import { isWholeAmount } from './validators.js';
+import { isAppDay } from './vnDate.js';
 
 // Reads the CSV file of "Import CSV" and checks its rows before they are sent (POST /transactions/import).
 // The columns are the ones of the export: Date, Type, Category, Amount, Currency, Note, Tags.
@@ -14,7 +16,7 @@ const TAG_REGEX = /^[a-z0-9-]{1,20}$/;
 const CURRENCY_REGEX = /^[A-Za-z]{3}$/;
 // The date of the export ("2026-10-27 12:30") or just a day
 const EXPORT_DATE_REGEX = /^(\d{4}-\d{2}-\d{2})(?: (\d{2}):(\d{2})(?::(\d{2}))?)?$/;
-const ISO_START_REGEX = /^\d{4}-\d{2}-\d{2}/;
+const ISO_START_REGEX = /^(\d{4}-\d{2}-\d{2})/;
 
 // The export puts a ' in front of a cell that starts with = + - @ (so a spreadsheet does not run it as a formula).
 // Taking it off again gives back the text that was saved: "'=SUM(A1)" -> "=SUM(A1)".
@@ -29,12 +31,6 @@ export function parseTags(text) {
     .map((tag) => tag.replace(/^#/, '').trim().toLowerCase())
     .filter(Boolean);
   return [...new Set(tags)];
-}
-
-// "2026-02-30" has the right shape but is not a real day (Date.UTC would quietly turn it into March 2nd)
-function isRealDay(day) {
-  const [year, month, date] = day.split('-').map(Number);
-  return new Date(Date.UTC(year, month - 1, date)).toISOString().slice(0, 10) === day;
 }
 
 // Text -> number when it is a number, otherwise the text itself (the row is then marked as an error)
@@ -82,9 +78,10 @@ function isValidDate(text) {
   const match = EXPORT_DATE_REGEX.exec(text);
   if (match) {
     const [, day, hour = '00', minute = '00', second = '00'] = match;
-    return isRealDay(day) && Number(hour) <= 23 && Number(minute) <= 59 && Number(second) <= 59;
+    return isAppDay(day) && Number(hour) <= 23 && Number(minute) <= 59 && Number(second) <= 59;
   }
-  return ISO_START_REGEX.test(text) && !Number.isNaN(Date.parse(text));
+  // The day part of an ISO date must exist too: Date.parse would turn 30 February into 2 March
+  return isAppDay(ISO_START_REGEX.exec(text)?.[1]) && !Number.isNaN(Date.parse(text));
 }
 
 // The first problem of a row as the same message the server gives (by its code), or '' when the row is fine.
@@ -92,7 +89,7 @@ function isValidDate(text) {
 export function validateImportRow(row, categories) {
   if (!TYPES.includes(row.type)) return i18n.t('errors.TYPE_INVALID');
   if (!row.category) return i18n.t('errors.CATEGORY_REQUIRED');
-  if (typeof row.amount !== 'number' || row.amount <= 0) return i18n.t('errors.AMOUNT_INVALID');
+  if (!isWholeAmount(row.amount)) return i18n.t('errors.AMOUNT_INVALID');
   if (!isValidDate(row.date)) return i18n.t('errors.DATE_INVALID');
   if (row.currency && !CURRENCY_REGEX.test(row.currency)) return i18n.t('errors.CURRENCY_INVALID');
   if (row.note.length > 200) return i18n.t('errors.NOTE_TOO_LONG');

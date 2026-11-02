@@ -20,8 +20,6 @@
   --gradient-button-hover: linear-gradient(180deg, #363f42 0%, #171d1f 100%);
 
   /* ---------- The aurora of the hero: emerald, ice and a little warmth. It is the same in both themes. ---------- */
-  --color-hero-from: #1f9e86;     /* only the old mocks of the dev style guide */
-  --color-hero-to: #1e6fa8;
   --color-hero-base: #0b1012;
   --gradient-hero:
     radial-gradient(60% 120% at 10% -10%, rgba(45, 190, 150, 0.46) 0%, rgba(45, 190, 150, 0) 70%),
@@ -32,6 +30,12 @@
   --color-hero-text-soft: rgba(255, 255, 255, 0.78);
   --color-hero-decor: rgba(255, 255, 255, 0.1);
   --color-hero-line: rgba(255, 255, 255, 0.14);
+  /* The light and the shade of the glass panels on dark parts (the hero, the sidebar, the landing page). Components mix
+     them with transparent for each effect: color-mix(in srgb, var(--glass-light) 10%, transparent) is white at 10%. */
+  --glass-light: #ffffff;
+  --glass-shade: #000000;
+  --glass-ink: #040e10;     /* the deep green-black under the hero */
+  --glass-night: #0f1316;   /* the frosted bar of the landing page */
   --aurora-emerald: #2fc79c;
   --aurora-ice: #4f9ff0;
   --aurora-warm: #e0c483;
@@ -56,7 +60,6 @@
 
   /* ---------- Soft washes ---------- */
   --gradient-soft: linear-gradient(135deg, #e6f2f6 0%, #e6f4ec 100%);
-  --gradient-banner: var(--gradient-soft); /* only the old mocks of the dev style guide */
   --ambient-1: rgba(47, 199, 156, 0.07);  /* the light behind the panels, fixed to the window */
   --ambient-2: rgba(79, 159, 240, 0.07);
 

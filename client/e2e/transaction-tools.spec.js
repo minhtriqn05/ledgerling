@@ -91,7 +91,7 @@ test('search, page through the results and keep the filters after F5', async ({ 
   await expect(page.getByText('45 transactions', { exact: true })).toBeVisible();
 });
 
-test('tag a transaction, then click its tag to filter the list', async ({ page }, testInfo) => {
+test('tag a transaction, then click its tag to filter the list', { tag: '@smoke' }, async ({ page }, testInfo) => {
   await register(page, testInfo, 'tags');
   await seed(page, [{ category: 'Food', amount: 20000, note: 'Plain coffee' }]);
 
@@ -139,7 +139,7 @@ test('tag a transaction, then click its tag to filter the list', async ({ page }
   await expect(visibleNotes(page, 'Team lunch')).toBeVisible();
 });
 
-test('export the list as a CSV file, then import that same file', async ({ page }, testInfo) => {
+test('export the list as a CSV file, then import that same file', { tag: '@smoke' }, async ({ page }, testInfo) => {
   await register(page, testInfo, 'csv');
   await seed(page, [
     { category: 'Food', amount: 45000, note: 'Lunch, with team', tags: ['work', 'trip'] },

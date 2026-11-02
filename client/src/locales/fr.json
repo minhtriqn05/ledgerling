@@ -958,7 +958,7 @@
   },
   "errors": {
     "ACCOUNT_DISABLED": "Ce compte a été désactivé",
-    "AMOUNT_INVALID": "Le montant doit être supérieur à 0",
+    "AMOUNT_INVALID": "Le montant doit être un nombre entier de VND, de 1 à 999 999 999 999",
     "BUDGET_EXISTS": "Un budget existe déjà pour cette catégorie et ce mois",
     "BUDGET_EXPENSE_ONLY": "Les budgets concernent uniquement les catégories de dépenses",
     "BUDGET_NOT_FOUND": "Budget introuvable",
@@ -1032,9 +1032,10 @@
     "WALLET_IN_USE": "Ce portefeuille a encore des transactions ou des transferts. Archivez-le.",
     "WALLET_DEFAULT_LOCKED": "Le portefeuille par défaut ne peut être ni archivé ni supprimé",
     "WALLET_TYPE_INVALID": "Choisissez un type de portefeuille",
-    "WALLET_BALANCE_INVALID": "Le solde de départ doit être de 0 ou plus",
+    "WALLET_BALANCE_INVALID": "Le solde de départ doit être un nombre entier de VND, de 0 ou plus",
     "TRANSFER_NOT_FOUND": "Transfert introuvable",
-    "TRANSFER_SAME_WALLET": "Choisissez deux portefeuilles différents"
+    "TRANSFER_SAME_WALLET": "Choisissez deux portefeuilles différents",
+    "REQUEST_ERROR": "La requête n'a pas pu être traitée. Veuillez réessayer."
   },
   "live": {
     "live": "En direct",

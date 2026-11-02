@@ -7,7 +7,7 @@ import { formatVnd } from '../../utils/format.js';
 import Modal from '../../components/Modal/Modal.jsx';
 import Button from '../../components/Button/Button.jsx';
 // Same layout as the "Delete this transaction?" dialog, so it uses the same styles
-import styles from '../transactions/DeleteTransactionDialog.module.css';
+import styles from '../../components/Modal/ConfirmDelete.module.css';
 
 // "Are you sure?" step before a goal is deleted. onDeleted(goal) runs after the API said OK.
 export default function DeleteGoalDialog({ goal, onDeleted, onClose }) {
