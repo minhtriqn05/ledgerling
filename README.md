@@ -82,7 +82,7 @@ data, click **Get started** and make an account (an email and a password, nothin
   every read, so they can never drift from the history.
 - **Admin and sessions.** Role-based Admin page, disabling an account, and "log out of all devices" through a token
   version stored in every JWT.
-- **Tested end to end.** 1,518 unit and API tests, 344 Playwright tests on Chrome (desktop and phone), the main flows
+- **Tested end to end.** 1,519 unit and API tests, 344 Playwright tests on Chrome (desktop and phone), the main flows
   again on Firefox and iPhone Safari, axe accessibility checks in both themes, CI on every push and a live smoke test
   after every deploy.
 
@@ -560,7 +560,7 @@ missing or `JWT_EXPIRES_IN` is not a valid duration.
 
 | Kind | Tools | Result (3 November 2026) |
 |------|-------|--------------------------|
-| API tests | Vitest, Supertest, mongodb-memory-server | **671 tests** in 39 files: every route, ownership (404 for another user's ids), validation, Vietnam time, money cross-checks, concurrency, indexes, and the docs against the code |
+| API tests | Vitest, Supertest, mongodb-memory-server | **672 tests** in 39 files: every route, ownership (404 for another user's ids), validation, Vietnam time, money cross-checks, concurrency, indexes, and the docs against the code |
 | API coverage | @vitest/coverage-v8 | **94.8% lines, 90.8% branches** (the run fails below 80%) |
 | Client unit tests | Vitest, React Testing Library, jsdom | **847 tests** in 97 files |
 | Client coverage | @vitest/coverage-v8 | **68.4% lines**; `src/utils` 94.0%, `src/hooks` 100% (fails below 60% / 80%) |

@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import express from "express";
 import request from "supertest";
+import vm from "node:vm";
 import app, { createApp } from "../src/app.js";
 import { errorHandler } from "../src/middlewares/errorHandler.js";
 import { api, auth, registerUser } from "./helpers.js";
@@ -40,6 +41,16 @@ describe("security headers (helmet)", () => {
     expect(res.text).toContain("swagger-ui");
     expect(res.headers["content-security-policy"]).toBeDefined();
     expect(res.headers["x-content-type-options"]).toBe("nosniff");
+  });
+
+  it("serves a Swagger script that is valid JavaScript and holds the whole spec", async () => {
+    // swagger-ui-express writes the spec into this script with String.replace, so a "$`" or "$'" in a description
+    // would turn into other text and break the script: the page then stays blank
+    const res = await api().get("/api-docs/swagger-ui-init.js");
+
+    expect(res.status).toBe(200);
+    expect(() => new vm.Script(res.text)).not.toThrow();
+    expect(res.text).toContain('"title": "Ledgerling API"');
   });
 });
 

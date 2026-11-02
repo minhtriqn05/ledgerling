@@ -11,6 +11,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - `GET /api`: a public front page of the API with links to Swagger UI, the health check, the app and the code, so
   the base URL no longer answers 404. The bare server address now opens Swagger UI.
 
+### Fixed
+
+- Swagger UI stayed blank: a `$` followed by a backtick in the API description was read as a replacement pattern
+  when the docs script was built, which broke it. The text is reworded and a test now compiles the script.
+
 ## [1.0.0] - 2026-11-03
 
 The first complete version, submitted as the final project of *Phát triển ứng dụng web và cơ sở dữ liệu*
