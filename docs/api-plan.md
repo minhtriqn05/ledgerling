@@ -133,6 +133,7 @@ The tables below list the `message` of each endpoint; the matching code is in th
 | # | Method | Path | Auth | Description |
 |---|--------|------|------|-------------|
 | 1 | GET | `/api/health` | No | Server health check |
+| 71 | GET | `/api/` | No | Front page of the API: links to the docs, the health check and the code |
 | 2 | POST | `/api/auth/register` | No | Create an account, returns a token |
 | 3 | POST | `/api/auth/login` | No | Log in, returns a token |
 | 4 | GET | `/api/auth/me` | Yes | Current user profile |
@@ -220,6 +221,30 @@ Auth: no.
 ```
 `version` is the Git commit Render deployed (`RENDER_GIT_COMMIT`), or the time the server started when it runs
 elsewhere. The live smoke workflow waits until it shows the commit that was just merged. Never rate-limited.
+
+### 71. GET /api/
+Auth: no. Also answers at `/api` without the slash. What a browser shows at the base URL.
+
+**200**
+```json
+{
+  "success": true,
+  "data": {
+    "name": "Ledgerling API",
+    "description": "REST API of Ledgerling, a personal expense tracker",
+    "version": "c9110dee8ef5f0777cfb26b4ead729dbefc54437",
+    "docs": "https://ledgerling-api.onrender.com/api-docs",
+    "health": "https://ledgerling-api.onrender.com/api/health",
+    "app": "https://ledgerling-ten.vercel.app",
+    "repository": "https://github.com/minhtriqn05/ledgerling"
+  }
+}
+```
+`docs` and `health` are built from the address of the request; `app` is the first address of `CLIENT_URL` (`null` when
+it is empty). Counted by the rate limit of `/api` like every route except `/health`.
+
+The bare server address (`GET /`, outside `/api`) answers 302 to `/api-docs/`, so opening
+https://ledgerling-api.onrender.com shows Swagger UI.
 
 ---
 

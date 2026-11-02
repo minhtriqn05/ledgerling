@@ -53,6 +53,9 @@ export function createApp({ rateLimit = rateLimitWanted() } = {}) {
   // Content-Disposition is exposed so the browser app can read the file name of a CSV export
   app.use(cors({ origin: allowedOrigins(), exposedHeaders: ["Content-Disposition"] }));
 
+  // The bare address of the server opens the interactive docs instead of a 404
+  app.get("/", (req, res) => res.redirect(302, "/api-docs/"));
+
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
       // Keep the pasted token after a page reload
       swaggerOptions: { persistAuthorization: true },
