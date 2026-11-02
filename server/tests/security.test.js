@@ -95,6 +95,23 @@ describe("rate limit", () => {
     expect(other.status).toBe(401);
   });
 
+  // On Render a request passes Cloudflare, then Render's own proxy: X-Forwarded-For arrives as "client, cloudflare-edge"
+  // and the edge address changes from one request to the next. The limit must follow the client, not the edge.
+  it("counts the visitor behind Cloudflare and Render's proxy, whatever Cloudflare edge the request came through", async () => {
+    const limited = createApp({ rateLimit: true });
+    const edges = ["104.22.17.40", "172.69.33.7", "162.158.1.9"];
+
+    for (let i = 0; i < 20; i += 1) await login(limited, `203.0.113.5, ${edges[i % edges.length]}`);
+    const blocked = await login(limited, `203.0.113.5, ${edges[0]}`);
+    const neighbour = await login(limited, `198.51.100.7, ${edges[0]}`);
+    // A visitor who sends his own X-Forwarded-For cannot pick a fresh counter: Cloudflare adds the real address after it
+    const spoofed = await login(limited, `6.6.6.6, 203.0.113.5, ${edges[1]}`);
+
+    expect(blocked.status).toBe(429);
+    expect(neighbour.status).toBe(401);
+    expect(spoofed.status).toBe(429);
+  });
+
   it("refuses the 301st request to /api in 15 minutes, but never the health check", async () => {
     const limited = createApp({ rateLimit: true });
 

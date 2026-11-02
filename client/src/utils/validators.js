@@ -1,5 +1,13 @@
-// Basic checks for the Login and Register forms. The server checks everything again.
+// Basic checks for the forms. The server checks everything again.
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Money is whole VND. The amount boxes hold 12 digits, so this is the biggest amount (the API has the same limit).
+export const MAX_AMOUNT = 999_999_999_999;
+
+// true for an amount the API accepts: a whole number from 1 to MAX_AMOUNT
+export function isWholeAmount(value) {
+  return Number.isInteger(value) && value >= 1 && value <= MAX_AMOUNT;
+}
 
 export function isValidEmail(value) {
   return EMAIL_REGEX.test(value.trim());

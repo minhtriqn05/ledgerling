@@ -1,16 +1,19 @@
 import "dotenv/config";
+import mongoose from "mongoose";
 import app from "./app.js";
 import { connectDB } from "./config/db.js";
-import { attachSocket } from "./services/realtimeService.js";
+import { envProblems } from "./config/env.js";
+import { attachSocket, closeSocket } from "./services/realtimeService.js";
 import User from "./models/User.js";
 import { DEMO_EMAIL } from "./utils/demo.js";
 
 const PORT = process.env.PORT || 4000;
 
 async function start() {
-  // Tokens cannot be signed or checked without a secret, so do not start at all
-  if (!process.env.JWT_SECRET) {
-    console.error("JWT_SECRET is not set in .env");
+  // A variable the server cannot work without stops it at once, with its name (Render > Logs shows the message)
+  const problems = envProblems(process.env);
+  if (problems.length > 0) {
+    console.error(`The server cannot start:\n- ${problems.join("\n- ")}\nSet them in server/.env (see .env.example) or in Render > Environment.`);
     process.exit(1);
   }
 
@@ -36,6 +39,16 @@ async function start() {
   });
   // The real-time events share the port of the API
   attachSocket(server);
+
+  // Render sends SIGTERM before it replaces this server with a new deploy. Closing Socket.IO also closes the HTTP
+  // server, which waits for the requests on their way; then the database connection ends.
+  async function shutdown() {
+    await closeSocket();
+    await mongoose.disconnect();
+    process.exit(0);
+  }
+  process.once("SIGTERM", shutdown);
+  process.once("SIGINT", shutdown);
 }
 
 start();

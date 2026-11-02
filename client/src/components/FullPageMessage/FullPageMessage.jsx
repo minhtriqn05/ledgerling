@@ -6,10 +6,11 @@ import styles from './FullPageMessage.module.css';
 // It must not use the router or any context, because the error screen is shown outside of them.
 export default function FullPageMessage({ code, icon, title, text, children }) {
   return (
-    <main className={styles.page}>
+    <main id="main" className={styles.page}>
       <div className={styles.content}>
         {code && <p className={styles.code}>{code}</p>}
-        <EmptyState icon={icon} title={title} text={text}>
+        {/* The whole page is this message, so its title is the heading of the page */}
+        <EmptyState icon={icon} title={title} text={text} titleAs="h1">
           {children}
         </EmptyState>
       </div>

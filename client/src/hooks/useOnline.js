@@ -1,12 +1,33 @@
 import { useSyncExternalStore } from 'react';
 import { useTranslation } from 'react-i18next';
 
+// A browser can change navigator.onLine without firing the event (Firefox does it for a page that was loaded while
+// offline), so the value is also looked at every 2 seconds. One watcher serves every component that uses the hook.
+const CHECK_EVERY_MS = 2000;
+const listeners = new Set();
+let lastSeen;
+let timer;
+
+function check() {
+  if (navigator.onLine === lastSeen) return;
+  lastSeen = navigator.onLine;
+  listeners.forEach((listener) => listener());
+}
+
 function subscribe(onChange) {
-  window.addEventListener('online', onChange);
-  window.addEventListener('offline', onChange);
+  if (listeners.size === 0) {
+    lastSeen = navigator.onLine;
+    window.addEventListener('online', check);
+    window.addEventListener('offline', check);
+    timer = setInterval(check, CHECK_EVERY_MS);
+  }
+  listeners.add(onChange);
   return () => {
-    window.removeEventListener('online', onChange);
-    window.removeEventListener('offline', onChange);
+    listeners.delete(onChange);
+    if (listeners.size > 0) return;
+    window.removeEventListener('online', check);
+    window.removeEventListener('offline', check);
+    clearInterval(timer);
   };
 }
 

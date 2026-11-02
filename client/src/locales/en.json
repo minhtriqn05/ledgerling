@@ -958,7 +958,7 @@
   },
   "errors": {
     "ACCOUNT_DISABLED": "This account has been disabled",
-    "AMOUNT_INVALID": "Amount must be greater than 0",
+    "AMOUNT_INVALID": "The amount must be a whole number of VND, from 1 to 999,999,999,999",
     "BUDGET_EXISTS": "Budget already exists for this category and month",
     "BUDGET_EXPENSE_ONLY": "Budgets are only for expense categories",
     "BUDGET_NOT_FOUND": "Budget not found",
@@ -1032,9 +1032,10 @@
     "WALLET_IN_USE": "This wallet still has transactions or transfers. Archive it instead.",
     "WALLET_DEFAULT_LOCKED": "The default wallet cannot be archived or deleted",
     "WALLET_TYPE_INVALID": "Choose a type for the wallet",
-    "WALLET_BALANCE_INVALID": "The starting balance must be 0 or more",
+    "WALLET_BALANCE_INVALID": "The starting balance must be a whole number of VND, 0 or more",
     "TRANSFER_NOT_FOUND": "Transfer not found",
-    "TRANSFER_SAME_WALLET": "Choose two different wallets"
+    "TRANSFER_SAME_WALLET": "Choose two different wallets",
+    "REQUEST_ERROR": "The request could not be processed. Please try again."
   },
   "live": {
     "live": "Live",

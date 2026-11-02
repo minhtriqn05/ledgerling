@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import Transaction from "../models/Transaction.js";
 import { httpError } from "../utils/httpError.js";
+import { escapeRegex } from "../utils/regex.js";
 import { VIETNAM_TIMEZONE, addDays, dayStart, nextDayStart, todayInVietnam } from "../utils/month.js";
 
 const STATS_DAYS = 30;
@@ -67,9 +68,6 @@ async function countsFor(userIds) {
   ]);
   return new Map(rows.map((row) => [String(row._id), row.count]));
 }
-
-// Characters that mean something in a regular expression get a backslash, so "a.b" or "(" is searched as plain text
-const escapeRegex = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 // Newest accounts first. q finds a part of the name or the email (case-insensitive).
 export async function listUsers({ q, page, limit }) {

@@ -958,7 +958,7 @@
   },
   "errors": {
     "ACCOUNT_DISABLED": "此账户已被停用",
-    "AMOUNT_INVALID": "金额必须大于 0",
+    "AMOUNT_INVALID": "金额必须是 1 到 999,999,999,999 之间的整数（越南盾）",
     "BUDGET_EXISTS": "该分类本月已有预算",
     "BUDGET_EXPENSE_ONLY": "预算仅适用于支出分类",
     "BUDGET_NOT_FOUND": "找不到预算",
@@ -1032,9 +1032,10 @@
     "WALLET_IN_USE": "这个钱包还有交易或转账，请改为归档。",
     "WALLET_DEFAULT_LOCKED": "默认钱包不能归档或删除",
     "WALLET_TYPE_INVALID": "请选择钱包类型",
-    "WALLET_BALANCE_INVALID": "初始余额必须大于或等于 0",
+    "WALLET_BALANCE_INVALID": "初始余额必须是大于或等于 0 的整数（越南盾）",
     "TRANSFER_NOT_FOUND": "找不到转账",
-    "TRANSFER_SAME_WALLET": "请选择两个不同的钱包"
+    "TRANSFER_SAME_WALLET": "请选择两个不同的钱包",
+    "REQUEST_ERROR": "无法处理该请求，请重试。"
   },
   "live": {
     "live": "实时",

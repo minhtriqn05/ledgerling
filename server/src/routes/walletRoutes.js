@@ -69,8 +69,10 @@ router.get("/", list);
  *                 pattern: '^#[0-9A-Fa-f]{6}$'
  *                 example: "#4A9FE3"
  *               initialBalance:
- *                 type: number
+ *                 type: integer
  *                 minimum: 0
+ *                 maximum: 999999999999
+ *                 description: The money already in the wallet, whole VND
  *                 default: 0
  *                 example: 5000000
  *     responses:
@@ -188,8 +190,10 @@ router.get("/:id", validateWalletId, getOne);
  *                 pattern: '^#[0-9A-Fa-f]{6}$'
  *                 example: "#22ADA3"
  *               initialBalance:
- *                 type: number
+ *                 type: integer
  *                 minimum: 0
+ *                 maximum: 999999999999
+ *                 description: Whole VND
  *                 example: 2000000
  *               archived:
  *                 type: boolean

@@ -4,17 +4,34 @@ import { test, expect } from '@playwright/test';
 
 const API_URL = 'http://localhost:4100/api';
 
-// The charts library (Recharts) is large. Vite serves it from /node_modules/.vite/deps/ in this dev setup.
-const isChartLibrary = (url) => /recharts/i.test(url);
+// The charts library (Recharts) is large. The build puts it in a file whose name it chooses itself, so a script is
+// recognised by its text: Recharts holds the class names it gives the charts, like "recharts-wrapper".
+function watchChartLibrary(page) {
+  const found = [];
+  const reads = [];
+  page.on('response', (response) => {
+    if (response.request().resourceType() !== 'script') return;
+    reads.push(
+      response
+        .text()
+        .then((text) => text.includes('recharts-wrapper') && found.push(response.url()))
+        .catch(() => {})
+    );
+  });
+  // The URLs of the downloaded scripts that hold Recharts, once every answer so far has been read
+  return async () => {
+    await Promise.all(reads);
+    return found;
+  };
+}
 
 test('the Login page does not download the charts library, the Dashboard does', async ({ page }) => {
-  const requested = [];
-  page.on('request', (request) => requested.push(request.url()));
+  const chartScripts = watchChartLibrary(page);
 
   await page.goto('/login');
   await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible();
   await page.waitForLoadState('networkidle');
-  expect(requested.filter(isChartLibrary)).toEqual([]);
+  expect(await chartScripts()).toEqual([]);
 
   // Register: the Dashboard (with charts) opens, and only now its code is downloaded
   const email = `perf-${Date.now()}-${Math.random().toString(36).slice(2, 6)}@example.com`;
@@ -25,7 +42,7 @@ test('the Login page does not download the charts library, the Dashboard does', 
   await page.getByRole('button', { name: 'Create account' }).click();
   await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
   await page.waitForLoadState('networkidle');
-  expect(requested.filter(isChartLibrary).length).toBeGreaterThan(0);
+  expect((await chartScripts()).length).toBeGreaterThan(0);
 });
 
 test('pages opened by their address are downloaded on demand and show their content', async ({ page }, testInfo) => {

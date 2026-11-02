@@ -30,8 +30,6 @@ const WelcomePage = lazy(() => import('./pages/WelcomePage.jsx'));
 const StaticPage = lazy(() => import('./pages/StaticPage.jsx'));
 const LoginPage = lazy(() => import('./pages/LoginPage.jsx'));
 const RegisterPage = lazy(() => import('./pages/RegisterPage.jsx'));
-// null in the production build: the condition is known when building, so that page is not even built
-const StyleGuidePage = import.meta.env.DEV ? lazy(() => import('./pages/StyleGuidePage.jsx')) : null;
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage.jsx'));
 
 export default function App() {
@@ -80,9 +78,6 @@ export default function App() {
               </Route>
             </Route>
           </Route>
-
-          {/* Temporary page to review the design tokens. Only available in dev mode. */}
-          {import.meta.env.DEV && <Route path="/style-guide" element={<StyleGuidePage />} />}
 
           {/* Any other address */}
           <Route path="*" element={<NotFoundPage />} />

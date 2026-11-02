@@ -27,7 +27,7 @@ export default function AuthLayout() {
   }
 
   return (
-    <main className={styles.page} data-tone="noir">
+    <main id="main" className={styles.page} data-tone="noir">
       <section className={styles.visual}>
         <Aurora className={styles.aurora} />
         <Link to="/welcome" className={styles.brand}>

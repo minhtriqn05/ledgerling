@@ -28,7 +28,7 @@ export default function StaticPage({ page }) {
         <LanguageSwitcher />
       </header>
 
-      <main className={styles.main}>
+      <main id="main" className={styles.main}>
         <BackButton to="/welcome" />
         <article className={styles.article}>
           <h1 className={styles.title}>{t(`legal.${page}.title`)}</h1>

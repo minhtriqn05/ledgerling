@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { chooseOption } from './helpers/controls.js';
+import { isPhone } from './helpers/device.js';
 
 // The API started by playwright.config.js (in-memory database)
 const API_URL = 'http://localhost:4100/api';
@@ -48,7 +49,7 @@ async function myPreferences(page) {
   return (await response.json()).data.preferences;
 }
 
-test('a new name shows in the menu at once, and after a reload', async ({ page }, testInfo) => {
+test('a new name shows in the menu at once, and after a reload', { tag: '@smoke' }, async ({ page }, testInfo) => {
   await register(page, testInfo, 'name', 'Old Name');
   await openMenuIfNeeded(page);
   await expect(page.getByTestId('account-name')).toHaveText('Old Name');
@@ -58,7 +59,7 @@ test('a new name shows in the menu at once, and after a reload', async ({ page }
   await page.getByRole('link', { name: 'Settings' }).click();
   await expect(page.getByRole('heading', { name: 'Settings', level: 1 })).toBeVisible();
   // A wide screen opens Profile; a phone first shows the list of sections
-  if (testInfo.project.name === 'mobile') await page.getByRole('link', { name: /^Profile/ }).click();
+  if (isPhone(testInfo)) await page.getByRole('link', { name: /^Profile/ }).click();
 
   // The save button is off until the name changes
   const save = page.getByRole('button', { name: 'Save changes' });
@@ -158,7 +159,7 @@ test('system theme follows the device', async ({ page }, testInfo) => {
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
 });
 
-test('change the password, then log in with the new one (the old token stops working)', async ({ page }, testInfo) => {
+test('change the password, then log in with the new one (the old token stops working)', { tag: '@smoke' }, async ({ page }, testInfo) => {
   const email = await register(page, testInfo, 'password');
   const oldToken = await otherDeviceToken(page, email);
   expect(await statusOf(page, oldToken)).toBe(200);
@@ -289,7 +290,7 @@ test('download my data: a JSON file with the profile and the data, never the pas
   await expect(page.getByText('Your data was downloaded.')).toBeVisible();
 });
 
-test('delete the account: the button needs DELETE and the password, then everything is gone', async ({ page }, testInfo) => {
+test('delete the account: the button needs DELETE and the password, then everything is gone', { tag: '@smoke' }, async ({ page }, testInfo) => {
   const email = await register(page, testInfo, 'delete');
   await page.goto('/settings/danger');
 

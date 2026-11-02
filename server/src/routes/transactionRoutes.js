@@ -188,7 +188,7 @@ router.use(requireAuth);
  *           "Wallet id is invalid", "Each tag must be 1-20 letters, digits or hyphens",
  *           "Search must be a string", "Search must be at most 100 characters",
  *           "Sort must be one of date, -date, amount, -amount", "Page must be a whole number from 1",
- *           "Limit must be a whole number from 1 to 100"
+ *           "Page must be at most 100000", "Limit must be a whole number from 1 to 100"
  *         content:
  *           application/json:
  *             schema:
@@ -196,10 +196,11 @@ router.use(requireAuth);
  *             example:
  *               success: false
  *               message: Use either month or from/to, not both
+ *               code: VALIDATION_ERROR
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  *       404:
- *         description: The wallet of the filter does not exist or belongs to another user
+ *         description: The wallet or the category of the filter does not exist or belongs to another user (WALLET_NOT_FOUND, CATEGORY_NOT_FOUND)
  *         content:
  *           application/json:
  *             schema:
@@ -322,8 +323,19 @@ router.get("/", validateListTransactions, list);
  *             example:
  *               success: false
  *               message: Use either month or from/to, not both
+ *               code: VALIDATION_ERROR
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
+ *       404:
+ *         description: The wallet or the category of the filter does not exist or belongs to another user (WALLET_NOT_FOUND, CATEGORY_NOT_FOUND)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Category not found
+ *               code: CATEGORY_NOT_FOUND
  */
 router.get("/export", validateExportTransactions, exportCsv);
 
@@ -352,9 +364,10 @@ router.get("/export", validateExportTransactions, exportCsv);
  *                 description: Id of one of your wallets (GET /wallets). Every new transaction is saved with a wallet; when this is left out, the default Cash wallet is used.
  *                 example: 6720f1b2c3d4e5f601234601
  *               amount:
- *                 type: number
- *                 exclusiveMinimum: true
- *                 minimum: 0
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 999999999999
+ *                 description: whole VND, 1 to 999,999,999,999
  *                 example: 45000
  *               currency:
  *                 type: string
@@ -401,6 +414,7 @@ router.get("/export", validateExportTransactions, exportCsv);
  *             example:
  *               success: false
  *               message: Amount must be greater than 0
+ *               code: AMOUNT_INVALID
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  *       404:
@@ -412,6 +426,7 @@ router.get("/export", validateExportTransactions, exportCsv);
  *             example:
  *               success: false
  *               message: Category not found
+ *               code: CATEGORY_NOT_FOUND
  *       409:
  *         description: The wallet is archived (WALLET_ARCHIVED)
  *         content:
@@ -471,8 +486,10 @@ router.post("/", validateCreateTransaction, create);
  *                       description: Name of one of your categories of this type
  *                       example: Food
  *                     amount:
- *                       type: number
- *                       description: JSON number greater than 0
+ *                       type: integer
+ *                       minimum: 1
+ *                       maximum: 999999999999
+ *                       description: A JSON number, whole VND, 1 to 999,999,999,999
  *                       example: 45000
  *                     currency:
  *                       type: string
@@ -525,6 +542,18 @@ router.post("/", validateCreateTransaction, create);
  *                           message:
  *                             type: string
  *                             example: Category "Unknown" (expense) not found
+ *                           code:
+ *                             type: string
+ *                             description: |
+ *                               The same codes as a single transaction (TYPE_INVALID, CATEGORY_REQUIRED, AMOUNT_INVALID,
+ *                               DATE_INVALID, CURRENCY_INVALID, NOTE_TOO_LONG, TAG_INVALID, TOO_MANY_TAGS,
+ *                               VALIDATION_ERROR), or IMPORT_CATEGORY_NOT_FOUND when no category of yours has
+ *                               that name and type (an import never creates categories)
+ *                             example: IMPORT_CATEGORY_NOT_FOUND
+ *                           params:
+ *                             type: object
+ *                             description: Only with IMPORT_CATEGORY_NOT_FOUND, to translate the message
+ *                             example: { name: Unknown, type: expense }
  *       400:
  *         description: 'The body is not usable: "Rows must be a non-empty array", "You can import at most 500 rows at a time"'
  *         content:
@@ -534,6 +563,7 @@ router.post("/", validateCreateTransaction, create);
  *             example:
  *               success: false
  *               message: You can import at most 500 rows at a time
+ *               code: IMPORT_TOO_MANY_ROWS
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  *       413:
@@ -547,8 +577,8 @@ router.post("/import", validateImportTransactions, importCsv);
  *   post:
  *     summary: Delete many of my transactions at once (1 to 200 ids)
  *     description: |
- *       Only transactions of the signed-in user are deleted. An id that does not exist or belongs to another user is
- *       skipped without an error, so `deleted` can be smaller than the number of ids sent.
+ *       All or nothing: when one of the ids is not a transaction of the signed-in user (it does not exist or belongs
+ *       to another user), the answer is 404 and nothing is deleted. Duplicated ids count once.
  *     tags: [Transactions]
  *     security:
  *       - bearerAuth: []
@@ -593,8 +623,19 @@ router.post("/import", validateImportTransactions, importCsv);
  *             example:
  *               success: false
  *               message: You can change at most 200 transactions at a time
+ *               code: VALIDATION_ERROR
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
+ *       404:
+ *         description: One of the ids is not a transaction of yours (TRANSACTION_NOT_FOUND); nothing was deleted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Transaction not found
+ *               code: TRANSACTION_NOT_FOUND
  */
 router.post("/bulk-delete", validateBulkDelete, bulkDelete);
 
@@ -604,9 +645,9 @@ router.post("/bulk-delete", validateBulkDelete, bulkDelete);
  *   patch:
  *     summary: Move many of my transactions to another category (1 to 200 ids)
  *     description: |
- *       The type of every changed transaction is copied from the new category. Only transactions of the signed-in user
- *       are changed; other ids are skipped without an error. `updated` counts the transactions that really changed
- *       (one that already had the category is not counted).
+ *       The type of every changed transaction is copied from the new category. All or nothing: when one of the ids is
+ *       not a transaction of the signed-in user, the answer is 404 and nothing changes. `updated` counts the
+ *       transactions that really changed (one that already had the category is not counted).
  *     tags: [Transactions]
  *     security:
  *       - bearerAuth: []
@@ -655,10 +696,11 @@ router.post("/bulk-delete", validateBulkDelete, bulkDelete);
  *             example:
  *               success: false
  *               message: Category id is invalid
+ *               code: VALIDATION_ERROR
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  *       404:
- *         description: Category not found (it does not exist or belongs to another user)
+ *         description: The category (CATEGORY_NOT_FOUND) or one of the transactions (TRANSACTION_NOT_FOUND) is not yours; nothing changed
  *         content:
  *           application/json:
  *             schema:
@@ -666,6 +708,7 @@ router.post("/bulk-delete", validateBulkDelete, bulkDelete);
  *             example:
  *               success: false
  *               message: Category not found
+ *               code: CATEGORY_NOT_FOUND
  */
 router.patch("/bulk-category", validateBulkCategory, bulkCategory);
 
@@ -707,6 +750,7 @@ router.patch("/bulk-category", validateBulkCategory, bulkCategory);
  *             example:
  *               success: false
  *               message: Transaction not found
+ *               code: TRANSACTION_NOT_FOUND
  */
 router.get("/:id", validateTransactionId, getOne);
 
@@ -740,9 +784,10 @@ router.get("/:id", validateTransactionId, getOne);
  *                 description: Moves the transaction to another of your wallets (not an archived one)
  *                 example: 6720f1b2c3d4e5f601234601
  *               amount:
- *                 type: number
- *                 exclusiveMinimum: true
- *                 minimum: 0
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 999999999999
+ *                 description: whole VND, 1 to 999,999,999,999
  *                 example: 50000
  *               currency:
  *                 type: string
@@ -785,14 +830,25 @@ router.get("/:id", validateTransactionId, getOne);
  *             example:
  *               success: false
  *               message: Nothing to update
+ *               code: VALIDATION_ERROR
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  *       404:
- *         description: Transaction or category not found (or it belongs to another user)
+ *         description: The transaction, the new category or the new wallet does not exist or belongs to another user
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
+ *             examples:
+ *               transaction:
+ *                 summary: The transaction
+ *                 value: { success: false, message: Transaction not found, code: TRANSACTION_NOT_FOUND }
+ *               category:
+ *                 summary: The new category
+ *                 value: { success: false, message: Category not found, code: CATEGORY_NOT_FOUND }
+ *               wallet:
+ *                 summary: The new wallet
+ *                 value: { success: false, message: Wallet not found, code: WALLET_NOT_FOUND }
  *       409:
  *         description: The new date is already used by another transaction of the same recurring rule
  *         content:
@@ -802,6 +858,7 @@ router.get("/:id", validateTransactionId, getOne);
  *             example:
  *               success: false
  *               message: Duplicate value
+ *               code: DUPLICATE_VALUE
  */
 router.patch("/:id", validateTransactionId, validateUpdateTransaction, update);
 
@@ -847,6 +904,7 @@ router.patch("/:id", validateTransactionId, validateUpdateTransaction, update);
  *             example:
  *               success: false
  *               message: Transaction not found
+ *               code: TRANSACTION_NOT_FOUND
  */
 router.delete("/:id", validateTransactionId, remove);
 

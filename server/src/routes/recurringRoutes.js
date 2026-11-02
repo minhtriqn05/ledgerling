@@ -79,6 +79,7 @@ router.get("/", list);
  *             example:
  *               success: false
  *               message: Frequency must be weekly or monthly
+ *               code: VALIDATION_ERROR
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  *       404:
@@ -90,6 +91,7 @@ router.get("/", list);
  *             example:
  *               success: false
  *               message: Category not found
+ *               code: CATEGORY_NOT_FOUND
  */
 router.post("/", validateRecurringRule, create);
 
@@ -140,6 +142,7 @@ router.post("/", validateRecurringRule, create);
  *             example:
  *               success: false
  *               message: End date must be after the start date
+ *               code: END_BEFORE_START
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  *       404:
@@ -151,6 +154,7 @@ router.post("/", validateRecurringRule, create);
  *             example:
  *               success: false
  *               message: Recurring rule not found
+ *               code: RULE_NOT_FOUND
  */
 router.put("/:id", validateRecurringId, validateRecurringRule, update);
 
@@ -195,6 +199,7 @@ router.put("/:id", validateRecurringId, validateRecurringRule, update);
  *             example:
  *               success: false
  *               message: Recurring rule not found
+ *               code: RULE_NOT_FOUND
  */
 router.patch("/:id/toggle", validateRecurringId, toggle);
 
@@ -240,6 +245,7 @@ router.patch("/:id/toggle", validateRecurringId, toggle);
  *             example:
  *               success: false
  *               message: Recurring rule not found
+ *               code: RULE_NOT_FOUND
  */
 router.delete("/:id", validateRecurringId, remove);
 

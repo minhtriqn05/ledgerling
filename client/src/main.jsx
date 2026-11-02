@@ -2,7 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { MotionConfig } from 'motion/react';
-import './i18n/index.js';
+import { loadSavedLanguage } from './i18n/index.js';
 import './utils/installPrompt.js';
 import App from './App.jsx';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary.jsx';
@@ -26,17 +26,20 @@ const router = createBrowserRouter([
   },
 ]);
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    {/* reducedMotion="user": motion components follow the prefers-reduced-motion setting of the system */}
-    <MotionConfig reducedMotion="user">
-      <ThemeProvider>
-        <AuthProvider>
-          <ToastProvider>
-            <RouterProvider router={router} />
-          </ToastProvider>
-        </AuthProvider>
-      </ThemeProvider>
-    </MotionConfig>
-  </StrictMode>
-);
+// A language other than English is downloaded first (see i18n/index.js), so the first screen is already in it
+loadSavedLanguage().then(() => {
+  createRoot(document.getElementById('root')).render(
+    <StrictMode>
+      {/* reducedMotion="user": motion components follow the prefers-reduced-motion setting of the system */}
+      <MotionConfig reducedMotion="user">
+        <ThemeProvider>
+          <AuthProvider>
+            <ToastProvider>
+              <RouterProvider router={router} />
+            </ToastProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </MotionConfig>
+    </StrictMode>
+  );
+});

@@ -1,10 +1,11 @@
 import { defineConfig, devices } from '@playwright/test';
 import base from './playwright.config.js';
 
-// npm run screenshots
-// Takes the pictures of the landing page (src/assets/screenshots/*.jpg) from the demo account, on the same API with an
-// in-memory database that the end-to-end tests use (never Atlas). Run it again when the app looks different.
-// The file is named *.capture.js, so the normal `npm run test:e2e` never runs it.
+// npm run screenshots: the pictures of the landing page (src/assets/screenshots/*.jpg, e2e/screenshots.capture.js).
+// npm run screenshots:docs: the pictures of the README (docs/screenshots/*.jpg, e2e/docs-screenshots.capture.js).
+// Both come from the demo account, on the same API with an in-memory database that the end-to-end tests use (never
+// Atlas). Run them again when the app looks different. The files are named *.capture.js, so `npm run test:e2e` never
+// runs them.
 export default defineConfig({
   ...base,
   testMatch: '**/*.capture.js',

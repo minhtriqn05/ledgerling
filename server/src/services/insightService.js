@@ -1,4 +1,5 @@
-import { listBudgets } from "./budgetService.js";
+import { budgetsOfMonth } from "./budgetService.js";
+import { processDueRules } from "./recurringService.js";
 import { loadMonthlyReport } from "./reportService.js";
 import { currentMonth, monthProgress, todayInVietnam, vietnamDay } from "../utils/month.js";
 
@@ -182,7 +183,7 @@ function largestExpenseInsight(report) {
 // The rules, as a pure function of the numbers (so every rule can be tested with made-up numbers).
 // Returns at most 6 insights, warnings first. A month without transactions has none.
 // - report, categories: from loadMonthlyReport()
-// - budgets: the month's budgets with `amount`, `spent` and `category.name` (from listBudgets), [] when unused
+// - budgets: the month's budgets with `amount`, `spent` and `category.name` (from budgetsOfMonth), [] whenunused
 // - today: "YYYY-MM-DD" in Vietnam time
 export function buildInsights({ month, report, categories, budgets, today }) {
   // Nothing was recorded: "31 days without spending" would only be noise
@@ -200,10 +201,12 @@ export function buildInsights({ month, report, categories, budgets, today }) {
   return found.sort((a, b) => SEVERITY_ORDER[a.severity] - SEVERITY_ORDER[b.severity]).slice(0, MAX_INSIGHTS);
 }
 
+// The recurring transactions that are due are created first, so the numbers include them
 export async function getInsights(userId, { month = currentMonth(), currency = "VND" }) {
+  await processDueRules(userId);
   const today = todayInVietnam();
   const { report, categories } = await loadMonthlyReport(userId, { month, currency, today });
   // Budgets only matter while the month is running
-  const budgets = month === currentMonth() && currency === BUDGET_CURRENCY ? await listBudgets(userId, { month }) : [];
+  const budgets = month === currentMonth() && currency === BUDGET_CURRENCY ? await budgetsOfMonth(userId, month) : [];
   return { month, currency, insights: buildInsights({ month, report, categories, budgets, today }) };
 }

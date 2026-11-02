@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import { getGoals } from '../api/goals.js';
@@ -32,12 +32,20 @@ export default function GoalsPage() {
   // { history: goal } or { delete: goal }
   const [dialog, setDialog] = useState(null);
   const toast = useToast();
+  // Counts the changes this page makes to the list itself. A list asked for before one of them can arrive after it,
+  // without it: that answer is not used (the effect below asks again).
+  const localChanges = useRef(0);
 
   useEffect(() => {
     let cancelled = false; // StrictMode runs effects twice in dev; ignore the first run's answer
+    const changesBefore = localChanges.current;
     getGoals()
       .then((data) => {
         if (cancelled) return;
+        if (localChanges.current !== changesBefore) {
+          setReloadKey((key) => key + 1);
+          return;
+        }
         setGoals(data);
         setLoadError('');
       })
@@ -65,9 +73,13 @@ export default function GoalsPage() {
   // list again in the background: a new deadline or saving money can complete a goal, which changes its place in the order.
   // A failed background request is ignored; the card is already up to date.
   function showSaved(saved) {
+    localChanges.current += 1;
+    const changesNow = localChanges.current;
     setGoals((list) => (list.some((g) => g._id === saved._id) ? list.map((g) => (g._id === saved._id ? saved : g)) : [saved, ...list]));
     getGoals()
-      .then(setGoals)
+      .then((data) => {
+        if (localChanges.current === changesNow) setGoals(data);
+      })
       .catch(() => {});
   }
 
@@ -86,6 +98,7 @@ export default function GoalsPage() {
   function handleDeleted(goal) {
     toast.success(t('goals.deleted'));
     setDialog(null);
+    localChanges.current += 1;
     setGoals((list) => list.filter((g) => g._id !== goal._id));
   }
 

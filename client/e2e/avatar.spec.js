@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
+import { isPhone } from './helpers/device.js';
 
 // Avatars: a ready-made one or an uploaded photo, shown in the menu at once and kept after a reload.
 // The API (playwright.config.js, in-memory database) seeds the demo account and one admin when it starts.
@@ -81,7 +82,7 @@ test('picking a ready-made avatar shows it in the menu at once and keeps it afte
   await expect((await menuAvatar(page)).locator('img')).toHaveAttribute('src', chosen);
 });
 
-test('an uploaded photo is cropped, shown in the menu at once and kept after a reload', async ({ page }, testInfo) => {
+test('an uploaded photo is cropped, shown in the menu at once and kept after a reload', { tag: '@smoke' }, async ({ page }, testInfo) => {
   await register(page, testInfo, 'upload');
   await openProfile(page);
 
@@ -165,7 +166,7 @@ test('the top bar of a phone shows the avatar and opens the profile; a wide scre
   await register(page, testInfo, 'bar');
 
   const barAvatar = page.getByTestId('bar-avatar');
-  if (testInfo.project.name === 'mobile') {
+  if (isPhone(testInfo)) {
     await expect(barAvatar).toBeVisible();
     await expect(barAvatar.locator('[data-avatar]')).toHaveAttribute('data-avatar', 'preset');
     await barAvatar.click();

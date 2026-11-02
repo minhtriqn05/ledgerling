@@ -1,7 +1,11 @@
 # Ledgerling – API Plan
 
-Base URL: `http://localhost:4000/api` (local), `https://<render-app>.onrender.com/api` (production).
-Swagger UI: `/api-docs` (outside `/api`).
+Base URL: `http://localhost:4000/api` (local), `https://ledgerling-api.onrender.com/api` (production).
+Swagger UI: `/api-docs` (outside `/api`): https://ledgerling-api.onrender.com/api-docs.
+
+`server/tests/apiDocs.test.js` keeps this file honest: the endpoint table and the numbered sections below must list
+exactly the routes of the code and of the Swagger spec, and the error code table exactly the codes the code sends,
+under the same status.
 
 ## Real-time events (Socket.IO)
 
@@ -39,7 +43,8 @@ or deleting the account. A device with an old token is then refused with `TOKEN_
   to the 1st of the next month at 00:00 +07:00.
   Example `2026-10` → `2026-09-30T17:00:00.000Z` ≤ date < `2026-10-31T17:00:00.000Z`.
 - **Dates** are ISO 8601 strings; the server stores them in UTC.
-- **Limits** (per IP address, counted in the memory of the server, so they start again after a restart):
+- **Limits** (per IP address of the visitor, counted in the memory of the server, so they start again after a restart;
+  on Render the address is read behind Cloudflare and Render's proxy, `trust proxy` = 2):
   300 requests per 15 minutes to `/api` (`/api/health` is free) and 20 requests per 15 minutes to
   `POST /auth/login`, `POST /auth/register` + `POST /auth/demo` (each has its own counter). More gets 429 `RATE_LIMITED`. A JSON body can be at most 100 kB
   (300 kB for `POST /transactions/import`, 200 kB for `PATCH /users/me/avatar`); a bigger one gets 413 `PAYLOAD_TOO_LARGE`.
@@ -71,19 +76,22 @@ or deleting the account. A device with an old token is then refused with `TOKEN_
 Every error has a `code`. A code never changes meaning, so the client can show its own translation of
 `errors.<code>` (see `client/src/locales/*.json`); for a code it does not know it shows `message`.
 When the place that throws an error names no specific code, the status gives a default:
-400 `VALIDATION_ERROR`, 401 `UNAUTHORIZED`, 403 `FORBIDDEN`, 404 `NOT_FOUND`, 409 `CONFLICT`, 500 `INTERNAL_ERROR`.
+400 `VALIDATION_ERROR`, 401 `UNAUTHORIZED`, 403 `FORBIDDEN`, 404 `NOT_FOUND`, 409 `CONFLICT`, 500 `INTERNAL_ERROR`. Any other
+4xx (for example 415 for an unsupported charset) gets `REQUEST_ERROR`. In production a database validation error answers
+400 `VALIDATION_ERROR` with the fixed message `"Invalid input"` (the schema's own text, which names models and paths, is only shown outside production).
 
 | Status | Codes |
 |--------|-------|
 | 400 | `VALIDATION_ERROR`, `INVALID_JSON`, `NAME_REQUIRED`, `NAME_TOO_LONG`, `EMAIL_INVALID`, `PASSWORD_REQUIRED`, `PASSWORD_TOO_SHORT`, `PASSWORD_TOO_LONG`, `CURRENT_PASSWORD_REQUIRED`, `NEW_PASSWORD_TOO_SHORT`, `PASSWORD_UNCHANGED`, `WRONG_PASSWORD`, `TYPE_INVALID`, `TYPE_LOCKED`, `COLOR_INVALID`, `ICON_INVALID`, `CATEGORY_REQUIRED`, `AMOUNT_INVALID`, `CURRENCY_INVALID`, `NOTE_TOO_LONG`, `DATE_INVALID`, `TAG_INVALID`, `TOO_MANY_TAGS`, `MONTH_INVALID`, `BUDGET_EXPENSE_ONLY`, `END_BEFORE_START`, `TARGET_INVALID`, `DEADLINE_IN_PAST`, `WITHDRAW_TOO_MUCH`, `DEPOSIT_IN_USE`, `IMPORT_TOO_MANY_ROWS`, `STATUS_INVALID`, `INVALID_INPUT`, `INVALID_AVATAR`, `INVALID_AVATAR_IMAGE`, `WALLET_TYPE_INVALID`, `WALLET_BALANCE_INVALID`, `TRANSFER_SAME_WALLET` |
-| 401 | `TOKEN_MISSING`, `TOKEN_INVALID`, `INVALID_CREDENTIALS` |
+| 401 | `TOKEN_MISSING`, `TOKEN_INVALID`, `INVALID_CREDENTIALS`, `UNAUTHORIZED` |
 | 403 | `FORBIDDEN`, `ACCOUNT_DISABLED`, `CANNOT_DISABLE_SELF`, `CANNOT_DISABLE_ADMIN`, `DEMO_READ_ONLY` |
-| 404 | `USER_NOT_FOUND`, `ROUTE_NOT_FOUND`, `CATEGORY_NOT_FOUND`, `TRANSACTION_NOT_FOUND`, `BUDGET_NOT_FOUND`, `RULE_NOT_FOUND`, `GOAL_NOT_FOUND`, `CONTRIBUTION_NOT_FOUND`, `TEMPLATE_NOT_FOUND`, `NOTIFICATION_NOT_FOUND`, `WALLET_NOT_FOUND`, `TRANSFER_NOT_FOUND` |
-| 409 | `EMAIL_TAKEN`, `CATEGORY_EXISTS`, `CATEGORY_IN_USE`, `CATEGORY_HAS_RULES`, `BUDGET_EXISTS`, `WALLET_EXISTS`, `WALLET_ARCHIVED`, `WALLET_IN_USE`, `WALLET_DEFAULT_LOCKED`, `DUPLICATE_VALUE` |
+| 404 | `NOT_FOUND`, `USER_NOT_FOUND`, `ROUTE_NOT_FOUND`, `CATEGORY_NOT_FOUND`, `TRANSACTION_NOT_FOUND`, `BUDGET_NOT_FOUND`, `RULE_NOT_FOUND`, `GOAL_NOT_FOUND`, `CONTRIBUTION_NOT_FOUND`, `TEMPLATE_NOT_FOUND`, `NOTIFICATION_NOT_FOUND`, `WALLET_NOT_FOUND`, `TRANSFER_NOT_FOUND` |
+| 409 | `EMAIL_TAKEN`, `CATEGORY_EXISTS`, `CATEGORY_IN_USE`, `CATEGORY_HAS_RULES`, `BUDGET_EXISTS`, `WALLET_EXISTS`, `WALLET_ARCHIVED`, `WALLET_IN_USE`, `WALLET_DEFAULT_LOCKED`, `DUPLICATE_VALUE`, `CONFLICT` |
 | 413 | `PAYLOAD_TOO_LARGE` |
 | 429 | `RATE_LIMITED` |
 | 500 | `INTERNAL_ERROR` |
 | 503 | `DEMO_UNAVAILABLE` |
+| other 4xx | `REQUEST_ERROR` |
 
 Example: `{ "success": false, "message": "Email is already registered", "code": "EMAIL_TAKEN" }`.
 The tables below list the `message` of each endpoint; the matching code is in the table above.
@@ -93,7 +101,7 @@ The tables below list the `message` of each endpoint; the matching code is in th
 | Field | Rule |
 |-------|------|
 | `name` (user) | string, trimmed, 1–50 chars |
-| `email` | valid email, stored lowercase, unique |
+| `email` | valid email, at most 254 characters, stored lowercase, unique |
 | `password` (register) | string, 6–72 chars (72 = bcrypt limit) |
 | `newPassword` (change password) | string, 8–72 chars, different from `currentPassword` |
 | `name` (category) | string, trimmed, 1–30 chars, unique per user + type (case-insensitive) |
@@ -101,20 +109,22 @@ The tables below list the `message` of each endpoint; the matching code is in th
 | `color` | hex `#RRGGBB` |
 | `icon` (category) | optional; an icon name from the app's icon set (e.g. `utensils`, `bus`, `receipt`, `banknote`; the full list is `server/src/utils/categoryIcons.js`) or, for older clients, exactly one emoji (e.g. `🍜`). `null` or `""` means no icon: the client then picks an icon from the name. Default categories get an icon name |
 | `categoryId` | valid ObjectId of one of the user's categories |
-| `amount` | JSON number > 0 (a string like `"45000"` is refused) |
+| `amount` | JSON number, **whole VND from 1 to 999,999,999,999** (a string like `"45000"`, a decimal like `1000.5` or 13 digits are refused with `AMOUNT_INVALID`) |
 | `currency` (transaction body) | 3 letters (ISO 4217); lower case is converted to upper case; default `"VND"` |
 | `currency` (stats query) | 3 **uppercase** letters; lower case like `usd` is refused with 400; default `"VND"` |
 | `note` | string, trimmed, max 200 chars, optional, default `""` |
 | `tags` | array of up to 5 tags, optional, default `[]`. Each tag is trimmed, converted to lower case, 1–20 characters of `a-z 0-9 -`; duplicates are removed |
-| `date` | ISO 8601 date, default: now |
+| `date` | ISO 8601 date, default: now. Its day must exist (`2026-02-30T10:00:00Z` is refused, not moved to 2 March) and its year must be 1970–2100 (`DATE_INVALID`) |
 | `month` (query) | `YYYY-MM` |
+| `page` (query of a paginated list) | whole number from 1 to 100,000 |
+| `initialBalance` (wallet body) | whole VND from 0 to 999,999,999,999 (`WALLET_BALANCE_INVALID`) |
 | `month` (budget body) | `YYYY-MM`, required; cannot be changed after the budget is created |
 | `categoryId` (budget body) | valid ObjectId of one of the user's **expense** categories |
-| `amount` (budget body) | JSON number > 0, the limit in VND |
+| `amount` (budget body) | the limit, whole VND from 1 to 999,999,999,999 |
 | `frequency` (recurring body) | `"weekly"` or `"monthly"`, required |
-| `startDate` (recurring body) | a day that exists, `YYYY-MM-DD` in Vietnam time, required |
+| `startDate` (recurring body) | a day that exists, `YYYY-MM-DD` in Vietnam time, year 1970–2100, required |
 | `name` (template) | string, trimmed, 1–40 chars |
-| `ids` (bulk body) | array of 1–200 transaction ids (24-hex strings); duplicates are removed; more than 200 → 400 |
+| `ids` (bulk body) | array of 1–200 transaction ids (24-hex strings); duplicates are removed (in lower case); more than 200 → 400; one id that is not yours → 404 and nothing changes |
 | `endDate` (recurring body) | a day that exists, `YYYY-MM-DD`, after `startDate`; optional, `null` or left out means no end |
 
 ## Endpoint summary
@@ -205,9 +215,10 @@ Auth: no.
 
 **200**
 ```json
-{ "success": true }
+{ "success": true, "data": { "version": "1ca2479a1b2c3d4e5f60718293a4b5c6d7e8f901" } }
 ```
-(No `data` field.)
+`version` is the Git commit Render deployed (`RENDER_GIT_COMMIT`), or the time the server started when it runs
+elsewhere. The live smoke workflow waits until it shows the commit that was just merged. Never rate-limited.
 
 ---
 
@@ -459,7 +470,7 @@ Auth: yes.
 | `from` | `2026-10-01` | `YYYY-MM-DD`, first day included, from 00:00 +07:00 |
 | `to` | `2026-10-31` | `YYYY-MM-DD`, last day included (until 00:00 +07:00 of the next day) |
 | `type` | `expense` | `income` \| `expense` |
-| `categoryId` | `6720b1b2...` | |
+| `categoryId` | `6720b1b2...` | only transactions of this category. Another user's category: 404 `CATEGORY_NOT_FOUND` |
 | `walletId` | `6720f1b2...` | only transactions of this wallet; the default wallet also has the ones saved before wallets existed. Another user's wallet: 404 `WALLET_NOT_FOUND` |
 | `tag` | `work` | only transactions that have this tag; one tag, upper case is converted to lower case |
 | `q` | `lunch` | search in `note`, ignores upper / lower case; trimmed, empty is ignored, max 100 characters |
@@ -603,7 +614,7 @@ that row: an import never creates categories. Only the valid rows are saved.
 |----------------|------|
 | `type` | required, `income` or `expense` |
 | `category` | required, the name of one of the user's categories of this `type` |
-| `amount` | required, JSON number > 0 |
+| `amount` | required, whole VND from 1 to 999,999,999,999 |
 | `date` | `YYYY-MM-DD HH:mm` or `YYYY-MM-DD` (Vietnam time, the export format; a day alone is 00:00), or ISO 8601 with an offset; empty = now |
 | `currency`, `note`, `tags` | as in endpoint 11; empty = the default (`VND`, `""`, `[]`) |
 
@@ -1250,8 +1261,9 @@ Built from simple rules (no AI). `severity` is `info`, `warning` or `success`. T
 
 ## Bulk actions
 
-Both routes act only on the signed-in user's transactions. An id that does not exist or belongs to another user is
-skipped without an error (the count is just smaller), so the answer never reveals whether such an id exists.
+Both routes act only on the signed-in user's transactions, **all or nothing**: when one id does not exist or belongs
+to another user, the answer is 404 `TRANSACTION_NOT_FOUND` and nothing changes. Both cases get the same answer, so it
+never reveals whether another user's id exists.
 They are declared before `/transactions/:id`, so `bulk-category` is never read as an id.
 
 ### 44. POST /api/transactions/bulk-delete
@@ -1272,6 +1284,7 @@ Auth: yes.
 | Code | message |
 |------|---------|
 | 400 | `"Ids must be a non-empty array"`, `"You can change at most 200 transactions at a time"` (nothing is deleted), `"Every id must be a valid transaction id"` |
+| 404 | `"Transaction not found"` (one of the ids is not yours; nothing is deleted) |
 
 ### 45. PATCH /api/transactions/bulk-category
 Auth: yes.
@@ -1293,7 +1306,7 @@ The `type` of every changed transaction is copied from the new category (an expe
 | Code | message |
 |------|---------|
 | 400 | `"Ids must be a non-empty array"`, `"You can change at most 200 transactions at a time"`, `"Every id must be a valid transaction id"`, `"Category id is invalid"` |
-| 404 | `"Category not found"` (does not exist or belongs to another user; nothing is changed) |
+| 404 | `"Category not found"` (does not exist or belongs to another user), `"Transaction not found"` (one of the ids is not yours); nothing is changed |
 
 ---
 

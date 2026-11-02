@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { placeTourCard, TOUR_STEPS } from '../../utils/tour.js';
+import { useRestoreFocus } from '../../hooks/useRestoreFocus.js';
 import Button from '../Button/Button.jsx';
 import styles from './Tour.module.css';
 
@@ -17,6 +18,8 @@ function findTarget(step) {
 export default function Tour({ onClose, onStepChange, menuOpen }) {
   const { t } = useTranslation();
   const dialogRef = useRef(null);
+  // The focus goes back to where it was when the tour ends
+  useRestoreFocus();
   const cardRef = useRef(null);
   const titleId = useId();
   const [index, setIndex] = useState(0);

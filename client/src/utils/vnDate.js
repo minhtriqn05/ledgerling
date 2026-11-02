@@ -57,6 +57,19 @@ export function toDateInput(date) {
   return dayParts.format(new Date(date));
 }
 
+// The years the app works with: the API refuses days outside them (server/src/utils/validation.js)
+export const MIN_YEAR = 1970;
+export const MAX_YEAR = 2100;
+
+// true for a "YYYY-MM-DD" that the API accepts: a day that exists ("2026-02-30" has the right shape, but Date.UTC
+// would quietly turn it into March 2nd) in a year from MIN_YEAR to MAX_YEAR
+export function isAppDay(text) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(text ?? '')) return false;
+  const [year, month, day] = text.split('-').map(Number);
+  const exists = new Date(Date.UTC(year, month - 1, day)).toISOString().slice(0, 10) === text;
+  return exists && year >= MIN_YEAR && year <= MAX_YEAR;
+}
+
 // A day from an <input type="date"> -> the ISO 8601 text the API expects (noon in Vietnam, so the day cannot shift).
 export function fromDateInput(day) {
   return `${day}T12:00:00+07:00`;

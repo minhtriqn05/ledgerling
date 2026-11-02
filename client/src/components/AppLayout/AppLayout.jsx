@@ -273,7 +273,7 @@ function Layout() {
             </div>
           </header>
         )}
-        <main className={styles.main}>
+        <main id="main" className={styles.main}>
           <OfflineBanner />
           {narrow && <Breadcrumbs />}
           {/* A short fade and a slide when another page opens. No exit animation: the new page is there at once. */}

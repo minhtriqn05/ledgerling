@@ -117,7 +117,10 @@ router.get("/", validateListTransfers, list);
  *                 type: string
  *                 example: 6720f1b2c3d4e5f601234602
  *               amount:
- *                 type: number
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 999999999999
+ *                 description: whole VND, 1 to 999,999,999,999
  *                 example: 300000
  *               date:
  *                 type: string

@@ -6,7 +6,7 @@ async function openMenuIfNeeded(page) {
   if (await menuButton.isVisible()) await menuButton.click();
 }
 
-test('register → add a transaction → see it everywhere → log out', async ({ page }, testInfo) => {
+test('register → add a transaction → see it everywhere → log out', { tag: '@smoke' }, async ({ page }, testInfo) => {
   // A new account for every run and every project (desktop / mobile)
   const email = `e2e-${testInfo.project.name}-${Date.now()}@example.com`;
 

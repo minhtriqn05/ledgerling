@@ -163,7 +163,7 @@ function ProductFrame() {
           <i />
         </span>
         {/* The same picture has its description in "See it in action" below */}
-        <img src={shotOf('dashboard')} alt="" width={SHOT_SIZE.width} height={SHOT_SIZE.height} decoding="async" />
+        <img src={shotOf('dashboard')} alt="" width={SHOT_SIZE.width} height={SHOT_SIZE.height} decoding="async" fetchPriority="high" />
       </motion.div>
     </div>
   );

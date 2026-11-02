@@ -58,7 +58,7 @@ async function unreadOnServer(page) {
 const bell = (page, unread) =>
   page.getByRole('button', { name: unread === undefined ? 'Notifications' : `Notifications, ${unread} unread`, exact: true });
 
-test('budget passes 80% → the bell shows 1 → open it → mark as read; each level notifies only once', async ({ page }, testInfo) => {
+test('budget passes 80% → the bell shows 1 → open it → mark as read; each level notifies only once', { tag: '@smoke' }, async ({ page }, testInfo) => {
   test.setTimeout(120000);
   await register(page, testInfo, 'bell');
   await expect(bell(page)).toBeVisible();
@@ -149,6 +149,9 @@ test('a switch that is off creates no notification of that kind', async ({ page 
   await expect(budgetSwitch).not.toBeChecked();
   await budgetSwitch.check();
   await expect(budgetSwitch).toBeChecked();
+  // The switch moves at once; wait for the server to have the choice (like step 2), because the next step reloads the
+  // page, and a reload cancels a request that is still on its way
+  await expect(page.getByText('Settings saved')).toBeVisible();
 
   // 5. Now the next expense reports the level that is already passed. The bell says 2: opening the Notifications
   //    page in step 4 listed them, which made this week's summary (the user had transactions by then).

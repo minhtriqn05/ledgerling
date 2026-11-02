@@ -49,6 +49,7 @@ const router = Router();
  *             example:
  *               success: false
  *               message: Password must be at least 6 characters
+ *               code: PASSWORD_TOO_SHORT
  *       409:
  *         description: Email is already registered
  *         content:
@@ -58,6 +59,7 @@ const router = Router();
  *             example:
  *               success: false
  *               message: Email is already registered
+ *               code: EMAIL_TAKEN
  *       429:
  *         $ref: '#/components/responses/TooManyRequests'
  */
@@ -96,6 +98,13 @@ router.post("/register", validateRegister, register);
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
+ *             examples:
+ *               email:
+ *                 summary: The email is not an email address
+ *                 value: { success: false, message: Email is invalid, code: EMAIL_INVALID }
+ *               password:
+ *                 summary: No password
+ *                 value: { success: false, message: Password is required, code: PASSWORD_REQUIRED }
  *       401:
  *         description: Wrong email or password (the same message for an unknown email and a wrong password)
  *         content:
@@ -105,6 +114,7 @@ router.post("/register", validateRegister, register);
  *             example:
  *               success: false
  *               message: Invalid email or password
+ *               code: INVALID_CREDENTIALS
  *       403:
  *         description: The password is right but an admin disabled the account (code ACCOUNT_DISABLED)
  *         content:
@@ -179,6 +189,7 @@ router.post("/demo", demo);
  *             example:
  *               success: false
  *               message: Not authorized, invalid token
+ *               code: TOKEN_INVALID
  */
 router.get("/me", requireAuth, me);
 

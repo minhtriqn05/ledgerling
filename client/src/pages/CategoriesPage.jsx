@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getCategories, deleteCategory } from '../api/categories.js';
 import { getErrorMessage } from '../api/axios.js';
@@ -6,7 +6,6 @@ import { useToast } from '../context/ToastContext.jsx';
 import PageHeader from '../components/PageHeader/PageHeader.jsx';
 import SegmentedControl from '../components/SegmentedControl/SegmentedControl.jsx';
 import Button from '../components/Button/Button.jsx';
-import Alert from '../components/Alert/Alert.jsx';
 import EmptyState from '../components/EmptyState/EmptyState.jsx';
 import LoadingState from '../components/LoadingState/LoadingState.jsx';
 import ErrorState from '../components/ErrorState/ErrorState.jsx';
@@ -16,7 +15,7 @@ import CategoryForm from './categories/CategoryForm.jsx';
 import { useLiveRefresh } from '../hooks/useLiveRefresh.js';
 import styles from './CategoriesPage.module.css';
 
-// Design: CategoriesPreview in pages/styleGuide. The list is on the left (Expense / Income switch + cards),
+// The list is on the left (Expense / Income switch + cards),
 // the "New category" / "Edit category" form on the right (below the list on smaller screens).
 
 // Same order as the API: by name, ignoring upper / lower case.
@@ -34,12 +33,20 @@ export default function CategoriesPage() {
   // The form on the right: which category it edits (null = a new one). A new `key` rebuilds it (see openForm).
   const [form, setForm] = useState({ key: 0, category: null, focus: false });
   const toast = useToast();
+  // Counts the changes this page makes to the list itself. A list asked for before one of them can arrive after it,
+  // without it: that answer is not used, and the list is asked for again.
+  const localChanges = useRef(0);
 
   useEffect(() => {
     let cancelled = false; // StrictMode runs effects twice in dev; ignore the first run's answer
+    const changesBefore = localChanges.current;
     getCategories()
       .then((data) => {
         if (cancelled) return;
+        if (localChanges.current !== changesBefore) {
+          setReloadKey((key) => key + 1);
+          return;
+        }
         setCategories(data);
         setLoadError('');
       })
@@ -79,6 +86,7 @@ export default function CategoriesPage() {
   // The form calls this with the category the API returned (new or updated).
   function handleSaved(saved) {
     toast.success(form.category ? t('categories.updated') : t('categories.added'));
+    localChanges.current += 1;
     setCategories((list) => sortByName([...list.filter((c) => c._id !== saved._id), saved]));
     setActiveType(saved.type); // show the list it belongs to
     openForm(null);
@@ -88,6 +96,7 @@ export default function CategoriesPage() {
   async function handleDelete(category) {
     try {
       await deleteCategory(category._id);
+      localChanges.current += 1;
       setCategories((list) => list.filter((c) => c._id !== category._id));
       toast.success(t('categories.deleted'));
       // If it was open in the form, the form goes back to "New category".

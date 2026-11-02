@@ -1,11 +1,10 @@
 import { useTranslation } from 'react-i18next';
+import { MAX_YEAR, MIN_YEAR } from '../../utils/vnDate.js';
 import Icon from '../Icon.jsx';
 import styles from '../MonthPicker/MonthPicker.module.css';
 
 // Like MonthPicker, for a whole year: a pill with the year and previous / next arrows.
 // year is "YYYY" (text); onChange gets the new year as "YYYY" text.
-const MIN_YEAR = 1970;
-const MAX_YEAR = 2100;
 
 export default function YearPicker({ year, onChange }) {
   const { t } = useTranslation();

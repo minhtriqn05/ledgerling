@@ -9,8 +9,8 @@ const PORT = 4100;
 
 process.env.JWT_SECRET = "e2e-secret";
 process.env.JWT_EXPIRES_IN = "1h";
-// The Vite dev server that Playwright opens, and the preview of the build (offline tests)
-process.env.CLIENT_URL = "http://localhost:5174,http://localhost:5175";
+// The build of the app that Playwright serves (vite preview, see client/playwright.config.js)
+process.env.CLIENT_URL = "http://localhost:5174";
 // The tests make hundreds of requests from one address, so the rate limits (src/app.js) are off
 process.env.RATE_LIMIT_OFF = "true";
 

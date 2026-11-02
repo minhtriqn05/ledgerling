@@ -23,7 +23,8 @@ export default function NotificationSettings() {
 
   function clearPending(key) {
     setPending((current) => {
-      const { [key]: _done, ...rest } = current;
+      const rest = { ...current };
+      delete rest[key];
       return rest;
     });
   }

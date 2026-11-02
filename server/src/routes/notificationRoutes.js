@@ -85,6 +85,7 @@ router.use(requireAuth);
  *             example:
  *               success: false
  *               message: Unread must be true or false
+ *               code: VALIDATION_ERROR
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */

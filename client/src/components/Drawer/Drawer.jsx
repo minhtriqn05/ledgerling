@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef } from 'react';
 import { motion, useReducedMotion, usePresence } from 'motion/react';
 import { useTranslation } from 'react-i18next';
+import { useRestoreFocus } from '../../hooks/useRestoreFocus.js';
 import IconButton from '../IconButton/IconButton.jsx';
 import styles from './Drawer.module.css';
 
@@ -17,6 +18,8 @@ export default function Drawer({ title, onClose, above = null, children }) {
   const titleId = useId();
   const reduced = useReducedMotion();
   const [isPresent, safeToRemove] = usePresence();
+  // The focus goes back to what opened it (a button) when it is gone
+  useRestoreFocus();
 
   useEffect(() => {
     const dialog = dialogRef.current;

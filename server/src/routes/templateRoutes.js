@@ -77,6 +77,7 @@ router.get("/", list);
  *             example:
  *               success: false
  *               message: Amount must be greater than 0
+ *               code: AMOUNT_INVALID
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  *       404:
@@ -88,6 +89,7 @@ router.get("/", list);
  *             example:
  *               success: false
  *               message: Category not found
+ *               code: CATEGORY_NOT_FOUND
  */
 router.post("/", validateCreateTemplate, create);
 
@@ -129,6 +131,7 @@ router.post("/", validateCreateTemplate, create);
  *             example:
  *               success: false
  *               message: Template not found
+ *               code: TEMPLATE_NOT_FOUND
  */
 router.get("/:id", validateTemplateId, getOne);
 
@@ -162,7 +165,10 @@ router.get("/:id", validateTemplateId, getOne);
  *                 type: string
  *                 example: 6720b1b2c3d4e5f601234568
  *               amount:
- *                 type: number
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 999999999999
+ *                 description: whole VND, 1 to 999,999,999,999
  *                 example: 35000
  *               note:
  *                 type: string
@@ -190,6 +196,7 @@ router.get("/:id", validateTemplateId, getOne);
  *             example:
  *               success: false
  *               message: Nothing to update
+ *               code: VALIDATION_ERROR
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  *       404:
@@ -201,6 +208,7 @@ router.get("/:id", validateTemplateId, getOne);
  *             example:
  *               success: false
  *               message: Template not found
+ *               code: TEMPLATE_NOT_FOUND
  */
 router.patch("/:id", validateTemplateId, validateUpdateTemplate, update);
 
@@ -246,6 +254,7 @@ router.patch("/:id", validateTemplateId, validateUpdateTemplate, update);
  *             example:
  *               success: false
  *               message: Template not found
+ *               code: TEMPLATE_NOT_FOUND
  */
 router.delete("/:id", validateTemplateId, remove);
 

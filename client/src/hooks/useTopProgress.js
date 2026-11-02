@@ -5,6 +5,9 @@ import { getActiveRequests, subscribeToRequests } from '../utils/requestTracker.
 export const ROUTE_PULSE_MS = 300;
 // Anything shorter does not show the bar at all, so a quick answer never makes it flicker
 export const SHOW_AFTER_MS = 120;
+// When everything is done the bar stays this long: a request that starts right after (a page that took a while to
+// open, then asks for its data) keeps it on screen instead of making it go away and come back
+export const HIDE_AFTER_MS = 150;
 
 // True while the thin bar at the top of the page should show: right after the address changed, or while requests are on their way.
 export function useTopProgress(pathname) {
@@ -21,11 +24,7 @@ export function useTopProgress(pathname) {
   const busy = active > 0 || pulsing;
 
   useEffect(() => {
-    if (!busy) {
-      setVisible(false);
-      return undefined;
-    }
-    const timer = setTimeout(() => setVisible(true), SHOW_AFTER_MS);
+    const timer = busy ? setTimeout(() => setVisible(true), SHOW_AFTER_MS) : setTimeout(() => setVisible(false), HIDE_AFTER_MS);
     return () => clearTimeout(timer);
   }, [busy]);
 

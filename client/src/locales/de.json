@@ -958,7 +958,7 @@
   },
   "errors": {
     "ACCOUNT_DISABLED": "Dieses Konto wurde gesperrt",
-    "AMOUNT_INVALID": "Der Betrag muss größer als 0 sein",
+    "AMOUNT_INVALID": "Der Betrag muss eine ganze Zahl in VND sein, von 1 bis 999.999.999.999",
     "BUDGET_EXISTS": "Für diese Kategorie und diesen Monat gibt es bereits ein Budget",
     "BUDGET_EXPENSE_ONLY": "Budgets gibt es nur für Ausgabenkategorien",
     "BUDGET_NOT_FOUND": "Budget nicht gefunden",
@@ -1032,9 +1032,10 @@
     "WALLET_IN_USE": "Diese Geldbörse hat noch Transaktionen oder Überweisungen. Archiviere sie stattdessen.",
     "WALLET_DEFAULT_LOCKED": "Die Standard-Geldbörse kann weder archiviert noch gelöscht werden",
     "WALLET_TYPE_INVALID": "Wähle eine Art für die Geldbörse",
-    "WALLET_BALANCE_INVALID": "Der Anfangsbestand muss 0 oder mehr sein",
+    "WALLET_BALANCE_INVALID": "Der Anfangsbestand muss eine ganze Zahl in VND sein, 0 oder mehr",
     "TRANSFER_NOT_FOUND": "Überweisung nicht gefunden",
-    "TRANSFER_SAME_WALLET": "Wähle zwei verschiedene Geldbörsen"
+    "TRANSFER_SAME_WALLET": "Wähle zwei verschiedene Geldbörsen",
+    "REQUEST_ERROR": "Die Anfrage konnte nicht verarbeitet werden. Bitte versuche es erneut."
   },
   "live": {
     "live": "Live",

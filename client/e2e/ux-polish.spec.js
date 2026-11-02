@@ -1,12 +1,11 @@
 import { expect, test } from '@playwright/test';
+import { isPhone } from './helpers/device.js';
 
 // The UX polish phase: Settings in sections, the way back, collapsing, the language picker, the user menu, the command
 // palette, the tour, the Session expired dialog and the small helpers. Every test runs on a desktop and on a phone screen.
 const API_URL = 'http://localhost:4100/api';
 const PASSWORD = 'secret123';
 const SECTIONS = ['Profile', 'Security', 'Appearance', 'Preferences', 'Notifications', 'App', 'Data', 'Danger zone'];
-
-const isPhone = (testInfo) => testInfo.project.name === 'mobile';
 
 async function register(page, testInfo, label) {
   const email = `ux-${label}-${testInfo.project.name}-${Date.now()}@example.com`;
@@ -424,7 +423,7 @@ test.describe('the user menu', () => {
 test.describe('the command palette', () => {
   const input = (page) => page.getByTestId('command-input');
 
-  test('Ctrl+K, type, Enter jumps to the page; Escape and Ctrl+K close it', async ({ page }, testInfo) => {
+  test('Ctrl+K, type, Enter jumps to the page; Escape and Ctrl+K close it', { tag: '@smoke' }, async ({ page }, testInfo) => {
     await register(page, testInfo, 'palette');
 
     await page.keyboard.press('Control+k');
@@ -608,8 +607,15 @@ test.describe('the Session expired dialog', () => {
   });
 
   test('also from the Dashboard: the way leads to the login and back, not to the landing page', async ({ page }, testInfo) => {
+    // The Dashboard of a new account asks for budgets and goals (its Get started card) after its first numbers. The
+    // click below must make the first request with the old token, so these two have to be answered before.
+    // (waitForLoadState('networkidle') does not wait here: the app went from /register to / without a page load.)
+    const cardLoaded = Promise.all([
+      page.waitForResponse((response) => new URL(response.url()).pathname === '/api/budgets'),
+      page.waitForResponse((response) => new URL(response.url()).pathname === '/api/goals'),
+    ]);
     const email = await register(page, testInfo, 'expired-home');
-    await page.waitForLoadState('networkidle');
+    await cardLoaded;
     await page.evaluate(() => localStorage.setItem('token', 'expired-token'));
 
     await page.getByRole('button', { name: /next month|previous month/i }).first().click();

@@ -93,6 +93,7 @@ router.use(requireAuth);
  *             example:
  *               success: false
  *               message: Month must be in YYYY-MM format
+ *               code: MONTH_INVALID
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */

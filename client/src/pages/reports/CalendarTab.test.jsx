@@ -38,12 +38,14 @@ beforeEach(() => {
 });
 
 describe('CalendarTab', () => {
-  it('shows a button for every day of the month, with its spending in the name', async () => {
+  it('shows a button for every day of the month: its name is what it shows, its description the spending', async () => {
     getMonthlyReport.mockResolvedValue(makeReport());
     renderTab();
 
-    expect(await screen.findByRole('button', { name: '10 October 2026: spent 1,000,000 ₫' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '1 October 2026: no spending' })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { description: '10 October 2026: spent 1,000,000 ₫' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { description: '1 October 2026: no spending' })).toBeInTheDocument();
+    // The name is what the button shows (the day and the short amount), so voice control can use it
+    expect(screen.getByRole('button', { description: /^10 October 2026/ })).toHaveTextContent('101M');
     // The chevron of the card is a button too: only the ones in the grid are days
     expect(within(screen.getByRole('group', { name: 'Calendar of October 2026' })).getAllByRole('button')).toHaveLength(31);
     expect(getMonthlyReport).toHaveBeenCalledWith('2026-10');
@@ -52,7 +54,7 @@ describe('CalendarTab', () => {
   it('starts the week on Monday', async () => {
     getMonthlyReport.mockResolvedValue(makeReport());
     renderTab();
-    await screen.findByRole('button', { name: /10 October 2026/ });
+    await screen.findByRole('button', { description: /10 October 2026/ });
 
     const names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d) => screen.getByText(d));
     // The order in the page is the order of the columns
@@ -64,7 +66,7 @@ describe('CalendarTab', () => {
   it('starts the week on Sunday when the preference says so', async () => {
     getMonthlyReport.mockResolvedValue(makeReport());
     renderTab({ weekStartsOn: 'sunday' });
-    await screen.findByRole('button', { name: /10 October 2026/ });
+    await screen.findByRole('button', { description: /10 October 2026/ });
 
     const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => screen.getByText(d));
     names.slice(1).forEach((name, i) => {
@@ -72,16 +74,16 @@ describe('CalendarTab', () => {
     });
     // 1 October 2026 is a Thursday: 4 empty cells come before it, so it is in the 5th column
     const cells = [...document.querySelectorAll('[role="group"] > *')].slice(7);
-    expect(cells[4]).toHaveAccessibleName('1 October 2026: no spending');
+    expect(cells[4]).toHaveAccessibleDescription('1 October 2026: no spending');
   });
 
   it('shades a day more the more was spent on it', async () => {
     getMonthlyReport.mockResolvedValue(makeReport());
     renderTab();
 
-    const busiest = await screen.findByRole('button', { name: /^10 October 2026/ });
-    const light = screen.getByRole('button', { name: /^3 October 2026/ });
-    const none = screen.getByRole('button', { name: /^1 October 2026/ });
+    const busiest = await screen.findByRole('button', { description: /^10 October 2026/ });
+    const light = screen.getByRole('button', { description: /^3 October 2026/ });
+    const none = screen.getByRole('button', { description: /^1 October 2026/ });
 
     expect(busiest.className).toMatch(/level4/);
     expect(light.className).toMatch(/level1/);
@@ -92,7 +94,7 @@ describe('CalendarTab', () => {
     getMonthlyReport.mockResolvedValue(makeReport());
     renderTab();
 
-    await userEvent.click(await screen.findByRole('button', { name: /10 October 2026/ }));
+    await userEvent.click(await screen.findByRole('button', { description: /10 October 2026/ }));
 
     expect(screen.getByTestId('where')).toHaveTextContent('/transactions?from=2026-10-10&to=2026-10-10');
   });
@@ -103,6 +105,6 @@ describe('CalendarTab', () => {
 
     await userEvent.click(await screen.findByRole('button', { name: 'Try again' }));
 
-    expect(await screen.findByRole('button', { name: /10 October 2026/ })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { description: /10 October 2026/ })).toBeInTheDocument();
   });
 });

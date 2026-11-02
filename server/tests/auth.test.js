@@ -87,9 +87,22 @@ describe("GET /api/auth/me", () => {
 });
 
 describe("GET /api/health", () => {
-  it("answers 200 without a token", async () => {
+  it("answers 200 without a token, with the time this server started as its version", async () => {
     const res = await api().get("/api/health");
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ success: true });
+    expect(res.body).toEqual({ success: true, data: { version: expect.any(String) } });
+    expect(Number.isNaN(Date.parse(res.body.data.version))).toBe(false);
+  });
+
+  it("gives the commit Render deployed as the version when Render names it", async () => {
+    const previous = process.env.RENDER_GIT_COMMIT;
+    process.env.RENDER_GIT_COMMIT = "1ca2479a1b2c3d4e5f60718293a4b5c6d7e8f901";
+    try {
+      const res = await api().get("/api/health");
+      expect(res.body.data.version).toBe("1ca2479a1b2c3d4e5f60718293a4b5c6d7e8f901");
+    } finally {
+      if (previous === undefined) delete process.env.RENDER_GIT_COMMIT;
+      else process.env.RENDER_GIT_COMMIT = previous;
+    }
   });
 });

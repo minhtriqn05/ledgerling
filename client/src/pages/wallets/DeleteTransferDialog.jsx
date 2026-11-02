@@ -7,7 +7,7 @@ import { formatVnd } from '../../utils/format.js';
 import Button from '../../components/Button/Button.jsx';
 import Modal from '../../components/Modal/Modal.jsx';
 // Same layout as the "Delete this transaction?" dialog, so it uses the same styles
-import styles from '../transactions/DeleteTransactionDialog.module.css';
+import styles from '../../components/Modal/ConfirmDelete.module.css';
 
 // "Are you sure?" step before a transfer is deleted: the money goes back. onDeleted(transfer) runs after the API said OK.
 export default function DeleteTransferDialog({ transfer, onDeleted, onClose }) {

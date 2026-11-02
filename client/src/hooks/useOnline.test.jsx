@@ -31,6 +31,22 @@ describe('OfflineBanner', () => {
     goOnline();
     expect(screen.queryByText(BANNER)).not.toBeInTheDocument();
   });
+
+  it('goes away when the network is back even if the browser fires no online event', () => {
+    vi.useFakeTimers();
+    try {
+      render(<OfflineBanner />);
+      goOffline();
+      expect(screen.getByText(BANNER)).toBeInTheDocument();
+
+      // navigator.onLine is true again, but no event arrives (Firefox can do this for a page loaded while offline)
+      vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(true);
+      act(() => vi.advanceTimersByTime(2000));
+      expect(screen.queryByText(BANNER)).not.toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });
 
 describe('needsNetwork', () => {

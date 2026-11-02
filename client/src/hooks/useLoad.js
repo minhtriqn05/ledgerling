@@ -29,8 +29,8 @@ export function useLoad(loader, deps) {
     return () => {
       cancelled = true;
     };
-    // loader is a new function on every render; only deps (and reloadKey) decide when to load again
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // loader is a new function on every render, so it is left out on purpose: only deps (and reloadKey) decide
+    // when to load again
   }, [...deps, reloadKey]);
 
   const reload = useCallback(() => setReloadKey((key) => key + 1), []);

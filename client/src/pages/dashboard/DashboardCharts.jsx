@@ -96,7 +96,7 @@ export function Capsule({ x, y, width, height, fill }) {
     <g>
       <rect x={x} y={y} width={width} height={height} rx={radius} ry={radius} fill={fill} />
       {height > radius * 2 + 8 && width > 22 && (
-        <rect x={x + width / 2 - 7} y={y + 9} width={14} height={3} rx={1.5} fill="#ffffff" fillOpacity={0.5} />
+        <rect x={x + width / 2 - 7} y={y + 9} width={14} height={3} rx={1.5} className={styles.capsuleMark} />
       )}
     </g>
   );

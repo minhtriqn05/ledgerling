@@ -13,7 +13,7 @@ export function csvCell(value) {
 }
 
 // The BOM tells Excel the file is UTF-8, so accents (like "ăn") are not shown as garbage.
-const BOM = "﻿";
+const BOM = "\uFEFF";
 
 // header: array of column names, rows: array of arrays. Lines end with CRLF, like RFC 4180 asks.
 export function buildCsv(header, rows) {

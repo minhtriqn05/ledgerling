@@ -7,6 +7,9 @@ import { DEMO_EMAIL } from "../utils/demo.js";
 import { randomPresetAvatar } from "../utils/avatars.js";
 
 const SALT_ROUNDS = 10;
+// Compared with when the email has no account, so that login takes as long as a wrong password: a quicker answer
+// would tell an attacker which emails are registered
+const UNKNOWN_USER_HASH = bcrypt.hashSync("no account has this password", SALT_ROUNDS);
 
 // The token says who the user is (sub = subject) and which token version it belongs to (tv).
 // It is signed, not encrypted: never put secrets in it.
@@ -38,9 +41,9 @@ export async function getCurrentUser(userId) {
 
 export async function login({ email, password }) {
   const user = await User.findOne({ email });
-  // Same message for an unknown email and a wrong password, so nobody can learn which emails exist
-  const ok = user && (await bcrypt.compare(password, user.passwordHash));
-  if (!ok) throw httpError(401, "Invalid email or password", "INVALID_CREDENTIALS");
+  // Same message (and the same work) for an unknown email and a wrong password, so nobody can learn which emails exist
+  const matches = await bcrypt.compare(password, user?.passwordHash ?? UNKNOWN_USER_HASH);
+  if (!user || !matches) throw httpError(401, "Invalid email or password", "INVALID_CREDENTIALS");
   // Checked after the password, so only the owner of the account learns that it was disabled
   if (user.status === "disabled") throw httpError(403, "Account disabled", "ACCOUNT_DISABLED");
 

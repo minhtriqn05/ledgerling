@@ -44,6 +44,9 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// The Admin page: the newest accounts first, and the accounts made per day
+userSchema.index({ createdAt: -1, _id: -1 });
+
 // Runs whenever a user is turned into JSON (e.g. res.json(user)),
 // so the password hash, the token version and Mongoose's internal __v never reach the client
 userSchema.set("toJSON", {

@@ -83,7 +83,7 @@ export default function TransactionList({
   );
 
   return (
-    <>
+    <div className={styles.list}>
       <div className={styles.tableWrap}>
         <table className={styles.table}>
           <thead>
@@ -212,6 +212,6 @@ export default function TransactionList({
           ))}
         </ul>
       </div>
-    </>
+    </div>
   );
 }

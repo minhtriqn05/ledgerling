@@ -48,7 +48,7 @@ describe('parseCsvText', () => {
   const header = 'Date,Type,Category,Amount,Currency,Note,Tags';
 
   it('reads the file the export makes, BOM and CRLF included', () => {
-    const csv = `﻿${header}\r\n2026-10-27 12:30,expense,Food,45000,VND,Lunch,work;trip\r\n2026-10-28 09:00,income,Salary,9000000,VND,"Pay, October",\r\n`;
+    const csv = `\uFEFF${header}\r\n2026-10-27 12:30,expense,Food,45000,VND,Lunch,work;trip\r\n2026-10-28 09:00,income,Salary,9000000,VND,"Pay, October",\r\n`;
     expect(parseCsvText(csv)).toEqual({
       rows: [
         { date: '2026-10-27 12:30', type: 'expense', category: 'Food', amount: 45000, currency: 'VND', note: 'Lunch', tags: ['work', 'trip'] },
@@ -122,11 +122,16 @@ describe('validateImportRow', () => {
   it.each([
     [{ type: 'other' }, 'Type must be income or expense'],
     [{ category: '' }, 'Category is required'],
-    [{ amount: 0 }, 'Amount must be greater than 0'],
-    [{ amount: -5 }, 'Amount must be greater than 0'],
-    [{ amount: 'abc' }, 'Amount must be greater than 0'],
+    [{ amount: 0 }, 'The amount must be a whole number of VND, from 1 to 999,999,999,999'],
+    [{ amount: -5 }, 'The amount must be a whole number of VND, from 1 to 999,999,999,999'],
+    [{ amount: 'abc' }, 'The amount must be a whole number of VND, from 1 to 999,999,999,999'],
+    [{ amount: 35000.5 }, 'The amount must be a whole number of VND, from 1 to 999,999,999,999'],
+    [{ amount: 1e12 }, 'The amount must be a whole number of VND, from 1 to 999,999,999,999'],
     [{ date: 'yesterday' }, 'Date is invalid, use YYYY-MM-DD HH:mm or ISO 8601'],
     [{ date: '2026-02-30' }, 'Date is invalid, use YYYY-MM-DD HH:mm or ISO 8601'],
+    [{ date: '2026-02-30T10:00:00Z' }, 'Date is invalid, use YYYY-MM-DD HH:mm or ISO 8601'],
+    [{ date: '1969-12-31 12:00' }, 'Date is invalid, use YYYY-MM-DD HH:mm or ISO 8601'],
+    [{ date: '2101-01-01T12:00:00+07:00' }, 'Date is invalid, use YYYY-MM-DD HH:mm or ISO 8601'],
     [{ date: '2026-10-27 25:00' }, 'Date is invalid, use YYYY-MM-DD HH:mm or ISO 8601'],
     [{ currency: 'DONG' }, 'Currency must be a 3-letter ISO code'],
     [{ note: 'x'.repeat(201) }, 'Note must be at most 200 characters'],

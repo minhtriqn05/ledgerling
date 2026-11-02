@@ -28,8 +28,8 @@ export default function PreferencesSync() {
     savedLanguage.current = language ?? null;
     if (isTheme(theme)) setTheme(theme);
     if (language && language !== i18n.resolvedLanguage) i18n.changeLanguage(language);
-    // Only when another person (or nobody) becomes the user: a new copy of the same user changes nothing here
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Only when another person (or nobody) becomes the user: a new copy of the same user changes nothing here,
+    // so userId is the only dependency on purpose
   }, [userId]);
 
   useEffect(() => {

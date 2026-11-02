@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { chooseOption } from './helpers/controls.js';
+import { isPhone } from './helpers/device.js';
 
 // The UI upgrade: languages, category icons and the details drawer.
 
@@ -7,7 +8,7 @@ const API_URL = 'http://localhost:4100/api';
 
 // Opens the menu on a phone (it is a dropdown there); on a desktop the sidebar is always open.
 async function openMenu(page, testInfo, label = 'Open menu') {
-  if (testInfo.project.name === 'mobile') await page.getByRole('button', { name: label }).click();
+  if (isPhone(testInfo)) await page.getByRole('button', { name: label }).click();
 }
 
 // A new account for every test and every project (desktop / mobile). Ends on the Dashboard.
@@ -47,7 +48,7 @@ test('the language picker on the Login page changes the page, and server errors 
   await expect(page.getByRole('alert')).toHaveText('Email hoặc mật khẩu không đúng');
 });
 
-test('switching to Tiếng Việt translates the menu, and F5 keeps the language', async ({ page }, testInfo) => {
+test('switching to Tiếng Việt translates the menu, and F5 keeps the language', { tag: '@smoke' }, async ({ page }, testInfo) => {
   await register(page, testInfo, 'lang');
   await openMenu(page, testInfo);
   const nav = page.getByRole('navigation', { name: 'Main navigation' });

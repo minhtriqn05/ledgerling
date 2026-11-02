@@ -14,9 +14,9 @@ concurrency:
 
 jobs:
   server:
-    name: Server tests
+    name: Server lint, tests and coverage
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     defaults:
       run:
         working-directory: server
@@ -28,13 +28,50 @@ jobs:
           cache: npm
           cache-dependency-path: server/package-lock.json
       - run: npm ci
-      # Vitest + Supertest; NODE_ENV=test is set in vitest.config.js
-      - run: npm test
+      - run: npm run lint
+      # Vitest + Supertest (NODE_ENV=test is set in vitest.config.js). Fails below the coverage thresholds of
+      # vitest.config.js: 80% of the lines and of the branches.
+      - run: npm run test:coverage
 
   client:
-    name: Client checks and end-to-end tests
+    name: Client lint, tests, coverage and build
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run i18n:check
+      # Vitest + React Testing Library. Fails below the coverage thresholds of vitest.config.js: 60% of the lines,
+      # 80% in src/utils and src/hooks.
+      - run: npm run test:coverage
+      - run: npm run build
+
+  e2e:
+    name: End-to-end tests (${{ matrix.name }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      # One browser failing does not stop the other run
+      fail-fast: false
+      matrix:
+        include:
+          - name: Chrome, desktop and phone, every test
+            browsers: chromium
+            script: test:e2e:chromium
+            report: playwright-report-chromium
+          - name: Firefox and iPhone Safari, the @smoke tests
+            browsers: firefox webkit
+            script: test:e2e:smoke
+            report: playwright-report-smoke
     defaults:
       run:
         working-directory: client
@@ -51,18 +88,14 @@ jobs:
       # Playwright starts the API from /server (in-memory database), so its packages are needed too
       - run: npm ci
         working-directory: server
-      # --if-present: there is no lint script yet
-      - run: npm run lint --if-present
-      - run: npm run i18n:check
-      - run: npm test
-      - run: npm run build
-      - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e
+      - run: npx playwright install --with-deps ${{ matrix.browsers }}
+      # Builds the app, starts the API and vite preview, then runs the tests (client/playwright.config.js)
+      - run: npm run ${{ matrix.script }}
       # The report is only kept when a test failed, to see why
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: playwright-report
+          name: ${{ matrix.report }}
           path: |
             client/playwright-report
             client/test-results

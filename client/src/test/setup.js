@@ -3,7 +3,12 @@
 import '@testing-library/jest-dom/vitest';
 import { afterEach } from 'vitest';
 import { cleanup } from '@testing-library/react';
-import '../i18n/index.js';
+import i18n from '../i18n/index.js';
+import { LANGUAGES } from '../i18n/languages.js';
+
+// The app downloads a language the first time it is used. The tests switch languages and read the text at once,
+// so every language is loaded before they start.
+await i18n.loadLanguages(LANGUAGES.map((language) => language.code));
 
 // Unit tests run with prefers-reduced-motion: no enter or exit animations to wait for.
 // (jsdom has no matchMedia of its own.)

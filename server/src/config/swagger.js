@@ -1,5 +1,37 @@
 import swaggerJsdoc from "swagger-jsdoc";
 
+// Every error code the API can answer with, by HTTP status (the enum of ErrorResponse.code below).
+// tests/apiDocs.test.js checks that it matches the codes in src/, the table in docs/api-plan.md and the client translations.
+export const ERROR_CODES_BY_STATUS = {
+  400: [
+    "VALIDATION_ERROR", "INVALID_JSON", "INVALID_INPUT", "NAME_REQUIRED", "NAME_TOO_LONG", "EMAIL_INVALID",
+    "PASSWORD_REQUIRED", "PASSWORD_TOO_SHORT", "PASSWORD_TOO_LONG", "CURRENT_PASSWORD_REQUIRED", "NEW_PASSWORD_TOO_SHORT",
+    "PASSWORD_UNCHANGED", "WRONG_PASSWORD", "TYPE_INVALID", "TYPE_LOCKED", "COLOR_INVALID", "ICON_INVALID",
+    "CATEGORY_REQUIRED", "AMOUNT_INVALID", "CURRENCY_INVALID", "NOTE_TOO_LONG", "DATE_INVALID", "TAG_INVALID",
+    "TOO_MANY_TAGS", "MONTH_INVALID", "BUDGET_EXPENSE_ONLY", "END_BEFORE_START", "TARGET_INVALID", "DEADLINE_IN_PAST",
+    "WITHDRAW_TOO_MUCH", "DEPOSIT_IN_USE", "IMPORT_TOO_MANY_ROWS", "STATUS_INVALID", "INVALID_AVATAR",
+    "INVALID_AVATAR_IMAGE", "WALLET_TYPE_INVALID", "WALLET_BALANCE_INVALID", "TRANSFER_SAME_WALLET",
+  ],
+  401: ["UNAUTHORIZED", "TOKEN_MISSING", "TOKEN_INVALID", "INVALID_CREDENTIALS"],
+  403: ["FORBIDDEN", "ACCOUNT_DISABLED", "CANNOT_DISABLE_SELF", "CANNOT_DISABLE_ADMIN", "DEMO_READ_ONLY"],
+  404: [
+    "NOT_FOUND", "ROUTE_NOT_FOUND", "USER_NOT_FOUND", "CATEGORY_NOT_FOUND", "TRANSACTION_NOT_FOUND", "BUDGET_NOT_FOUND",
+    "RULE_NOT_FOUND", "GOAL_NOT_FOUND", "CONTRIBUTION_NOT_FOUND", "TEMPLATE_NOT_FOUND", "NOTIFICATION_NOT_FOUND",
+    "WALLET_NOT_FOUND", "TRANSFER_NOT_FOUND",
+  ],
+  409: [
+    "CONFLICT", "EMAIL_TAKEN", "CATEGORY_EXISTS", "CATEGORY_IN_USE", "CATEGORY_HAS_RULES", "BUDGET_EXISTS",
+    "WALLET_EXISTS", "WALLET_ARCHIVED", "WALLET_IN_USE", "WALLET_DEFAULT_LOCKED", "DUPLICATE_VALUE",
+  ],
+  413: ["PAYLOAD_TOO_LARGE"],
+  429: ["RATE_LIMITED"],
+  500: ["INTERNAL_ERROR"],
+  503: ["DEMO_UNAVAILABLE"],
+  // Any other 4xx status, for example 415 for a body in an unsupported charset
+  "other 4xx": ["REQUEST_ERROR"],
+};
+const ERROR_CODES = Object.values(ERROR_CODES_BY_STATUS).flat();
+
 const options = {
   definition: {
     openapi: "3.0.0",
@@ -401,7 +433,7 @@ const options = {
           required: ["categoryId", "amount", "frequency", "startDate"],
           properties: {
             categoryId: { type: "string", description: "Id of one of your categories", example: "6720b1b2c3d4e5f601234571" },
-            amount: { type: "number", description: "In VND, greater than 0", example: 3500000 },
+            amount: { type: "integer", minimum: 1, maximum: 999999999999, description: "In whole VND, 1 to 999,999,999,999", example: 3500000 },
             note: { type: "string", maxLength: 200, example: "Rent" },
             frequency: { type: "string", enum: ["weekly", "monthly"], example: "monthly" },
             startDate: {
@@ -446,7 +478,7 @@ const options = {
           properties: {
             name: { type: "string", minLength: 1, maxLength: 40, example: "Morning coffee" },
             categoryId: { type: "string", description: "Id of one of your categories", example: "6720b1b2c3d4e5f601234568" },
-            amount: { type: "number", description: "In VND, greater than 0", example: 35000 },
+            amount: { type: "integer", minimum: 1, maximum: 999999999999, description: "In whole VND, 1 to 999,999,999,999", example: 35000 },
             note: { type: "string", maxLength: 200, example: "Coffee" },
           },
         },
@@ -533,7 +565,13 @@ const options = {
           properties: {
             success: { type: "boolean", example: false },
             message: { type: "string", description: "English text for people", example: "Email is invalid" },
-            code: { type: "string", description: "Stable identifier the client translates (see docs/api-plan.md)", example: "EMAIL_INVALID" },
+            code: {
+              type: "string",
+              description:
+                "Stable identifier the client translates. Every code the API can send is listed here; docs/api-plan.md groups them by status. NOT_FOUND, UNAUTHORIZED, CONFLICT and REQUEST_ERROR are only the defaults for an error that names no code of its own.",
+              enum: ERROR_CODES,
+              example: "EMAIL_INVALID",
+            },
           },
         },
       },

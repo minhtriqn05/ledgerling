@@ -958,7 +958,7 @@
   },
   "errors": {
     "ACCOUNT_DISABLED": "このアカウントは停止されています",
-    "AMOUNT_INVALID": "金額は 0 より大きくしてください",
+    "AMOUNT_INVALID": "金額は 1〜999,999,999,999 の整数（VND）にしてください",
     "BUDGET_EXISTS": "このカテゴリと月の予算はすでにあります",
     "BUDGET_EXPENSE_ONLY": "予算は支出カテゴリにのみ設定できます",
     "BUDGET_NOT_FOUND": "予算が見つかりません",
@@ -1032,9 +1032,10 @@
     "WALLET_IN_USE": "このウォレットには取引または振替があります。アーカイブしてください。",
     "WALLET_DEFAULT_LOCKED": "デフォルトのウォレットはアーカイブも削除もできません",
     "WALLET_TYPE_INVALID": "ウォレットの種類を選んでください",
-    "WALLET_BALANCE_INVALID": "開始残高は 0 以上にしてください",
+    "WALLET_BALANCE_INVALID": "開始残高は 0 以上の整数（VND）にしてください",
     "TRANSFER_NOT_FOUND": "振替が見つかりません",
-    "TRANSFER_SAME_WALLET": "異なる 2 つのウォレットを選んでください"
+    "TRANSFER_SAME_WALLET": "異なる 2 つのウォレットを選んでください",
+    "REQUEST_ERROR": "リクエストを処理できませんでした。もう一度お試しください。"
   },
   "live": {
     "live": "ライブ",

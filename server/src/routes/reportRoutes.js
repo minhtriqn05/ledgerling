@@ -140,6 +140,7 @@ router.use(requireAuth);
  *             example:
  *               success: false
  *               message: Month must be in YYYY-MM format
+ *               code: MONTH_INVALID
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
@@ -223,6 +224,7 @@ router.get("/monthly", validateMonthQuery, monthly);
  *             example:
  *               success: false
  *               message: Year must be a 4-digit year from 1970 to 2100
+ *               code: VALIDATION_ERROR
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
