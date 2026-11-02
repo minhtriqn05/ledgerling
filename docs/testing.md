@@ -11,7 +11,7 @@ Measured on 3 November 2026 on Windows 11, Node 24.19.0 (the same commands run o
 | Check | Command | Result |
 |-------|---------|--------|
 | Server lint | `cd server && npm run lint` | 0 warnings |
-| Server tests | `cd server && npm test` | 39 files, **671 passed** |
+| Server tests | `cd server && npm test` | 39 files, **672 passed** |
 | Server coverage | `cd server && npm run test:coverage` | **94.83% lines**, 90.82% branches (fails below 80% lines or branches) |
 | Client lint | `cd client && npm run lint` | 0 warnings |
 | Client unit tests | `cd client && npm test` | 97 files, **847 passed** |
