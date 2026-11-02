@@ -8,7 +8,7 @@
 | Full reference | [api-plan.md](api-plan.md): every endpoint with its query, body, answers and errors |
 | Postman | [postman/ledgerling.postman_collection.json](postman/ledgerling.postman_collection.json) |
 
-The 72 endpoints are listed in the [README](../README.md#api-overview). This page explains the rules they all share.
+The 71 endpoints are listed in the [README](../README.md#api-overview). This page explains the rules they all share.
 
 ## Conventions
 

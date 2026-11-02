@@ -397,7 +397,7 @@ tài khoản có vai trò `admin`. Thử mọi route trong **[Swagger UI](https:
 [docs/api-plan.md](docs/api-plan.md).
 
 <details>
-<summary><b>Toàn bộ 72 endpoint</b> (bấm để mở)</summary>
+<summary><b>Toàn bộ 71 endpoint</b> (bấm để mở)</summary>
 
 | Method | Path | Auth | Mô tả |
 |--------|------|------|-------|
