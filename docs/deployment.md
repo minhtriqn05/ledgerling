@@ -3,7 +3,7 @@
 | Part | Host | Address |
 |------|------|---------|
 | App (React build) | Vercel | https://ledgerling-ten.vercel.app |
-| API + Socket.IO | Render (free web service) | `https://ledgerling-api.onrender.com/api` ([health](https://ledgerling-api.onrender.com/api/health)) |
+| API + Socket.IO | Render (free web service) | https://ledgerling-api.onrender.com/api ([docs](https://ledgerling-api.onrender.com/api-docs), [health](https://ledgerling-api.onrender.com/api/health)) |
 | Database | MongoDB Atlas (free M0 cluster) | private connection string in Render's environment |
 
 A push (or a merged pull request) to `main` deploys both sides by itself; the

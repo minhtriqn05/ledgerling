@@ -20,7 +20,7 @@
 
 **[Dùng thử](https://ledgerling-ten.vercel.app)** ·
 **[Tài liệu API (Swagger)](https://ledgerling-api.onrender.com/api-docs)** ·
-**[API base URL](https://ledgerling-api.onrender.com/api/health)** ·
+**[API base URL](https://ledgerling-api.onrender.com/api)** ·
 **[English](README.md)**
 
 </div>
@@ -81,7 +81,7 @@ riêng mình thì bấm **Get started** và tạo tài khoản (chỉ cần emai
   khi đọc, nên không bao giờ lệch với lịch sử.
 - **Quản trị và phiên đăng nhập.** Trang Admin theo vai trò, khoá tài khoản, và "đăng xuất mọi thiết bị" nhờ số phiên
   bản token lưu trong mỗi JWT.
-- **Kiểm thử đầu cuối.** 1.512 test đơn vị và API, 344 test Playwright trên Chrome (máy tính và điện thoại), các luồng
+- **Kiểm thử đầu cuối.** 1.518 test đơn vị và API, 344 test Playwright trên Chrome (máy tính và điện thoại), các luồng
   chính chạy lại trên Firefox và Safari của iPhone, kiểm tra khả năng truy cập bằng axe ở cả hai giao diện, CI cho mỗi
   lần push và test trên site thật sau mỗi lần deploy.
 
@@ -390,17 +390,18 @@ erDiagram
 
 ## Tổng quan API
 
-Base URL `https://ledgerling-api.onrender.com/api`. Mọi response có dạng `{ success: true, data }` hoặc
+Base URL **[https://ledgerling-api.onrender.com/api](https://ledgerling-api.onrender.com/api)** (mở bằng trình duyệt sẽ thấy link tới tài liệu và health check). Mọi response có dạng `{ success: true, data }` hoặc
 `{ success: false, message, code }`. **JWT** nghĩa là cần header `Authorization: Bearer <token>`; **Admin** là JWT của
 tài khoản có vai trò `admin`. Thử mọi route trong **[Swagger UI](https://ledgerling-api.onrender.com/api-docs)**; quy
 ước, mã lỗi, phân trang và ví dụ `curl` nằm ở [docs/api.md](docs/api.md), từng request và response ở
 [docs/api-plan.md](docs/api-plan.md).
 
 <details>
-<summary><b>Toàn bộ 71 endpoint</b> (bấm để mở)</summary>
+<summary><b>Toàn bộ 72 endpoint</b> (bấm để mở)</summary>
 
 | Method | Path | Auth | Mô tả |
 |--------|------|------|-------|
+| GET | `/` | – | Trang đầu của API: link tới tài liệu, health check và mã nguồn |
 | GET | `/health` | – | API có đang chạy không, và commit nào đang trả lời |
 | POST | `/auth/register` | – | Tạo tài khoản và nhận token |
 | POST | `/auth/login` | – | Đăng nhập và nhận token |
@@ -557,7 +558,7 @@ Server không chịu khởi động, và báo rõ tên biến, khi thiếu `MONG
 
 | Loại | Công cụ | Kết quả (3/11/2026) |
 |------|---------|---------------------|
-| Test API | Vitest, Supertest, mongodb-memory-server | **665 test** trong 38 file: mọi route, quyền sở hữu (404 với id của người khác), validation, giờ Việt Nam, đối chiếu số tiền, chạy đồng thời, index, và đối chiếu tài liệu với code |
+| Test API | Vitest, Supertest, mongodb-memory-server | **671 test** trong 39 file: mọi route, quyền sở hữu (404 với id của người khác), validation, giờ Việt Nam, đối chiếu số tiền, chạy đồng thời, index, và đối chiếu tài liệu với code |
 | Coverage API | @vitest/coverage-v8 | **94,8% dòng, 90,8% nhánh** (dưới 80% là fail) |
 | Test đơn vị client | Vitest, React Testing Library, jsdom | **847 test** trong 97 file |
 | Coverage client | @vitest/coverage-v8 | **68,4% dòng**; `src/utils` 94,0%, `src/hooks` 100% (dưới 60% / 80% là fail) |
