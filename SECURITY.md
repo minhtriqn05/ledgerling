@@ -27,7 +27,7 @@ can. I will credit you in the release notes if you want.
 
 ## Scope
 
-In scope: the web app (https://ledgerling-ten.vercel.app), the API (`https://ledgerling-api.onrender.com/api`, health check <https://ledgerling-api.onrender.com/api/health>) and the code
+In scope: the web app (https://ledgerling-ten.vercel.app), the API (<https://ledgerling-api.onrender.com/api>) and the code
 in this repository.
 
 Out of scope:

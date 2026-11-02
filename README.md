@@ -20,7 +20,7 @@
 
 **[Live demo](https://ledgerling-ten.vercel.app)** ·
 **[API docs (Swagger)](https://ledgerling-api.onrender.com/api-docs)** ·
-**[API base URL](https://ledgerling-api.onrender.com/api/health)** ·
+**[API base URL](https://ledgerling-api.onrender.com/api)** ·
 **[Tiếng Việt](README.vi.md)**
 
 </div>
@@ -82,7 +82,7 @@ data, click **Get started** and make an account (an email and a password, nothin
   every read, so they can never drift from the history.
 - **Admin and sessions.** Role-based Admin page, disabling an account, and "log out of all devices" through a token
   version stored in every JWT.
-- **Tested end to end.** 1,512 unit and API tests, 344 Playwright tests on Chrome (desktop and phone), the main flows
+- **Tested end to end.** 1,518 unit and API tests, 344 Playwright tests on Chrome (desktop and phone), the main flows
   again on Firefox and iPhone Safari, axe accessibility checks in both themes, CI on every push and a live smoke test
   after every deploy.
 
@@ -392,17 +392,18 @@ erDiagram
 
 ## API overview
 
-Base URL `https://ledgerling-api.onrender.com/api`. Every answer is `{ success: true, data }` or
+Base URL **[https://ledgerling-api.onrender.com/api](https://ledgerling-api.onrender.com/api)** (open it in a browser: it answers with links to the docs and the health check). Every answer is `{ success: true, data }` or
 `{ success: false, message, code }`. **JWT** means the header `Authorization: Bearer <token>`; **Admin** means a JWT of
 an account with the `admin` role. Try every route in **[Swagger UI](https://ledgerling-api.onrender.com/api-docs)**;
 conventions, error codes, pagination and `curl` examples are in [docs/api.md](docs/api.md), and every request and
 answer in [docs/api-plan.md](docs/api-plan.md).
 
 <details>
-<summary><b>All 71 endpoints</b> (click to open)</summary>
+<summary><b>All 72 endpoints</b> (click to open)</summary>
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
+| GET | `/` | – | Front page of the API: links to the docs, the health check and the code |
 | GET | `/health` | – | Is the API up, and which commit answers |
 | POST | `/auth/register` | – | Create an account and get a token |
 | POST | `/auth/login` | – | Log in and get a token |
@@ -559,7 +560,7 @@ missing or `JWT_EXPIRES_IN` is not a valid duration.
 
 | Kind | Tools | Result (3 November 2026) |
 |------|-------|--------------------------|
-| API tests | Vitest, Supertest, mongodb-memory-server | **665 tests** in 38 files: every route, ownership (404 for another user's ids), validation, Vietnam time, money cross-checks, concurrency, indexes, and the docs against the code |
+| API tests | Vitest, Supertest, mongodb-memory-server | **671 tests** in 39 files: every route, ownership (404 for another user's ids), validation, Vietnam time, money cross-checks, concurrency, indexes, and the docs against the code |
 | API coverage | @vitest/coverage-v8 | **94.8% lines, 90.8% branches** (the run fails below 80%) |
 | Client unit tests | Vitest, React Testing Library, jsdom | **847 tests** in 97 files |
 | Client coverage | @vitest/coverage-v8 | **68.4% lines**; `src/utils` 94.0%, `src/hooks` 100% (fails below 60% / 80%) |

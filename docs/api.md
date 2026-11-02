@@ -2,13 +2,13 @@
 
 | | |
 |---|---|
-| Base URL (production) | `https://ledgerling-api.onrender.com/api` |
+| Base URL (production) | [https://ledgerling-api.onrender.com/api](https://ledgerling-api.onrender.com/api) (a public front page with links; the bare server address opens Swagger UI) |
 | Base URL (local) | `http://localhost:4000/api` |
 | Interactive docs | [Swagger UI](https://ledgerling-api.onrender.com/api-docs) (`/api-docs`, outside `/api`) |
 | Full reference | [api-plan.md](api-plan.md): every endpoint with its query, body, answers and errors |
 | Postman | [postman/ledgerling.postman_collection.json](postman/ledgerling.postman_collection.json) |
 
-The 71 endpoints are listed in the [README](../README.md#api-overview). This page explains the rules they all share.
+The 72 endpoints are listed in the [README](../README.md#api-overview). This page explains the rules they all share.
 
 ## Conventions
 
@@ -122,7 +122,8 @@ free plan the first request can take up to a minute while the server wakes up.
 ```bash
 API=https://ledgerling-api.onrender.com/api
 
-# Health check (never rate-limited)
+# The front page of the API, then the health check (never rate-limited)
+curl -s $API
 curl -s $API/health
 
 # Sign in to the demo account and keep the token

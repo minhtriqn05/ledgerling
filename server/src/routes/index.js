@@ -16,7 +16,7 @@ import notificationRoutes from "./notificationRoutes.js";
 import userRoutes from "./userRoutes.js";
 import adminRoutes from "./adminRoutes.js";
 import { liveChanges } from "../middlewares/liveChanges.js";
-import { health } from "../controllers/healthController.js";
+import { apiIndex, health } from "../controllers/healthController.js";
 
 const router = Router();
 
@@ -70,5 +70,56 @@ router.use("/admin", adminRoutes);
  *                 version: 1ca2479a1b2c3d4e5f60718293a4b5c6d7e8f901
  */
 router.get("/health", health);
+
+/**
+ * @openapi
+ * /:
+ *   get:
+ *     summary: The front page of the API, with links to the docs, the health check and the code
+ *     description: |
+ *       What a browser shows at the base URL. No token needed. `version` is the same as in `/health`; `app` is the first
+ *       address of `CLIENT_URL`.
+ *     tags: [Health]
+ *     responses:
+ *       200:
+ *         description: The API answers
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                     description:
+ *                       type: string
+ *                     version:
+ *                       type: string
+ *                     docs:
+ *                       type: string
+ *                     health:
+ *                       type: string
+ *                     app:
+ *                       type: string
+ *                       nullable: true
+ *                     repository:
+ *                       type: string
+ *             example:
+ *               success: true
+ *               data:
+ *                 name: Ledgerling API
+ *                 description: REST API of Ledgerling, a personal expense tracker
+ *                 version: c9110dee8ef5f0777cfb26b4ead729dbefc54437
+ *                 docs: https://ledgerling-api.onrender.com/api-docs
+ *                 health: https://ledgerling-api.onrender.com/api/health
+ *                 app: https://ledgerling-ten.vercel.app
+ *                 repository: https://github.com/minhtriqn05/ledgerling
+ */
+router.get("/", apiIndex);
 
 export default router;

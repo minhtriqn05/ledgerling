@@ -11,8 +11,8 @@ Measured on 3 November 2026 on Windows 11, Node 24.19.0 (the same commands run o
 | Check | Command | Result |
 |-------|---------|--------|
 | Server lint | `cd server && npm run lint` | 0 warnings |
-| Server tests | `cd server && npm test` | 38 files, **665 passed** |
-| Server coverage | `cd server && npm run test:coverage` | **94.81% lines**, 90.79% branches, 94.54% statements (fails below 80% lines or branches) |
+| Server tests | `cd server && npm test` | 39 files, **671 passed** |
+| Server coverage | `cd server && npm run test:coverage` | **94.83% lines**, 90.82% branches (fails below 80% lines or branches) |
 | Client lint | `cd client && npm run lint` | 0 warnings |
 | Client unit tests | `cd client && npm test` | 97 files, **847 passed** |
 | Client coverage | `cd client && npm run test:coverage` | **68.36% lines**; `src/utils` 94.0%, `src/hooks` 100% (fails below 60%, or 80% in utils and hooks) |
@@ -23,7 +23,7 @@ Measured on 3 November 2026 on Windows 11, Node 24.19.0 (the same commands run o
 
 ## Server: Vitest + Supertest
 
-`server/tests/` holds 38 files. `tests/setup.js` gives every test file its own empty in-memory MongoDB and builds the
+`server/tests/` holds 39 files. `tests/setup.js` gives every test file its own empty in-memory MongoDB and builds the
 unique indexes first, so duplicates are refused from the first test; Supertest sends real HTTP requests to the Express
 app, so the whole chain of middlewares runs.
 

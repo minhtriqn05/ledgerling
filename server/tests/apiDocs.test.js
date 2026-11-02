@@ -25,11 +25,12 @@ async function codeEndpoints() {
   const addRoutes = (prefix, router) => {
     for (const { route } of router.stack) {
       if (!route) continue;
-      const path = route.path === "/" ? prefix : prefix + route.path;
+      // GET /api itself is router.get("/") in index.js, under no prefix
+      const path = route.path === "/" ? prefix || "/" : prefix + route.path;
       for (const method of Object.keys(route.methods)) found.push(endpoint(method, path));
     }
   };
-  addRoutes("", apiRouter); // GET /health is declared in index.js itself
+  addRoutes("", apiRouter); // GET / and GET /health are declared in index.js itself
   for (const [, prefix, name] of mounts) addRoutes(prefix, (await import(`../src/routes/${name}.js`)).default);
   return found;
 }
