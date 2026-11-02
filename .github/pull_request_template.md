@@ -6,10 +6,15 @@
 
 <!-- A Postman request or the steps in the browser -->
 
+## Screenshots
+
+<!-- Only when the interface changes: before / after, light and dark, desktop and phone if the layout changed. -->
+
 ## Checklist
 
-- [ ] Branch from an up-to-date `main`, Conventional Commits message
+- [ ] Branch from an up-to-date `main`; Conventional Commits messages
+- [ ] Checks green: `npm run lint` and `npm run test:coverage` on both sides; `npm run i18n:check`, `npm run build`
+      and `npm run test:e2e` in `client/`
+- [ ] i18n: every new text goes through `t()` and exists in all 8 languages
 - [ ] API change: Swagger comment, `docs/api-plan.md` (and `docs/erd.md`), tests for 200 / 400 / 401 / 404 / 409
-- [ ] Interface change: every text through `t()` in all 8 languages, colors and fonts from `tokens.css`
-- [ ] `npm run lint` and `npm run test:coverage` pass on both sides; `npm run i18n:check`, `npm run build` and
-      `npm run test:e2e` pass in `client/`
+- [ ] Interface change: colors and fonts from `tokens.css`, screenshots above
