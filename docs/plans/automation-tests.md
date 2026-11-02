@@ -33,8 +33,8 @@ No API or page changes its behaviour. A real bug found by a test is fixed and li
 
 ## Checklist
 
-- [x] CLAUDE.md: new sections before `## Git`, new "Plan first" line
-- [x] `.git/info/exclude`: `.claude/` and `study/`
+- [x] Project brief: new sections before `## Git`, new "Plan first" line
+- [x] `.git/info/exclude`: local editor folders and `study/`
 - [x] Server: install vitest, supertest, mongodb-memory-server; `npm test`
 - [x] Server tests: auth, categories, transactions (month filter at 23:30 on the last day, 409 delete), stats
 - [x] Client: install vitest, RTL, jest-dom, user-event, jsdom; jsdom config; `npm test`

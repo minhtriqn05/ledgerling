@@ -45,22 +45,25 @@ Severity: **Critical** (data loss / account takeover), **High** (security or a p
 | F-037 | Low | `client/playwright.config.js`, `client/e2e/*` (Firefox / WebKit runs) | Fixed |
 | F-038 | Medium | `client/src/pages/CategoriesPage.jsx`, `BudgetsPage.jsx`, `GoalsPage.jsx`, `RecurringPage.jsx` (old list answer) | Fixed |
 | F-039 | Low | `client/e2e/ux-polish.spec.js` (Session expired test raced the Dashboard) | Fixed |
+| F-040 | High | `server/src/middlewares/rateLimit.js`, `server/src/app.js` (visitor address, F-001 again) | Fixed (live check after the deploy) |
+| F-041 | Medium | `client/playwright.config.js` (WebKit admin test ran out of time on the CI) | Fixed |
+| F-042 | Low | `client/src/components/Tour/Tour.jsx` (card drawn at the last step's place for a frame) | Fixed |
+| F-043 | Low | `.github/workflows/*.yml` (actions on Node 20, moving `ubuntu-latest`) | Fixed |
 
 ---
 
 ### F-001 – High – Rate limits count Cloudflare's edge, not the visitor
 - **Where**: `server/src/app.js:41` (`app.set("trust proxy", 1)`).
-- **What**: on Render a request goes through Cloudflare and then Render's proxy, so `X-Forwarded-For` arrives as
-  `visitor, cloudflare-edge`. With one trusted hop, `req.ip` is the Cloudflare edge address, which changes from request
-  to request and is shared by unrelated visitors. The 300 / 15 min API limit and the 20 / 15 min login, register and
-  demo limits were therefore shared between strangers (one busy visitor could lock others out), while one visitor's
-  login attempts were spread over several counters.
+- **What**: on Render a request goes through Cloudflare and then Render's own proxies. With one trusted hop, `req.ip`
+  is an address of that path, which changes from request to request and is shared by unrelated visitors. The
+  300 / 15 min API limit and the 20 / 15 min login, register and demo limits were therefore shared between strangers
+  (one busy visitor could lock others out), while one visitor's login attempts were spread over several counters.
 - **Reproduce (live)**: 12 requests in a row from one IPv4 address to `GET /api/auth/me` answered
   `ratelimit-remaining` 295, 295, 294, 293, 292, 291, 294, 293, **299 (reset 900)**, 290, 289, 292: three counters with
-  three reset times for one visitor. Test: `tests/security.test.js` "counts the visitor behind Cloudflare and Render's
-  proxy..." (red before the fix: the 21st login through rotating edges was not refused).
-- **Fix**: `trust proxy` = 2 (Cloudflare + Render). A visitor's own `X-Forwarded-For` value stays further left and is
-  never used. The live smoke check (`npm run test:e2e:live`) checks after each deploy that consecutive requests share one counter.
+  three reset times for one visitor.
+- **First fix (wrong)**: `trust proxy` = 2, on the guess that `X-Forwarded-For` arrives as `visitor, cloudflare-edge`.
+  The live smoke run after the deploy (run 41457585854) disproved it: the counter still jumped. The real fix is F-040.
+  The live smoke check (`npm run test:e2e:live`) checks after each deploy that consecutive requests share one counter.
 - **Re-checked on 2 November 2026** (the live site still runs the old code): `e2e/live/site.live.js` opens a new
   connection for each request (this computer has no IPv6, so it is always one address); within the first five requests
   one answered `ratelimit-remaining` 277 where the counter of the first request had to show 295: a second counter. The
@@ -406,6 +409,56 @@ Severity: **Critical** (data loss / account takeover), **High** (security or a p
   dialog opened, and the click was blocked by it. The app was right; the test was not.
 - **Fix**: the test waits for the answers of `/api/budgets` and `/api/goals` (waiters made before registering) before
   it replaces the token.
+
+### F-040 – High – With `trust proxy` 2 the rate limits still followed a proxy, not the visitor
+- **Where**: `server/src/middlewares/rateLimit.js` (no `keyGenerator`, so `req.ip`), `server/src/app.js` (`trust proxy` 2).
+- **What**: the fix of F-001 assumed two hops. After the deploy the live smoke check failed (expected 298, got 299: a
+  fresh counter). Measured again from one computer on 2 November 2026 (15 requests, one connection each): counters
+  295, 294, 293, 292, 291, **299**, 298, **299**, **299**, 290, 289, **298**, 288, 287, 298, while Cloudflare's own
+  `/cdn-cgi/trace` showed the same visitor address every time. So the last two addresses of `X-Forwarded-For` both
+  belong to the path (at least `visitor, cloudflare-edge, render-proxy`). `tests/security.test.js` encoded the
+  disproved two-hop chain; that test was rewritten with the measured chain (the reason a test was changed).
+- **Fix**: the limits count `CF-Connecting-IP`, the address Cloudflare writes for every request. A visitor cannot
+  forge it: Cloudflare refuses a request that already carries that header (measured: 403, `error code: 1000`), while a
+  forged `X-Forwarded-For`, `X-Real-IP` or `True-Client-IP` passes, so those are not read. Without the header (this
+  computer, the tests) the key is `req.ip` with `trust proxy` = 3, which the measurement shows is safe: a forged address
+  stays left of the visitor. IPv6 addresses count per /56 block (`ipKeyGenerator` of express-rate-limit). Tests first:
+  `tests/security.test.js` "counts the visitor Cloudflare names in CF-Connecting-IP..." and "without
+  CF-Connecting-IP, counts the visitor three hops back..." (both red before the fix). Live: `e2e/live/site.live.js`
+  gains "a visitor cannot send CF-Connecting-IP himself" (green already, it checks Cloudflare); the counter check turns
+  green only once Render runs this code.
+- **Remaining risk**: whether Render's proxy passes `CF-Connecting-IP` on is only visible after the deploy. If it does
+  not, `trust proxy` 3 is the second chance; the live smoke run after the merge tells.
+
+### F-041 – Medium – The WebKit admin test ran out of its 30 s on the CI
+- **Where**: `client/playwright.config.js` (project `webkit`).
+- **What**: `e2e/admin.spec.js` "an admin sees the statistics..." failed on WebKit in all three CI runs of PR #33, at
+  the second click on Disable. The trace shows no hang: every click waited for the page to hold still (4.7 s for Log
+  in, 7.4 s for Open menu, about 2 s for each of the others, 19.6 s in all), so the 30 s were gone before the end. The
+  iPhone 14 profile draws 3 device pixels per CSS pixel, without a GPU, on 4 shared processors. Reproduced on Linux in
+  `mcr.microsoft.com/playwright:v1.64.1-noble` limited to 1.5 processors: 10.4 s of waiting at 3 pixels, 3.0 s at 1
+  (36 s and 19 s for the whole test).
+- **Fix**: the WebKit project keeps the iPhone 14 screen size, touch, user agent and reduced motion, and draws at
+  `deviceScaleFactor: 1`. No test or timeout was changed. The 52 Firefox / WebKit tests then passed on Linux with
+  3 processors; the final proof is the CI run of the branch.
+
+### F-042 – Low – The tour card showed the new step at the place of the last one for a frame
+- **Where**: `client/src/components/Tour/Tour.jsx` (the card was placed in a `requestAnimationFrame`).
+- **What**: after Next, the card already showed step 2 (with its Back button) but still stood where step 1 had put it,
+  until the next frame. On a busy CI machine that frame came late: `e2e/ux-polish.spec.js` "Skip closes it for
+  good..." clicked Back at (1028, 662), where the card of step 1 had been, and the click went to the page behind
+  (trace of run 41457585803). A quick double click by a person can do the same.
+- **Fix**: the card is placed in a layout effect, before the browser paints, so it is never drawn at the old place.
+  The `<dialog>` is opened in a layout effect declared before it: the first version of the fix measured the card while
+  the dialog was still closed (no size), which put it off screen and turned the 6 tour tests red in the first local
+  end-to-end run. Test first: `src/components/Tour/Tour.test.jsx` gives elements their size only inside an open dialog
+  and checks that the card is next to the new element right after the click (red before each of the two changes).
+
+### F-043 – Low – CI actions on Node 20, and a runner image that moves by itself
+- **Where**: `.github/workflows/ci.yml`, `live-smoke.yml`.
+- **What**: every run warned that `actions/checkout@v4`, `actions/setup-node@v4` and `actions/upload-artifact@v4` run
+  on Node 20, which GitHub is removing, and that `ubuntu-latest` moves to Ubuntu 26 from October 2026.
+- **Fix**: `checkout@v5`, `setup-node@v5`, `upload-artifact@v6` (all on Node 24) and `runs-on: ubuntu-24.04`.
 
 ### Checked without a defect (tests added so it stays that way)
 - Mass assignment on every create / update route (`tests/massAssignment.test.js`).

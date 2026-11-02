@@ -13,8 +13,8 @@ Done when: a visitor who opens the link sees the landing page, "Try the demo" go
 - Client: `/welcome` is a public page (no layout). `/` for a visitor redirects to `/welcome`; `/welcome` for a signed-in user redirects to `/`. `ProtectedRoute` now sends a visitor on `/` to `/welcome` and any other private page to `/login`.
 - Screenshots: `client/e2e/screenshots.capture.js` (run by `npm run screenshots`, not part of the normal e2e run); it logs in with the demo account on the e2e API and saves PNGs to `client/src/assets/screenshots`. The e2e API (`start:e2e`) seeds the demo user with the same `seedDemo`.
 - OG image: `client/scripts/og-image.html` + `client/scripts/capture-og.mjs` (Playwright) -> `client/public/og-image.png` (1200x630).
-- Site URL: CLAUDE.md still holds the placeholder `[link Vercel]`, so `index.html` uses `__SITE_URL__`, replaced at build time by a tiny Vite plugin from `VITE_SITE_URL` (default `https://ledgerling.vercel.app`).
-- Accessibility: `@axe-core/playwright` (allowed in CLAUDE.md), one spec that scans 7 pages for `serious`/`critical` violations.
+- Site URL: the project brief still holds the placeholder `[link Vercel]`, so `index.html` uses `__SITE_URL__`, replaced at build time by a tiny Vite plugin from `VITE_SITE_URL` (default `https://ledgerling.vercel.app`).
+- Accessibility: `@axe-core/playwright` (allowed in the project brief), one spec that scans 7 pages for `serious`/`critical` violations.
 
 ## Checklist
 ### Server
@@ -45,4 +45,4 @@ Done when: a visitor who opens the link sees the landing page, "Try the demo" go
 - [x] Stop servers, final report in Vietnamese
 
 ## Notes
-- Live URLs in CLAUDE.md are still placeholders (`[link Vercel]`, `[link Render]`), so the check in step 2 of the workflow could not be done.
+- Live URLs in the project brief are still placeholders (`[link Vercel]`, `[link Render]`), so the check in step 2 of the workflow could not be done.

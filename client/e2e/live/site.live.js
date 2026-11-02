@@ -43,10 +43,11 @@ test('the demo account is ready', async ({ request }) => {
 });
 
 test('the rate limit counts the requests of one visitor one by one, whatever X-Forwarded-For says', async ({ playwright }) => {
-  // The server finds the visitor behind Cloudflare and Render ("trust proxy" in server/src/app.js). Each request opens
-  // its own connection, which can reach Render from another Cloudflare address: with a wrong setting the counter would
-  // follow that address and jump (F-001), or follow an address the visitor writes and start again. (A computer that
-  // switches between IPv4 and IPv6 is two visitors; the GitHub runners of the live-smoke workflow only have IPv4.)
+  // The server finds the visitor behind Cloudflare and Render (CF-Connecting-IP in server/src/middlewares/rateLimit.js,
+  // "trust proxy" in server/src/app.js). Each request opens its own connection, which can reach Render through other
+  // Cloudflare and Render addresses: with a wrong setting the counter would follow those addresses and jump (F-001,
+  // F-040), or follow an address the visitor writes and start again. (A computer that switches between IPv4 and IPv6
+  // is two visitors; the GitHub runners of the live-smoke workflow only have IPv4.)
   async function remaining(headers) {
     const context = await playwright.request.newContext();
     try {
@@ -61,6 +62,13 @@ test('the rate limit counts the requests of one visitor one by one, whatever X-F
   expect(first).toBeGreaterThan(10);
   for (let step = 1; step <= 6; step += 1) expect(await remaining()).toBe(first - step);
   expect(await remaining({ 'X-Forwarded-For': '203.0.113.7' })).toBe(first - 7);
+});
+
+test('a visitor cannot send CF-Connecting-IP himself: Cloudflare refuses the request', async ({ request }) => {
+  // So the address the rate limits read from that header is always the one Cloudflare wrote
+  const response = await request.get(`${LIVE_API_URL}/health`, { headers: { 'CF-Connecting-IP': '203.0.113.8' } });
+  expect(response.status()).toBe(403);
+  expect(response.headers()['ratelimit-remaining']).toBeUndefined();
 });
 
 test('main flow: a temporary account logs in, adds an expense, sees it on the Dashboard, and is deleted', async ({ page, request }) => {

@@ -1,0 +1,52 @@
+name: Bug report
+description: Something in Ledgerling does not work as it should
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. A security problem never goes here: use the **Security** tab (see SECURITY.md).
+        Never paste a password, a token or other private data.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you saw, and what you expected instead
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open Transactions
+        2. Click Add transaction
+        3. ...
+    validations:
+      required: true
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where
+      options:
+        - Live site (ledgerling-ten.vercel.app)
+        - My own copy, on my computer
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Browser and device
+      placeholder: Chrome 140 on Windows 11, Safari on iPhone 15 ...
+    validations:
+      required: true
+  - type: dropdown
+    id: language
+    attributes:
+      label: Language of the app
+      options: [English, Tiếng Việt, Français, Deutsch, Español, 中文 (简体), 日本語, 한국어]
+  - type: textarea
+    id: extra
+    attributes:
+      label: Screenshots or error messages
+      description: Optional. A screenshot, or what the browser console shows

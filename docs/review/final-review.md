@@ -6,8 +6,10 @@ with 6 cores / 12 threads, Node 24.19.0, npm 11.17.0). The baseline is in [basel
 
 ## In short
 
-- **39 findings, all fixed**: 2 High, 12 Medium, 25 Low. Each behaviour bug got a test that failed before its fix.
-- The rate limits now count the real visitor behind Cloudflare and Render (F-001, confirmed on the live site); the
+- **43 findings, all fixed**: 3 High, 13 Medium, 27 Low. Each behaviour bug got a test that failed before its fix.
+  F-040..F-043 came after the merge of PR #33, from its CI and live smoke runs (see [After the merge](#after-the-merge)).
+- The rate limits now count the real visitor behind Cloudflare and Render (F-001; the first fix was disproved on the
+  live site and replaced by Cloudflare's `CF-Connecting-IP`, F-040); the
   share links point to Ledgerling (F-002); bulk actions, the category filter, amounts and dates are checked strictly
   (F-003..F-008); a saved item can no longer vanish from a list (F-038); the offline banner leaves when the network is
   back, in every browser (F-034).
@@ -22,12 +24,12 @@ with 6 cores / 12 threads, Node 24.19.0, npm 11.17.0). The baseline is in [basel
 
 | | Before (baseline) | After |
 |-|-|-|
-| Server tests (Vitest + Supertest) | 25 files, 594 passed | **38 files, 664 passed** |
-| Client unit tests (Vitest + RTL) | 89 files, 759 passed | **96 files, 845 passed** |
+| Server tests (Vitest + Supertest) | 25 files, 594 passed | **38 files, 665 passed** |
+| Client unit tests (Vitest + RTL) | 89 files, 759 passed | **97 files, 847 passed** |
 | End-to-end, Chrome desktop + phone | 298 tests: 282 passed, **10 failed**, 6 skipped, **17.9 min** (dev server) | 344 tests: **337 passed, 0 failed**, 7 skipped (phone-only / desktop-only), **7.1–7.8 min** (production build), 3 runs in a row green — see [Final runs](#final-runs) |
 | End-to-end, Firefox + iPhone Safari (`@smoke`) | – | **52 passed** (26 main flows × 2 browsers), 7.0–7.4 min |
-| Server coverage (lines / branches) | 95.22 % / 90.21 % | **94.81 % / 90.75 %** (the run fails below 80 / 80) |
-| Client coverage (lines) | 57.16 % (utils 93.7 %, hooks 100 %) | **67.51 %** (utils 94.0 %, hooks 100 %; fails below 60 %, 80 % for utils / hooks) |
+| Server coverage (lines / branches) | 95.22 % / 90.21 % | **94.81 % / 90.79 %** (the run fails below 80 / 80) |
+| Client coverage (lines) | 57.16 % (utils 93.7 %, hooks 100 %) | **68.36 %** (utils 94.0 %, hooks 100 %; fails below 60 %, 80 % for utils / hooks) |
 | Lint | no ESLint on either side | ESLint (`eslint` + `@eslint/js`), **0 warnings** on both sides |
 | i18n | 8 languages × 966 keys | 8 languages × 967 keys, every API error code translated (checked by a test) |
 | JavaScript (all files) | 58 files, 1,789.6 kB (575.6 kB gzip) | 64 files, 1,793.0 kB (577.7 kB gzip): the 7 other languages became their own files |
@@ -82,6 +84,10 @@ with 6 cores / 12 threads, Node 24.19.0, npm 11.17.0). The baseline is in [basel
 | F-037 | Low | The new Firefox and iPhone Safari runs failed because of the test setup | Fixed |
 | F-038 | Medium | A saved category, budget or goal could vanish, a deleted rule or budget come back | Fixed |
 | F-039 | Low | The "Session expired" test from the Dashboard raced the Dashboard | Fixed |
+| F-040 | High | With `trust proxy` 2 the rate limits still followed a proxy, not the visitor | Fixed |
+| F-041 | Medium | The WebKit admin test ran out of its 30 s on the CI | Fixed |
+| F-042 | Low | The tour card showed the new step at the place of the last one for a frame | Fixed |
+| F-043 | Low | CI actions on Node 20, and a runner image that moves by itself | Fixed |
 
 ## Final runs
 
@@ -100,6 +106,29 @@ skipped tests are the ones written for a phone only or a wide screen only.
 Same day: server `npm run lint` 0 warnings, `npm test` 664 passed, `npm run test:coverage` 94.81 % / 90.75 % (thresholds
 met); client `npm run lint` 0 warnings, `npm run i18n:check` OK, `npm test` 845 passed, `npm run test:coverage` 67.51 %
 (thresholds met), `npm run build` OK; live checks (P5.7) and the deploy rehearsal (P5.8) as in the plan.
+
+## After the merge
+
+PR #33 was merged on 2 November. Its CI failed on WebKit (`admin.spec.js`, three runs out of three) and once on Chrome
+(the tour), and the live smoke run after the deploy failed on the rate-limit check. The fixes are F-040..F-043, on the
+branch `fix/ci-and-rate-limit` ([plan](../plans/fix-ci-rate-limit.md)). Checked on 2–3 November 2026:
+
+| Check | Result |
+|-------|--------|
+| Server `npm run lint`, `npm run test:coverage` | 0 warnings; 38 files, 665 passed; 94.81 % / 90.79 % |
+| Client `npm run lint`, `i18n:check`, `test:coverage`, `build` | 0 warnings; 8 × 967 keys; 97 files, 847 passed, 68.36 % (utils 94.0 %, hooks 100 %); OK |
+| `npm run test:e2e` on Windows (after the second fix of F-042) | Chrome 337 passed, 7 skipped (7.5 min); `@smoke` 52 passed (4.5 min) |
+| `npm run test:e2e:chromium`, twice more | 337 passed, 7 skipped (7.4 min, 7.4 min) |
+| Linux (Docker, Playwright 1.64.1, 3 processors) `npm run test:e2e:smoke` | 52 passed (5.5 min) |
+| Linux, the 3 tour tests × 10 on desktop and phone, one worker | 60 passed |
+| Live, read-only: "a visitor cannot send CF-Connecting-IP himself" | passed (Cloudflare answers 403) |
+
+The first local run after the tour change had 6 tour tests red: the card was measured while its dialog was still
+closed (see F-042), which the unit test now catches. The same run had one red avatar test ("Adjust your photo" without
+its picture after 10 s) that did not come back in 12 runs of that test alone nor in the three full runs; its trace was
+overwritten, so it is noted here, not explained. Two repeated runs with several workers failed on "Email is already
+registered": the tests make their emails from `Date.now()`, and repeats of one test on parallel workers can start in
+the same millisecond. CI runs each test once, so this only concerns `--repeat-each`.
 
 ## Lighthouse
 
@@ -153,9 +182,11 @@ install much older majors (`eslint@4`, `swagger-jsdoc@6.2.8`, `vite-plugin-pwa@1
 
 ## Remaining risks
 
-1. **The live site runs the old code until this branch is merged.** F-001 was confirmed there on 2 November (one visitor,
-   two rate-limit counters). The live smoke workflow checks the fix after the deploy; if Render ever changes its proxy
-   chain, that check fails.
+1. **The rate-limit fix is only proven live after its deploy.** The first fix (F-001, `trust proxy` 2) was disproved by
+   the live smoke run after PR #33. The second one (F-040) reads `CF-Connecting-IP`, which Cloudflare sets and a visitor
+   cannot send (measured); whether Render's proxy passes it on is known after the deploy, and `trust proxy` 3 is the
+   fallback. The live smoke workflow checks it after each deploy; if Render ever changes its proxy chain, that check
+   fails.
 2. **Rate limits per IP address**: a class on one Wi-Fi shares one counter (300 API requests / 15 min, 20 logins /
    15 min). A live demo in front of many students on the same network could see "Too many requests".
 3. **Deleting a category at the very moment a transaction is created for it** on another device can leave that
@@ -167,8 +198,8 @@ install much older majors (`eslint@4`, `swagger-jsdoc@6.2.8`, `vite-plugin-pwa@1
    a feature freeze. Desktop is 98, accessibility, best practices and SEO are 100.
 5. **Passwords are limited to 72 characters, not 72 bytes**: bcrypt only reads the first 72 bytes, so a very long password
    written with many accents or emoji is cut silently.
-6. **WebKit runs with reduced motion** in the end-to-end tests (Playwright's WebKit has no GPU, F-037); the full
-   animations are tested on Chrome and Firefox only.
+6. **WebKit runs with reduced motion and 1 device pixel** in the end-to-end tests (Playwright's WebKit has no GPU,
+   F-037, F-041); the full animations run on Chrome and Firefox only, a dense phone screen on Chrome's Pixel 7 profile.
 7. **Render's free plan sleeps**: the first visit after 15 quiet minutes waits up to a minute (the app says so).
 8. The animation library prints a development-only warning when the device asks for reduced motion; it is not in the
    production build.

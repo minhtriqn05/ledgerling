@@ -5,7 +5,7 @@ Branch: `feature/quick-ux`.
 Done when: adding by the "+" button or the N key works (typing "coffee 35k #work" is understood correctly), transaction
 templates, category icons, bulk actions and Undo all work.
 
-Live site check (step 2): the Live URLs in CLAUDE.md are still placeholders (`[link Vercel]`, `[link Render]`), so there
+Live site check (step 2): the Live URLs in the project brief are still placeholders (`[link Vercel]`, `[link Render]`), so there
 was nothing to curl. Reported in the final answer.
 
 ## Checklist

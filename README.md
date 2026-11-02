@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/minhtriqn05/ledgerling/actions/workflows/ci.yml/badge.svg)](https://github.com/minhtriqn05/ledgerling/actions/workflows/ci.yml)
 [![Live smoke](https://github.com/minhtriqn05/ledgerling/actions/workflows/live-smoke.yml/badge.svg)](https://github.com/minhtriqn05/ledgerling/actions/workflows/live-smoke.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 A personal expense tracker for the web, the phone and offline use.
 
@@ -161,10 +162,10 @@ up to today; it only rebuilds the documents of the demo user. Check: `curl -X PO
 
 | Command | What it runs |
 |---------|--------------|
-| `cd server && npm test` | 664 API tests (Vitest + Supertest) on an in-memory MongoDB: every route, access rules, validation, Vietnam time, money cross-checks, concurrency, indexes, the docs against the code |
+| `cd server && npm test` | 665 API tests (Vitest + Supertest) on an in-memory MongoDB: every route, access rules, validation, Vietnam time, money cross-checks, concurrency, indexes, the docs against the code |
 | `cd server && npm run test:coverage` | the same with coverage: 94.8% of lines, 90.8% of branches (the run fails below 80%) |
-| `cd client && npm test` | 845 unit and component tests (Vitest + React Testing Library) |
-| `cd client && npm run test:coverage` | the same with coverage: 67.5% of lines, `src/utils` 94.0%, `src/hooks` 100% (fails below 60% / 80%) |
+| `cd client && npm test` | 847 unit and component tests (Vitest + React Testing Library) |
+| `cd client && npm run test:coverage` | the same with coverage: 68.4% of lines, `src/utils` 94.0%, `src/hooks` 100% (fails below 60% / 80%) |
 | `cd client && npm run test:e2e` | Playwright on the production build: every flow on Chrome (desktop and phone), the main flow of each feature (`@smoke`) also on Firefox and iPhone Safari, axe on every page in light and dark |
 | `cd client && npm run test:e2e:live` | the deployed site: health, API docs, the app, its security headers, the demo, the rate limit, and the main flow with one temporary account that is deleted at the end |
 | `npm run lint` (both), `npm run i18n:check` (client) | ESLint with zero warnings; every text in all 8 languages |
@@ -227,7 +228,8 @@ Both `.env.example` files list the same variables.
 ## Folder structure
 
 ```
-.github/workflows/   ci.yml (checks on every push), live-smoke.yml (after each deploy of main)
+.github/             workflows/ (ci.yml on every push, live-smoke.yml after each deploy of main),
+                     issue forms and the pull request template
 client/              React app (Vite)
   e2e/               Playwright tests; e2e/live/ checks the deployed site
   public/            icons and the share image
@@ -257,3 +259,10 @@ server/
   tests/             Vitest + Supertest
 docs/                api-plan.md, erd.md, ui-style.md, plans/, review/, screenshots/, postman/
 ```
+
+## Contributing, security and license
+
+- How to report a bug, set up the project and check a change: [CONTRIBUTING.md](CONTRIBUTING.md), with the
+  [Code of Conduct](CODE_OF_CONDUCT.md).
+- A security problem is reported privately: [SECURITY.md](SECURITY.md).
+- The code is under the [MIT License](LICENSE).

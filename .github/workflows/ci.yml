@@ -1,5 +1,7 @@
 # Runs on every push and on every pull request into main.
 # No secrets are needed: the tests use mongodb-memory-server (an empty MongoDB in memory), never Atlas.
+# Ubuntu 24.04 by name, not ubuntu-latest: that label moves to Ubuntu 26 from October 2026, and the browsers of
+# `playwright install --with-deps` and the MongoDB binary of mongodb-memory-server are known to work on 24.04.
 name: CI
 
 on:
@@ -15,14 +17,14 @@ concurrency:
 jobs:
   server:
     name: Server lint, tests and coverage
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     defaults:
       run:
         working-directory: server
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: npm
@@ -35,14 +37,14 @@ jobs:
 
   client:
     name: Client lint, tests, coverage and build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     defaults:
       run:
         working-directory: client
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: npm
@@ -57,7 +59,7 @@ jobs:
 
   e2e:
     name: End-to-end tests (${{ matrix.name }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     strategy:
       # One browser failing does not stop the other run
@@ -76,8 +78,8 @@ jobs:
       run:
         working-directory: client
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: npm
@@ -92,7 +94,7 @@ jobs:
       # Builds the app, starts the API and vite preview, then runs the tests (client/playwright.config.js)
       - run: npm run ${{ matrix.script }}
       # The report is only kept when a test failed, to see why
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: failure()
         with:
           name: ${{ matrix.report }}

@@ -3,13 +3,13 @@
 Course: "Phát triển ứng dụng web và cơ sở dữ liệu" (Web application and database development), class CSBU109.R11.KHBC, UIT.
 
 ## Findings (step 2, live check)
-- CLAUDE.md "Live URLs" still holds the placeholders `[link Vercel]` / `[link Render]`, so the live site cannot be curled from here.
+- The "Live URLs" of the project brief still holds the placeholders `[link Vercel]` / `[link Render]`, so the live site cannot be curled from here.
 - Local: `POST /api/auth/demo` against a seeded in-memory database answers 200 with a token; route, rate limit, CORS and the client call are fine.
 - Most likely cause of a broken button on Atlas: the demo user was never seeded there (answer 503 `DEMO_UNAVAILABLE`). The seed must be run by the owner (`npm run seed`, needs `DEMO_PASSWORD` in `server/.env`).
 
 ## Checklist
 ### 1. Course name
-- [x] CLAUDE.md, README.md, docs/, Swagger info, package.json descriptions, locales (footer note), index.html: no more MSIS207 / "Web Application Development"
+- [x] Project brief, README.md, docs/, Swagger info, package.json descriptions, locales (footer note), index.html: no more MSIS207 / "Web Application Development"
 - [x] UI footer says "UIT · CSBU109.R11.KHBC"
 
 ### 2. Demo button

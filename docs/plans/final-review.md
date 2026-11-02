@@ -4,7 +4,7 @@ Branch: `feature/final-review`. Feature freeze: only find bugs, fix them and rai
 Findings go to `docs/review/findings.md` (F-001...), the baseline to `docs/review/baseline.md`, the closing
 report to `docs/review/final-review.md`. Tick each box when it is done, so the phase can be resumed in a new chat.
 
-Live (found from the GitHub repo homepage and the bundle; CLAUDE.md only has placeholders):
+Live (found from the GitHub repo homepage and the bundle; the project brief only has placeholders):
 - Frontend: https://ledgerling-ten.vercel.app
 - API: https://ledgerling-api.onrender.com/api (health `/api/health`, docs `/api-docs`)
 
@@ -81,10 +81,10 @@ first-visit numbers (final-review.md) are /welcome 77 mobile / 98 desktop, Dashb
   `firefox` (Desktop Firefox) + `webkit` (iPhone 14, reduced motion), one worker each, `isPhone()` helper; smoke 52/52
   in 7.0 min (F-034, F-037); Chromium 3 runs in a row: 337 passed + 7 skipped (phone-only / desktop-only), 7.1 / 7.2 /
   7.3 min
-- [x] 3. CI: lint, unit, coverage, i18n, build, e2e (Chromium full, Firefox / WebKit @smoke); live-smoke workflow on main (health `version`, wait for deploy, Vercel 200, `test:e2e:live`); CLAUDE.md Checks
+- [x] 3. CI: lint, unit, coverage, i18n, build, e2e (Chromium full, Firefox / WebKit @smoke); live-smoke workflow on main (health `version`, wait for deploy, Vercel 200, `test:e2e:live`); project brief Checks
   — `.github/workflows/ci.yml` (server, client, e2e matrix), `.github/workflows/live-smoke.yml`, `playwright.live.config.js`
   + `e2e/live/site.live.js` (checked on the local stack: 4/4 that can run there), scripts `test:e2e:chromium`,
-  `test:e2e:smoke`, `test:e2e:live`; CLAUDE.md Checks + Live URLs (CLAUDE.md is git-ignored)
+  `test:e2e:smoke`, `test:e2e:live`; project brief Checks + Live URLs (the brief is kept locally, not in git)
 - [x] 4. Docs: Swagger for every route with examples and error codes; api-plan.md = code (automatic route check); erd.md Mermaid erDiagram
   — F-036, `tests/apiDocs.test.js` (9 checks), F-035 (index errors logged)
 - [x] 5. Screenshots (seeded e2e data) to `docs/screenshots/` — `npm run screenshots:docs` (`e2e/docs-screenshots.capture.js`):

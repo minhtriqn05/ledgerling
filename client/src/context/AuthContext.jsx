@@ -4,7 +4,7 @@ import { clearApiCache } from '../utils/apiCache.js';
 import { SESSION_EXPIRED_EVENT } from '../utils/sessionEvents.js';
 
 // Holds the signed-in user and the JWT for the whole app.
-// The token is also kept in localStorage (see CLAUDE.md) so the session survives a page refresh;
+// The token is also kept in localStorage (a choice of the project brief) so the session survives a page refresh;
 // api/axios.js reads it from there to send the Authorization header.
 
 const AuthContext = createContext(null);

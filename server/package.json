@@ -17,8 +17,8 @@
     "node": "24.x"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Nguyễn Minh Trí",
+  "license": "MIT",
   "type": "module",
   "dependencies": {
     "bcryptjs": "^3.0.3",

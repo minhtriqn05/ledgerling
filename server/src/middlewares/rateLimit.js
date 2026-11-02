@@ -1,4 +1,5 @@
-import { rateLimit } from "express-rate-limit";
+import { isIP } from "node:net";
+import { ipKeyGenerator, rateLimit } from "express-rate-limit";
 
 const WINDOW_MS = 15 * 60 * 1000;
 
@@ -11,6 +12,19 @@ function tooManyRequests(req, res) {
   });
 }
 
+// The visitor's address. On Render, Cloudflare writes it into CF-Connecting-IP; a visitor cannot send that header
+// himself (Cloudflare refuses such a request with 403). Without the header (on this computer, in the tests) it is
+// req.ip, found with "trust proxy" in app.js.
+export function visitorAddress(req) {
+  const fromCloudflare = req.get("CF-Connecting-IP")?.trim();
+  return fromCloudflare && isIP(fromCloudflare) ? fromCloudflare : req.ip;
+}
+
+// ipKeyGenerator counts a whole IPv6 block (/56) as one visitor, so a new address from the same block is no way around
+function visitorKey(req) {
+  return ipKeyGenerator(visitorAddress(req));
+}
+
 function limiter(max, options = {}) {
   return rateLimit({
     windowMs: WINDOW_MS,
@@ -18,12 +32,13 @@ function limiter(max, options = {}) {
     // RateLimit-* headers tell the client how many requests are left
     standardHeaders: true,
     legacyHeaders: false,
+    keyGenerator: visitorKey,
     handler: tooManyRequests,
     ...options,
   });
 }
 
-// Counts requests per IP address (the real one: app.js sets "trust proxy" for Render), in the memory of this server.
+// Counts requests per visitor address (see visitorAddress), in the memory of this server.
 // The counters start again from 0 when the server restarts, which is fine for a small project.
 // Every call makes new counters, so each app made by createApp() has its own.
 
