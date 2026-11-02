@@ -1,7 +1,32 @@
 {
   "name": "ledgerling-server",
   "version": "1.0.0",
-  "description": "Ledgerling backend API. Course project, Phát triển ứng dụng web và cơ sở dữ liệu (CSBU109.R11.KHBC), UIT",
+  "description": "Ledgerling REST API: Node.js + Express 5 + MongoDB (Mongoose), JWT auth, Socket.IO, Swagger. Course project, Phát triển ứng dụng web và cơ sở dữ liệu (CSBU109.R11.KHBC), UIT",
+  "keywords": [
+    "expense-tracker",
+    "rest-api",
+    "express",
+    "mongodb",
+    "mongoose",
+    "jwt",
+    "socket-io",
+    "swagger",
+    "vitest"
+  ],
+  "homepage": "https://ledgerling-ten.vercel.app",
+  "bugs": {
+    "url": "https://github.com/minhtriqn05/ledgerling/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/minhtriqn05/ledgerling.git",
+    "directory": "server"
+  },
+  "author": {
+    "name": "Nguyễn Minh Trí",
+    "url": "https://github.com/minhtriqn05"
+  },
+  "license": "MIT",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
@@ -16,9 +41,6 @@
   "engines": {
     "node": "24.x"
   },
-  "keywords": [],
-  "author": "Nguyễn Minh Trí",
-  "license": "MIT",
   "type": "module",
   "dependencies": {
     "bcryptjs": "^3.0.3",

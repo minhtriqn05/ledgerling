@@ -1,0 +1,39 @@
+{
+  "name": "ledgerling",
+  "version": "1.0.0",
+  "description": "Ledgerling, a personal expense tracker (React + Express + MongoDB). Solo course project, CSBU109.R11.KHBC, UIT.",
+  "keywords": [
+    "expense-tracker",
+    "personal-finance",
+    "budgeting",
+    "react",
+    "vite",
+    "express",
+    "mongodb",
+    "mongoose",
+    "nodejs",
+    "pwa",
+    "socket-io",
+    "i18n",
+    "jwt",
+    "rest-api",
+    "course-project"
+  ],
+  "homepage": "https://ledgerling-ten.vercel.app",
+  "bugs": {
+    "url": "https://github.com/minhtriqn05/ledgerling/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/minhtriqn05/ledgerling.git"
+  },
+  "author": {
+    "name": "Nguyễn Minh Trí",
+    "url": "https://github.com/minhtriqn05"
+  },
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "node": "24.x"
+  }
+}

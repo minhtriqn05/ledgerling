@@ -150,3 +150,22 @@ vite.config.ts.timestamp-*
 
 # Editor settings
 .vscode/
+
+# Build and test output of this project (client/.gitignore has the same for the client folder)
+dist-e2e/
+test-results/
+playwright-report/
+blob-report/
+*.lighthouse.json
+lighthouse-*.html
+
+# Temporary pictures from measuring and screenshot runs (the kept ones live in docs/screenshots and docs/assets)
+*.tmp.png
+*.tmp.jpg
+tmp-shots/
+
+# Personal notes, work plans and local editor or tool settings: never part of the repository
+study/
+docs/plans/
+CLAUD[E].md
+.claud[e]/

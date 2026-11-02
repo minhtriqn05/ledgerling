@@ -1,8 +1,33 @@
 {
   "name": "ledgerling-client",
   "private": true,
-  "version": "0.1.0",
-  "description": "Ledgerling web app (React + Vite). Course project, Phát triển ứng dụng web và cơ sở dữ liệu (CSBU109.R11.KHBC), UIT",
+  "version": "1.0.0",
+  "description": "Ledgerling web app: React 19 + Vite, installable PWA, 8 languages. Course project, Phát triển ứng dụng web và cơ sở dữ liệu (CSBU109.R11.KHBC), UIT",
+  "keywords": [
+    "expense-tracker",
+    "personal-finance",
+    "react",
+    "vite",
+    "pwa",
+    "i18next",
+    "recharts",
+    "socket-io-client",
+    "playwright"
+  ],
+  "homepage": "https://ledgerling-ten.vercel.app",
+  "bugs": {
+    "url": "https://github.com/minhtriqn05/ledgerling/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/minhtriqn05/ledgerling.git",
+    "directory": "client"
+  },
+  "author": {
+    "name": "Nguyễn Minh Trí",
+    "url": "https://github.com/minhtriqn05"
+  },
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "dev": "vite",
