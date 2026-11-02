@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security problem
+    url: https://github.com/minhtriqn05/ledgerling/security/advisories/new
+    about: Privately, never in a public issue (see SECURITY.md)
+  - name: API documentation
+    url: https://ledgerling-api.onrender.com/api-docs
+    about: Every endpoint, with its body and answers (Swagger)

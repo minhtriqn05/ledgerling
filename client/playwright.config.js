@@ -44,7 +44,11 @@ export default defineConfig({
     // Playwright's WebKit draws without the GPU: the endless background animations (three lights blurred by 64px, the
     // logo coin) cost about 0.6 s per frame there, so every click waits for the page to hold still. With reduced
     // motion, which the app follows, a frame takes 16 ms. A real iPhone moves those layers on its GPU.
-    { name: 'webkit', use: { ...devices['iPhone 14'], reducedMotion: 'reduce' }, grep: /@smoke/, workers: 1 },
+    // The iPhone's 3 device pixels per CSS pixel make every frame 9 times bigger to draw: on the 4 processors of the CI
+    // one click waited up to 7 s for the page to hold still, and the admin test ran out of its 30 s (F-041). The iPhone
+    // screen, touch and browser stay; only the drawing is at 1 device pixel (measured on Linux with 1.5 processors:
+    // 10.4 s of waiting in that test at 3 pixels, 3.0 s at 1).
+    { name: 'webkit', use: { ...devices['iPhone 14'], deviceScaleFactor: 1, reducedMotion: 'reduce' }, grep: /@smoke/, workers: 1 },
   ],
   webServer: [
     {

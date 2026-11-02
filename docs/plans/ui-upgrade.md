@@ -40,7 +40,7 @@ and 8 languages, with no change to existing features. Tick each box when done so
 - [x] Translate fr, de, es, zh-CN, ja, ko, vi
 - [x] Server `code` field on errors; client translates by code; Swagger and api-plan updated
 - [x] `npm run i18n:check` is clean
-- [x] Update CLAUDE.md (Stack and Autonomous workflow)
+- [x] Update the project brief (Stack and Autonomous workflow)
 
 ## 7. Verification
 - [x] Update tests broken by text/UI/code changes (prefer role or data-testid; none deleted or weakened)
@@ -64,7 +64,7 @@ and 8 languages, with no change to existing features. Tick each box when done so
 - `@vite-pwa/assets-generator` (dev only) regenerates the PWA PNGs from `public/favicon.svg` (`npm run generate-pwa-assets`).
 - The dev-only style guide page stays in English (it is a design reference, not part of the product).
 - Session 2 (resumed): fixed a unit test that used `formatPercent` without importing it; documented the error codes,
-  icon names and insight codes in Swagger, `docs/api-plan.md` and `docs/erd.md`; updated `docs/ui-style.md` (v6) and CLAUDE.md.
+  icon names and insight codes in Swagger, `docs/api-plan.md` and `docs/erd.md`; updated `docs/ui-style.md` (v6) and the project brief.
 
 ## Session 2 results
 - Server `npm test`: 385/385. Client `npm test`: 360/360. `npm run build`: OK. `npm run i18n:check`: OK (8 languages, 493 keys).

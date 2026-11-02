@@ -44,7 +44,8 @@ or deleting the account. A device with an old token is then refused with `TOKEN_
   Example `2026-10` → `2026-09-30T17:00:00.000Z` ≤ date < `2026-10-31T17:00:00.000Z`.
 - **Dates** are ISO 8601 strings; the server stores them in UTC.
 - **Limits** (per IP address of the visitor, counted in the memory of the server, so they start again after a restart;
-  on Render the address is read behind Cloudflare and Render's proxy, `trust proxy` = 2):
+  on Render the address is the `CF-Connecting-IP` header that Cloudflare writes, which a visitor cannot send himself;
+  without it, the third address from the right of `X-Forwarded-For`, `trust proxy` = 3; IPv6 counts per /56 block):
   300 requests per 15 minutes to `/api` (`/api/health` is free) and 20 requests per 15 minutes to
   `POST /auth/login`, `POST /auth/register` + `POST /auth/demo` (each has its own counter). More gets 429 `RATE_LIMITED`. A JSON body can be at most 100 kB
   (300 kB for `POST /transactions/import`, 200 kB for `PATCH /users/me/avatar`); a bigger one gets 413 `PAYLOAD_TOO_LARGE`.

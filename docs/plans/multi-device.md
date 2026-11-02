@@ -54,4 +54,4 @@ Done when: a transaction added on one device appears on the other within seconds
 - [x] Stop servers, final report in Vietnamese
 
 ## Notes
-- Live URLs in CLAUDE.md are still placeholders, so the check in step 2 of the workflow could not be done.
+- Live URLs in the project brief are still placeholders, so the check in step 2 of the workflow could not be done.

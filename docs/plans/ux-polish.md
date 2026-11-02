@@ -3,7 +3,7 @@
 Course: "Phát triển ứng dụng web và cơ sở dữ liệu" (Web application and database development), class CSBU109.R11.KHBC, UIT.
 
 ## Findings (step 2, live check)
-- CLAUDE.md "Live URLs" still holds the placeholders `[link Vercel]` / `[link Render]`, so the live site cannot be curled from here.
+- The "Live URLs" of the project brief still holds the placeholders `[link Vercel]` / `[link Render]`, so the live site cannot be curled from here.
 - No backend change in this phase: no new endpoint, model or error code. `docs/api-plan.md` and `docs/erd.md` stay as they are.
 
 ## Decisions

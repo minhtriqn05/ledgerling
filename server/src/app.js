@@ -36,11 +36,12 @@ function rateLimitWanted() {
 export function createApp({ rateLimit = rateLimitWanted() } = {}) {
   const app = express();
 
-  // Render puts two proxies in front of the server: Cloudflare, then Render's own. X-Forwarded-For arrives as
-  // "visitor, cloudflare-edge" (the edge changes between requests), so the visitor is the second address from the right.
-  // With 1, req.ip would be the Cloudflare edge and unrelated visitors would share one rate limit counter.
+  // Render puts Cloudflare and its own proxies in front of the server. Measured on the live API (F-001, F-040): with 1 or
+  // 2 trusted hops req.ip still changes from one connection to the next for one visitor, so X-Forwarded-For arrives as
+  // "visitor, cloudflare-edge, render-proxy" and the visitor is the third address from the right.
   // An address a visitor writes into the header himself stays further left, so it is never used.
-  app.set("trust proxy", 2);
+  // The rate limits read CF-Connecting-IP first (middlewares/rateLimit.js); req.ip is the fallback.
+  app.set("trust proxy", 3);
   // Query strings stay flat: ?a[b]=c is not turned into an object
   app.set("query parser", "simple");
 

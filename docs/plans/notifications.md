@@ -37,7 +37,7 @@ is never created.
 - [x] Stop every server that was started
 
 ## Decisions
-- The Live URLs in CLAUDE.md are still placeholders, so the live-site check (step 2) was skipped.
+- The Live URLs in the project brief are still placeholders, so the live-site check (step 2) was skipped.
 - The notification stores `type`, `title`, `message`, `link` in English (as the data model says) and also `params`
   (the numbers and names it was built from). The client builds the text in the user's language from `type` + `params`
   and only falls back to `title` / `message`.

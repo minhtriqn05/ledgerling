@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { placeTourCard, TOUR_STEPS } from '../../utils/tour.js';
 import { useRestoreFocus } from '../../hooks/useRestoreFocus.js';
@@ -28,7 +28,8 @@ export default function Tour({ onClose, onStepChange, menuOpen }) {
   const step = TOUR_STEPS[index];
   const isLast = index === TOUR_STEPS.length - 1;
 
-  useEffect(() => {
+  // A layout effect too, and before the one that measures the card: inside a closed <dialog> the card has no size yet
+  useLayoutEffect(() => {
     const dialog = dialogRef.current;
     // StrictMode runs effects twice in dev; showModal() on an open dialog would throw.
     if (!dialog.open) dialog.showModal();
@@ -45,7 +46,9 @@ export default function Tour({ onClose, onStepChange, menuOpen }) {
     dialogRef.current.querySelector('[data-autofocus]')?.focus();
   }, [step]);
 
-  useEffect(() => {
+  // A layout effect runs before the browser paints: the card with the text of the new step already has its size, and it
+  // is never drawn (or clicked) where the last step had it (F-042)
+  useLayoutEffect(() => {
     function measure() {
       const target = findTarget(step);
       const card = cardRef.current;
@@ -53,13 +56,9 @@ export default function Tour({ onClose, onStepChange, menuOpen }) {
       setPlace(placeTourCard(target, { width: card.offsetWidth, height: card.offsetHeight }, { width: window.innerWidth, height: window.innerHeight }));
     }
 
-    // One frame later: the card has its size for this text by then
-    const frame = requestAnimationFrame(measure);
+    measure();
     window.addEventListener('resize', measure);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener('resize', measure);
-    };
+    return () => window.removeEventListener('resize', measure);
   }, [step, menuOpen]);
 
   // Escape fires "cancel"; the page closes the tour through onClose instead of the browser

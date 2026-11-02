@@ -5,7 +5,7 @@ Branch: `feature/security-perf`.
 Done when: every protection layer has a test, the first page loads less JavaScript, and the CI file runs the tests and the build.
 
 ## Decisions
-- Libraries: `helmet`, `compression`, `express-rate-limit` (all allowed in CLAUDE.md). No `express-mongo-sanitize` (does not work with Express 5).
+- Libraries: `helmet`, `compression`, `express-rate-limit` (all allowed in the project brief). No `express-mongo-sanitize` (does not work with Express 5).
 - Middleware order in `app.js`: `trust proxy` → helmet → compression → cors → rate limit → body parser → routes.
 - Helmet runs for every route. `/api-docs` gets its own, looser Content-Security-Policy (Swagger UI needs inline scripts and styles), set on that router only.
 - Rate limit: `/api` 300 requests / 15 min / IP, `/api/auth/login` + `/api/auth/register` 20 / 15 min / IP. The answer is 429 `{ success: false, message, code: "RATE_LIMITED" }`.

@@ -95,19 +95,39 @@ describe("rate limit", () => {
     expect(other.status).toBe(401);
   });
 
-  // On Render a request passes Cloudflare, then Render's own proxy: X-Forwarded-For arrives as "client, cloudflare-edge"
-  // and the edge address changes from one request to the next. The limit must follow the client, not the edge.
-  it("counts the visitor behind Cloudflare and Render's proxy, whatever Cloudflare edge the request came through", async () => {
-    const limited = createApp({ rateLimit: true });
-    const edges = ["104.22.17.40", "172.69.33.7", "162.158.1.9"];
+  // On Render a request passes Cloudflare, then Render's own proxies. Measured on the live API (F-040): the two last
+  // addresses of X-Forwarded-For change from one connection to the next, so the chain is at least
+  // "visitor, cloudflare-edge, render-proxy". Cloudflare also names the visitor in CF-Connecting-IP.
+  const edges = ["104.22.17.40", "172.69.33.7", "162.158.1.9"];
+  const renderProxies = ["10.201.4.17", "10.201.9.3"];
+  const chain = (visitor, i) => `${visitor}, ${edges[i % edges.length]}, ${renderProxies[i % renderProxies.length]}`;
 
-    for (let i = 0; i < 20; i += 1) await login(limited, `203.0.113.5, ${edges[i % edges.length]}`);
-    const blocked = await login(limited, `203.0.113.5, ${edges[0]}`);
-    const neighbour = await login(limited, `198.51.100.7, ${edges[0]}`);
-    // A visitor who sends his own X-Forwarded-For cannot pick a fresh counter: Cloudflare adds the real address after it
-    const spoofed = await login(limited, `6.6.6.6, 203.0.113.5, ${edges[1]}`);
+  it("counts the visitor Cloudflare names in CF-Connecting-IP, whatever X-Forwarded-For chain comes with it", async () => {
+    const limited = createApp({ rateLimit: true });
+
+    for (let i = 0; i < 20; i += 1) {
+      await login(limited, `${i}.1.1.1, ${chain("203.0.113.5", i)}`).set("CF-Connecting-IP", "203.0.113.5");
+    }
+    const blocked = await login(limited, chain("198.51.100.7", 1)).set("CF-Connecting-IP", "203.0.113.5");
+    const neighbour = await login(limited, chain("203.0.113.5", 0)).set("CF-Connecting-IP", "198.51.100.7");
 
     expect(blocked.status).toBe(429);
+    expect(neighbour.status).toBe(401);
+  });
+
+  it("without CF-Connecting-IP, counts the visitor three hops back, whatever Cloudflare and Render address it came through", async () => {
+    const limited = createApp({ rateLimit: true });
+
+    for (let i = 0; i < 20; i += 1) await login(limited, chain("203.0.113.5", i));
+    const blocked = await login(limited, chain("203.0.113.5", 1));
+    // A value that is not an address is ignored, like a missing header
+    const notAnAddress = await login(limited, chain("203.0.113.5", 2)).set("CF-Connecting-IP", "unknown");
+    const neighbour = await login(limited, chain("198.51.100.7", 0));
+    // A visitor who sends his own X-Forwarded-For cannot pick a fresh counter: Cloudflare adds the real address after it
+    const spoofed = await login(limited, `6.6.6.6, ${chain("203.0.113.5", 1)}`);
+
+    expect(blocked.status).toBe(429);
+    expect(notAnAddress.status).toBe(429);
     expect(neighbour.status).toBe(401);
     expect(spoofed.status).toBe(429);
   });
