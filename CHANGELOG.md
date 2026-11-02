@@ -63,7 +63,7 @@ The first complete version, submitted as the final project of *Phát triển ứ
 - Installable PWA with offline reading of the pages and data already loaded; writes are locked while offline.
 
 **API and documentation**
-- REST API of 71 endpoints with Swagger UI at `/api-docs`, a Postman collection, the API reference and the ER diagram.
+- REST API of 70 endpoints with Swagger UI at `/api-docs`, a Postman collection, the API reference and the ER diagram.
 - README in English and Vietnamese, docs on architecture, database, API, testing and deployment, screenshots of every
   page in both themes, logo files and a social preview image.
 

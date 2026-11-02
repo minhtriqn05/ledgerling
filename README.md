@@ -399,7 +399,7 @@ conventions, error codes, pagination and `curl` examples are in [docs/api.md](do
 answer in [docs/api-plan.md](docs/api-plan.md).
 
 <details>
-<summary><b>All 72 endpoints</b> (click to open)</summary>
+<summary><b>All 71 endpoints</b> (click to open)</summary>
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
