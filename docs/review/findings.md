@@ -2,7 +2,7 @@
 
 Every finding below was reproduced (by a test, a request or by reading the code) before it was fixed.
 Severity: **Critical** (data loss / account takeover), **High** (security or a production feature broken), **Medium**
-(wrong behaviour a user can hit), **Low** (robustness, consistency, clean-up). Every finding of Medium or above is fixed.
+(wrong behaviour a user can hit), **Low** (stability, consistency, clean-up). Every finding of Medium or above is fixed.
 
 | ID | Severity | Where | Status |
 |----|----------|-------|--------|

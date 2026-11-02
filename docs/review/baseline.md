@@ -17,7 +17,7 @@ npm 11.17.0. Only `@vitest/coverage-v8` 5.0.5 and the `test:coverage` scripts we
 The 10 e2e failures were all time-outs (30 s) or "context closed" at the end of multi-browser tests: admin (desktop +
 mobile), breadcrumbs, budgets, custom controls, bulk actions (desktop + mobile), real-time (2), CSV export/import.
 The first batch failed while Vite was still re-optimising its dependencies (the lockfile had just changed); the machine
-was also running the server tests at the same time. They are treated as flakiness to fix at the root (P5.2).
+was also running the server tests at the same time. They are treated as flakiness to fix at the root (F-018).
 
 ## Coverage (`npm run test:coverage`, v8)
 

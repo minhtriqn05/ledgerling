@@ -9,7 +9,7 @@ were made for the earlier look: they follow the tokens, but their layouts are ol
 
 ## 1. Mood – "Noir"
 
-**A private bank at night: dark, quiet and expensive, with a little light where it matters.** Plan: `docs/plans/premium-redesign.md`.
+**A private bank at night: dark, quiet and expensive, with a little light where it matters.**
 
 Principles:
 
@@ -41,7 +41,7 @@ Principles:
 | v4 | Sky & Mint, pastel | Brighter and softer; charts redesigned in the asklepios style. Felt a bit monotonous. |
 | v5 | Sky & Mint + accents | Vivid hero, colored icon tiles, tinted cards. All MVP screens designed. |
 | v6 | Sky & Mint, refined + motion | New logo, floating sidebar, banner headers, pill rows, motion, line icons, 8 languages. |
-| **v7 (current)** | **Noir, with Porcelain** | The owner asked for a completely new template with a high-end feel. Dark first, aurora hero, pearl buttons, Manrope. The sky and mint live on in the aurora; violet stays out. |
+| **v7 (current)** | **Noir, with Porcelain** | I wanted a completely new template with a high-end feel. Dark first, aurora hero, pearl buttons, Manrope. The sky and mint live on in the aurora; violet stays out. |
 
 ## 3. Color palette (Noir)
 

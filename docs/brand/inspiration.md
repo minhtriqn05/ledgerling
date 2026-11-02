@@ -18,7 +18,7 @@ We take ideas only. No layout, text, image or asset is copied, and the palette s
 
 ## Second look, 2026-11-01: the Noir redesign
 
-The owner asked for a completely new template that feels high-end, with this site as a starting point and better than it.
+I wanted a completely new template that feels high-end, with this site as a starting point and better than it.
 What changed from the table below: dark comes first now, and the top bar, the right rail and the numbers in the hero come from here.
 
 | Observation | What Ledgerling does with it |
