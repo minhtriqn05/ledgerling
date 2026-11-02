@@ -1,8 +1,8 @@
-# Final review – before and after (phase 24)
+# Final review – before and after
 
 Branch `feature/final-review`, measured on 2 November 2026 on the machine of the baseline (Windows 11, Ryzen 5 5625U
 with 6 cores / 12 threads, Node 24.19.0, npm 11.17.0). The baseline is in [baseline.md](baseline.md), every finding in
-[findings.md](findings.md), the step-by-step plan in [../plans/final-review.md](../plans/final-review.md).
+[findings.md](findings.md).
 
 ## In short
 
@@ -99,19 +99,19 @@ After the last code change (F-038, F-039), on 2 November 2026:
 | 2 | `npm run test:e2e:chromium` | 337 passed, 7 skipped | 7.5 min |
 | 3 | `npm run test:e2e:chromium` | 337 passed, 7 skipped | 7.4 min |
 
-Before that last change the suite had also passed three times in a row (P5.2: 7.1 / 7.2 / 7.3 min); the first final
+Before that last change the suite had also passed three times in a row (7.1 / 7.2 / 7.3 min); the first final
 round then showed one failure in each of two runs, which led to F-038 (an app bug) and F-039 (a test bug). The 7
 skipped tests are the ones written for a phone only or a wide screen only.
 
 Same day: server `npm run lint` 0 warnings, `npm test` 664 passed, `npm run test:coverage` 94.81 % / 90.75 % (thresholds
 met); client `npm run lint` 0 warnings, `npm run i18n:check` OK, `npm test` 845 passed, `npm run test:coverage` 67.51 %
-(thresholds met), `npm run build` OK; live checks (P5.7) and the deploy rehearsal (P5.8) as in the plan.
+(thresholds met), `npm run build` OK; the live checks and the deploy rehearsal (see [Deploy](#deploy)) passed.
 
 ## After the merge
 
 PR #33 was merged on 2 November. Its CI failed on WebKit (`admin.spec.js`, three runs out of three) and once on Chrome
 (the tour), and the live smoke run after the deploy failed on the rate-limit check. The fixes are F-040..F-043, on the
-branch `fix/ci-and-rate-limit` ([plan](../plans/fix-ci-rate-limit.md)). Checked on 2–3 November 2026:
+branch `fix/ci-and-rate-limit`. Checked on 2–3 November 2026:
 
 | Check | Result |
 |-------|--------|
@@ -150,7 +150,7 @@ Dashboard is signed in as the demo account.
   faster (2.2 s → 1.2 s, F-032) but the largest one did not. The Dashboard also waits for its data and for 2.1 s of
   main-thread work on a 4× slower CPU (TBT 480 ms). Getting over 90 needs the landing page written into the HTML
   (prerender or server rendering) and a lighter chart library: changes of the architecture, not of a feature freeze.
-- Correction: the earlier numbers of this review (/welcome 93, Dashboard 86 in the P4 notes and in F-032) were taken
+- Correction: the earlier numbers of this review (/welcome 93, Dashboard 86 in an earlier draft of this review and in F-032) were taken
   with the service worker of an earlier visit still installed, so the app came from its cache; and the "Dashboard
   before" file had in fact measured /welcome, because that first runner lost the session. They were replaced by the
   first-visit numbers above.
@@ -162,7 +162,7 @@ Dashboard is signed in as the demo account.
 | Server | 8 moderate (baseline 4) | 3 moderate (baseline 3) |
 | Client | 2 low + 12 moderate (baseline 2 + 8) | 0 (baseline 0) |
 
-No high or critical. The new entries are ESLint and `@eslint/js` (development only, added in P3), through the same
+No high or critical. The new entries are ESLint and `@eslint/js` (development only, added during this review), through the same
 `minimatch` advisory as before. The production ones are `swagger-jsdoc` → `glob` → `minimatch`, which reads the route
 files of the project once at start-up, never user input. npm offers no fix except `npm audit fix --force`, which would
 install much older majors (`eslint@4`, `swagger-jsdoc@6.2.8`, `vite-plugin-pwa@1.1.0`), so nothing was forced.
@@ -171,7 +171,7 @@ install much older majors (`eslint@4`, `swagger-jsdoc@6.2.8`, `vite-plugin-pwa@1
 
 - `npm ci` from scratch in a clean copy, the server with production packages only, `NODE_ENV=production npm start`
   on an in-memory database, the client built and served by `vite preview`: health, `/api-docs`, deep links, CORS, rate
-  limits, the demo seed and the main flow all worked (P5.8).
+  limits, the demo seed and the main flow all worked.
 - `engines.node` is `24.x` in both packages, so Render and Vercel use the Node version of the tests and the CI.
 - `client/vercel.json` keeps the SPA rewrite and adds `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`
   and `Permissions-Policy` (no CSP: the app loads Google Fonts and talks to the API on another domain, a mistake there
@@ -190,9 +190,9 @@ install much older majors (`eslint@4`, `swagger-jsdoc@6.2.8`, `vite-plugin-pwa@1
 2. **Rate limits per IP address**: a class on one Wi-Fi shares one counter (300 API requests / 15 min, 20 logins /
    15 min). A live demo in front of many students on the same network could see "Too many requests".
 3. **Deleting a category at the very moment a transaction is created for it** on another device can leave that
-   transaction with a category that no longer exists (two requests in the same few milliseconds; found in P2, not fixed
+   transaction with a category that no longer exists (two requests in the same few milliseconds; found during this review, not fixed
    because it needs a transaction across two collections).
-4. **Lighthouse performance on a phone is 77 (/welcome) and 67 (Dashboard)**, under the 90 asked for: the pages are
+4. **Lighthouse performance on a phone is 77 (/welcome) and 67 (Dashboard)**, under the target of 90: the pages are
    drawn by JavaScript (about 270 kB compressed for the first page), so the largest paint waits for it on a slow 4×
    CPU. Going over 90 needs prerendering or server rendering and a lighter chart library, which is out of the scope of
    a feature freeze. Desktop is 98, accessibility, best practices and SEO are 100.
