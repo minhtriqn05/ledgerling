@@ -1116,7 +1116,9 @@
   "session": {
     "title": "登录已过期",
     "text": "为了你的安全，你已被退出登录。请重新登录，从刚才的地方继续。",
-    "logInAgain": "重新登录"
+    "logInAgain": "重新登录",
+    "unreachableTitle": "正在等待服务器",
+    "unreachableText": "服务器正在启动或暂时无法连接。您仍处于登录状态：服务器一响应，应用就会自动打开。"
   },
   "legal": {
     "linksLabel": "关于本站",

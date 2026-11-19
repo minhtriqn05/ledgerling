@@ -17,6 +17,21 @@
   transform: translateY(-2px);
 }
 
+/* The card rises by 2px; this strip under it keeps the mouse on the card meanwhile, so a mouse resting on its bottom
+   edge does not make it bounce (it would leave the card, the card would come down under it again, and so on) */
+.card {
+  position: relative;
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  top: 100%; /* from the inside of the border: the strip covers the border, then the lift */
+  right: 0;
+  left: 0;
+  height: 3px;
+}
+
 .income {
   --tone: var(--color-income);
   --money: var(--color-income-text);
@@ -68,6 +83,8 @@
 .label {
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
+  /* A long word of a narrow card ("Transaktionen" next to the sidebar of a tablet) wraps instead of leaving the card */
+  overflow-wrap: anywhere;
 }
 
 .balance .label {

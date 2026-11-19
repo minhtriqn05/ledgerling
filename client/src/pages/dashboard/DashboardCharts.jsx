@@ -10,17 +10,53 @@ import {
   PieChart,
   Pie,
 } from 'recharts';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useReducedMotion } from 'motion/react';
 import { useTheme } from '../../context/ThemeContext.jsx';
 import { cssVar } from '../../utils/cssVar.js';
 import { formatCompact, formatVnd } from '../../utils/format.js';
+import { tooltipLeft } from '../../utils/chartTooltip.js';
 import styles from './DashboardCharts.module.css';
 
 // The two charts of the Dashboard, in the style of docs/ui-style.md §9.
 // Recharts draws SVG, which needs real color values, so colors are read from tokens.css with cssVar().
 
 const axisTick = () => ({ fill: cssVar('--chart-axis'), fontSize: cssVar('--font-size-xs') });
+
+// The tooltip card of every chart stands just above the chart, over the column (or the day) under the pointer, and
+// never past the left or right edge of the chart: it never covers a bar, the line or the total in the middle of the
+// donut. It moves at once from one column to the next (no glide) and hides when the pointer leaves the chart.
+// Spread on <Tooltip>: Recharts' own box then has the size of the chart and ChartTooltip places the card in it.
+export const TOOLTIP_PROPS = {
+  isAnimationActive: false,
+  position: { x: 0, y: 0 },
+  wrapperStyle: { width: '100%', height: '100%', zIndex: 2 },
+};
+
+// A finger has no "mouse leave", so the tooltip would stay on screen after a tap on a chart. The next touch outside
+// the chart hides it and a touch on the chart shows it again (a mouse leaving the chart is handled by Recharts).
+//   const [chartRef, tooltipActive] = useTapAway();  <div ref={chartRef}>...<Tooltip active={tooltipActive} /></div>
+export function useTapAway() {
+  const ref = useRef(null);
+  const [away, setAway] = useState(false);
+
+  useEffect(() => {
+    function handlePointerDown(event) {
+      if (event.pointerType === 'mouse') return;
+      const inside = Boolean(ref.current?.contains(event.target));
+      // Only a card on screen needs hiding: any other touch outside changes nothing, so the chart is not drawn again
+      // (a new render of a Recharts chart inside the touch event made the first touch of a page 60 ms long at 4x CPU)
+      if (!inside && !ref.current?.querySelector(`.${styles.tooltip}`)) return;
+      setAway(!inside);
+    }
+    document.addEventListener('pointerdown', handlePointerDown, true);
+    return () => document.removeEventListener('pointerdown', handlePointerDown, true);
+  }, []);
+
+  // undefined: Recharts decides (hover, touch); false: hidden
+  return [ref, away ? false : undefined];
+}
 
 // Round axis steps so labels read naturally (0, 6M, 12M... instead of 5.5M, 16.5M...).
 export function niceTicks(max, count = 4) {
@@ -31,11 +67,29 @@ export function niceTicks(max, count = 4) {
   return Array.from({ length: Math.ceil(max / step) + 1 }, (_, i) => i * step);
 }
 
-// Small card shown on hover.
-export function ChartTooltip({ active, payload, label, hideLabel = false }) {
+// The bar that stays at the top of the window (the top bar of a phone or of a wide screen) and what it covers
+const coveredTop = () => parseFloat(cssVar('--topbar-height')) + parseFloat(cssVar('--frame-gap')) + 8;
+
+// Small card shown on hover or touch, placed as TOOLTIP_PROPS says. Recharts passes active, payload, label and
+// coordinate (x: the middle of the column under the pointer). center: over the middle of the chart (the donut).
+export function ChartTooltip({ active, payload, label, hideLabel = false, coordinate, center = false }) {
+  const ref = useRef(null);
+  const [place, setPlace] = useState(null);
+
+  // Measured before the browser paints, so the card is never seen at a wrong place
+  useLayoutEffect(() => {
+    const card = ref.current;
+    const frame = card?.offsetParent; // the box of Recharts, as big as the chart
+    if (!card || !frame) return;
+    const left = tooltipLeft(frame.clientWidth, card.offsetWidth, center ? null : coordinate?.x);
+    // Above the chart, unless the chart is so high in the window that the top bar would hide the card
+    const inside = frame.getBoundingClientRect().top - card.offsetHeight - 4 < coveredTop();
+    setPlace((old) => (old?.left === left && old?.inside === inside ? old : { left, inside }));
+  });
+
   if (!active || !payload?.length) return null;
   return (
-    <div className={styles.tooltip}>
+    <div ref={ref} className={`${styles.tooltip} ${place?.inside ? styles.tooltipInside : ''}`} style={{ transform: `translateX(${place?.left ?? 0}px)` }}>
       {!hideLabel && <p className={styles.tooltipLabel}>{label}</p>}
       {payload.map((item) => {
         const color = item.payload?.fill;
@@ -57,9 +111,10 @@ export function CategoryDonut({ data, total }) {
   const { t } = useTranslation();
   const animate = !useReducedMotion();
   const pieData = data.map((c) => ({ ...c, fill: c.color }));
+  const [chartRef, tooltipActive] = useTapAway();
 
   return (
-    <div className={styles.donut} role="img" aria-label={t('dashboard.donutLabel', { total: formatVnd(total) })}>
+    <div ref={chartRef} className={styles.donut} role="img" aria-label={t('dashboard.donutLabel', { total: formatVnd(total) })}>
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
@@ -77,7 +132,7 @@ export function CategoryDonut({ data, total }) {
             animationDuration={500}
             animationEasing="ease-out"
           />
-          <Tooltip content={<ChartTooltip hideLabel />} />
+          <Tooltip {...TOOLTIP_PROPS} active={tooltipActive} content={<ChartTooltip hideLabel center />} />
         </PieChart>
       </ResponsiveContainer>
       <div className={styles.donutCenter}>
@@ -109,9 +164,10 @@ export function MonthlyExpenseChart({ data, selected }) {
   const { t } = useTranslation();
   const animate = !useReducedMotion();
   const biggest = Math.max(...data.map((d) => d.expense), 1);
+  const [chartRef, tooltipActive] = useTapAway();
 
   return (
-    <div className={styles.barChart} role="img" aria-label={t('dashboard.barLabel')}>
+    <div ref={chartRef} className={styles.barChart} role="img" aria-label={t('dashboard.barLabel')}>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 22, right: 0, bottom: 0, left: 0 }} barCategoryGap="20%">
           <defs>
@@ -122,7 +178,7 @@ export function MonthlyExpenseChart({ data, selected }) {
           </defs>
           <XAxis dataKey="label" axisLine={false} tickLine={false} tickMargin={10} interval={0} tick={axisTick()} />
           <YAxis hide domain={[0, biggest]} />
-          <Tooltip cursor={false} content={<ChartTooltip />} />
+          <Tooltip {...TOOLTIP_PROPS} active={tooltipActive} cursor={false} content={<ChartTooltip />} />
           <Bar
             dataKey="expense"
             name={t('common.expense')}

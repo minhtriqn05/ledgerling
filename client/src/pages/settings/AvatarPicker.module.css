@@ -50,6 +50,23 @@
 }
 
 /* Eight choices per tab: four on a row, two rows (on a phone: also four, smaller) */
+/* The tabs of the avatar groups, as wide as the card. In a long language on a phone ("Thiên nhiên", "Naturaleza") they
+   are wider than the card: the row then scrolls sideways inside it, instead of the whole page */
+.groups {
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.groups::-webkit-scrollbar {
+  display: none;
+}
+
+.groups > [role='group'] {
+  width: max-content;
+  min-width: 100%;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -81,6 +98,21 @@
 
 .choice:hover:not(:disabled) {
   transform: translateY(-2px);
+}
+
+/* It rises by 2px on hover; this strip under it keeps the mouse on it meanwhile, so a mouse resting on its bottom edge
+   does not make it bounce */
+.choice {
+  position: relative;
+}
+
+.choice::after {
+  content: '';
+  position: absolute;
+  top: 100%; /* from the inside of the border: the strip covers the border, then the lift */
+  right: 0;
+  left: 0;
+  height: 4px;
 }
 
 .choice:focus-visible {

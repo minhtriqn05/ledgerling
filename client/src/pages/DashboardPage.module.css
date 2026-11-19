@@ -30,7 +30,8 @@
   font-weight: var(--font-weight-light);
   line-height: 1.04;
   letter-spacing: var(--letter-spacing-display);
-  white-space: nowrap;
+  /* Breaks only where the amount allows it (after a group separator, DashboardPage.jsx): never inside a number */
+  white-space: normal;
 }
 
 .balanceValue small {
@@ -74,6 +75,21 @@
   transform: translateY(-2px);
 }
 
+/* It rises by 2px on hover; this strip under it keeps the mouse on it meanwhile, so a mouse resting on its bottom edge
+   does not make it bounce */
+.tile {
+  position: relative;
+}
+
+.tile::after {
+  content: '';
+  position: absolute;
+  top: 100%; /* from the inside of the border: the strip covers the border, then the lift */
+  right: 0;
+  left: 0;
+  height: 3px;
+}
+
 .expense {
   --tone: var(--color-expense);
   --money: var(--color-expense-text);
@@ -105,7 +121,8 @@
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-tight);
   letter-spacing: var(--letter-spacing-display);
-  white-space: nowrap;
+  /* Breaks only after a group separator (DashboardPage.jsx), when a very large amount does not fit */
+  white-space: normal;
 }
 
 .tileValue small {

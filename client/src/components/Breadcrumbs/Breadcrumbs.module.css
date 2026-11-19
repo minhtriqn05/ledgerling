@@ -4,9 +4,11 @@
   font-size: var(--font-size-sm);
 }
 
+/* One line: a trail that wrapped to two lines and back while the page loaded moved the whole page. Where the top bar has
+   no room for a whole trail (a tablet with the sidebar open), AppLayout puts it above the page instead. */
 .list {
   display: inline-flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   gap: var(--space-1);
   min-height: var(--control-height);
@@ -18,11 +20,17 @@
   list-style: none;
 }
 
+/* Never shrunk: a shrunk level left its › out of its own box, drawn over the next name */
 .item {
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   gap: var(--space-1);
-  min-width: 0;
+}
+
+/* Above the page instead of in the top bar (a phone, or a tablet with the sidebar open: AppLayout.jsx) */
+main > .nav {
+  margin-bottom: var(--space-3);
 }
 
 .link {

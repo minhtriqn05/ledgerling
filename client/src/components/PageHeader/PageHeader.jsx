@@ -11,7 +11,10 @@ import styles from './PageHeader.module.css';
 // The title and subtitle are on the left, the page's main actions (children) on the right.
 // stats: the numbers the page leads with, in a row under the title.
 // The title also becomes the text of the browser tab, unless documentTitle names a part of the page.
-export default function PageHeader({ title, subtitle, eyebrow, icon, logo = false, stats, documentTitle, children }) {
+// subtitleReserve: while the data of the page loads, a text of about the size of what the subtitle will add (" · 10
+//   transactions"). It is kept invisible after the subtitle, so the header has its final size from the first frame and
+//   nothing jumps when the real count arrives (the buttons used to move to a new line then, in some languages).
+export default function PageHeader({ title, subtitle, subtitleReserve, eyebrow, icon, logo = false, stats, documentTitle, children }) {
   useDocumentTitle(documentTitle ?? title);
 
   return (
@@ -28,7 +31,16 @@ export default function PageHeader({ title, subtitle, eyebrow, icon, logo = fals
           <div className={styles.titles}>
             {eyebrow && <p className={styles.eyebrow}>{eyebrow}</p>}
             <PageTitle>{title}</PageTitle>
-            {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
+            {(subtitle || subtitleReserve) && (
+              <p className={styles.subtitle}>
+                {subtitle}
+                {subtitleReserve && (
+                  <span className={styles.reserve} aria-hidden="true">
+                    {subtitleReserve}
+                  </span>
+                )}
+              </p>
+            )}
           </div>
         </div>
         {children && <div className={styles.actions}>{children}</div>}

@@ -69,6 +69,12 @@ h4 {
   }
 }
 
+/* The top margin of the first part of a page stays inside the app's root: it used to pass through <body>, which then
+   moved down 12px when the page replaced its loading screen (a layout shift) */
+#root {
+  display: flow-root;
+}
+
 /* The Skip to content link puts the focus on <main>: no ring around the whole page */
 main:focus {
   outline: none;

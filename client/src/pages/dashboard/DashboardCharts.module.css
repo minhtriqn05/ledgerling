@@ -1,5 +1,13 @@
 /* ---------- Tooltip ---------- */
+/* Placed by ChartTooltip inside the box of Recharts (the size of the chart): just above the chart, its left edge set
+   from the column under the pointer. .tooltipInside: at the top inside the chart, when the top bar of the window would
+   hide it above. */
 .tooltip {
+  position: absolute;
+  bottom: calc(100% + var(--space-1));
+  left: 0;
+  width: max-content;
+  max-width: min(320px, calc(100vw - 2 * var(--space-4)));
   min-width: 170px;
   padding: var(--space-3);
   background: var(--color-surface-raised);
@@ -7,6 +15,11 @@
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
   font-size: var(--font-size-xs);
+}
+
+.tooltipInside {
+  top: 0;
+  bottom: auto;
 }
 
 .tooltipLabel {

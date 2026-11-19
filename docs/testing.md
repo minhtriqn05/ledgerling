@@ -12,14 +12,14 @@ Measured on 3 November 2026 on Windows 11, Node 24.19.0 (the same commands run o
 |-------|---------|--------|
 | Server lint | `cd server && npm run lint` | 0 warnings |
 | Server tests | `cd server && npm test` | 39 files, **672 passed** |
-| Server coverage | `cd server && npm run test:coverage` | **94.83% lines**, 90.82% branches (fails below 80% lines or branches) |
+| Server coverage | `cd server && npm run test:coverage` | **94.83% lines**, 90.73% branches (fails below 80% lines or branches) |
 | Client lint | `cd client && npm run lint` | 0 warnings |
-| Client unit tests | `cd client && npm test` | 97 files, **847 passed** |
-| Client coverage | `cd client && npm run test:coverage` | **68.36% lines**; `src/utils` 94.0%, `src/hooks` 100% (fails below 60%, or 80% in utils and hooks) |
-| i18n | `cd client && npm run i18n:check` | 8 languages, 967 keys each |
-| Build | `cd client && npm run build` | OK, PWA precache of 109 entries |
-| End-to-end, Chrome | `cd client && npm run test:e2e:chromium` | **337 passed**, 7 skipped (tests written for a phone only or a wide screen only) |
-| End-to-end, Firefox + WebKit | `cd client && npm run test:e2e:smoke` | **52 passed** (26 `@smoke` flows × 2 browsers) |
+| Client unit tests | `cd client && npm test` | 106 files, **879 passed** |
+| Client coverage | `cd client && npm run test:coverage` | **68.60% lines**; `src/utils` 94.2%, `src/hooks` 100% (fails below 60%, or 80% in utils and hooks) |
+| i18n | `cd client && npm run i18n:check` | 8 languages, 969 keys each |
+| Build | `cd client && npm run build` | OK, PWA precache of 110 entries |
+| End-to-end, Chrome | `cd client && npm run test:e2e:chromium` | **373 passed**, 15 skipped (tests written for a phone only or a wide screen only) |
+| End-to-end, Firefox + WebKit | `cd client && npm run test:e2e:smoke` | **59 passed**, 1 skipped (30 `@smoke` flows × 2 browsers) |
 
 ## Server: Vitest + Supertest
 

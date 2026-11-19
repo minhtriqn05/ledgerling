@@ -21,6 +21,7 @@
 **[Dùng thử](https://ledgerling-ten.vercel.app)** ·
 **[Tài liệu API (Swagger)](https://ledgerling-api.onrender.com/api-docs)** ·
 **[API base URL](https://ledgerling-api.onrender.com/api)** ·
+**[Mã nguồn (GitHub)](https://github.com/minhtriqn05/ledgerling)** ·
 **[English](README.md)**
 
 </div>
@@ -81,7 +82,7 @@ riêng mình thì bấm **Get started** và tạo tài khoản (chỉ cần emai
   khi đọc, nên không bao giờ lệch với lịch sử.
 - **Quản trị và phiên đăng nhập.** Trang Admin theo vai trò, khoá tài khoản, và "đăng xuất mọi thiết bị" nhờ số phiên
   bản token lưu trong mỗi JWT.
-- **Kiểm thử đầu cuối.** 1.519 test đơn vị và API, 344 test Playwright trên Chrome (máy tính và điện thoại), các luồng
+- **Kiểm thử đầu cuối.** 1.551 test đơn vị và API, 388 test Playwright trên Chrome (máy tính và điện thoại), các luồng
   chính chạy lại trên Firefox và Safari của iPhone, kiểm tra khả năng truy cập bằng axe ở cả hai giao diện, CI cho mỗi
   lần push và test trên site thật sau mỗi lần deploy.
 
@@ -556,16 +557,16 @@ Server không chịu khởi động, và báo rõ tên biến, khi thiếu `MONG
 
 ## Kiểm thử
 
-| Loại | Công cụ | Kết quả (3/11/2026) |
+| Loại | Công cụ | Kết quả (19/11/2026) |
 |------|---------|---------------------|
 | Test API | Vitest, Supertest, mongodb-memory-server | **672 test** trong 39 file: mọi route, quyền sở hữu (404 với id của người khác), validation, giờ Việt Nam, đối chiếu số tiền, chạy đồng thời, index, và đối chiếu tài liệu với code |
-| Coverage API | @vitest/coverage-v8 | **94,8% dòng, 90,8% nhánh** (dưới 80% là fail) |
-| Test đơn vị client | Vitest, React Testing Library, jsdom | **847 test** trong 97 file |
-| Coverage client | @vitest/coverage-v8 | **68,4% dòng**; `src/utils` 94,0%, `src/hooks` 100% (dưới 60% / 80% là fail) |
-| End-to-end | Playwright trên bản build production | **337 pass, 7 bỏ qua** (test chỉ dành cho điện thoại hoặc chỉ cho máy tính) trên Chrome desktop + Pixel 7; **52 pass** test `@smoke` trên Firefox + Safari iPhone 14 |
+| Coverage API | @vitest/coverage-v8 | **94,8% dòng, 90,7% nhánh** (dưới 80% là fail) |
+| Test đơn vị client | Vitest, React Testing Library, jsdom | **879 test** trong 106 file |
+| Coverage client | @vitest/coverage-v8 | **68,6% dòng**; `src/utils` 94,2%, `src/hooks` 100% (dưới 60% / 80% là fail) |
+| End-to-end | Playwright trên bản build production | **373 pass, 15 bỏ qua** (test chỉ dành cho điện thoại hoặc chỉ cho máy tính) trên Chrome desktop + Pixel 7; **59 pass** test `@smoke` trên Firefox + Safari iPhone 14 |
 | Khả năng truy cập | axe-core trong Playwright | **0 lỗi mức serious hay critical** trên mọi trang, cả sáng và tối, kèm hộp thoại, drawer, tour và bảng lệnh |
 | Site thật | Playwright trên bản đã deploy | health, Swagger, ứng dụng và header của nó, demo, rate limit và luồng chính với một tài khoản tạm bị xoá khi xong |
-| Tĩnh | ESLint, `i18n:check` | 0 cảnh báo ở cả hai phía; 8 ngôn ngữ × 967 key |
+| Tĩnh | ESLint, `i18n:check` | 0 cảnh báo ở cả hai phía; 8 ngôn ngữ × 969 key |
 
 Test end-to-end tự khởi động API riêng với cơ sở dữ liệu trong bộ nhớ, nên không bao giờ đụng tới Atlas. Cách tổ chức
 từng bộ test và cách chạy riêng một file: [docs/testing.md](docs/testing.md).
@@ -576,9 +577,10 @@ từng bộ test và cách chạy riêng một file: [docs/testing.md](docs/test
   cần khoảng **268 kB JavaScript đã gzip** (trước đây 370 kB).
 - API nén response (gzip), và mọi danh sách, mọi phép kiểm tra đều đi qua index (`server/tests/indexes.test.js` kiểm tra
   các truy vấn chính bằng `explain()`).
-- Lighthouse, lần truy cập đầu, bản build production: hiệu năng **98** trên máy tính cho cả `/welcome` lẫn Dashboard;
-  trên điện thoại giả lập chậm là **77** (`/welcome`) và **67** (Dashboard), vì trang được vẽ bằng JavaScript.
-  Accessibility, Best Practices và SEO đều **100**.
+- Lighthouse, lần truy cập đầu trên site thật (19/11/2026, mỗi trang 2–4 lần): hiệu năng trên máy tính **97** cho
+  `/welcome` và **87–93** cho Dashboard; trên điện thoại giả lập chậm là **77–78** (`/welcome`) và **49–68**
+  (Dashboard), vì trang được vẽ bằng JavaScript. Accessibility, Best Practices và SEO đều **100** (SEO của các trang
+  công khai từ khi mỗi trang tự ghi địa chỉ canonical của mình).
 
 ## Khả năng truy cập
 

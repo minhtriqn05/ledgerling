@@ -154,6 +154,7 @@ export default function GoalsPage() {
             ? `${t('goals.count', { count: goals.length })} · ${t('goals.completedCount', { count: completedCount })}`
             : undefined
         }
+        subtitleReserve={ready ? undefined : `${t('goals.count', { count: 10 })} · ${t('goals.completedCount', { count: 1 })}`}
         stats={
           ready && goals.length > 0 ? (
             <HeroStats label={t('nav.goals')}>

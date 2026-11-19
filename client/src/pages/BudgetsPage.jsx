@@ -205,6 +205,7 @@ export default function BudgetsPage() {
         icon="gauge"
         title={t('nav.budgets')}
         subtitle={ready ? `${formatMonth(month)} · ${t('budgets.count', { count: budgets.length })}` : formatMonth(month)}
+        subtitleReserve={ready ? undefined : ` · ${t('budgets.count', { count: 10 })}`}
         stats={
           ready && budgets.length > 0 ? (
             <HeroStats label={t('common.totalsFor', { period: formatMonth(month) })}>

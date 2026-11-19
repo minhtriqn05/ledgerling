@@ -181,3 +181,103 @@ i18n OK. End to end on Chrome desktop + Pixel 7: 341 passed, 7 skipped (4 new: `
 light is blurred inside a box that only moves, that the slow moves go in steps, and that the aurora and the logo wait
 out of the window); `@smoke` on Firefox + iPhone Safari: 52 passed. One full run had the WebKit browser fail to start
 for one test (before any page was opened); the test passed alone and the whole `@smoke` run passed again.
+
+## Full audit before the presentation (19 November 2026)
+
+Measured on branch `fix/full-audit`, same laptop, with the fixes of [ui-audit.md](ui-audit.md). "Local" is the
+production build (`vite build` + `vite preview`) with the end-to-end API and its in-memory database; "live" is the
+deployed site (`main` before this branch), only opened with "Try the demo", read and scrolled. The measuring scripts
+were run from outside the repository.
+
+### Method
+
+Each cell is one browser and one screen. In each cell, on the Dashboard, Transactions, Reports and the landing page:
+
+- **Idle**: CPU time of the whole browser (every process it started, read from Windows) over 20 s without input, as %
+  of one core: the average of the 20 s, and the part after 8 s (the decorations then pause, see below).
+- **Scroll**: 2,400 px down and up at 1,600 px/s (a touch gesture on touch screens, the mouse wheel with the pointer
+  over the page on a computer); frames per second, frames over 50 ms, the longest frame, long tasks.
+- **Latency**: from the input to the second frame after it, for a hover (or a tap) on a chart, the next month on the
+  Dashboard, opening the transaction drawer and opening another page from the menu.
+- **Console**: every error.
+
+Cells: Chromium 390 (phone, touch), 768 and 1024 (tablets, touch) with the CPU slowed down 4 times; Chromium 390, 1536
+at 125 % and 1920; Microsoft Edge 390 (4× CPU), 1536, 1920; Firefox and WebKit 390, 1536, 1920. Targets: idle after the
+pause under 5 % of one core; scrolling at 55 fps or more with no frame over 100 ms; the result of an input on screen
+in under 200 ms on a slow phone and under 100 ms of main thread work on a computer; no console error.
+
+### Results (local, final build)
+
+| Browser | Screen | Idle after the pause (% of one core) | Scroll: lowest fps | Frames > 50 ms, longest | Latency ms: chart / month / drawer / page | Console errors |
+|---|---|---:|---:|---|---|---:|
+| Chromium | 390 | 1.3 | 94.7 | 0, 12 ms | 42 / 54 / 103 / 41 | 0 |
+| Chromium | 390, 4× CPU | – | 94.0 | 0, 12 ms | 108 / 369 / 255 / 93 | 0 |
+| Chromium | 768, 4× CPU | – | 94.0 | 0, 12 ms | 108 / 377 / 251 / 100 | 0 |
+| Chromium | 1024 touch, 4× CPU | – | 92.6 | 0, 12 ms | 111 / 378 / 269 / 109 | 0 |
+| Chromium | 1536 at 125 % | 0.4 | 93.8 | 0, 40 ms | 18 / 37 / 178 / 37 | 0 |
+| Chromium | 1920 | 1.2 | 91.1 | 0, 40 ms | 17 / 52 / 174 / 45 | 0 |
+| Edge | 390, 4× CPU | – | 92.6 | 0, 12 ms | 107 / 312 / 222 / 116 | 0 |
+| Edge | 1536 at 125 % | 1.9 | 93.1 | 0, 40 ms | 18 / 54 / 176 / 46 | 0 |
+| Edge | 1920 | 1.5 | 88.6 | 0, 40 ms | 19 / 49 / 172 / 46 | 0 |
+| Firefox | 390 | 0.4 | 100 | 0, 14 ms | 33 / 93 / 92 / 53 | 0 |
+| Firefox | 1536 | 0.3 | 99.5 | 0, 21 ms | 33 / 71 / 129 / 88 | 0 |
+| Firefox | 1920 | 1.5 | 93.3 | 0, 43 ms | 32 / 117 / 240 / 78 | 0 |
+| WebKit | 390 | 0.3 | 4.6 | 47, 516 ms | 748 / 1,312 / 972 / 216 | 0 |
+| WebKit | 1536 | 1.0 | 4.3 | 110, 307 ms | 718 / 491 / 512 / 324 | 0 |
+| WebKit | 1920 | 0 | 5.4 | 96, 230 ms | 527 / 370 / 378 / 243 | 0 |
+
+The idle cost over the whole 20 s, including the first 8 s while the decorations still move: Chromium and Edge 7–14 %,
+Firefox 19–38 %, WebKit 39–41 % of one core.
+
+- **WebKit** here is the WebKit that Playwright ships for Windows, a port that Safari does not use. The build before the
+  fixes gives the same numbers in it (4.5 fps, 681 ms for a hover), so they come from that browser, not from the app.
+- **Latency with the CPU slowed down** includes the round trip between the measuring script and the browser. Measured
+  inside the page instead (from the touch to the frame that shows the result): the next month 56–62 ms and the drawer
+  133–140 ms on a phone at 4× CPU; on a computer the main thread needs 31–55 ms for both. All under the targets. The
+  build before the fixes gave 420 ms and 228 ms in the same script, so nothing became slower.
+- **The first opening of the drawer on a computer** (172–240 ms in the table) is mostly the GPU painting the blurred
+  backdrop for the first time; the main thread part is 31–45 ms. The blur is part of the look and was kept.
+
+### Two problems found and fixed
+
+1. **A page left open kept the processor busy.** On the live site, the Dashboard, Transactions, Reports and the
+   landing page cost **15–25 %** of one core even after 8 s without input (Chromium 1536, Edge 1920), and the live
+   check measured 47.9 % on the Dashboard in a headless Chromium. Since the lag fix above, the only work left was the
+   endless decorations (the coin, its band of light, the lights of the hero, the caret of the landing page). Now
+   `utils/idleDecorations.js` sets `html[data-idle]` after 8 s without any input (mouse, touch, key, wheel, scroll,
+   focus) and their CSS pauses them where they are; the next input lets them go on from the same place. After the pause:
+   **0–2 %** in every browser, and 10.0 % in the same headless check (its 15 s start before the pause).
+2. **The first touch of a page with charts took one long frame** (57–64 ms at 4× CPU, every time). A fix of the audit
+   (a touch outside a chart hides its tooltip) drew every chart again inside the touch event, even when no tooltip was
+   shown. A touch outside a chart now changes it only while its card is on screen: 0 long frames in 12 runs, as on the
+   build before the fixes.
+
+Two ways to make the month change and the drawer answer sooner were also measured and not kept: wrapping them in a
+React transition drew the frame after the touch sooner, but the result itself up to 120 ms later.
+
+### Lighthouse
+
+Lighthouse 12, first visit (empty cache, no service worker), 2 runs each; the Dashboard signed in with the demo token.
+
+| Page | Local, before the fixes | Local, final | Live (`main`), 19 Nov |
+|---|---|---|---|
+| `/welcome`, phone | 73–74 | 73 | 77–78 |
+| `/welcome`, desktop | 97 | 97 | 97 |
+| Dashboard, phone | 61–62 | 61–63 | 49–68 (4 runs) |
+| Dashboard, desktop | 93–94 | 95 | 87–93 (4 runs) |
+
+Accessibility and Best Practices are 100 everywhere. SEO is 100 everywhere except `/welcome` on the live site (92):
+the single `index.html` named the root of the site as the canonical page of every address. `hooks/useCanonicalLink.js`
+now points it at the open page; a build served at its own address gives 92 on `/welcome` and `/about` without it and
+100 on the six public pages with it. The local preview sends gzip over HTTP/1.1 and the live CDN brotli over
+HTTP/2, which is why the live phone numbers of the landing page are higher. The phone score stays the known limit: the
+pages are drawn by JavaScript, so on a slow phone with a slow network the largest paint waits for the code (LCP 4.9–5.7 s).
+Prerendering the landing page would change that, which is a change of architecture and out of scope here.
+
+### Same look
+
+The pictures of every state before and after the fixes (animations off, 10 screens, light and dark, 564 pictures) were
+compared pixel by pixel. 172 are identical. In the others, the differences are only where a bug was fixed: the
+footer 16 px taller on wide screens, the phone top bar at 360 px, the breadcrumb above the page at 768 px, and a
+sub-pixel move of the ₫ sign of the hero amounts. The rest also differ between two runs of the unchanged build
+(pictures of the landing page that load late, the edges of letters).

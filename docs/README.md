@@ -15,7 +15,8 @@ read, run or change the code.
 | [ui-style.md](ui-style.md) | The visual design: palette, fonts, spacing, motion and the decisions behind them |
 | [brand/](brand/README.md) | The logo, what it means and how it moves |
 | [review/](review/final-review.md) | The final review before submission: findings, fixes and measurements |
-| [review/performance.md](review/performance.md) | What an open page costs on a wide screen: the lag of the redesign, its causes, the fix and the numbers before and after |
+| [review/performance.md](review/performance.md) | What an open page costs on a wide screen: the lag of the redesign, its causes, the fix and the numbers before and after; then the full audit: four browsers, phones to wide screens, Lighthouse |
+| [review/ui-audit.md](review/ui-audit.md) | The full audit before the presentation: every page on phones, tablets and laptops, four browsers, eight languages; the bugs found and how they were fixed |
 | [screenshots/](screenshots/README.md) | Every page at 1440 px and 390 px, in the light and the dark theme |
 | [assets/](assets/README.md) | Logo files and the social preview image of the repository |
 | [postman/](postman/ledgerling.postman_collection.json) | A Postman collection of the API |

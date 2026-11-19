@@ -1116,7 +1116,9 @@
   "session": {
     "title": "Hết phiên đăng nhập",
     "text": "Để an toàn, bạn đã được đăng xuất. Hãy đăng nhập lại để tiếp tục từ chỗ đang dở.",
-    "logInAgain": "Đăng nhập lại"
+    "logInAgain": "Đăng nhập lại",
+    "unreachableTitle": "Đang chờ máy chủ",
+    "unreachableText": "Máy chủ đang khởi động hoặc tạm thời không kết nối được. Bạn vẫn đang đăng nhập: ứng dụng sẽ tự mở ngay khi máy chủ phản hồi."
   },
   "legal": {
     "linksLabel": "Về trang web này",

@@ -44,4 +44,9 @@
   .layout {
     grid-template-columns: minmax(0, 1fr);
   }
+
+  /* The form comes once the list is there: shown during the loading, it was pushed down when the list arrived */
+  .layout[data-loading] > :not(.listColumn) {
+    display: none;
+  }
 }

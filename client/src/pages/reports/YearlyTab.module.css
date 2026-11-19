@@ -12,7 +12,9 @@
 }
 
 /* ---------- Month by month ---------- */
+/* position: relative keeps hidden labels inside the scroll area (else the page scrolls sideways) */
 .tableWrap {
+  position: relative;
   overflow-x: auto;
 }
 

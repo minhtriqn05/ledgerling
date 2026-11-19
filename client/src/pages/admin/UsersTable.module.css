@@ -3,7 +3,11 @@
   margin-bottom: var(--space-4);
 }
 
+/* A table wider than the room next to the sidebar (a tablet) scrolls inside its card, not the whole page.
+   position: the hidden column names (.srOnly) are placed in it, so they scroll and are cut with the table too. */
 .tableWrap {
+  position: relative;
+  overflow-x: auto;
   transition: opacity var(--duration-fast) var(--ease-out);
 }
 

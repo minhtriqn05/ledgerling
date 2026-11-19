@@ -541,6 +541,7 @@ export default function TransactionsPage() {
         icon="transactions"
         title={t('nav.transactions')}
         subtitle={ready ? `${period} · ${t('transactions.count', { count: total })}` : period}
+        subtitleReserve={ready ? undefined : ` · ${t('transactions.count', { count: 10 })}`}
         stats={
           showTotals || totalsPending ? (
             <>

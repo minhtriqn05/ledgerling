@@ -112,9 +112,12 @@
   color: var(--color-text-muted);
 }
 
-/* The Select and DatePicker controls of the filter bar share one width */
+/* The Select and DatePicker controls of the filter bar share one width, a little wider when the words of a language
+   need it ("Tất cả danh mục", "Toutes les catégories" were cut with an ellipsis) */
 .select {
-  width: 150px;
+  width: auto;
+  min-width: 150px;
+  max-width: 220px;
 }
 
 /* ---------- Responsive ---------- */
@@ -131,6 +134,7 @@
   .select {
     flex: 1 1 0;
     min-width: 0;
+    max-width: none;
   }
 
   .filterLabel {

@@ -178,7 +178,8 @@ Library: `motion` (`motion/react`). One main curve, `--ease-out` `cubic-bezier(0
 - **Page change:** the content fades in and rises 10px (`AppLayout`).
 - **Lists and cards:** a short stagger (`components/Motion/Reveal.jsx`); `onScroll` waits until it scrolls into view (landing page). The numbers of the hero count up (`CountUp.jsx`).
 - **Landing page:** the picture of the app lies back 16° and stands up while the page scrolls (`useScroll` + `useTransform`).
-- **Hover and press:** primary buttons rise 1px, cards 2px; pressing scales to 0.98. The + turns 90° on hover.
+- **Hover and press:** primary buttons rise 1px, cards 2px; pressing scales to 0.98. The + turns 90° on hover (only with a mouse: a finger would leave it turned). A rising element keeps the mouse while it is up: a strip under it as tall as its border and its lift, or the list item around a card (which does not move), so a mouse resting on the bottom edge does not make it bounce.
+- **Still pages:** after 8 seconds without any input (mouse, touch, key, wheel, scroll, focus) the endless decorations (aurora, coin, band of light, landing caret) stop where they are and go on with the next input (`utils/idleDecorations.js`, `html[data-idle]`): the same picture, almost no processor time.
 - **Logo:** the coin turns once in 16s (in steps of 1/30 s) and a band of light crosses it every 6s (at the pace of a 60 Hz screen); out of the window both wait. On hover or keyboard focus it flips once, tilts, opens into its four L, lights up inside and turns fast; nothing jumps when the mouse arrives or leaves. A press tosses it, and it lands with a ring and small square chips (`docs/brand/README.md`).
 - **Menu:** the active pill is measured from the open link and slides between items, so it fits every language. The theme thumb slides too.
 - **Charts:** Recharts draws in 500ms; skeletons shimmer.
@@ -189,7 +190,7 @@ Library: `motion` (`motion/react`). One main curve, `--ease-out` `cubic-bezier(0
 
 - **App frame:** a floating dark sidebar (264px, `--radius-xl`, `--frame-gap` 14px around it) on the canvas, the top bar and the main area beside it (content up to 1520px).
 - **Sidebar** (`data-tone="noir"`): the logo (a link to `/welcome`) with the live dot, the links in three groups with a small title (Money, Planning, Account; `group` in `config/navItems.js`), and at the bottom the language, the fold button and the account card. The links scroll by themselves, so the account always stays on screen; on a low window the group titles give way first.
-- **Top bar** (wide screens): stays at the top while the page scrolls, the page shows through it, blurred. The breadcrumb in a pill on the left; the search button (opens the command palette), `ThemeToggle` and the bell on the right.
+- **Top bar** (wide screens): stays at the top while the page scrolls, the page shows through it, blurred. The breadcrumb in a pill on the left; the search button (opens the command palette), `ThemeToggle` and the bell on the right. On a tablet with the sidebar open (768–959 px) the top bar has no room for the trail: the pill goes above the page, as on a phone (`TABLET_SCREEN` in `hooks/useMediaQuery.js`).
 - **Active page:** a glass pill in emerald and ice with a thin bright edge, semibold text, an ice icon. The link also gets `aria-current="page"`.
 - **Folded sidebar:** the fold button or the `[` key shrink it to 72px: only icons, the name of each in a tooltip on hover and keyboard focus. The choice is kept in localStorage. A phone has no sidebar to fold.
 - **Narrow screens (<768px):** one floating bar with the logo, the live dot, the bell, the face of the account and a round menu button. The button opens a panel under the bar with the search, the links, the language, the theme and the account. Escape, a click outside or choosing a link closes it.
@@ -236,7 +237,7 @@ Colors are read from the tokens with `cssVar()` because SVG needs real color val
 - **Daily expense:** a smooth 2px line with a fading fill (28% → 0%), a solid hairline grid, round ticks (0 / 6M / 12M…) from `niceTicks()`.
 - **Yearly:** pairs of 12px capsules, income and expense, with a legend in the card header.
 - **The small capsules in the hero:** plain HTML, six months, this month lit. Decoration next to the real number.
-- **Hover:** a raised tooltip card with colored dots and full amounts; lines show a 5px dot with a ring in the surface color.
+- **Hover:** a raised tooltip card with colored dots and full amounts; lines show a 5px dot with a ring in the surface color. The card stands just above the chart, centred on the column (or the day) under the pointer and held inside the width of the chart; the donut's card stands above the ring, centred. So it never covers a bar, the line or the total in the middle. It moves at once (no glide) and a touch outside the chart hides it (`TOOLTIP_PROPS`, `useTapAway` in `pages/dashboard/DashboardCharts.jsx`).
 - Never two y-axes in one chart; text always uses text colors; gridlines are solid, never dashed.
 
 ## 10. Where things live
