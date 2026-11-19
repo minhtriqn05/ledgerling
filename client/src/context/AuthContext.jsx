@@ -31,27 +31,65 @@ export function AuthProvider({ children }) {
     return () => window.removeEventListener(SESSION_EXPIRED_EVENT, handleExpired);
   }, []);
 
+  // The stored token could not be checked: no answer at all (offline, the free server is down or restarting) or a server
+  // error. The token says nothing yet, so it is kept and checked again; ProtectedRoute shows a "waiting" screen meanwhile.
+  const [unreachable, setUnreachable] = useState(false);
+  const [checkKey, setCheckKey] = useState(0);
+
   // On first load: if a token is stored, ask the API who it belongs to.
   useEffect(() => {
     if (!localStorage.getItem('token')) return;
 
     let cancelled = false; // StrictMode runs effects twice in dev; ignore the first run's answer
-    getMe()
-      .then((me) => {
-        if (!cancelled) setUser(me);
-      })
-      .catch((error) => {
-        // Invalid, expired or unknown token: forget it. No answer at all (offline, server asleep) says nothing about the token.
-        if (!cancelled && error.response?.status === 401) clearSession();
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
+    let timer = null;
+    let attempt = 0;
+
+    function check() {
+      // Logged out meanwhile: nothing to check any more
+      if (!localStorage.getItem('token')) {
+        setUnreachable(false);
+        setLoading(false);
+        return;
+      }
+      getMe()
+        .then((me) => {
+          if (cancelled) return;
+          setUser(me);
+          setUnreachable(false);
+        })
+        .catch((error) => {
+          if (cancelled) return;
+          const status = error.response?.status;
+          // Invalid, expired or unknown token: forget it
+          if (status === 401) {
+            clearSession();
+            setUnreachable(false);
+            return;
+          }
+          // No answer, or the server failed: ask again a little later (1, 2, 4, 8, then every 10 seconds), so the app
+          // opens by itself once the server is back. Any other answer (403, 404) is final.
+          if (!error.response || status >= 500) {
+            setUnreachable(true);
+            attempt += 1;
+            timer = setTimeout(check, Math.min(1000 * 2 ** (attempt - 1), 10000));
+          }
+        })
+        .finally(() => {
+          if (!cancelled) setLoading(false);
+        });
+    }
+    check();
 
     return () => {
       cancelled = true;
+      clearTimeout(timer);
     };
-  }, []);
+  }, [checkKey]);
+
+  // "Try again" on the waiting screen: check at once instead of waiting for the next try
+  function retryCheck() {
+    setCheckKey((key) => key + 1);
+  }
 
   function saveSession({ token, user }) {
     if (localStorage.getItem(CACHE_OWNER_KEY) !== user._id) clearApiCache();
@@ -119,6 +157,8 @@ export function AuthProvider({ children }) {
     sessionExpired,
     expireSession,
     endExpiredSession,
+    unreachable,
+    retryCheck,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -15,6 +15,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 - Swagger UI stayed blank: a `$` followed by a backtick in the API description was read as a replacement pattern
   when the docs script was built, which broke it. The text is reworded and a test now compiles the script.
+- The bugs of the full audit before the presentation ([docs/review/ui-audit.md](docs/review/ui-audit.md)): chart
+  tooltips on phones and computers, cards bouncing under a resting mouse, the phone top bar, layout shifts while pages
+  load, sideways scroll in long languages, very large amounts and long words, a valid session sent to the login page
+  while the server restarts, pages that could not load after a deploy or offline, a new version that needed two
+  reloads, endless decorations working while nobody uses the page, the first touch of a page with charts, and the
+  canonical link of the public pages.
 
 ## [1.0.0] - 2026-11-03
 

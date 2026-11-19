@@ -145,6 +145,7 @@
 
 /* ---------- Preview table (scrolls inside the dialog) ---------- */
 .previewWrap {
+  position: relative; /* hidden labels stay inside the scroll area */
   max-height: 320px;
   overflow: auto;
   border: 1px solid var(--color-border);

@@ -51,8 +51,10 @@
 }
 
 /* ---------- Top categories ---------- */
-/* Scrolls sideways inside the card on a narrow screen instead of squeezing the numbers */
+/* Scrolls sideways inside the card on a narrow screen instead of squeezing the numbers.
+   position: relative keeps the hidden words of the change badges inside the scroll area (else the page scrolls sideways). */
 .tableWrap {
+  position: relative;
   overflow-x: auto;
 }
 

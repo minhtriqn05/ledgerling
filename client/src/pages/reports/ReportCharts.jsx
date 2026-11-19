@@ -16,7 +16,7 @@ import { cssVar } from '../../utils/cssVar.js';
 import { formatCompact } from '../../utils/format.js';
 import { formatLongDay } from '../../utils/reports.js';
 import { formatMonth, formatMonthShort } from '../../utils/vnDate.js';
-import { ChartTooltip, niceTicks } from '../dashboard/DashboardCharts.jsx';
+import { ChartTooltip, TOOLTIP_PROPS, niceTicks, useTapAway } from '../dashboard/DashboardCharts.jsx';
 import styles from './ReportCharts.module.css';
 
 // The two charts of the Reports page, in the style of docs/ui-style.md §9:
@@ -24,6 +24,11 @@ import styles from './ReportCharts.module.css';
 // Recharts draws SVG, which needs real color values, so colors are read from tokens.css with cssVar().
 
 const axisTick = () => ({ fill: cssVar('--chart-axis'), fontSize: cssVar('--font-size-xs') });
+
+// The tooltip card with the long name of the day or the month as its title
+function FullLabelTooltip(props) {
+  return <ChartTooltip {...props} label={props.payload?.[0]?.payload.fullLabel} />;
+}
 
 // Expense of every day of one month as a smooth line over a soft fill.
 // dailyExpense: [{ date: 'YYYY-MM-DD', total }], one entry per day (the monthly report sends them all).
@@ -39,9 +44,10 @@ export function DailyExpenseChart({ dailyExpense, month }) {
   const ticks = niceTicks(Math.max(...data.map((d) => d.expense)));
   const color = cssVar('--color-expense');
   const grid = cssVar('--chart-grid');
+  const [chartRef, tooltipActive] = useTapAway();
 
   return (
-    <div className={styles.chart} role="img" aria-label={t('reports.dailyChartLabel', { month: formatMonth(month) })}>
+    <div ref={chartRef} className={styles.chart} role="img" aria-label={t('reports.dailyChartLabel', { month: formatMonth(month) })}>
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data} margin={{ top: 8, right: 12, bottom: 0, left: 0 }}>
           <defs>
@@ -62,12 +68,7 @@ export function DailyExpenseChart({ dailyExpense, month }) {
             tick={axisTick()}
             tickFormatter={formatCompact}
           />
-          <Tooltip
-            cursor={{ stroke: grid }}
-            content={({ active, payload }) => (
-              <ChartTooltip active={active} payload={payload} label={payload?.[0]?.payload.fullLabel} />
-            )}
-          />
+          <Tooltip {...TOOLTIP_PROPS} active={tooltipActive} cursor={{ stroke: grid }} content={<FullLabelTooltip />} />
           <Area
             type="monotone"
             dataKey="expense"
@@ -95,9 +96,10 @@ export function YearlyChart({ months, year }) {
   const animate = !useReducedMotion();
   const data = months.map((m) => ({ ...m, label: formatMonthShort(m.month), fullLabel: formatMonth(m.month) }));
   const ticks = niceTicks(Math.max(...data.map((d) => Math.max(d.income, d.expense))));
+  const [chartRef, tooltipActive] = useTapAway();
 
   return (
-    <div className={styles.chart} role="img" aria-label={t('reports.yearlyChartLabel', { year })}>
+    <div ref={chartRef} className={styles.chart} role="img" aria-label={t('reports.yearlyChartLabel', { year })}>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 8, right: 12, bottom: 0, left: 0 }} barCategoryGap="25%" barGap={3}>
           <CartesianGrid vertical={false} stroke={cssVar('--chart-grid')} />
@@ -120,12 +122,7 @@ export function YearlyChart({ months, year }) {
             tick={axisTick()}
             tickFormatter={formatCompact}
           />
-          <Tooltip
-            cursor={false}
-            content={({ active, payload }) => (
-              <ChartTooltip active={active} payload={payload} label={payload?.[0]?.payload.fullLabel} />
-            )}
-          />
+          <Tooltip {...TOOLTIP_PROPS} active={tooltipActive} cursor={false} content={<FullLabelTooltip />} />
           <Bar
             dataKey="income"
             name={t('common.income')}

@@ -142,6 +142,7 @@ export default function NotificationsPage() {
         icon="bell"
         title={t('nav.notifications')}
         subtitle={!loading && !loadError ? t('notifications.unreadCount', { count: unread }) : undefined}
+        subtitleReserve={loading ? t('notifications.unreadCount', { count: 10 }) : undefined}
       >
         <Button variant="secondary" icon="settings" onClick={() => navigate('/settings/notifications')}>
           {t('notifications.settingsLink')}

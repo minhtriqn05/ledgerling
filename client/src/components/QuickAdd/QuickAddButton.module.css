@@ -28,10 +28,24 @@
   transform: scale(0.95);
 }
 
-.fab:hover {
-  transform: translateY(-2px) rotate(90deg);
-  background: var(--gradient-button-hover);
-  box-shadow: var(--shadow-primary), var(--shadow-lg);
+/* Only with a mouse: a finger leaves a phone's button "hovered" after the tap, turned and raised */
+@media (hover: hover) {
+  .fab:hover {
+    transform: translateY(-2px) rotate(90deg);
+    background: var(--gradient-button-hover);
+    box-shadow: var(--shadow-primary), var(--shadow-lg);
+  }
+}
+
+/* It rises by 2px on hover; this strip under it keeps the mouse on it meanwhile, so a mouse resting on its bottom edge
+   does not make it bounce */
+.fab::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  height: 2px;
 }
 
 .fab:focus-visible {

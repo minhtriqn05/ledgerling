@@ -1116,7 +1116,9 @@
   "session": {
     "title": "La sesión ha caducado",
     "text": "Por tu seguridad se cerró tu sesión. Vuelve a iniciarla para continuar donde lo dejaste.",
-    "logInAgain": "Iniciar sesión de nuevo"
+    "logInAgain": "Iniciar sesión de nuevo",
+    "unreachableTitle": "Esperando al servidor",
+    "unreachableText": "El servidor se está iniciando o no se puede contactar en este momento. Sigues con la sesión iniciada: la aplicación se abrirá sola en cuanto el servidor responda."
   },
   "legal": {
     "linksLabel": "Sobre este sitio",

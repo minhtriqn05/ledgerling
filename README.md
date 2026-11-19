@@ -21,6 +21,7 @@
 **[Live demo](https://ledgerling-ten.vercel.app)** ·
 **[API docs (Swagger)](https://ledgerling-api.onrender.com/api-docs)** ·
 **[API base URL](https://ledgerling-api.onrender.com/api)** ·
+**[Repository](https://github.com/minhtriqn05/ledgerling)** ·
 **[Tiếng Việt](README.vi.md)**
 
 </div>
@@ -82,7 +83,7 @@ data, click **Get started** and make an account (an email and a password, nothin
   every read, so they can never drift from the history.
 - **Admin and sessions.** Role-based Admin page, disabling an account, and "log out of all devices" through a token
   version stored in every JWT.
-- **Tested end to end.** 1,519 unit and API tests, 344 Playwright tests on Chrome (desktop and phone), the main flows
+- **Tested end to end.** 1,551 unit and API tests, 388 Playwright tests on Chrome (desktop and phone), the main flows
   again on Firefox and iPhone Safari, axe accessibility checks in both themes, CI on every push and a live smoke test
   after every deploy.
 
@@ -558,16 +559,16 @@ missing or `JWT_EXPIRES_IN` is not a valid duration.
 
 ## Testing
 
-| Kind | Tools | Result (3 November 2026) |
+| Kind | Tools | Result (19 November 2026) |
 |------|-------|--------------------------|
 | API tests | Vitest, Supertest, mongodb-memory-server | **672 tests** in 39 files: every route, ownership (404 for another user's ids), validation, Vietnam time, money cross-checks, concurrency, indexes, and the docs against the code |
-| API coverage | @vitest/coverage-v8 | **94.8% lines, 90.8% branches** (the run fails below 80%) |
-| Client unit tests | Vitest, React Testing Library, jsdom | **847 tests** in 97 files |
-| Client coverage | @vitest/coverage-v8 | **68.4% lines**; `src/utils` 94.0%, `src/hooks` 100% (fails below 60% / 80%) |
-| End-to-end | Playwright on the production build | **337 passed, 7 skipped** (phone-only or desktop-only) on Chrome desktop + Pixel 7; **52 passed** `@smoke` tests on Firefox + iPhone 14 Safari |
+| API coverage | @vitest/coverage-v8 | **94.8% lines, 90.7% branches** (the run fails below 80%) |
+| Client unit tests | Vitest, React Testing Library, jsdom | **879 tests** in 106 files |
+| Client coverage | @vitest/coverage-v8 | **68.6% lines**; `src/utils` 94.2%, `src/hooks` 100% (fails below 60% / 80%) |
+| End-to-end | Playwright on the production build | **373 passed, 15 skipped** (phone-only or desktop-only) on Chrome desktop + Pixel 7; **59 passed** `@smoke` tests on Firefox + iPhone 14 Safari |
 | Accessibility | axe-core in Playwright | **0 serious or critical issues** on every page, in light and dark, plus dialogs, drawer, tour and command palette |
 | Live | Playwright against the deployed site | health, Swagger, the app and its headers, the demo, the rate limit and the main flow with one temporary account that is deleted at the end |
-| Static | ESLint, `i18n:check` | 0 warnings on both sides; 8 languages × 967 keys |
+| Static | ESLint, `i18n:check` | 0 warnings on both sides; 8 languages × 969 keys |
 
 The end-to-end tests start their own API with an in-memory database, so they never touch Atlas. How each suite is
 organised and how to run one file: [docs/testing.md](docs/testing.md).
@@ -578,9 +579,10 @@ organised and how to run one file: [docs/testing.md](docs/testing.md).
   page needs about **268 kB of gzip JavaScript** (down from 370 kB).
 - The API compresses its answers (gzip), and every list and check reads through an index
   (`server/tests/indexes.test.js` checks the main queries with `explain()`).
-- Lighthouse, first visit, production build: **98** performance on desktop for both `/welcome` and the Dashboard; on a
-  throttled phone **77** (`/welcome`) and **67** (Dashboard), because the pages are drawn by JavaScript. Accessibility,
-  Best Practices and SEO are **100** everywhere.
+- Lighthouse, first visit of the live site (19 November 2026, 2–4 runs each): **97** performance on desktop for
+  `/welcome` and **87–93** for the Dashboard; on a throttled phone **77–78** (`/welcome`) and **49–68** (Dashboard),
+  because the pages are drawn by JavaScript. Accessibility, Best Practices and SEO are **100** (SEO of the public pages
+  since each page names itself as canonical).
 
 ## Accessibility
 

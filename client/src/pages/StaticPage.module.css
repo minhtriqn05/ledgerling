@@ -46,6 +46,9 @@
   font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-regular);
   letter-spacing: -0.02em;
+  /* One long word ("Nutzungsbedingungen") is wider than a phone: it is hyphenated, or broken, instead of leaving the page */
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 .lead {

@@ -137,6 +137,7 @@ export default function RecurringPage() {
         icon="repeat"
         title={t('nav.recurring')}
         subtitle={ready ? t('recurring.count', { count: rules.length }) : undefined}
+        subtitleReserve={ready ? undefined : t('recurring.count', { count: 10 })}
       >
         <Button needsNetwork icon="plus" onClick={() => setDialog({ form: null })} disabled={!ready}>
           {t('recurring.add')}

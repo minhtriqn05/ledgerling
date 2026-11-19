@@ -32,7 +32,10 @@
     border-color var(--duration-base) var(--ease-out);
 }
 
-.lift:hover {
+/* The card sits alone in a list item (Budgets, Categories, Goals), which does not move: while the mouse is in it, the card
+   stays up, so a mouse resting on its bottom edge does not make it bounce */
+.lift:hover,
+li:hover > .lift {
   border-color: color-mix(in srgb, var(--color-text) 16%, var(--color-border));
   box-shadow: var(--shadow-md);
   transform: translateY(-2px);

@@ -36,7 +36,8 @@
   min-width: 0;
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-semibold);
-  overflow-wrap: break-word;
+  /* anywhere, not break-word: one long word ("Gesundheitsvorsorgeleistungen") must break too, or it runs under the buttons */
+  overflow-wrap: anywhere;
 }
 
 .dot {

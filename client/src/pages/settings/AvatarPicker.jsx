@@ -117,12 +117,14 @@ export default function AvatarPicker() {
 
       {!user.isDemo && (
         <>
-          <SegmentedControl
-            label={t('avatar.groupsLabel')}
-            value={group}
-            onChange={setGroup}
-            options={AVATAR_GROUP_KEYS.map((key) => ({ value: key, label: t(`avatar.groups.${key}`) }))}
-          />
+          <div className={styles.groups}>
+            <SegmentedControl
+              label={t('avatar.groupsLabel')}
+              value={group}
+              onChange={setGroup}
+              options={AVATAR_GROUP_KEYS.map((key) => ({ value: key, label: t(`avatar.groups.${key}`) }))}
+            />
+          </div>
           <div className={styles.grid} role="radiogroup" aria-label={t(`avatar.groups.${group}`)}>
             {AVATAR_GROUPS[group].map((id) => {
               const selected = shown?.type === 'preset' && shown.value === id;

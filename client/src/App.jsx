@@ -9,6 +9,7 @@ import LoadingState from './components/LoadingState/LoadingState.jsx';
 import PreferencesSync from './components/PreferencesSync/PreferencesSync.jsx';
 import SkipLink from './components/SkipLink/SkipLink.jsx';
 import TopProgress from './components/TopProgress/TopProgress.jsx';
+import { useCanonicalLink } from './hooks/useCanonicalLink.js';
 
 // Every page is its own file in the build, downloaded the first time its address opens (code splitting).
 // The first page then loads only its own code, and the Recharts library only comes with the pages that draw charts.
@@ -35,6 +36,8 @@ const NotFoundPage = lazy(() => import('./pages/NotFoundPage.jsx'));
 export default function App() {
   // Subscribes to the language, so everything below renders again when it changes
   useTranslation();
+  // The canonical link names the open page (search engines)
+  useCanonicalLink();
 
   return (
     <>

@@ -19,6 +19,21 @@
   transform: translateY(-1px);
 }
 
+/* It rises by 1px on hover; this strip under it keeps the mouse on it meanwhile, so a mouse resting on its bottom edge
+   does not make it bounce */
+.button {
+  position: relative;
+}
+
+.button::after {
+  content: '';
+  position: absolute;
+  top: 100%; /* from the inside of the border: the strip covers the border, then the lift */
+  right: 0;
+  left: 0;
+  height: 2px;
+}
+
 .button:active:not(:disabled) {
   transform: translateY(0) scale(0.98);
 }

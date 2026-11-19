@@ -132,18 +132,33 @@
   gap: var(--space-1);
 }
 
+/* The frequency, the next run, the switch and the buttons: columns of the row itself on a wide screen */
+.meta {
+  display: contents;
+}
+
 /* ---------- Little room (a phone, or a tablet next to the sidebar): category and amount on top, the rest below ---------- */
+/* The second line is a flex line: the next run takes the room that is left, and when even its date does not fit
+   (a narrow phone, a long language) the buttons go to a third line on the right instead of covering the date. */
 @container (max-width: 760px) {
   .row {
-    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: var(--space-2) var(--space-3);
   }
 
-  .main {
-    grid-column: 1 / 3;
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    grid-column: 1 / -1;
+    align-items: center;
+    gap: var(--space-2) var(--space-3);
   }
 
-  .amount {
-    grid-column: 3 / 5;
+  .nextRun {
+    flex: 1 0 auto;
+  }
+
+  .actions {
+    margin-left: auto;
   }
 }

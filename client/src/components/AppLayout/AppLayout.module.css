@@ -411,6 +411,7 @@
   flex-shrink: 0;
   align-items: center;
   gap: var(--space-3);
+  margin-left: auto; /* on the right also when the breadcrumb is above the page instead (a tablet, AppLayout.jsx) */
 }
 
 /* Opens the command palette; it looks like a quiet search box */
@@ -463,6 +464,13 @@
   font-weight: var(--font-weight-medium);
 }
 
+/* A tablet: the search box is at its smallest, and the key hint left no room for the word ("Recherch…" in French) */
+@media (min-width: 768px) and (max-width: 899px) {
+  .searchKey {
+    display: none;
+  }
+}
+
 /* ---------- Main area ---------- */
 /* The right column: page content on top, footer pushed to the bottom of the screen. */
 .body {
@@ -488,8 +496,10 @@
   justify-content: space-between;
   gap: var(--space-4);
   padding: var(--space-5);
-  /* Room below, so the floating + button never covers the last line */
+  /* Room on the right and below, so the floating + button (56px, 24px from the corner) never covers the last line of
+     the page once it is scrolled to the end */
   padding-right: calc(var(--space-5) + 72px);
+  padding-bottom: calc(var(--space-5) + var(--space-4));
 }
 
 /* A quiet text button; keyboards only, so phones do not show it. */
@@ -530,8 +540,10 @@
     grid-template-rows: auto 1fr;
   }
 
+  /* At the top of the page it floats 8px below the edge (its margin); once the page scrolls it stays against the edge,
+     so the page never shows through a gap above it */
   .sidebar {
-    top: var(--space-2);
+    top: 0;
     z-index: 25; /* the open menu goes over the floating + button */
     height: auto;
     margin: var(--space-2) var(--space-2) 0;
@@ -545,11 +557,13 @@
     border-bottom: none;
   }
 
-  /* A phone reads the logo and the dot on one line */
+  /* A phone reads the logo and the dot on one line. When the words of the status do not fit next to the logo and the
+     buttons (a narrow phone, a long language), they go under the logo instead of running under the bell. */
   .brand {
     flex-direction: row;
+    flex-wrap: wrap;
     align-items: center;
-    gap: var(--space-2);
+    gap: 2px var(--space-2);
     padding: 0;
     min-width: 0;
   }
@@ -585,6 +599,8 @@
     flex: none;
     gap: var(--space-2);
     max-height: calc(100vh - var(--topbar-height) - 3 * var(--space-2));
+    /* The part of the screen that is really visible: Safari counts its toolbars in 100vh, which hid the end of the menu */
+    max-height: calc(100dvh - var(--topbar-height) - 3 * var(--space-2));
     padding: var(--space-3);
     overflow-y: auto;
     border: 1px solid var(--color-border);

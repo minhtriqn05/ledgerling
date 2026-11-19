@@ -34,6 +34,12 @@
   min-width: 0;
 }
 
+/* The logo or the tile keeps its size: a long title on a narrow phone used to squeeze the logo, whose picture then ran
+   under the first letters of the title */
+.heading > :first-child:not(.titles) {
+  flex-shrink: 0;
+}
+
 /* A piece of frosted glass: lit from above, with a thin bright edge */
 .tile {
   display: grid;
@@ -63,6 +69,11 @@
   margin: var(--space-1) 0 0;
   color: var(--color-hero-text-soft);
   font-size: var(--font-size-sm);
+}
+
+/* Holds the place of the count while it loads (PageHeader.jsx, subtitleReserve) */
+.reserve {
+  visibility: hidden;
 }
 
 .actions {

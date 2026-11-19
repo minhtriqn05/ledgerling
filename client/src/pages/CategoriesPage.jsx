@@ -151,7 +151,7 @@ export default function CategoriesPage() {
         </Button>
       </PageHeader>
 
-      <div className={styles.layout}>
+      <div className={styles.layout} data-loading={loading || undefined}>
         <section className={styles.listColumn} aria-label={t('categories.yours')}>
           <div className={styles.listHeader}>
             <SegmentedControl label={t('categories.typeLabel')} options={typeOptions} value={activeType} onChange={changeType} />

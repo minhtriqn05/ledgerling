@@ -85,6 +85,11 @@
   animation-play-state: paused;
 }
 
+/* Nobody has touched the page for a while (utils/idleDecorations.js): the lights wait where they are */
+:global(html[data-idle]) .blob {
+  animation-play-state: paused;
+}
+
 /* A phone has little width: the lights take more of it */
 @media (max-width: 767px) {
   .emerald,

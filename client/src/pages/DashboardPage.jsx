@@ -40,10 +40,14 @@ function greetingKey(hour) {
   return 'evening';
 }
 
+// A line may break only after a group separator (20,|800,|000), so a very large amount wraps by groups of digits
+// instead of leaving its card. An amount that fits stays on one line, as before.
+const breakAfterSeparators = (text) => text.split(/(?<=[^\d-])/).flatMap((part, i) => (i ? [<wbr key={i} />, part] : [part]));
+
 // The amount with a smaller, softer ₫ next to it
 const heroAmount = (value) => (
   <>
-    {formatNumber(value)}
+    {breakAfterSeparators(formatNumber(value))}
     <small>&nbsp;₫</small>
   </>
 );

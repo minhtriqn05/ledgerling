@@ -4,6 +4,7 @@ import { useTheme } from '../../context/ThemeContext.jsx';
 import { cssVar } from '../../utils/cssVar.js';
 import { formatCompact, formatNumber } from '../../utils/format.js';
 import { countTicks } from '../../utils/admin.js';
+import { useTapAway } from '../dashboard/DashboardCharts.jsx';
 import styles from './AdminCharts.module.css';
 
 // A line chart of "how many per day" for the Admin page, in the approved style of docs/ui-style.md §9
@@ -33,9 +34,10 @@ export default function CountLineChart({ data, name, color, ariaLabel }) {
   const ticks = countTicks(Math.max(...data.map((d) => d.count), 0));
   const stroke = cssVar(color);
   const grid = cssVar('--chart-grid');
+  const [chartRef, tooltipActive] = useTapAway();
 
   return (
-    <div className={styles.chart} role="img" aria-label={ariaLabel}>
+    <div ref={chartRef} className={styles.chart} role="img" aria-label={ariaLabel}>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ top: 8, right: 12, bottom: 0, left: 0 }}>
           <CartesianGrid vertical={false} stroke={grid} />
@@ -50,7 +52,7 @@ export default function CountLineChart({ data, name, color, ariaLabel }) {
             tick={axisTick()}
             tickFormatter={formatCompact}
           />
-          <Tooltip cursor={{ stroke: grid }} content={({ active, payload }) => <CountTooltip active={active} payload={payload} name={name} />} />
+          <Tooltip isAnimationActive={false} active={tooltipActive} cursor={{ stroke: grid }} content={({ active, payload }) => <CountTooltip active={active} payload={payload} name={name} />} />
           <Line
             type="monotone"
             dataKey="count"

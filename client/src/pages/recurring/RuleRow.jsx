@@ -33,30 +33,33 @@ export default function RuleRow({ rule, index = 0, toggling, onToggle, onEdit, o
 
       <span className={`${styles.amount} ${styles[category.type]}`}>{formatSignedVnd(rule.amount, category.type)}</span>
 
-      <span className={styles.frequency}>{t(`recurring.${rule.frequency}`)}</span>
+      {/* A wide row has these as its own columns; a narrow one puts them on a second line that wraps when needed */}
+      <div className={styles.meta}>
+        <span className={styles.frequency}>{t(`recurring.${rule.frequency}`)}</span>
 
-      <span className={styles.nextRun}>
-        <span className={styles.caption}>{t('recurring.nextRun')}</span>
-        {nextRunText(rule, t)}
-      </span>
+        <span className={styles.nextRun}>
+          <span className={styles.caption}>{t('recurring.nextRun')}</span>
+          {nextRunText(rule, t)}
+        </span>
 
-      <button
-        type="button"
-        role="switch"
-        className={styles.switch}
-        aria-checked={rule.active}
-        aria-label={t('recurring.active', { name })}
-        disabled={toggling || locked}
-        title={note}
-        onClick={() => onToggle(rule)}
-      >
-        <span className={styles.knob} />
-      </button>
+        <button
+          type="button"
+          role="switch"
+          className={styles.switch}
+          aria-checked={rule.active}
+          aria-label={t('recurring.active', { name })}
+          disabled={toggling || locked}
+          title={note}
+          onClick={() => onToggle(rule)}
+        >
+          <span className={styles.knob} />
+        </button>
 
-      <span className={styles.actions}>
-        <IconButton needsNetwork icon="edit" label={t('common.editName', { name })} onClick={() => onEdit(rule)} />
-        <IconButton needsNetwork icon="trash" label={t('common.deleteName', { name })} danger onClick={() => onDelete(rule)} />
-      </span>
+        <span className={styles.actions}>
+          <IconButton needsNetwork icon="edit" label={t('common.editName', { name })} onClick={() => onEdit(rule)} />
+          <IconButton needsNetwork icon="trash" label={t('common.deleteName', { name })} danger onClick={() => onDelete(rule)} />
+        </span>
+      </div>
     </Reveal>
   );
 }

@@ -1116,7 +1116,9 @@
   "session": {
     "title": "Session expirée",
     "text": "Par sécurité, vous avez été déconnecté. Reconnectez-vous pour reprendre là où vous en étiez.",
-    "logInAgain": "Se reconnecter"
+    "logInAgain": "Se reconnecter",
+    "unreachableTitle": "En attente du serveur",
+    "unreachableText": "Le serveur démarre ou est injoignable pour le moment. Vous êtes toujours connecté : l'application s'ouvrira d'elle-même dès que le serveur répondra."
   },
   "legal": {
     "linksLabel": "À propos de ce site",

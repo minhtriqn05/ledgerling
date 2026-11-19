@@ -25,7 +25,7 @@ import { BreadcrumbProvider } from '../../context/BreadcrumbContext.jsx';
 import { NotificationsProvider } from '../../context/NotificationsContext.jsx';
 import { SocketProvider } from '../../context/SocketContext.jsx';
 import { useCommandKey, useHotkeys } from '../../hooks/useHotkeys.js';
-import { NARROW_SCREEN, useMediaQuery } from '../../hooks/useMediaQuery.js';
+import { NARROW_SCREEN, TABLET_SCREEN, useMediaQuery } from '../../hooks/useMediaQuery.js';
 import { useSpotlight } from '../../hooks/useSpotlight.js';
 import { useStoredBoolean } from '../../hooks/useStoredBoolean.js';
 import { useTour } from '../../hooks/useTour.js';
@@ -66,6 +66,10 @@ function Layout() {
   const narrow = useMediaQuery(NARROW_SCREEN);
   const [collapsedChoice, setCollapsedChoice] = useStoredBoolean(SIDEBAR_KEY);
   const collapsed = collapsedChoice && !narrow; // a phone has the top bar instead of a sidebar
+  // The breadcrumb goes above the page, as on a phone, where the top bar has no room for it: a phone, or a tablet with
+  // the sidebar open (it was cut to "R… › M…" there). A tablet with the sidebar closed keeps it in the top bar.
+  const tablet = useMediaQuery(TABLET_SCREEN);
+  const crumbsInPage = narrow || (tablet && !collapsed);
   const [menuOpen, setMenuOpen] = useState(false); // only matters on narrow screens
   const [quickAddOpen, setQuickAddOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
@@ -265,7 +269,7 @@ function Layout() {
         {!narrow && (
           <header className={styles.topbar}>
             {/* "Home / Reports / Monthly", made from the address (config/breadcrumbs.js) */}
-            <Breadcrumbs />
+            {!crumbsInPage && <Breadcrumbs />}
             <div className={styles.topbarActions}>
               {searchButton}
               <ThemeToggle />
@@ -275,7 +279,7 @@ function Layout() {
         )}
         <main id="main" className={styles.main}>
           <OfflineBanner />
-          {narrow && <Breadcrumbs />}
+          {crumbsInPage && <Breadcrumbs />}
           {/* A short fade and a slide when another page opens. No exit animation: the new page is there at once. */}
           <motion.div
             key={pageKeyOf(location.pathname)}

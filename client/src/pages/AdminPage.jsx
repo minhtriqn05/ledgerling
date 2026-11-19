@@ -60,13 +60,17 @@ export default function AdminPage() {
     <div className={styles.page}>
       <PageHeader icon="shield" title={t('nav.admin')} subtitle={t('admin.subtitle')} />
       {renderStats()}
-      <Card>
-        <CardHeader icon="user" tone="periwinkle" title={t('admin.users.title')} subtitle={t('admin.users.pageText')}>
-          <Button variant="secondary" onClick={() => navigate('/admin/users')}>
-            {t('admin.users.manage')}
-          </Button>
-        </CardHeader>
-      </Card>
+      {/* Comes with the numbers: shown under the loading cards, it was pushed down when the numbers and the charts
+          arrived (a layout shift of 0.17 on a phone) */}
+      {!loading && (
+        <Card>
+          <CardHeader icon="user" tone="periwinkle" title={t('admin.users.title')} subtitle={t('admin.users.pageText')}>
+            <Button variant="secondary" onClick={() => navigate('/admin/users')}>
+              {t('admin.users.manage')}
+            </Button>
+          </CardHeader>
+        </Card>
+      )}
     </div>
   );
 }

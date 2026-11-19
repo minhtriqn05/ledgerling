@@ -210,6 +210,13 @@
   animation-play-state: paused;
 }
 
+/* Nobody has touched the page for a while (utils/idleDecorations.js): the coin and its light wait where they are */
+:global(html[data-idle]) .drift,
+:global(html[data-idle]) .cruise,
+:global(html[data-idle]) .sheen {
+  animation-play-state: paused;
+}
+
 /* A phone has no mouse, and it would keep this state after a tap. The keyboard counts as the mouse. */
 @media (hover: hover) {
   .logo:hover,

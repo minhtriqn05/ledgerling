@@ -1116,7 +1116,9 @@
   "session": {
     "title": "Sitzung abgelaufen",
     "text": "Zu deiner Sicherheit wurdest du abgemeldet. Melde dich erneut an, um dort weiterzumachen, wo du warst.",
-    "logInAgain": "Erneut anmelden"
+    "logInAgain": "Erneut anmelden",
+    "unreachableTitle": "Warten auf den Server",
+    "unreachableText": "Der Server startet gerade oder ist im Moment nicht erreichbar. Du bist weiterhin angemeldet: Die App öffnet sich von selbst, sobald der Server antwortet."
   },
   "legal": {
     "linksLabel": "Über diese Website",

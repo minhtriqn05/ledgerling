@@ -1,5 +1,8 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext.jsx';
+import Button from '../Button/Button.jsx';
+import FullPageMessage from '../FullPageMessage/FullPageMessage.jsx';
 import LoadingState from '../LoadingState/LoadingState.jsx';
 
 // Wraps the pages that need a signed-in user. Used as a layout route in App.jsx:
@@ -7,11 +10,24 @@ import LoadingState from '../LoadingState/LoadingState.jsx';
 // A visitor who opens the home address (/) sees the landing page instead: it is the first thing a new person meets.
 // Somebody whose session just expired goes to /login from every page, also from the Dashboard, and comes back to it.
 export default function ProtectedRoute() {
-  const { user, loading, sessionExpired } = useAuth();
+  const { t } = useTranslation();
+  const { user, loading, sessionExpired, unreachable, retryCheck } = useAuth();
   const location = useLocation();
 
   // A stored token is still being checked with the API: do not redirect yet.
-  if (loading) return <LoadingState fullScreen />;
+  if (loading) return <LoadingState fullScreen slowText={t('welcome.demoStarting')} />;
+
+  // The API did not answer the check (asleep, restarting, no network): the session is kept and checked again by
+  // AuthContext, and this page opens by itself once it answers. Sending the person to /login would make them sign in again.
+  if (!user && unreachable) {
+    return (
+      <FullPageMessage icon="globe" title={t('session.unreachableTitle')} text={t('session.unreachableText')}>
+        <Button variant="secondary" onClick={retryCheck}>
+          {t('common.tryAgain')}
+        </Button>
+      </FullPageMessage>
+    );
+  }
 
   // `state.from` remembers the page the visitor wanted, so after logging in they can be sent back to it.
   if (!user) {

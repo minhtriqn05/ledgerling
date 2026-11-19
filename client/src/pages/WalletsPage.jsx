@@ -177,6 +177,7 @@ export default function WalletsPage() {
         icon="wallet"
         title={t('nav.wallets')}
         subtitle={ready ? `${t('wallets.subtitle')} · ${t('wallets.count', { count: list.length })}` : t('wallets.subtitle')}
+        subtitleReserve={ready ? undefined : ` · ${t('wallets.count', { count: 10 })}`}
         stats={ready ? renderTotal() : null}
       >
         <Button

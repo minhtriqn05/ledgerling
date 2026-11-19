@@ -1116,7 +1116,9 @@
   "session": {
     "title": "Session expired",
     "text": "For your safety you were signed out. Log in again to continue where you left off.",
-    "logInAgain": "Log in again"
+    "logInAgain": "Log in again",
+    "unreachableTitle": "Waiting for the server",
+    "unreachableText": "The server is starting up or cannot be reached right now. You are still signed in: the app opens by itself as soon as the server answers."
   },
   "legal": {
     "linksLabel": "About this site",
