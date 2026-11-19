@@ -39,7 +39,11 @@ An old Vietnamese coin, round outside and square inside, made of four glass L.
   out the angle again. So each move has its own group and they add up; the fast turn is only paused or running.
 - **Why three pictures of the coin:** a flat picture disappears when it is seen from the side. A front, a darker middle and a
   back, a few pixels apart in 3D (`translateZ`), give it a real thickness.
-- **Cost:** the turns are transforms of whole elements, which the graphics card does. On an idle Dashboard the logo adds at most about 0.1% of main thread time (headless Chromium, measured over 6 seconds).
+- **Cost:** the turns are transforms of whole elements, which the graphics card does; the slow turn goes in steps of 1/30 s
+  (0.75° each), so it changes the screen 30 times a second whatever the refresh rate. The band of light is part of the
+  SVG, which the browser moves on the main thread: it moves at the pace of a 60 Hz screen and it is the largest part of
+  what an idle page still costs (Chromium with the GPU, 1440 px: about 10% of one processor core). Out of the window
+  the coin waits (`hooks/usePauseOffscreen.js`). Measurements: `docs/review/performance.md`.
 
 ## Where it is used
 

@@ -91,9 +91,10 @@
   transition: transform 1200ms cubic-bezier(0.3, 0.7, 0.2, 1);
 }
 
-/* Never stops: one turn in 16 seconds. */
+/* Never stops: one turn in 16 seconds, in 480 small steps (30 a second, 0.75 degree each, a fraction of a pixel at the
+   rim). The screen then changes 30 times a second for it instead of on every refresh (60 to 144 times). */
 .drift {
-  animation: turn 16s linear infinite;
+  animation: turn 16s steps(480) infinite;
 }
 
 /* Paused until the mouse is there. Pausing keeps the angle, so the speed changes without a jump. */
@@ -144,21 +145,69 @@
   transition: transform 560ms var(--ease-pop);
 }
 
-/* A band of light crosses the coin every few seconds. It would show in the gaps of an open coin, so it waits then. */
+/* A band of light crosses the coin every few seconds. It would show in the gaps of an open coin, so it waits then.
+   It is part of the drawing (SVG), so the browser moves it on the main thread: each change of its place is a new
+   layout and paint. It moves in steps of 1/61 s (steps(11) in each part of 0.18 s), the pace of a 60 Hz screen, so a
+   faster screen does not repaint it more often. */
 .sheen {
   opacity: calc(1 - var(--logo-lit));
-  animation: sheen 6s ease-in-out infinite;
+  animation: sheen 6s steps(11) infinite;
 }
 
+/* It waits 70 % of the time, then crosses with an ease-in-out speed, written as 11 points of that curve (within half a
+   unit of it). */
 @keyframes sheen {
   0%,
   70% {
     transform: translateX(-22px);
   }
 
+  73% {
+    transform: translateX(-20.15px);
+  }
+
+  76% {
+    transform: translateX(-14.32px);
+  }
+
+  79% {
+    transform: translateX(-4.38px);
+  }
+
+  82% {
+    transform: translateX(9.2px);
+  }
+
+  85% {
+    transform: translateX(25px);
+  }
+
+  88% {
+    transform: translateX(40.8px);
+  }
+
+  91% {
+    transform: translateX(54.38px);
+  }
+
+  94% {
+    transform: translateX(64.32px);
+  }
+
+  97% {
+    transform: translateX(70.15px);
+  }
+
   100% {
     transform: translateX(72px);
   }
+}
+
+/* Out of the window (Logo.jsx): the coin and its light wait where they are */
+.logo[data-offscreen] .drift,
+.logo[data-offscreen] .cruise,
+.logo[data-offscreen] .sheen {
+  animation-play-state: paused;
 }
 
 /* A phone has no mouse, and it would keep this state after a tap. The keyboard counts as the mouse. */

@@ -91,14 +91,25 @@
 .heroAurora {
   height: 820px;
   border-radius: 0;
-  -webkit-mask-image: linear-gradient(180deg, var(--glass-shade) 45%, transparent 100%);
-  mask-image: linear-gradient(180deg, var(--glass-shade) 45%, transparent 100%);
+}
+
+/* The light fades into the page from 45 % of its height down: the color of the page laid over it, from transparent to
+   solid. The page behind the hero is plain --color-bg, so this gives the same picture as a fading mask; a mask over
+   moving lights was worked out again by the GPU on every frame, this layer is painted once. Above the lights and the
+   grain (z-index), under the text of the hero (which comes after the aurora). */
+.heroAurora::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 45%, var(--color-bg) 100%);
 }
 
 .heroAurora > span {
+  --blob-blur: 100px;
+
   top: -220px;
   height: 620px;
-  filter: blur(100px);
 }
 
 .heroAurora > span:last-child {
@@ -673,8 +684,9 @@
 }
 
 .closing > span:first-child > span {
+  --blob-blur: 80px;
+
   height: 380px;
-  filter: blur(80px);
 }
 
 .closingInner {
@@ -766,9 +778,10 @@
   }
 
   .heroAurora > span {
+    --blob-blur: 70px;
+
     top: -140px;
     height: 420px;
-    filter: blur(70px);
     opacity: 0.32;
   }
 

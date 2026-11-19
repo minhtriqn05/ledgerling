@@ -21,46 +21,68 @@
   mix-blend-mode: overlay;
 }
 
+/* One light. This box only moves (transform) and fades (opacity); the blurred circle is drawn by ::before inside it.
+   With the blur on the moving box itself, the GPU blurred every light again on every frame of the screen (60 to 144
+   times a second). Drawn inside a box that moves, the blurred circle is painted once and the GPU only slides it. */
 .blob {
   position: absolute;
   display: block;
-  border-radius: 50%;
-  filter: blur(64px);
   will-change: transform;
-  animation: drift 26s ease-in-out infinite alternate;
+  /* 10 parts of 2.6 s, each in 78 small steps: 30 steps a second (see @keyframes drift) */
+  animation: drift 26s steps(78) infinite alternate;
+}
+
+/* The color comes from --blob-color, the size of the blur from --blob-blur (a page can make it softer) */
+.blob::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--blob-color);
+  filter: blur(var(--blob-blur, 64px));
 }
 
 .emerald {
+  --blob-color: var(--aurora-emerald);
+
   top: -170px;
   left: -4%;
   width: 46%;
   height: 280px;
-  background: var(--aurora-emerald);
   opacity: 0.46;
 }
 
 .ice {
+  --blob-color: var(--aurora-ice);
+
   top: -190px;
   right: -2%;
   width: 46%;
   height: 290px;
-  background: var(--aurora-ice);
   opacity: 0.42;
   animation-duration: 32s;
+  animation-timing-function: steps(96); /* parts of 3.2 s: 30 steps a second */
   animation-direction: alternate-reverse;
 }
 
 /* Near the bottom of the hero. Placed from the top and moved down with translate: when the numbers of the hero arrive
    and it grows, only the translate changes, which is not a layout shift (bottom: -190px made it jump). */
 .warm {
+  --blob-color: var(--aurora-warm);
+
   top: 0;
   right: 22%;
   translate: 0 calc(100cqh - 70px);
   width: 40%;
   height: 260px;
-  background: var(--aurora-warm);
   opacity: 0.14;
   animation-duration: 38s;
+  animation-timing-function: steps(114); /* parts of 3.8 s: 30 steps a second */
+}
+
+/* Out of the window (Aurora.jsx): the lights wait where they are, and nothing is drawn for them */
+.aurora[data-offscreen] .blob {
+  animation-play-state: paused;
 }
 
 /* A phone has little width: the lights take more of it */
@@ -71,11 +93,42 @@
   }
 }
 
+/* The slow drift of a light: from (-4%, -3%) at its own size to (6%, 7%) at 1.12 times its size, with an ease-in-out
+   speed. The curve is written as 11 of its points, and the light moves in small steps between them (steps() above):
+   the screen then changes 30 times a second, not on every refresh, which saves most of the drawing. A step is a
+   fraction of a pixel of a light blurred by 64 px, and the points keep the old curve to within 0.4 px. */
 @keyframes drift {
-  from {
+  0% {
     transform: translate3d(-4%, -3%, 0) scale(1);
   }
-  to {
+  10% {
+    transform: translate3d(-3.803%, -2.803%, 0) scale(1.0024);
+  }
+  20% {
+    transform: translate3d(-3.183%, -2.183%, 0) scale(1.0098);
+  }
+  30% {
+    transform: translate3d(-2.126%, -1.126%, 0) scale(1.0225);
+  }
+  40% {
+    transform: translate3d(-0.681%, 0.319%, 0) scale(1.0398);
+  }
+  50% {
+    transform: translate3d(1%, 2%, 0) scale(1.06);
+  }
+  60% {
+    transform: translate3d(2.681%, 3.681%, 0) scale(1.0802);
+  }
+  70% {
+    transform: translate3d(4.126%, 5.126%, 0) scale(1.0975);
+  }
+  80% {
+    transform: translate3d(5.183%, 6.183%, 0) scale(1.1102);
+  }
+  90% {
+    transform: translate3d(5.803%, 6.803%, 0) scale(1.1176);
+  }
+  100% {
     transform: translate3d(6%, 7%, 0) scale(1.12);
   }
 }
