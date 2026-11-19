@@ -1,10 +1,12 @@
-import { useId, useState } from 'react';
+import { useId, useRef, useState } from 'react';
 import { useReducedMotion } from 'motion/react';
+import { usePauseOffscreen } from '../../hooks/usePauseOffscreen.js';
 import styles from './Logo.module.css';
 
 // The Ledgerling logo: an old Vietnamese coin, round outside and square inside, made of four glass L, plus the name
 // drawn as plain strokes, so no font is involved. Design notes: docs/brand/README.md. The word takes the CSS `color` of its parent.
 // It turns slowly all the time. The mouse opens it into its four L and spins it; a press tosses it (Logo.module.css).
+// Out of the window it stands still, so the GPU does not draw it for nobody (usePauseOffscreen).
 // size: the height of the mark in px. showName: false gives the mark alone.
 const WORDMARK_WIDTH = 120.1;
 const WORDMARK_PATH =
@@ -57,9 +59,12 @@ export default function Logo({ size = 32, showName = true }) {
   const id = useId();
   const reduced = useReducedMotion();
   const [tossing, setTossing] = useState(false);
+  const ref = useRef(null);
+  usePauseOffscreen(ref);
 
   return (
     <span
+      ref={ref}
       className={styles.logo}
       role="img"
       aria-label="Ledgerling"

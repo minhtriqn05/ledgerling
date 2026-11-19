@@ -172,14 +172,14 @@ The person picks **Light**, **Dark** or **System** in Settings > Appearance or t
 Library: `motion` (`motion/react`). One main curve, `--ease-out` `cubic-bezier(0.22, 0.61, 0.36, 1)` (plus `--ease-pop` for small "pop" moments), and three durations:
 `--duration-fast` 160ms (hover, press), `--duration-base` 240ms (menu pill, cards), `--duration-slow` 380ms (drawer).
 
-- **Aurora:** the three lights drift over 26–38 seconds, only `transform`, so it costs almost nothing.
+- **Aurora:** the three lights drift over 26–38 seconds. Each light is blurred inside a box that only moves (`transform`), so the blur is painted once (a blur on the moving box itself is computed again on every frame); the drift goes in steps of 1/30 s, a fraction of a pixel each, and it waits while the hero is out of the window (`hooks/usePauseOffscreen.js`). Measurements: `docs/review/performance.md`.
 - **Spotlight:** a soft light follows the mouse over a card (`hooks/useSpotlight.js` tells the card where the mouse is, once per frame; `[data-spot]`). Not on touch screens.
 - **Wallet card:** rises 3px, a shadow in its own color, and a band of light crosses it once.
 - **Page change:** the content fades in and rises 10px (`AppLayout`).
 - **Lists and cards:** a short stagger (`components/Motion/Reveal.jsx`); `onScroll` waits until it scrolls into view (landing page). The numbers of the hero count up (`CountUp.jsx`).
 - **Landing page:** the picture of the app lies back 16° and stands up while the page scrolls (`useScroll` + `useTransform`).
 - **Hover and press:** primary buttons rise 1px, cards 2px; pressing scales to 0.98. The + turns 90° on hover.
-- **Logo:** the coin turns once in 16s and a band of light crosses it every 6s. On hover or keyboard focus it flips once, tilts, opens into its four L, lights up inside and turns fast; nothing jumps when the mouse arrives or leaves. A press tosses it, and it lands with a ring and small square chips (`docs/brand/README.md`).
+- **Logo:** the coin turns once in 16s (in steps of 1/30 s) and a band of light crosses it every 6s (at the pace of a 60 Hz screen); out of the window both wait. On hover or keyboard focus it flips once, tilts, opens into its four L, lights up inside and turns fast; nothing jumps when the mouse arrives or leaves. A press tosses it, and it lands with a ring and small square chips (`docs/brand/README.md`).
 - **Menu:** the active pill is measured from the open link and slides between items, so it fits every language. The theme thumb slides too.
 - **Charts:** Recharts draws in 500ms; skeletons shimmer.
 - **Dialogs, drawer and toasts:** enter and leave with a fade and a small slide or scale, over a blurred page.

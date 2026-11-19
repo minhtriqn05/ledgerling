@@ -23,9 +23,11 @@
   border-radius: 0;
 }
 
+/* --blob-blur: the blur of each light (components/Aurora/Aurora.module.css) */
 .aurora > span {
+  --blob-blur: 100px;
+
   height: 620px;
-  filter: blur(100px);
 }
 
 .aurora > span:last-child {
@@ -175,9 +177,10 @@
   }
 
   .aurora > span {
+    --blob-blur: 64px;
+
     top: -150px;
     height: 300px;
-    filter: blur(64px);
   }
 
   .aurora > span:last-child {
