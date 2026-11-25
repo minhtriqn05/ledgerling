@@ -37,6 +37,15 @@ async function addFoodExpense(page, amount) {
   await expect(dialog).toBeHidden();
 }
 
+// Reloads the Transactions page and waits for its heading, not only for the bell: the bell belongs to the frame of the
+// app and shows before the page itself has loaded. A page.goto right after that left a page that was still starting,
+// and WebKit reported its start as another navigation, which stopped the page.goto ("interrupted by another
+// navigation": CI on 19 Nov 2026, and 13 runs in 15 in a Linux container).
+async function reloadTransactions(page) {
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'Transactions', level: 1 })).toBeVisible();
+}
+
 // Creates a budget in the current month on the Budgets page.
 async function addFoodBudget(page, amount) {
   await page.goto('/budgets');
@@ -94,7 +103,7 @@ test('budget passes 80% → the bell shows 1 → open it → mark as read; each 
   // 6. More spending below 100% does not notify again (80% was already reported)
   await addFoodExpense(page, 50000);
   expect(await unreadOnServer(page)).toBe(0);
-  await page.reload();
+  await reloadTransactions(page);
   await expect(bell(page)).toBeVisible();
 
   // 7. Passing 100% (850,000 + 200,000) notifies once, and more spending after that does not
@@ -138,7 +147,7 @@ test('a switch that is off creates no notification of that kind', async ({ page 
   await addFoodBudget(page, 1000000);
   await addFoodExpense(page, 900000);
   expect(await unreadOnServer(page)).toBe(0);
-  await page.reload();
+  await reloadTransactions(page);
   await expect(bell(page)).toBeVisible();
 
   // 4. The choice is kept after a reload; turn Budgets on again. The Notifications page is opened first: listing

@@ -1,6 +1,7 @@
-# After every new commit on main (a merged pull request): waits until Render runs that commit, checks that Vercel
-# answers, then runs `npm run test:e2e:live` on the live site (client/e2e/live/site.live.js). That test makes one
-# temporary account through the public API and deletes it at the end. No secrets are needed.
+# After every new commit on main (a merged pull request): waits until Render runs that commit and Vercel has deployed
+# it, checks that Vercel answers, then runs `npm run test:e2e:live` on the live site (client/e2e/live/site.live.js).
+# That test makes one temporary account through the public API and deletes it at the end. No secrets are needed: the
+# Vercel deploy is read from the commit status that Vercel's GitHub app sets, with the token GitHub gives every run.
 name: Live smoke
 
 on:
@@ -18,11 +19,16 @@ env:
   LIVE_APP_URL: https://ledgerling-ten.vercel.app
   LIVE_API_URL: https://ledgerling-api.onrender.com/api
 
+# Reads the code and the commit statuses, writes nothing
+permissions:
+  contents: read
+  statuses: read
+
 jobs:
   live:
     name: Live site
     runs-on: ubuntu-24.04
-    timeout-minutes: 35
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v5
         with:
@@ -49,6 +55,24 @@ jobs:
           echo "Render still does not run $GITHUB_SHA after 15 minutes"
           exit 1
 
+      # Vercel's GitHub app gives every commit of main a status named "Vercel": pending while it builds, then success
+      # (or failure). Without this wait the test could run on the version before, while Vercel was still building.
+      - name: Wait until Vercel has deployed this commit (15 minutes at most)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for attempt in $(seq 1 90); do
+            state=$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/statuses" --jq '[.[] | select(.context == "Vercel")][0].state // empty' || true)
+            case "$state" in
+              success) echo "Vercel has deployed $GITHUB_SHA"; exit 0 ;;
+              failure|error) echo "The Vercel deploy of $GITHUB_SHA failed ($state)"; exit 1 ;;
+            esac
+            echo "Attempt $attempt: Vercel status ${state:-not there yet}, waiting"
+            sleep 10
+          done
+          echo "Vercel has still not deployed $GITHUB_SHA after 15 minutes"
+          exit 1
+
       - name: Vercel answers 200
         run: |
           for attempt in $(seq 1 30); do
@@ -69,8 +93,18 @@ jobs:
           cache-dependency-path: client/package-lock.json
       - run: npm ci
         working-directory: client
-      - run: npx playwright install --with-deps chromium
+      # Same as in ci.yml: apt gives up on a silent Ubuntu mirror after 30 s, and the install is tried up to 3 times
+      - name: Install the Playwright browser (chromium)
         working-directory: client
+        timeout-minutes: 30
+        run: |
+          printf 'Acquire::Retries "5";\nAcquire::http::Timeout "30";\nAcquire::https::Timeout "30";\n' | sudo tee /etc/apt/apt.conf.d/99-ci-network > /dev/null
+          for attempt in 1 2 3; do
+            if timeout 8m npx playwright install --with-deps chromium; then exit 0; fi
+            echo "Attempt $attempt of the browser install failed, trying again in 20 s"
+            sleep 20
+          done
+          exit 1
       - run: npm run test:e2e:live
         working-directory: client
       - uses: actions/upload-artifact@v6

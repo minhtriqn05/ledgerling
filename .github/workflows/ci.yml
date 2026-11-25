@@ -60,7 +60,8 @@ jobs:
   e2e:
     name: End-to-end tests (${{ matrix.name }})
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    # About 20 minutes of tests, plus room for the retries of the browser install below
+    timeout-minutes: 60
     strategy:
       # One browser failing does not stop the other run
       fail-fast: false
@@ -90,7 +91,20 @@ jobs:
       # Playwright starts the API from /server (in-memory database), so its packages are needed too
       - run: npm ci
         working-directory: server
-      - run: npx playwright install --with-deps ${{ matrix.browsers }}
+      # The browsers and the Linux libraries they need (apt). An Ubuntu mirror that does not answer once kept apt
+      # waiting until the job ran out of its 45 minutes, and a half-updated package list once ended in 404s.
+      # apt now gives up on a silent mirror after 30 s and tries again; the whole install is tried up to 3 times,
+      # 8 minutes each at most. It still fails the job when the third try fails.
+      - name: Install the Playwright browsers (${{ matrix.browsers }})
+        timeout-minutes: 30
+        run: |
+          printf 'Acquire::Retries "5";\nAcquire::http::Timeout "30";\nAcquire::https::Timeout "30";\n' | sudo tee /etc/apt/apt.conf.d/99-ci-network > /dev/null
+          for attempt in 1 2 3; do
+            if timeout 8m npx playwright install --with-deps ${{ matrix.browsers }}; then exit 0; fi
+            echo "Attempt $attempt of the browser install failed, trying again in 20 s"
+            sleep 20
+          done
+          exit 1
       # Builds the app, starts the API and vite preview, then runs the tests (client/playwright.config.js)
       - run: npm run ${{ matrix.script }}
       # The report is only kept when a test failed, to see why
