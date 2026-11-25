@@ -62,6 +62,8 @@ test.describe('phone top bar', () => {
 });
 
 test('Recurring: the Active switch never covers the date of the next run, at 360 px in Vietnamese and German', { tag: '@smoke' }, async ({ page }) => {
+  // It measures every text of every rule in two languages, and the demo account has four rules: more time than usual
+  test.slow();
   await page.setViewportSize({ width: 360, height: 780 });
   await signInAsDemo(page);
   await page.goto('/recurring');

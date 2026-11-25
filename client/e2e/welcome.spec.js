@@ -123,15 +123,15 @@ test('the footer names the course class', async ({ page }) => {
   await expect(page.getByRole('contentinfo')).toContainText('UIT · CSBU109.R11.KHBC');
 });
 
-test('the demo account has 3 months of transactions, two rules and no hand-made Rent or Salary', async ({ page }) => {
+test('the demo account has 4 months of transactions up to today and four recurring rules', async ({ page }) => {
   await tryTheDemo(page);
   const token = await page.evaluate(() => localStorage.getItem('token'));
   const headers = { Authorization: `Bearer ${token}` };
 
   const all = await (await page.request.get(`${API_URL}/transactions?from=2000-01-01&limit=100`, { headers })).json();
-  expect(all.meta.total).toBeGreaterThanOrEqual(85);
+  expect(all.meta.total).toBeGreaterThanOrEqual(78);
   const rules = await (await page.request.get(`${API_URL}/recurring`, { headers })).json();
-  expect(rules.data.map((rule) => rule.category.name).sort()).toEqual(['Rent', 'Salary']);
+  expect(rules.data.map((rule) => rule.category.name).sort()).toEqual(['Entertainment', 'Rent', 'Salary', 'Tutoring']);
 });
 
 test('a signed-in user who opens /welcome stays there and sees Open app instead of Log in and Get started', async ({ page }) => {

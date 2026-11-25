@@ -316,9 +316,10 @@ landing page. The account is made by `cd server && npm run seed` (see below). It
 | 429 | `RATE_LIMITED` |
 | 503 | `"Demo account is not available"` (`DEMO_UNAVAILABLE`): the account has not been seeded on this server (or an admin disabled it) |
 
-The demo account is full of sample data (10 categories with icons, about 90 transactions in the current month and the two before,
-budgets of the current month with one over 100% and one over 80%, two monthly recurring rules Rent and Salary that make their own
-transactions, two savings goals, three templates and a few notifications). Everything else works as for any user, except three actions
+The demo account is full of sample data (14 categories with icons, 25-40 transactions a month over the current month and the three before,
+counted back from the day of the seed and never in the future; budgets of the current month with Food over 100% and two over 80%;
+four recurring rules (Salary, Rent and Spotify monthly, tutoring weekly) that make their own transactions; three savings goals at
+different stages, three wallets with transfers, three templates, tags and a few notifications). Everything else works as for any user, except three actions
 that would lock out the next visitor or destroy the account. They answer **403** `"Not available in the demo account"` (`DEMO_READ_ONLY`):
 `PATCH /users/me/password` (53), `POST /auth/logout-all` (54), `DELETE /users/me` (56), and `PATCH` / `DELETE /users/me/avatar` (61, 62): the demo account keeps one fixed avatar (`panda`).
 

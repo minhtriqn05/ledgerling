@@ -56,7 +56,7 @@ More detail lives in [docs/](docs/README.md): architecture, database, API, testi
 ## Try it in 30 seconds
 
 1. Open **https://ledgerling-ten.vercel.app**.
-2. Click **Try the demo**. No sign-up: you land in a shared account with three months of sample data
+2. Click **Try the demo**. No sign-up: you land in a shared account with four months of sample data
    (transactions, budgets, goals, wallets, recurring rules, notifications).
 3. Look around: add a transaction with `N`, open the command palette with `Ctrl+K`, switch the theme or the language.
 
