@@ -17,6 +17,7 @@ import { useTheme } from '../../context/ThemeContext.jsx';
 import { cssVar } from '../../utils/cssVar.js';
 import { formatCompact, formatVnd } from '../../utils/format.js';
 import { tooltipLeft } from '../../utils/chartTooltip.js';
+import { useMediaQuery } from '../../hooks/useMediaQuery.js';
 import styles from './DashboardCharts.module.css';
 
 // The two charts of the Dashboard, in the style of docs/ui-style.md §9.
@@ -105,13 +106,19 @@ export function ChartTooltip({ active, payload, label, hideLabel = false, coordi
   );
 }
 
+// A screen without hover: a phone or a tablet, used with a finger
+const TOUCH_SCREEN = '(hover: none)';
+
 // Share of spending per category: a ring of rounded segments with small gaps, the total in the middle.
 // data: [{ name, color (hex of the category), total }]
+// The card of a segment follows the mouse over the segment. With a finger it opens on a tap (trigger "click"): right
+// after a tap Chrome moves its idea of the mouse away from the segment, and the card of a hover went away again at once.
 export function CategoryDonut({ data, total }) {
   const { t } = useTranslation();
   const animate = !useReducedMotion();
   const pieData = data.map((c) => ({ ...c, fill: c.color }));
   const [chartRef, tooltipActive] = useTapAway();
+  const touch = useMediaQuery(TOUCH_SCREEN);
 
   return (
     <div ref={chartRef} className={styles.donut} role="img" aria-label={t('dashboard.donutLabel', { total: formatVnd(total) })}>
@@ -132,7 +139,7 @@ export function CategoryDonut({ data, total }) {
             animationDuration={500}
             animationEasing="ease-out"
           />
-          <Tooltip {...TOOLTIP_PROPS} active={tooltipActive} content={<ChartTooltip hideLabel center />} />
+          <Tooltip {...TOOLTIP_PROPS} trigger={touch ? 'click' : 'hover'} active={tooltipActive} content={<ChartTooltip hideLabel center />} />
         </PieChart>
       </ResponsiveContainer>
       <div className={styles.donutCenter}>
